@@ -1,0 +1,66 @@
+H2T 通道掩码粒度：下一轮最小科学迭代 / Codex 执行指令
+日期：2026-10-15
+代码分支：experiment/h2t-mask-selection-causal-20261015
+本文件只描述科学实验与本地代码执行。禁止设计、建议或执行任何 Git 操作：不得使用 git、gh、GitHub API、push、pull、fetch、checkout、branch、commit、merge、rebase、PR 等。所有版本控制、仓库同步由用户本人操作。本次 Codex 任务仅在用户已经准备好的本地工作目录中执行。
+
+【科学问题】
+原始 H2T 4D 分支按 minibatch 共享 16/64 通道掩码；我们现有受控 Clean 数据只比较 Uniform-PerSample 与 Low-VS，所以“随机通道选择有缺陷”仍无法成立。
+此轮优先拆分两个效应：
+A：minibatch 掩码共享 vs 每个样本独立随机；
+B：Uniform-PerSample vs 有 VS 的 Low-VS。
+更好地识别共享随机化效应后，再决定是否做扰动强度匹配。
+
+【预先固定实验】
+数据 CIFAR-100-LT IF100；一套已有 Clean Stage I seed42 epoch184（SHA256 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88）；固定 BN / backbone；仅分类器训练；10 epochs；batch128；16/64 完整特征图通道替换；SGD lr0.1 momentum0.9 wd0.0005；固定 epoch10 主结果，best epoch 只做敏感性分析。
+Stage II seed124、125（这一轮只新增 Uniform-BatchShared 两次训练）。已有 Uniform-PerSample 和 Low-VS 控制组直接复用其当次封存结果，不重复跑；seed123作为独立历史 pilot 报告，不混算新实验统计。
+三臂：
+1 Uniform-BatchShared：对于每一真实 minibatch，用“第一个样本的 Uniform Gumbel 16 通道”扩展至全 minibatch。这精确模拟原始 H2T 的 batch 共用粒度，但不模拟原始 torch.randperm 的 RNG 路径；应称 original-like mask granularity，不可称完全官方原始复现。
+2 Uniform-PerSample：已有对照，每个样本 Uniform16/64。
+3 Low-VS：已有对照，每个样本从 Bottom48 中 Uniform16；保持供体 n<20 时 fallback 等旧规则。
+保持 BS 接收样本序列、IS 供体序列、图像增强、初始分类器、学习率等不变。每 batch 与旧 Uniform 控制的 13 个字段逐一核查完全一致。BN 不更新，backbone 不反传。
+验证集 1980 张原始 TRAIN 留出（类别1..99，每类20，class0无）；输出100 logits；禁止官方 TEST 数据、TEST 选模或另造测试集。
+
+【现有代码】
+H2T_repro_audit/mask_granularity_iteration/mask_policy.py
+H2T_repro_audit/mask_granularity_iteration/run_mask_granularity.py
+源实验（本轮只读）：
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/
+脚本从本地原实验导入已有模型构建、采样方案、online_masks、特征融合、类别指标，不重复实现这套方法。不要修改源实验任何文件。
+
+【第一步：只做静态审查和 preflight，不训练】
+先审查 run_mask_granularity.py 是否能在本地项目目录内运行。
+特别核对 import 路径、torch/cuda 运行、dataset 路径、checkpoint 存在性、统计文件、旧 control 的 850 batch CSV 和验证 npz、官方 TEST guard。
+检查原目录是否确实包含未上传 GitHub 的大文件：locked/clean_stage1_best.pth、train_images.npy、train_labels.npy、validation_feature_maps.npy、validation_labels.npy、plans/124 和125 的 Gumbel 与方案等。
+然后运行：
+python H2T_repro_audit/mask_granularity_iteration/run_mask_granularity.py preflight
+不通过则修复本分支新增文件中的真实 bug，重新 preflight；严禁为通过而放松证据条件、删除配对校验、伪造或重建历史模型/历史控制数据。缺历史文件直接停止，报告缺项并等待用户提供或恢复；不许自作主张重跑 Stage I/旧 baseline。
+检查每个 step 的状态与日志输出最终写入新目录 results/，不能覆盖旧实验文件。若脚本的 audit / CSV 等仍会写旧目录，必须修复。
+
+【第二步：正式训练】
+严格执行且只执行下面两次（不要无限扩展）：
+python H2T_repro_audit/mask_granularity_iteration/run_mask_granularity.py train --seed 124
+python H2T_repro_audit/mask_granularity_iteration/run_mask_granularity.py train --seed 125
+训练后每 seed 应有 10 epochs、850 更新、actual_masks.npz、epoch_validation_metrics.csv、validation_epoch01..10.npz、best/final ckpt、summary.json。
+任何训练失败要停止、排查，不能悄悄覆写中途文件（目录存在时脚本拒绝覆写）。如需清除失败运行，仅在明确征得用户同意后清理指定新实验失败输出目录；不要改动历史资料。
+
+【第三步：自动汇总】
+python H2T_repro_audit/mask_granularity_iteration/run_mask_granularity.py report
+应输出 results/all_three_epoch10.csv 和 results/paired_differences.csv。
+固定第10epoch表格列：seed×三策略、Overall/Head/Medium/Tail/Many/Few/Macro、best_epoch和best_Overall。谨慎说明 OfficialMedium 与 Many/Medium/Few 定义不同。
+逐图配对计数：shared vs per-sample、shared vs Low-VS 的 wrong->right、right->wrong、净差、Tail 净变化，且结果与准确率差严格一致（1980张）。
+记录各策略的 mask overlap / 选通道次数以及 batch 共享掩码带来的跨样本相关性；可以用输出的 actual_masks 和旧 sampling masks 离线分析，不要新增训练。
+报告两个 seeds 各自结果、均值及变化方向，不宣称 n=2 显著；不能与 seed123 混作 n=3 全同协议。
+注意：同一验证样本多次出现，别直接把两个 seed 的 3960 样本当作独立观测。class0 缺失，不能称官方100类 TEST 性能。
+
+【成功/失败判据（预注册，不准跑完后更改）】
+(1) 若 PerSample > Shared，而 Low-VS > PerSample（总体或重点 Tail/Few），则两种因素都有贡献的初步证据；不过若 Head 损失和 model-best 不稳定，也不能宣称全面获益。
+(2) 若 Shared≈PerSample，而 Low-VS > PerSample，则主要线索是 VS 池选择；但也需控制真实替换偏移强度。
+(3) 若 Shared > PerSample，则“逐样本随机更好”假设被否定，应重新讨论不同粒度所引入的相关性。
+(4) 任意方案出现跨 seed 变号或 best epoch 反转，必须如实写出。
+差值小于一张验证图像（Overall 0.0505pp）或者小于少数类一张样本引起的增益时，不许夸大结论。
+如果本轮发现选择策略只改变扰动范数/统计幅度，则下轮才做 Low-VS/Uniform 的 norm-matched 机制消融，本轮不追加其他模型或更复杂模块。
+
+【最后交付】
+给出中文科学报告 MASK_GRANULARITY_RESULTS.md（本地新实验目录），必须包含：准确命题、协议区别、所有失败/异常、旧控制配对校验、数据泄漏防护、epoch10+best对照、Tail得失、下一轮唯一最值得做的实验和停止条件。
+把完整 stdout 关键信息、错误栈和文件相对路径列出；如果有 GPU/环境限制，说明真实缺口，绝不编造数值。
+最后停止并请用户把所有相关结果上传/提供给 ChatGPT 复核。不得自动继续跑其他 seeds、Stage I、官方 TEST，不得执行任何版本控制操作。
