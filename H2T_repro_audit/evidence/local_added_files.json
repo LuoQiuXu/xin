@@ -1,0 +1,60 @@
+{
+  "H2T": {
+    "added_sources_and_reports": [
+      "BALANCED_REFERENCE_EXPERIMENT_REPORT.md",
+      "DONOR_SELECTION_REPORT.md",
+      "FULL_STAGE2_BOUNDARY_REPORT.md",
+      "MINIVAL_REPORT.md",
+      "PI_H2T_BPCF_BALANCED_REFERENCE_STRICT_REPORT.md",
+      "PI_H2T_BPCF_UNIFIED_MARGIN_SEED42_REPORT.md",
+      "PI_H2T_CENTER_VS_BOUNDARY_R_SEED42_REPORT.md",
+      "PI_H2T_DONOR_SELECTION_VALIDATION.md",
+      "PI_H2T_OOF_CONTROLLED_CROSSING_SEED42_REPORT.md",
+      "PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md",
+      "PI_H2T_PURE_CENTER_VS_BOUNDARY_R_SEED42_REPORT.md",
+      "PI_H2T_RATIO_ONLY_CE_MULTISEED_REPORT.md",
+      "PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md",
+      "PI_H2T_RATIO_ONLY_PROTOCOL.md",
+      "PI_H2T_RATIO_ONLY_SEED42_REPORT.md",
+      "RISK_AWARE_SUPERVISION_REPORT.md",
+      "analyze_hardest_safe_availability.py",
+      "analyze_relative_hardest_safe_by_group.py",
+      "audit_multiboundary_geometry.py",
+      "audit_pif_cosine_ratio.py",
+      "compare_reference_external_risk.py",
+      "config/cifar100/cifar100_imb001_stage1_ce_mixup_pif.yaml",
+      "config/cifar100/cifar100_imb001_stage1_ce_mixup_pif_off_matched.yaml",
+      "export_cifar100_minival_features.py",
+      "export_minival_pairs_from_archive.py",
+      "fusion_risk_minival.py",
+      "summarize_fusion_risk_minival.py",
+      "train_balanced_reference_head.py",
+      "train_boundary_h2t_stage2.py",
+      "train_center_boundary_r_stage2.py",
+      "train_cifar100_stage1_minival.py",
+      "train_donor_selection_stage2.py",
+      "train_fixed_feature_stage2.py",
+      "train_oof_balanced_reference.py",
+      "train_oof_controlled_crossing_stage2.py",
+      "train_pi_h2t_ratio_only_stage2.py"
+    ],
+    "ratio_detach_hits": []
+  },
+  "H2T_official_clean": {
+    "added_sources_and_reports": [
+      "aggregate_h2t_calibration_sweep.py",
+      "analyze_h2t_donor_predictability.py",
+      "audit_h2t_calibration.py",
+      "audit_h2t_direction_groups.py",
+      "audit_h2t_direction_multiseed.py",
+      "audit_h2t_direction_selectors.py",
+      "audit_h2t_instance_top10.py",
+      "audit_h2t_real_shuffled_holdout.py",
+      "audit_h2t_transfer_oracle.py",
+      "swap_backbone_classifier.py",
+      "train_h2t_diversity_pilot.py",
+      "train_h2t_selected_donors.py"
+    ],
+    "ratio_detach_hits": []
+  }
+}

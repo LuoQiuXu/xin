@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "official_manifest_file_count": 48,
+  "official_manifest_all_match": true,
+  "identical_runtime_files": [
+    "methods.py",
+    "datasets/cifar100.py",
+    "loss.py",
+    "utils/logger.py",
+    "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+    "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml"
+  ],
+  "train_validate_scheduler_AST_unchanged": true,
+  "training_and_eval_entrypoints_only_change_checkpoint_loading": true,
+  "log_metrics_match_independent_count": {
+    "stage1": {
+      "overall": 3.58,
+      "head": 9.917,
+      "medium": 0.029,
+      "tail": 0.0
+    },
+    "stage2": {
+      "overall": 5.15,
+      "head": 9.556,
+      "medium": 4.086,
+      "tail": 0.966
+    },
+    "eval": {
+      "overall": 5.15,
+      "head": 9.556,
+      "medium": 4.086,
+      "tail": 0.966
+    }
+  },
+  "stage2_eval_correct_per_class_identical": true,
+  "stage2_loaded_exact_stage1_audit_checkpoint": true,
+  "formal_config_parse_pass": true,
+  "formal_training_executed_during_command_check": false,
+  "complete_training_epochs_executed": {
+    "stage1": 1,
+    "stage2": 1
+  },
+  "full_training_started": false
+}

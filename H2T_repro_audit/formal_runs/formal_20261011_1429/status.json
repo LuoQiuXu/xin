@@ -1,0 +1,13 @@
+{
+  "state": "failed",
+  "pid": 2388,
+  "run_name": "cifar100_imb001_stage1_ce_mixup_formal_20261011_1429",
+  "started_at": "2026-10-11T14:28:04+0800",
+  "completed_epochs": 0,
+  "checkpoint_load_calls": [],
+  "epochs": [],
+  "error": "Traceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\新\\H2T_repro_audit\\formal_stage1.py\", line 275, in run\n    original.main()\n  File \"D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\train_stage1.py\", line 64, in main\n    args = parse_args()\n           ^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\新\\H2T_repro_audit\\formal_stage1.py\", line 193, in parse\n    args = real_parse()\n           ^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\train_stage1.py\", line 53, in parse_args\n    update_config(config, args)\n  File \"D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\utils\\logger.py\", line 100, in update_config\n    cfg.merge_from_list(args.opts)\n  File \"D:\\app\\anaconda\\envs\\pytorch\\Lib\\site-packages\\yacs\\config.py\", line 223, in merge_from_list\n    _assert_with_logging(\n  File \"D:\\app\\anaconda\\envs\\pytorch\\Lib\\site-packages\\yacs\\config.py\", line 545, in _assert_with_logging\n    assert cond, msg\n           ^^^^\nAssertionError: Override list has odd length: ['train_stage1.py', '--cfg', 'config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml', 'data_path', 'D:\\\\xiangmuxunlian\\\\新\\\\H2T\\\\data\\\\cifar100', 'resume', \"''\", 'name', 'cifar100_imb001_stage1_ce_mixup_formal_20261011_1429']; it must be a list of pairs\n",
+  "finished_at": "2026-10-11T14:28:04+0800",
+  "elapsed_seconds": 0.05792500008828938,
+  "gpu_global_peak_sampled_mib": 1071.0
+}

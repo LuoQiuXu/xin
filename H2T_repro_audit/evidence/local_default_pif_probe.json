@@ -1,0 +1,6 @@
+{
+  "pif_active_default": true,
+  "backbone": "resnet32_fe",
+  "default_local_stage1_model_setup": "fail",
+  "error": "Traceback (most recent call last):\n  File \"<string>\", line 3, in <module>\n  File \"D:\\xiangmuxunlian\\\u65b0\\H2T\\models\\resnet_cifar.py\", line 154, in set_pif_active\n    raise ValueError(\"cannot activate PIF on a backbone without PIF parameters\")\nValueError: cannot activate PIF on a backbone without PIF parameters\n"
+}

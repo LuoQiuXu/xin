@@ -1,0 +1,326 @@
+{
+  "H2T": [
+    {
+      "path": "README.md",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb0005_stage1_ce_mixup.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb0005_stage2_ce_H2T.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb002_stage1_ce_mixup.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb002_stage2_ce_H2T.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/cifar10.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/cifar100.py",
+      "status": "modified"
+    },
+    {
+      "path": "datasets/imagenet.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/ina2018.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/places.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/sampler.py",
+      "status": "identical"
+    },
+    {
+      "path": "eval-modifed.py",
+      "status": "identical"
+    },
+    {
+      "path": "loss.py",
+      "status": "identical"
+    },
+    {
+      "path": "methods.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/resnet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/resnet_cifar.py",
+      "status": "modified"
+    },
+    {
+      "path": "models/resnet_places.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/EAResNeXt.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/EAResNet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/RIDEResNeXt.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/RIDEResNet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/ResNeXt.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/ResNet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/__init__.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet_places.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/loss.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/metric.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/model.py",
+      "status": "identical"
+    },
+    {
+      "path": "train_stage1.py",
+      "status": "modified"
+    },
+    {
+      "path": "train_stage2.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/Unzip.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/__init__.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/logger.py",
+      "status": "modified"
+    },
+    {
+      "path": "utils/meter.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/metric.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/util.py",
+      "status": "modified"
+    }
+  ],
+  "H2T_official_clean": [
+    {
+      "path": "README.md",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb0005_stage1_ce_mixup.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb0005_stage2_ce_H2T.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb002_stage1_ce_mixup.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "config/cifar100/cifar100_imb002_stage2_ce_H2T.yaml",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/cifar10.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/cifar100.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/imagenet.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/ina2018.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/places.py",
+      "status": "identical"
+    },
+    {
+      "path": "datasets/sampler.py",
+      "status": "identical"
+    },
+    {
+      "path": "eval-modifed.py",
+      "status": "identical"
+    },
+    {
+      "path": "loss.py",
+      "status": "identical"
+    },
+    {
+      "path": "methods.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/resnet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/resnet_cifar.py",
+      "status": "modified"
+    },
+    {
+      "path": "models/resnet_places.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/EAResNeXt.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/EAResNet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/RIDEResNeXt.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/RIDEResNet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/ResNeXt.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/ResNet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/fb_resnets/__init__.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet_places.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/loss.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/metric.py",
+      "status": "identical"
+    },
+    {
+      "path": "models/ride_model/model.py",
+      "status": "identical"
+    },
+    {
+      "path": "train_stage1.py",
+      "status": "identical"
+    },
+    {
+      "path": "train_stage2.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/Unzip.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/__init__.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/logger.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/meter.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/metric.py",
+      "status": "identical"
+    },
+    {
+      "path": "utils/util.py",
+      "status": "identical"
+    }
+  ]
+}

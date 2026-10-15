@@ -1,0 +1,8 @@
+{
+  "verified_at": "2026-10-14T14:08:08+08:00",
+  "receivers_equal": true,
+  "donors_equal": true,
+  "Gumbel_float64_equal": true,
+  "seed123_training_executed": false,
+  "only_input_reconstruction": true
+}

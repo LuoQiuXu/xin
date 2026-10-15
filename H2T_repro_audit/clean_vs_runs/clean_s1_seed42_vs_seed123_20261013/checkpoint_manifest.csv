@@ -1,0 +1,7 @@
+arm,kind,path,epoch,sha256
+Uniform-PerSample,best,D:\xiangmuxunlian\新\H2T_repro_audit\clean_vs_runs\clean_s1_seed42_vs_seed123_20261013\arms\Uniform-PerSample\checkpoints\model_best.pth.tar,3,0ee67f8bd3bcfeaf3e991fc5b97882e5524712a750390af6fa966d92c096d76d
+Uniform-PerSample,final,D:\xiangmuxunlian\新\H2T_repro_audit\clean_vs_runs\clean_s1_seed42_vs_seed123_20261013\arms\Uniform-PerSample\checkpoints\model_final.pth.tar,10,9b14053acdfc9b04036da629d133d0fa69cc2197d623348aa8b5821e73fe52c1
+High-VS,best,D:\xiangmuxunlian\新\H2T_repro_audit\clean_vs_runs\clean_s1_seed42_vs_seed123_20261013\arms\High-VS\checkpoints\model_best.pth.tar,9,a88ef0e4ffe3f58f8a50f39acc85a94efe9b7258bb88b595ba7976ab5eab8a5d
+High-VS,final,D:\xiangmuxunlian\新\H2T_repro_audit\clean_vs_runs\clean_s1_seed42_vs_seed123_20261013\arms\High-VS\checkpoints\model_final.pth.tar,10,87b8804d1bd1c67068657b2186d2ef3ce414c5891c56bfe28e2fbf6d6b0ac727
+Low-VS,best,D:\xiangmuxunlian\新\H2T_repro_audit\clean_vs_runs\clean_s1_seed42_vs_seed123_20261013\arms\Low-VS\checkpoints\model_best.pth.tar,9,56668ccb641e6d5682123cd4a7dcdede896777870ee819f9acf20fdf130551f9
+Low-VS,final,D:\xiangmuxunlian\新\H2T_repro_audit\clean_vs_runs\clean_s1_seed42_vs_seed123_20261013\arms\Low-VS\checkpoints\model_final.pth.tar,10,1cb077ba6ccbda645b1026d6851f93f29bc9cd1bf1a27230aaca3997ff9cd82b

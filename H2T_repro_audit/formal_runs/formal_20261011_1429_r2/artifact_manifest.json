@@ -1,0 +1,230 @@
+{
+  "run_id": "formal_20261011_1429_r2",
+  "files": {
+    "artifact_verification.json": {
+      "bytes": 7140,
+      "sha256": "f6a1b6747ae8f3e3691c8c3c6a0967de6ac9a87640bdcfd8a1616b84779508b1"
+    },
+    "best_evaluation.json": {
+      "bytes": 3859,
+      "sha256": "d6cd03573ab2c994930903d23bca89362e96ca9bd1d689ff0842afa5b5a391dd"
+    },
+    "best_evaluation.official.log": {
+      "bytes": 2493,
+      "sha256": "82f7f776f767ffb86ab44f703defafa4a6adf373ac899823105c2e6df4af025f"
+    },
+    "compatibility.diff": {
+      "bytes": 3401,
+      "sha256": "4b0f28d3e5368f246940a67bd79dc874a868714ebd6c05f2cb6ffb322527e5ba"
+    },
+    "effective.yaml": {
+      "bytes": 1405,
+      "sha256": "a8e39acc6d7a18afe6a7f04688f70bca1f9382f6c0a80cbb27d83c9ba0f0c73e"
+    },
+    "epochs.csv": {
+      "bytes": 33588,
+      "sha256": "8794786aecc73cfd655c09c8181f3e631d9a0302eccbd03513602956c4e1decf"
+    },
+    "finalize_completed_stage1.py": {
+      "bytes": 2900,
+      "sha256": "b6ffd953397849f5517a8b471b6473c5be021a8ac71daee2b656b1e9ba309a10"
+    },
+    "final_evaluation.json": {
+      "bytes": 3856,
+      "sha256": "e11ae467adb1f1e2061ec82c013ae4673c49efe45fbe8902e335c3ea61bfb3b2"
+    },
+    "final_evaluation.official.log": {
+      "bytes": 2499,
+      "sha256": "64b33f3f1687024e4ee0c986117995fb1bb4cb9ef997620807e1807538a2dd70"
+    },
+    "formal_stage1.py": {
+      "bytes": 15798,
+      "sha256": "edb7ea04c5f335e9465e07bca2263d84cd5f65de0a50322b89289734b84b7f4e"
+    },
+    "formal_stage1_after_run_fix.py": {
+      "bytes": 16337,
+      "sha256": "279ef0193e991c6ed43cce7d28f714a43eb8a4fd572058b2969be36096d93e06"
+    },
+    "gpu_samples.jsonl": {
+      "bytes": 45803,
+      "sha256": "f75e16df71460760e3ff2980d424e59d73123c662e7828f888d0242ed7a2f724"
+    },
+    "H2T_DR_COMPARISON_PLAN.md": {
+      "bytes": 10428,
+      "sha256": "99262baf53a94315c3d3aa2795ecc311f3e5c908164b349499353d36951f8826"
+    },
+    "H2T_STAGE1_RESULTS.md": {
+      "bytes": 10916,
+      "sha256": "27a070f636c9f9154ab019845909ec385ca10519baddbc91679dd5b04b1ffdd7"
+    },
+    "nvidia_smi_preflight.txt": {
+      "bytes": 2918,
+      "sha256": "8353952a4424d7b72cb36497c35dbcb7fb6f7e11ec5469287e206e6d68c6e78e"
+    },
+    "original.yaml": {
+      "bytes": 665,
+      "sha256": "96b8b504a44c194ba3c06a70e4691f71c73e3192af084674ad50b329c0fe7c5b"
+    },
+    "preflight.json": {
+      "bytes": 8324,
+      "sha256": "f981f0127f8724d35f37383105975fcbeb8586f8fc1fc1a88807940d24bfc0cd"
+    },
+    "report_formal_stage1.py": {
+      "bytes": 12588,
+      "sha256": "ac53039a6b5a85bfcd766c8771b6514e5680440ec0656e34077cc340b8897993"
+    },
+    "requirements-repro.txt": {
+      "bytes": 284,
+      "sha256": "fda5ffa4c7752bb597e7fa1cc740258e88ee1e99da9f184027a970bebdd14644"
+    },
+    "runtime_manifest.json": {
+      "bytes": 5469,
+      "sha256": "8cc414019f0b320cd01ee193d92d5c11a04a9671e0303a18780f83d13a0d6f06"
+    },
+    "source_manifest.json": {
+      "bytes": 7334,
+      "sha256": "56fbd74d4b85d9afa081c694b42eda4b657ebac4ca3041e25182757cf3bd1bbe"
+    },
+    "status.json": {
+      "bytes": 141673,
+      "sha256": "48cfd7e4d0abf72a6a039d644b39d55e63c49548e5a7e8b69041c5140e694cd1"
+    },
+    "status_before_finalize_recovery.json": {
+      "bytes": 140596,
+      "sha256": "5b12e7bd3e46b120ef8a179fa42322428cf5c813559c86a7e83d61c8a34125c3"
+    },
+    "stdout_stderr.log": {
+      "bytes": 146314,
+      "sha256": "d5dafdbf882d8f655943b03ff151a46c2bde77862af0a16604ac20820242551b"
+    },
+    "verify_formal_stage1.py": {
+      "bytes": 8438,
+      "sha256": "75ac081619dbf0ae1cabec142c7ab62ed14f42d297416ed624688604108e61a9"
+    }
+  },
+  "checkpoints": {
+    "model_best.pth.tar": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\saved\\cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428\\ckps\\model_best.pth.tar",
+      "sha256": "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e",
+      "bytes": 1954577,
+      "epoch": 198,
+      "best_acc1_percent": 40.48999786376953,
+      "all_state_tensors_finite": true,
+      "bn_counts": {
+        "module.bn1.num_batches_tracked": 16830,
+        "module.layer1.0.bn1.num_batches_tracked": 16830,
+        "module.layer1.0.bn2.num_batches_tracked": 16830,
+        "module.layer1.1.bn1.num_batches_tracked": 16830,
+        "module.layer1.1.bn2.num_batches_tracked": 16830,
+        "module.layer1.2.bn1.num_batches_tracked": 16830,
+        "module.layer1.2.bn2.num_batches_tracked": 16830,
+        "module.layer1.3.bn1.num_batches_tracked": 16830,
+        "module.layer1.3.bn2.num_batches_tracked": 16830,
+        "module.layer1.4.bn1.num_batches_tracked": 16830,
+        "module.layer1.4.bn2.num_batches_tracked": 16830,
+        "module.layer2.0.bn1.num_batches_tracked": 16830,
+        "module.layer2.0.bn2.num_batches_tracked": 16830,
+        "module.layer2.1.bn1.num_batches_tracked": 16830,
+        "module.layer2.1.bn2.num_batches_tracked": 16830,
+        "module.layer2.2.bn1.num_batches_tracked": 16830,
+        "module.layer2.2.bn2.num_batches_tracked": 16830,
+        "module.layer2.3.bn1.num_batches_tracked": 16830,
+        "module.layer2.3.bn2.num_batches_tracked": 16830,
+        "module.layer2.4.bn1.num_batches_tracked": 16830,
+        "module.layer2.4.bn2.num_batches_tracked": 16830,
+        "module.layer3.0.bn1.num_batches_tracked": 16830,
+        "module.layer3.0.bn2.num_batches_tracked": 16830,
+        "module.layer3.1.bn1.num_batches_tracked": 16830,
+        "module.layer3.1.bn2.num_batches_tracked": 16830,
+        "module.layer3.2.bn1.num_batches_tracked": 16830,
+        "module.layer3.2.bn2.num_batches_tracked": 16830,
+        "module.layer3.3.bn1.num_batches_tracked": 16830,
+        "module.layer3.3.bn2.num_batches_tracked": 16830,
+        "module.layer3.4.bn1.num_batches_tracked": 16830,
+        "module.layer3.4.bn2.num_batches_tracked": 16830
+      }
+    },
+    "current.pth.tar": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\saved\\cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428\\ckps\\current.pth.tar",
+      "sha256": "0bbc992651b358cd7ab7a89466dbfbbd405ad1f1c459461840e3bf1ffd259a55",
+      "bytes": 1954577,
+      "epoch": 200,
+      "best_acc1_percent": 40.48999786376953,
+      "all_state_tensors_finite": true,
+      "bn_counts": {
+        "module.bn1.num_batches_tracked": 17000,
+        "module.layer1.0.bn1.num_batches_tracked": 17000,
+        "module.layer1.0.bn2.num_batches_tracked": 17000,
+        "module.layer1.1.bn1.num_batches_tracked": 17000,
+        "module.layer1.1.bn2.num_batches_tracked": 17000,
+        "module.layer1.2.bn1.num_batches_tracked": 17000,
+        "module.layer1.2.bn2.num_batches_tracked": 17000,
+        "module.layer1.3.bn1.num_batches_tracked": 17000,
+        "module.layer1.3.bn2.num_batches_tracked": 17000,
+        "module.layer1.4.bn1.num_batches_tracked": 17000,
+        "module.layer1.4.bn2.num_batches_tracked": 17000,
+        "module.layer2.0.bn1.num_batches_tracked": 17000,
+        "module.layer2.0.bn2.num_batches_tracked": 17000,
+        "module.layer2.1.bn1.num_batches_tracked": 17000,
+        "module.layer2.1.bn2.num_batches_tracked": 17000,
+        "module.layer2.2.bn1.num_batches_tracked": 17000,
+        "module.layer2.2.bn2.num_batches_tracked": 17000,
+        "module.layer2.3.bn1.num_batches_tracked": 17000,
+        "module.layer2.3.bn2.num_batches_tracked": 17000,
+        "module.layer2.4.bn1.num_batches_tracked": 17000,
+        "module.layer2.4.bn2.num_batches_tracked": 17000,
+        "module.layer3.0.bn1.num_batches_tracked": 17000,
+        "module.layer3.0.bn2.num_batches_tracked": 17000,
+        "module.layer3.1.bn1.num_batches_tracked": 17000,
+        "module.layer3.1.bn2.num_batches_tracked": 17000,
+        "module.layer3.2.bn1.num_batches_tracked": 17000,
+        "module.layer3.2.bn2.num_batches_tracked": 17000,
+        "module.layer3.3.bn1.num_batches_tracked": 17000,
+        "module.layer3.3.bn2.num_batches_tracked": 17000,
+        "module.layer3.4.bn1.num_batches_tracked": 17000,
+        "module.layer3.4.bn2.num_batches_tracked": 17000
+      }
+    },
+    "model_final.pth.tar": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\saved\\cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428\\ckps\\model_final.pth.tar",
+      "sha256": "0bbc992651b358cd7ab7a89466dbfbbd405ad1f1c459461840e3bf1ffd259a55",
+      "bytes": 1954577,
+      "epoch": 200,
+      "best_acc1_percent": 40.48999786376953,
+      "all_state_tensors_finite": true,
+      "bn_counts": {
+        "module.bn1.num_batches_tracked": 17000,
+        "module.layer1.0.bn1.num_batches_tracked": 17000,
+        "module.layer1.0.bn2.num_batches_tracked": 17000,
+        "module.layer1.1.bn1.num_batches_tracked": 17000,
+        "module.layer1.1.bn2.num_batches_tracked": 17000,
+        "module.layer1.2.bn1.num_batches_tracked": 17000,
+        "module.layer1.2.bn2.num_batches_tracked": 17000,
+        "module.layer1.3.bn1.num_batches_tracked": 17000,
+        "module.layer1.3.bn2.num_batches_tracked": 17000,
+        "module.layer1.4.bn1.num_batches_tracked": 17000,
+        "module.layer1.4.bn2.num_batches_tracked": 17000,
+        "module.layer2.0.bn1.num_batches_tracked": 17000,
+        "module.layer2.0.bn2.num_batches_tracked": 17000,
+        "module.layer2.1.bn1.num_batches_tracked": 17000,
+        "module.layer2.1.bn2.num_batches_tracked": 17000,
+        "module.layer2.2.bn1.num_batches_tracked": 17000,
+        "module.layer2.2.bn2.num_batches_tracked": 17000,
+        "module.layer2.3.bn1.num_batches_tracked": 17000,
+        "module.layer2.3.bn2.num_batches_tracked": 17000,
+        "module.layer2.4.bn1.num_batches_tracked": 17000,
+        "module.layer2.4.bn2.num_batches_tracked": 17000,
+        "module.layer3.0.bn1.num_batches_tracked": 17000,
+        "module.layer3.0.bn2.num_batches_tracked": 17000,
+        "module.layer3.1.bn1.num_batches_tracked": 17000,
+        "module.layer3.1.bn2.num_batches_tracked": 17000,
+        "module.layer3.2.bn1.num_batches_tracked": 17000,
+        "module.layer3.2.bn2.num_batches_tracked": 17000,
+        "module.layer3.3.bn1.num_batches_tracked": 17000,
+        "module.layer3.3.bn2.num_batches_tracked": 17000,
+        "module.layer3.4.bn1.num_batches_tracked": 17000,
+        "module.layer3.4.bn2.num_batches_tracked": 17000
+      }
+    }
+  }
+}

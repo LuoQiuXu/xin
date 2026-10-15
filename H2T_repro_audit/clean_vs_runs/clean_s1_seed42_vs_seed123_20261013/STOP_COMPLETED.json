@@ -1,0 +1,17 @@
+{
+  "completed_at": "2026-10-13T22:11:02+08:00",
+  "StageI_seed": 42,
+  "StageI_epochs": 200,
+  "StageII_seeds": [
+    123
+  ],
+  "StageII_arms": [
+    "Uniform-PerSample",
+    "High-VS",
+    "Low-VS"
+  ],
+  "epochs_each": 10,
+  "updates_each": 850,
+  "TEST_used": false,
+  "new_training_requires_explicit_authorization": true
+}

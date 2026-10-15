@@ -1,0 +1,8 @@
+{
+  "locked_at": "2026-10-14T14:24:19+08:00",
+  "files": {
+    "analyze_stability.py": "bee6148d3a34d8b2fd4070e33b84fb4f9c9dafbe0726a17641679d5794d6e055",
+    "write_stability_report.py": "5b8ced99395d64077ba2039c48c11b6fbe18ad4580fdc3c1c7d4a36637dcc1b3",
+    "seal_stability.py": "1c30ae9726fdd4919e80ccf6c921545710eba2b4f1565e904a8a0536e6b23457"
+  }
+}

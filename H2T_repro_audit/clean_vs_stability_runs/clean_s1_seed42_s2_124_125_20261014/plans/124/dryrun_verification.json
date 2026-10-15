@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "completed_at": "2026-10-14T14:13:56+08:00",
+  "arms": {
+    "Uniform-PerSample": {
+      "loss": 1.6582896709442139,
+      "mask_sha256": "505d76b4849e8a278499db82c3cc1b92059c7872b4ee61cee85a1347a5c71b1c",
+      "16_unique_full_channels": true,
+      "copied_unselected_and_labels_exact": true,
+      "classifier_updated": true,
+      "backbone_BN_affine_and_buffers_bitwise_unchanged": true,
+      "inputs_features_score_and_noise_paired": true
+    },
+    "Low-VS": {
+      "loss": 1.9846103191375732,
+      "mask_sha256": "3802f2eebd4aaec07344d113d093ecdb75bd979b1e03af5b56b2eba339f4fb5d",
+      "16_unique_full_channels": true,
+      "copied_unselected_and_labels_exact": true,
+      "classifier_updated": true,
+      "backbone_BN_affine_and_buffers_bitwise_unchanged": true,
+      "inputs_features_score_and_noise_paired": true
+    }
+  },
+  "seed": 124,
+  "controls": {
+    "initial": {
+      "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+      "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+    },
+    "images": "31adb012eef95c10d878b690038624c5ce565207c7fb844550f35d4ebd2880a3",
+    "features": "bf0a0cc2639ebe87260ec5354bf23a3bb0c96005693b5ded7ba8561f26da4e8e",
+    "S": "70d77765c777e9baebed470f066bd1fb5b9ac80ae75b4e45defa8a8f562c8156",
+    "all_masks": "a636931ac6a5f72e59bab725ef4d40490a8e575706fd5c428e7b64b6d0d78abe"
+  },
+  "no_old_checkpoint_or_statistics": true,
+  "disposable_updates_discarded": true,
+  "formal_classifiers_freshly_reinitialized": true,
+  "peak_allocated_mib": 77.23486328125,
+  "peak_reserved_mib": 98.0,
+  "fresh_formal_model_and_empty_SGD_required": true
+}

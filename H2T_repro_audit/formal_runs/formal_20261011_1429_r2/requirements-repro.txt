@@ -1,0 +1,9 @@
+# Verified existing environment: Python 3.12.13, Windows x64.
+# CUDA wheels are installed from https://download.pytorch.org/whl/cu130
+# This audit did not install or upgrade packages.
+torch==2.11.0+cu130
+torchvision==0.26.0+cu130
+numpy==2.3.1
+Pillow==11.1.0
+PyYAML==6.0.3
+yacs==0.1.8

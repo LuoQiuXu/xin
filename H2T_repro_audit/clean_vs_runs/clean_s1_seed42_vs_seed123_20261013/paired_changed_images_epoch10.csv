@@ -1,0 +1,11 @@
+arm,group,samples,gained_images,lost_images,net_images,difference_pp
+High-VS,Overall,1980,35,38,-3,-0.15151515151515152
+High-VS,Head,700,17,1,16,2.2857142857142856
+High-VS,OfficialMedium,700,9,24,-15,-2.142857142857143
+High-VS,Tail,580,9,13,-4,-0.6896551724137931
+High-VS,Few,600,9,15,-6,-1.0
+Low-VS,Overall,1980,21,15,6,0.30303030303030304
+Low-VS,Head,700,2,7,-5,-0.7142857142857143
+Low-VS,OfficialMedium,700,9,4,5,0.7142857142857143
+Low-VS,Tail,580,10,4,6,1.0344827586206897
+Low-VS,Few,600,10,4,6,1.0

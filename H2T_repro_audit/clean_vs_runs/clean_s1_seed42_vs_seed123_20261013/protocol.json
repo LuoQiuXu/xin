@@ -1,0 +1,32 @@
+{
+  "declared_at": "2026-10-13T21:30:59+08:00",
+  "stage1_seed": 42,
+  "stage2_seed": 123,
+  "StageI_epochs": 200,
+  "StageII_epochs": 10,
+  "batch_size": 128,
+  "arms": [
+    "Uniform-PerSample",
+    "High-VS",
+    "Low-VS"
+  ],
+  "validation": "same 1980 unseen TRAIN raw IDs, class1..99,20/class; 100 outputs retained",
+  "StageI_selection": "max validation Overall over all200 epochs, earliest tie; no early stopping",
+  "StageI_training_RNG": "Python/NumPy/Torch seed42; subset seed0 verified in isolated RandomState; frozen array load consumes no training RNG",
+  "StageI_recipe": "original ResNet32,SGD lr.1,momentum.9,wd.0002,CE+MixUp alpha1,warmup5,milestones160/180,workers0,cudnn deterministicTrue",
+  "StageII_recipe": "frozen Clean best Backbone/BN; fc init from same Clean best; original CE,SGD lr.1*cosine factor.2,momentum.9,wd.0005",
+  "statistics": "USER CONFIRMED: preserve old files; recompute LT-only stats using Clean best Backbone, exact existing formulas/shrinkage/epsilon definition",
+  "shrinkage": "lambda=5/(n+5), pooled=sum(n*var_ddof0)/(N-100)",
+  "epsilon": "1e-6 * mean(per-channel global LT feature variance ddof1)",
+  "primary": "fixed epoch10 99-class TRAIN holdout Overall; Head/OfficialMedium/Tail,Many/Medium/Few,Macro also report",
+  "rho": 0.25,
+  "channels": 64,
+  "replace_channels": 16,
+  "Top48": 48,
+  "fallback": "donor n<20; ptp(S)<=1e-12; nonfinite stop; unchanged IS class distribution",
+  "sampling": "exact saved seed123 BS/IS indices and Gumbel noise; online native aug seed123+300009 isolated; identical three-arm input/control hashes",
+  "TEST": "forbidden file/Dataset loads except preflight opaque MD5; guard violation aborts before StageII",
+  "no_search": true,
+  "no_extra_seeds": true,
+  "historical_files_read_only": true
+}

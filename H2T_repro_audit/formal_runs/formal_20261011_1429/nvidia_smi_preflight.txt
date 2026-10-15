@@ -1,0 +1,33 @@
+Sun Oct 11 14:27:55 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 591.74                 Driver Version: 591.74         CUDA Version: 13.1     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 ...  WDDM  |   00000000:01:00.0  On |                  N/A |
+| N/A   47C    P2             14W /   86W |    1225MiB /   8151MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            1532    C+G   ...\codex-computer-use-swift.exe      N/A      |
+|    0   N/A  N/A            3316    C+G   ...xyewy\ShellExperienceHost.exe      N/A      |
+|    0   N/A  N/A            8196    C+G   ...indows\System32\ShellHost.exe      N/A      |
+|    0   N/A  N/A           12116    C+G   ...2txyewy\CrossDeviceResume.exe      N/A      |
+|    0   N/A  N/A           17372    C+G   ...y\StartMenuExperienceHost.exe      N/A      |
+|    0   N/A  N/A           22828    C+G   ...IA app\CEF\NVIDIA Overlay.exe      N/A      |
+|    0   N/A  N/A           24848    C+G   ..._cw5n1h2txyewy\SearchHost.exe      N/A      |
+|    0   N/A  N/A           25184    C+G   ...5n1h2txyewy\TextInputHost.exe      N/A      |
+|    0   N/A  N/A           32160    C+G   ...ntrolPanel\SystemSettings.exe      N/A      |
+|    0   N/A  N/A           33176    C+G   ...IA app\CEF\NVIDIA Overlay.exe      N/A      |
+|    0   N/A  N/A           34224    C+G   C:\Windows\explorer.exe               N/A      |
+|    0   N/A  N/A           34524    C+G   ...Lab\Kaspersky 21.26\avpui.exe      N/A      |
+|    0   N/A  N/A           34732    C+G   ...App_cw5n1h2txyewy\LockApp.exe      N/A      |
+|    0   N/A  N/A           38212      C   ...conda\envs\pytorch\python.exe      N/A      |
++-----------------------------------------------------------------------------------------+

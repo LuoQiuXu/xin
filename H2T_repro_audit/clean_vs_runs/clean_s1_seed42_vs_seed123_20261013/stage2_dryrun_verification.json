@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "completed_at": "2026-10-13T22:04:47+08:00",
+  "arms": {
+    "Uniform-PerSample": {
+      "loss": 1.7644932270050049,
+      "mask_sha256": "ba7ac90ec184f72ab2bfe50236d09fc6a499a8329efb00e916f19f72cae64e98",
+      "16_unique_full_channels": true,
+      "copied_unselected_and_labels_exact": true,
+      "classifier_updated": true,
+      "backbone_BN_affine_and_buffers_bitwise_unchanged": true,
+      "inputs_features_score_and_noise_paired": true
+    },
+    "High-VS": {
+      "loss": 1.0338404178619385,
+      "mask_sha256": "93d5e9e220cb22a8d2628de6fe2fe1b481c71b881b3d17cf1467e2da5ac96253",
+      "16_unique_full_channels": true,
+      "copied_unselected_and_labels_exact": true,
+      "classifier_updated": true,
+      "backbone_BN_affine_and_buffers_bitwise_unchanged": true,
+      "inputs_features_score_and_noise_paired": true
+    },
+    "Low-VS": {
+      "loss": 2.124424695968628,
+      "mask_sha256": "457813e09187f662a07635eb98210d4193ab75e7894a3243daf8e55f4e8c9dd9",
+      "16_unique_full_channels": true,
+      "copied_unselected_and_labels_exact": true,
+      "classifier_updated": true,
+      "backbone_BN_affine_and_buffers_bitwise_unchanged": true,
+      "inputs_features_score_and_noise_paired": true
+    }
+  },
+  "seed": 123,
+  "controls": {
+    "initial": {
+      "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+      "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+    },
+    "images": "885e85ef665fbadcd179d9f0ecc626a944f9bc1fe6cab996d23ad977b1447423",
+    "features": "02dc36f8144e2492341c6bfb9f9e5828caecb454753e06f4a22e70f3b5123a1e",
+    "S": "a988a0e9c674bd1d31127e5f85fd0292e0c411d11163f7fc425b2362e23729d8",
+    "all_masks": "44cc7c6bc5beb88ada2f0946e6eb0dd2cbc30070ada9bae30f0718a1ffef188d"
+  },
+  "no_old_checkpoint_or_statistics": true,
+  "disposable_updates_discarded": true,
+  "formal_classifiers_freshly_reinitialized": true
+}

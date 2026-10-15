@@ -1,0 +1,49 @@
+name: cifar100_imb001_stage1_ce_mixup_pif_off_matched
+print_freq: 40
+workers: 0
+log_dir: 'logs'
+model_dir: 'ckps'
+
+# Strict matched control for the existing PIF Stage-I run.  It instantiates
+# the same Option-A PIF-capable ResNet-32 (and therefore consumes RNG in the
+# same order) but bypasses PIF in forward.  All other settings are identical.
+dataset: 'cifar100'
+data_path: './data/cifar100'
+num_classes: 100
+imb_factor: 0.01
+backbone: 'resnet32_pif_fe'
+classifier: 'Classifier'
+pif_active: False
+resume: ''
+head_class_idx:
+  - 0
+  - 36
+med_class_idx:
+  - 36
+  - 71
+tail_class_idx:
+  - 71
+  - 100
+
+deterministic: True
+distributed: False
+gpu: 0
+world_size: -1
+rank: -1
+dist_url: 'tcp://224.66.41.62:23456'
+dist_backend: 'nccl'
+multiprocessing_distributed: False
+
+mode: 'stage1'
+lr: 0.1
+batch_size: 128
+weight_decay: 2e-4
+num_epochs: 200
+momentum: 0.9
+mixup: True
+alpha: 1.0
+lr_scheduler:
+  type: 'multistep'
+  lr_step:
+    - 160
+    - 180

@@ -1,0 +1,154 @@
+{
+  "124/Uniform-PerSample": {
+    "best": {
+      "epoch": 4,
+      "sha256": "a0485819be4934a1db328228934eb5076d49efdaae7466a41bf23af18408b098",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\uniform_seed124\\checkpoints\\model_best.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.300581693649292,
+        "module.fc.bias": 0.1102258488535881
+      },
+      "validation_reload_exact": true
+    },
+    "final": {
+      "epoch": 10,
+      "sha256": "ec810520ea8d7d07d1220602e49cc4c536ef55131b56d36ed127826cd4b1fa92",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\uniform_seed124\\checkpoints\\model_final.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.3819913864135742,
+        "module.fc.bias": 0.13026665151119232
+      },
+      "validation_reload_exact": true
+    }
+  },
+  "124/Low-VS": {
+    "best": {
+      "epoch": 9,
+      "sha256": "13bf6641ce4c8b5a3456c7630bd0e5c02f9d9e18da888d7e00dfce94783555ef",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\lowvs_seed124\\checkpoints\\model_best.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.3296545743942261,
+        "module.fc.bias": 0.12360582500696182
+      },
+      "validation_reload_exact": true
+    },
+    "final": {
+      "epoch": 10,
+      "sha256": "e7592d49adc5fd2d2d4f4a3485f285e862863d53f011ef0494008c01016ba8a9",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\lowvs_seed124\\checkpoints\\model_final.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.3305608034133911,
+        "module.fc.bias": 0.12392590194940567
+      },
+      "validation_reload_exact": true
+    }
+  },
+  "125/Uniform-PerSample": {
+    "best": {
+      "epoch": 6,
+      "sha256": "07392925abf3dea4b27af9cc5e72c0c3efd5afa2881d7707abba21c19371a533",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\uniform_seed125\\checkpoints\\model_best.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.3736875057220459,
+        "module.fc.bias": 0.11980299651622772
+      },
+      "validation_reload_exact": true
+    },
+    "final": {
+      "epoch": 10,
+      "sha256": "f6b865a693c9767f6881f30a6ee629f88e33537a5d1ca6616447389071f22424",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\uniform_seed125\\checkpoints\\model_final.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.40920376777648926,
+        "module.fc.bias": 0.12936867773532867
+      },
+      "validation_reload_exact": true
+    }
+  },
+  "125/Low-VS": {
+    "best": {
+      "epoch": 6,
+      "sha256": "5e80dd1f5acf73583c849a7bfc99cb471e9217882a6a9a19bdfd685e36357843",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\lowvs_seed125\\checkpoints\\model_best.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.3241463899612427,
+        "module.fc.bias": 0.1165194883942604
+      },
+      "validation_reload_exact": true
+    },
+    "final": {
+      "epoch": 10,
+      "sha256": "a20360a56114333bdf96f9e2a61b6cbc6bb65e146c8a10b39d10f2a48baaf4f9",
+      "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\lowvs_seed125\\checkpoints\\model_final.pth.tar",
+      "all_backbone_state_entries_bitwise_unchanged": 186,
+      "backbone_parameter_tensors_bitwise_unchanged": 93,
+      "conv_parameter_tensors_bitwise_unchanged": 31,
+      "BN_affine_parameter_tensors_bitwise_unchanged": 62,
+      "BN_buffer_tensors_bitwise_unchanged": 93,
+      "num_batches_tracked_values": [
+        15640
+      ],
+      "classifier_max_abs_changes": {
+        "module.fc.weight": 0.3530299663543701,
+        "module.fc.bias": 0.12562201917171478
+      },
+      "validation_reload_exact": true
+    }
+  }
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\official\\datasets\\cifar100.py",
+    "sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "bytes": 8354
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\datasets\\cifar100.py",
+    "sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "bytes": 8354
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\saved\\cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428\\codes\\datasets\\cifar100.py",
+    "sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "bytes": 8354
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\runtime\\saved\\cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428\\codes\\train_stage1.py",
+    "sha256": "ec3a3bb3029bbb948ed7bbc975a1006e0392d40549b125dbf9e95712b45e0782",
+    "bytes": 19620
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\formal_runs\\formal_20261011_1429_r2\\formal_stage1.py",
+    "sha256": "edb7ea04c5f335e9465e07bca2263d84cd5f65de0a50322b89289734b84b7f4e",
+    "bytes": 15798
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\formal_runs\\formal_20261011_1429_r2\\epochs.csv",
+    "sha256": "8794786aecc73cfd655c09c8181f3e631d9a0302eccbd03513602956c4e1decf",
+    "bytes": 33588
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\formal_runs\\formal_20261011_1429_r2\\preflight.json",
+    "sha256": "f981f0127f8724d35f37383105975fcbeb8586f8fc1fc1a88807940d24bfc0cd",
+    "bytes": 8324
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\formal_runs\\formal_20261011_1429_r2\\best_evaluation.json",
+    "sha256": "d6cd03573ab2c994930903d23bca89362e96ca9bd1d689ff0842afa5b5a391dd",
+    "bytes": 3859
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\donor_stage2_runs\\selector_fixed_bn_20261012\\selector_stage2.py",
+    "sha256": "a53873d09a917752bc6d4371d88912cb119ad3364c91901051e775e7d8786412",
+    "bytes": 46581
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\donor_stage2_runs\\selector_fixed_bn_20261012\\protocol.json",
+    "sha256": "7075451bd19c08c7c5ad6a7418db99feef58294d0ae52a3af0765be6c309f3fc",
+    "bytes": 4926
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\common.py",
+    "sha256": "3882b5d02fb567b1fdf289c8aeeac34f5fd2b189fd6d287a1b793d08872c2c2e",
+    "bytes": 7427
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\vs_stage2.py",
+    "sha256": "d87b9703bb9e216fb06786b79d8491ad094ec8eefc71320c4fecda025f904c75",
+    "bytes": 11961
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\training.py",
+    "sha256": "593011023c14c2f5b05b222648ecdb97988b8d22ed5e687cb3f4831dffdb427c",
+    "bytes": 16780
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\reused_helpers.py",
+    "sha256": "26bb88d0c357d9b55f91ab46f3910592d2eb62d645b8a958bd015ea0dd54f5b4",
+    "bytes": 3790
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\protocol.json",
+    "sha256": "a0c834385c74a189bf7340d9ee185f0ae73a7337a29a716481fa3bc81bfcc365",
+    "bytes": 6725
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\preflight.json",
+    "sha256": "67ea161020d171604839f0347411c13ef98541b5f382724689964137ce6b065d",
+    "bytes": 7625
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_stage2_runs\\vs_stage2_seed123\\full_console.log",
+    "sha256": "c38082ade8e1e0869571d0d7d6acb313af9175ee745697ec9e39702a5b1b8555",
+    "bytes": 14567
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_runs\\variation_shift_20261013_seed123\\audit.py",
+    "sha256": "3adc42bd16af9e8dacffc04bad3bdc6bcca711343a6e3fcd29ed9f5de902dc20",
+    "bytes": 17168
+  },
+  {
+    "path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\variation_shift_runs\\variation_shift_20261013_seed123\\statistics_and_scores.py",
+    "sha256": "c5af9b3ef3f4e1981da69c31c13e5b250748190e8750b879c3feefe8effe9039",
+    "bytes": 24084
+  },
+  {
+    "path": "D:\\app\\anaconda\\envs\\pytorch\\Lib\\site-packages\\torchvision\\datasets\\cifar.py",
+    "sha256": "d53ef546096da0d5638d6c63094491042421e817ff3b9d128a6f30ddc380e344",
+    "bytes": 5951
+  }
+]

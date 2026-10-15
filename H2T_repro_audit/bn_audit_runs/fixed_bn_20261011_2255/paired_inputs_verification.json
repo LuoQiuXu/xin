@@ -1,0 +1,25 @@
+{
+  "total_batches": 850,
+  "initial_rng_hashes_identical": true,
+  "backend_settings_identical": true,
+  "identical_batches_by_field": {
+    "bs_labels_sha256": 850,
+    "is_labels_sha256": 850,
+    "bs_images_sha256": 850,
+    "is_images_sha256": 850,
+    "cpu_rng_at_batch_ready_sha256": 850
+  },
+  "epoch_start_rng_equal": {
+    "torch_cpu": 10,
+    "torch_cuda": 10,
+    "python": 10,
+    "numpy": 10
+  },
+  "epoch_end_rng_equal": {
+    "torch_cpu": 10,
+    "torch_cuda": 10,
+    "python": 10,
+    "numpy": 10
+  },
+  "bn_state_and_backbone_parameters_identical_between_arms": true
+}

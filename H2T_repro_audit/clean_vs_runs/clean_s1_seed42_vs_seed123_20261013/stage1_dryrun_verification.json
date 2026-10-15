@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "completed_at": "2026-10-13T21:35:52+08:00",
+  "seed": 42,
+  "initial_state_hashes": {
+    "backbone": "3220838fb6384edaa33c72af7ecd7981abca7d88493a72497638e400acb6d600",
+    "classifier": "4a7f95fb1e761f2d69980c7cca23e023b5ec1fc74afd2844e0cb22c3d90fa7b5"
+  },
+  "original_functions_reused": true,
+  "actual_LT_forward_backward_SGD_steps": 1,
+  "backbone_updated": true,
+  "classifier_updated": true,
+  "finite_loss_and_all_gradients": true,
+  "loss": 6.279252529144287,
+  "validation_source": "TRAIN holdout only; first128 checked; 100 logits",
+  "disposable_model_discarded": true,
+  "formal_training_reinitialized_fresh": true
+}

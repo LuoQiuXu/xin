@@ -1,0 +1,8 @@
+{
+  "phase": "dryrun_124",
+  "installed_at": "2026-10-14T14:13:55+08:00",
+  "official_test_image_or_label_loads": 0,
+  "allowed_integrity_open_count": 0,
+  "blocked_attempts": [],
+  "CIFAR100_trainFalse_calls": 0
+}

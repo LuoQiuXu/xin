@@ -1,0 +1,16 @@
+{
+  "completed_at": "2026-10-14T14:21:31+08:00",
+  "seeds": [
+    124,
+    125
+  ],
+  "methods": [
+    "Uniform-PerSample",
+    "Low-VS"
+  ],
+  "epochs_each": 10,
+  "total_formal_updates": 3400,
+  "TEST_used": false,
+  "StageI_retrained": false,
+  "extra_training_requires_explicit_authorization": true
+}

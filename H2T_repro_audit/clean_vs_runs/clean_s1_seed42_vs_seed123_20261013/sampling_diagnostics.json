@@ -1,0 +1,37 @@
+{
+  "draws_each_arm": 108470,
+  "channels_replaced": 16,
+  "strategy_granularity": "per sample",
+  "IS_counts_each_epoch_exact": true,
+  "BS_draws_per_epoch": 10847,
+  "same_BS_IS_plan_all_arms": true,
+  "same_private_online_augmentation": true,
+  "same_Gumbel_base": true,
+  "old_model_statistics_used": false,
+  "arms": {
+    "Uniform-PerSample": {
+      "16_unique_channels_all_draws": true,
+      "mean_overlap_Uniform": 16.0,
+      "exact_Uniform_mask_rate": 1.0,
+      "fallback_draws": 3050,
+      "fallback_rate": 0.02811837374389232,
+      "unique_channel_sets": 108470
+    },
+    "High-VS": {
+      "16_unique_channels_all_draws": true,
+      "mean_overlap_Uniform": 12.113570572508527,
+      "exact_Uniform_mask_rate": 0.032451369042131466,
+      "fallback_draws": 3050,
+      "fallback_rate": 0.02811837374389232,
+      "unique_channel_sets": 108470
+    },
+    "Low-VS": {
+      "16_unique_channels_all_draws": true,
+      "mean_overlap_Uniform": 12.108389416428505,
+      "exact_Uniform_mask_rate": 0.0327002857933069,
+      "fallback_draws": 3050,
+      "fallback_rate": 0.02811837374389232,
+      "unique_channel_sets": 108470
+    }
+  }
+}

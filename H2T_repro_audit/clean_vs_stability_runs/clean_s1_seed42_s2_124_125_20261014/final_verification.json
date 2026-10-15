@@ -1,0 +1,38 @@
+{
+  "verified_at": "2026-10-14T14:24:23+08:00",
+  "passed": true,
+  "seeds": [
+    124,
+    125
+  ],
+  "methods": [
+    "Uniform-PerSample",
+    "Low-VS"
+  ],
+  "formal_runs": 4,
+  "epochs_each": 10,
+  "formal_updates": 3400,
+  "StageI_retrained": false,
+  "additional_seeds_or_strategies": false,
+  "TEST_images_or_labels_loaded": 0,
+  "TEST_evaluation_or_model_selection": false,
+  "guard_phases": [
+    "test_guard_dryrun_124.json",
+    "test_guard_dryrun_125.json",
+    "test_guard_plans.json",
+    "test_guard_prepare.json",
+    "test_guard_stability_analysis.json",
+    "test_guard_stability_final_verification.json",
+    "test_guard_stability_report.json",
+    "test_guard_train_124.json",
+    "test_guard_train_125.json"
+  ],
+  "historical_files_unchanged": 2853,
+  "fixed_checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "fixed_statistics_sha256": "e81a4897a965d642f832bd6429e0e5a7d136725daaa069d9ded96f87ab64aef9",
+  "report_path": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\CLEAN_VS_MULTI_SEED_STABILITY_REPORT.md",
+  "root_report_copy": "D:\\xiangmuxunlian\\新\\CLEAN_VS_MULTI_SEED_STABILITY_REPORT.md",
+  "report_sha256": "4f3349b108da784e0afca73eb43573a049803fb19a4a3e05818d9b72eaffd572",
+  "all_sources_and_locked_inputs_unchanged": true,
+  "all_saved_checkpoint_hashes_verified": true
+}

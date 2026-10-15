@@ -1,0 +1,80 @@
+H2T: 0.25
+ResLT:
+  gamma: 0.7
+alpha: null
+backbone: resnet32_fe
+batch_size: 128
+classifier: Classifier
+data_path: "D:\\xiangmuxunlian\\\u65B0\\H2T\\data\\cifar100"
+dataset: cifar100
+deterministic: false
+dist_backend: nccl
+dist_url: null
+distributed: false
+gpu: null
+head_class_idx:
+- 0
+- 36
+imb_factor: 0.01
+log_dir: logs
+loss:
+  CE:
+    reweight_CE: false
+  LDAM:
+    max_m: 0.5
+    reweight_epoch: -1
+    s: 30
+  RIDE:
+    additional_diversity_factor: -0.2
+    base_diversity_temperature: 1.0
+    base_loss_factor: 1.0
+    max_m: 0.5
+    reweight: false
+    reweight_epoch: -1
+    reweight_factor: 0.05
+    s: 30
+  ResLT:
+    beta: 0.99
+    smooth: 0.0
+  add_extra_info: false
+  type: CrossEntropyLoss
+lr: 0.1
+lr_scheduler:
+  lr_factor: 0.2
+  lr_step:
+  - 160
+  - 180
+  type: cos
+med_class_idx:
+- 36
+- 71
+mixup: false
+mode: stage2
+model_dir: "D:\\xiangmuxunlian\\\u65B0\\H2T_repro_audit\\clean_vs_stability_runs\\\
+  clean_s1_seed42_s2_124_125_20261014\\uniform_seed124\\checkpoints"
+momentum: 0.9
+multiprocessing_distributed: false
+name: clean_s1_seed42_s2_124_125_20261014_seed124_Uniform-PerSample
+num_classes: 100
+num_epochs: 10
+num_experts: 1
+print_freq: 40
+rank: -1
+resume: ''
+sampler:
+  dual_sample:
+    enable: true
+    type: long-tailed
+  type: weighted sampler
+  weighted_sampler:
+    type: balance
+shift_bn: false
+smooth_head: null
+smooth_tail: null
+tail_class_idx:
+- 71
+- 100
+use_norm: false
+weight_decay: 0.0005
+workers: 0
+world_size: -1

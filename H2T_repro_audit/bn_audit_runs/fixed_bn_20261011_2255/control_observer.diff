@@ -1,0 +1,250 @@
+--- original_observer/formal_stage2.py
++++ control_observer/bn_audit_runner.py
+@@ -1,8 +1,5 @@
+-"""Run original Stage II in two fresh processes, with passive audit evidence.
+-
+-Only H2T=0.0 distinguishes DR from the published YAML. Both processes use
+-seed 123 without changing the YAML deterministic/CuDNN defaults. No RNG calls
+-are added to the training stream. Additional best/final saves are byte copies.
++"""Fixed-BN paired-input control; calls the original training and H2T functions.
++This is a mechanism control experiment, separate from the official reproduction.
+ """
+ from __future__ import annotations
+ 
+@@ -23,10 +20,15 @@
+ import torch
+ import torchvision
+ 
+-from formal_stage1 import check_sources, dump, sha, GpuMonitor, MetricsHandler
+-
+-BASE = Path(__file__).resolve().parent
+-RUNTIME = BASE / "runtime"
++from bn_audit_helpers import check_sources as verify_sources, dump, sha, GpuMonitor, MetricsHandler, protected_files
++
++SUITE = Path(__file__).resolve().parent
++BASE = SUITE.parent.parent
++RUNTIME = SUITE / "runtime"
++CHANNEL_SEED = 123
++
++def check_sources():
++    return verify_sources(BASE, RUNTIME)
+ DATA = BASE.parent / "H2T/data/cifar100"
+ CFG = "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml"
+ STAGE1_EVIDENCE = BASE / "formal_runs/formal_20261011_1429_r2/best_evaluation.json"
+@@ -39,14 +41,14 @@
+     from utils import config, update_config
+     cfg = config.clone()
+     opts = ["data_path", str(DATA), "resume", STAGE1["path"],
+-            "name", f"cifar100_if100_stage2_{suite_id}_{arm}"]
++            "name", f"cifar100_if100_stage2_{suite_id}_{arm}", "shift_bn", "False"]
+     if arm == "dr":
+         opts += ["H2T", "0.0"]
+     update_config(cfg, argparse.Namespace(cfg=str(RUNTIME / CFG), opts=opts))
+     assert cfg.num_epochs == 10 and cfg.batch_size == 128 and cfg.imb_factor == .01
+     assert cfg.backbone == "resnet32_fe" and cfg.gpu is None and cfg.workers == 0
+     assert cfg.loss.type == "CrossEntropyLoss" and not cfg.loss.CE.reweight_CE
+-    assert not cfg.mixup and cfg.alpha is None and cfg.shift_bn
++    assert not cfg.mixup and cfg.alpha is None and not cfg.shift_bn
+     assert not cfg.deterministic and not cfg.multiprocessing_distributed
+     assert cfg.lr == .1 and cfg.weight_decay == 5e-4 and cfg.momentum == .9
+     assert cfg.lr_scheduler.type == "cos" and cfg.lr_scheduler.lr_factor == .2
+@@ -61,7 +63,8 @@
+ 
+ 
+ def delta(before, after):
+-    changed = [k for k in before if not torch.equal(before[k], after[k])]
++    assert before.keys() == after.keys()
++    changed = [k for k in before if before[k].numpy().tobytes() != after[k].contiguous().numpy().tobytes()]
+     return {"changed_count": len(changed), "total_count": len(before),
+             "max_abs_delta": max((float((before[k].double()-after[k].double()).abs().max()) for k in changed), default=0.),
+             "changed_names": changed,
+@@ -86,7 +89,8 @@
+ def prepare(folder, suite_id):
+     from datasets.cifar100 import CIFAR100_LT
+     from torchvision.datasets.utils import check_integrity
+-    assert not folder.exists(), "Use a new suite output directory"
++    assert folder == SUITE and not (folder/"preflight.json").exists(), "Use a new suite output directory"
++    assert protected_files(BASE) == json.loads((folder/"protected_original_before.json").read_text(encoding="utf-8"))
+     manifest = check_sources()
+     assert sha(STAGE1["path"]) == STAGE1["sha256"] == "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e"
+     loaded = torch.load(STAGE1["path"], map_location="cpu", weights_only=False)
+@@ -112,12 +116,11 @@
+     assert a.dump() == b.dump(), "Unexpected algorithm/config difference"
+     for cfg in configs.values():
+         assert not list((RUNTIME/"saved").glob(cfg.name + "_*"))
+-    folder.mkdir(parents=True)
++    folder.mkdir(parents=True, exist_ok=True)
+     for filename in ["runtime_manifest.json", "source_manifest.json", "compatibility.diff"]:
+         shutil.copy2(BASE/"evidence"/filename, folder/filename)
+     shutil.copy2(STAGE1_EVIDENCE, folder/"stage1_reference.json")
+-    shutil.copy2(__file__, folder/"formal_stage2.py")
+-    shutil.copy2(BASE/"formal_stage1.py", folder/"formal_stage1_helpers.py")
++    assert Path(__file__).parent == folder
+     for arm, cfg in configs.items():
+         target = folder/arm
+         target.mkdir()
+@@ -132,7 +135,10 @@
+         "train_samples": 10847, "test_samples": 10000, "batches_per_epoch": 85,
+         "stage1_checkpoint": STAGE1, "stage1_epoch": 198, "seed": SEED,
+         "deterministic_yaml": False, "runtime_files": manifest,
+-        "launcher_sha256": sha(__file__), "helpers_sha256": sha(BASE/"formal_stage1.py"),
++        "launcher_sha256": sha(__file__), "helpers_sha256": sha(SUITE/"bn_audit_helpers.py"),
++        "channel_seed": CHANNEL_SEED, "shift_bn": False, "is_official_reproduction": False,
++        "independent_runtime": str(RUNTIME), "core_source_modifications": [],
++        "control_differences_from_original": ["shift_bn=False", "isolated CPU channel RNG"],
+         "only_arm_config_differences": ["H2T", "name"], "disk_free_bytes": shutil.disk_usage(RUNTIME).free})
+     print("STAGE II PREFLIGHT PASS; same Stage I checksum; configs differ only by H2T/name", flush=True)
+ 
+@@ -141,7 +147,8 @@
+     preflight = json.loads((folder/"preflight.json").read_text(encoding="utf-8"))
+     assert check_sources() == preflight["runtime_files"]
+     assert sha(__file__) == preflight["launcher_sha256"]
+-    assert sha(BASE/"formal_stage1.py") == preflight["helpers_sha256"]
++    assert sha(SUITE/"bn_audit_helpers.py") == preflight["helpers_sha256"]
++    assert protected_files(BASE) == json.loads((folder/"protected_original_before.json").read_text(encoding="utf-8"))
+     assert sha(STAGE1["path"]) == STAGE1["sha256"]
+     evidence = folder/arm
+     assert not (evidence/"status.json").exists()
+@@ -161,6 +168,13 @@
+     monitor, metrics = GpuMonitor(evidence), MetricsHandler()
+     ctx = {"phase": "setup"}
+     initial = {}
++    channel_generator = torch.Generator(device="cpu").manual_seed(CHANNEL_SEED)
++    status["channel_rng"] = {"seed": CHANNEL_SEED, "isolation": "torch.random.fork_rng(devices=[])",
++        "initial_state_sha256": hashlib.sha256(channel_generator.get_state().numpy().tobytes()).hexdigest()}
++    assert Path(original.__file__).resolve().is_relative_to(RUNTIME.resolve())
++    import methods
++    assert Path(methods.__file__).resolve().is_relative_to(RUNTIME.resolve())
++    status["imported_source_files"] = {"train_stage2": original.__file__, "methods": methods.__file__}
+ 
+     def parse():
+         result = real_parse()
+@@ -185,21 +199,28 @@
+ 
+     def fuse(x1, x2, rho=.3):
+         assert arm == "h2t" and rho == .25 and not torch.is_grad_enabled()
+-        first = status["h2t_calls"] == 0
+-        if first:
+-            before, donor = x1.clone(), x2.clone()
+-            generator = torch.Generator(device="cpu")
+-            generator.set_state(torch.get_rng_state())
+-            chosen = torch.randperm(64, generator=generator)[:16].to(x1.device)
+-            others = torch.tensor([i for i in range(64) if i not in chosen.cpu().tolist()], device=x1.device)
+-        value = real_fuse(x1, x2, rho)
++        assert x1.shape[1:] == (64,8,8)
++        before, donor = x1.clone(), x2.clone()
++        ambient = torch.get_rng_state().clone()
++        predictor = torch.Generator(device="cpu")
++        predictor.set_state(channel_generator.get_state())
++        chosen = torch.randperm(64, generator=predictor)[:16].to(x1.device)
++        others = torch.tensor([i for i in range(64) if i not in chosen.cpu().tolist()],device=x1.device)
++        with torch.random.fork_rng(devices=[]):
++            torch.set_rng_state(channel_generator.get_state())
++            value = real_fuse(x1,x2,rho)
++            channel_generator.set_state(torch.get_rng_state())
++        assert torch.equal(torch.get_rng_state(), ambient), "Channel RNG leaked into data/augmentation stream"
++        assert torch.equal(channel_generator.get_state(),predictor.get_state()), "Unexpected channel RNG consumption"
++        assert value.data_ptr() == x1.data_ptr() and torch.equal(value[:,chosen],donor[:,chosen])
++        assert torch.equal(value[:,others],before[:,others]) and torch.equal(x2,donor)
+         status["h2t_calls"] += 1
+-        if first:
+-            assert value.data_ptr() == x1.data_ptr() and torch.equal(value[:,chosen], donor[:,chosen])
+-            assert torch.equal(value[:,others], before[:,others]) and torch.equal(x2, donor)
+-            status["fusion_verified"] = {"rho": rho, "replaced_channels": 16, "retained_channels": 48,
+-                "chosen_channels_first_call": chosen.cpu().tolist(), "feature_shape": list(value.shape),
+-                "same_mask_for_entire_batch": True, "inplace": True, "donor_unchanged": True}
++        ctx["channel_masks"].append(chosen.cpu().tolist())
++        if status["h2t_calls"] == 1:
++            status["fusion_verified"] = {"rho":rho,"replaced_channels":16,"retained_channels":48,
++                "chosen_channels_first_call":chosen.cpu().tolist(),"feature_shape":list(value.shape),
++                "same_mask_for_entire_batch":True,"inplace":True,"donor_unchanged":True,
++                "ambient_cpu_rng_bitwise_unchanged_every_call":True,"checked_every_fusion_call":True}
+         return value
+ 
+     class LoaderObserver:
+@@ -217,7 +238,7 @@
+                 item = {"batch": step, "bs_labels_sha256": hashlib.sha256(targets.numpy().tobytes()).hexdigest(),
+                     "is_labels_sha256": hashlib.sha256(meta["sample_label"].numpy().tobytes()).hexdigest(),
+                     "cpu_rng_at_batch_ready_sha256": hashlib.sha256(torch.get_rng_state().numpy().tobytes()).hexdigest()}
+-                if step < 2:
++                if True:  # fingerprint every batch, including the last partial batch
+                     item.update({"bs_images_sha256": hashlib.sha256(images.numpy().tobytes()).hexdigest(),
+                         "is_images_sha256": hashlib.sha256(meta["sample_image"].numpy().tobytes()).hexdigest()})
+                 ctx["batch_fingerprints"].append(item)
+@@ -239,10 +260,12 @@
+                 "initial_backbone_buffers_sha256": state_hash(initial["buffers"]),
+                 "initial_classifier_sha256": state_hash(initial["classifier"]),
+                 "optimizer_groups": [{k:v for k,v in g.items() if k != "params"} for g in optimizer.param_groups],
+-                "backbone_requires_grad_parameter_count": sum(p.requires_grad for p in model.parameters())})
++                "backbone_requires_grad_parameter_count": sum(p.requires_grad for p in model.parameters()),
++                "initial_bn_counters": {k:int(v) for k,v in initial["buffers"].items() if k.endswith("num_batches_tracked")},
++                "core_sources_equal_audited_original": True})
+         before_bn = snapshot(model, True)
+         ctx.update({"phase": "train", "loss_sum": 0., "samples": 0, "steps": 0, "backbone_calls": 0,
+-            "loss_min": float("inf"), "loss_max": float("-inf"), "batch_fingerprints": [],
++            "loss_min": float("inf"), "loss_max": float("-inf"), "batch_fingerprints": [], "channel_masks": [],
+             "bs_hist": np.zeros(100, dtype=np.int64), "is_hist": np.zeros(100, dtype=np.int64)})
+         rng_start = rng_hashes()
+         def loss_hook(_module, args, output):
+@@ -257,7 +280,8 @@
+             ctx["steps"] += 1
+             ctx["loss_min"], ctx["loss_max"] = min(ctx["loss_min"],value), max(ctx["loss_max"],value)
+         def backbone_hook(_module, _args):
+-            assert not torch.is_grad_enabled() and model.training
++            assert not torch.is_grad_enabled() and not model.training
++            assert all(not m.training for m in model.modules() if isinstance(m, torch.nn.modules.batchnorm._BatchNorm))
+             ctx["backbone_calls"] += 1
+         loss_handle = criterion.register_forward_hook(loss_hook)
+         backbone_handle = model.register_forward_pre_hook(backbone_hook)
+@@ -276,7 +300,9 @@
+         backbone_delta = delta(initial["parameters"], model_after)
+         assert backbone_delta["changed_count"] == 0
+         bn_increment = {k: int(bn_after[k]-before_bn[k]) for k in before_bn if k.endswith("num_batches_tracked")}
+-        assert len(bn_increment) == 31 and all(v == ctx["backbone_calls"] for v in bn_increment.values())
++        assert len(bn_increment) == 31 and all(v == 0 for v in bn_increment.values())
++        assert state_hash(bn_after) == state_hash(initial["buffers"]), "BN buffers changed at the byte level"
++        assert state_hash(model_after) == state_hash(initial["parameters"]), "Conv/BN affine parameters changed"
+         assert ctx["is_hist"].tolist() == preflight["class_counts"]
+         status["epochs"].append({"epoch": epoch+1, "official_zero_based_epoch": epoch,
+             "lr": optimizer.param_groups[0]["lr"], "train_seconds": time.perf_counter()-started,
+@@ -287,7 +313,10 @@
+             "bn_delta_this_epoch": delta(before_bn, bn_after), "bn_count_increment": bn_increment,
+             "backbone_gradients_absent": True, "classifier_gradients_finite": True, "ce_labels_equal_bs": True,
+             "bs_histogram": ctx["bs_hist"].tolist(), "is_histogram": ctx["is_hist"].tolist(),
+-            "batch_fingerprints": ctx["batch_fingerprints"], "rng_at_epoch_start": rng_start,
++            "batch_fingerprints": ctx["batch_fingerprints"], "channel_masks": ctx["channel_masks"],
++            "backbone_parameters_bitwise_equal_stage1": True, "bn_buffers_bitwise_equal_stage1": True,
++            "backbone_parameters_sha256": state_hash(model_after), "bn_buffers_sha256": state_hash(bn_after),
++            "rng_at_epoch_start": rng_start,
+             "rng_at_epoch_end": rng_hashes()})
+ 
+     def validate(loader, model, classifier, criterion, config, log, block=None):
+@@ -295,7 +324,7 @@
+         metrics.metrics = None
+         started = time.perf_counter()
+         result = real_validate(loader, model, classifier, criterion, config, log, block)
+-        assert all(torch.equal(v, snapshot(model, True)[k]) for k,v in before.items())
++        assert state_hash(before) == state_hash(snapshot(model, True)) == state_hash(initial["buffers"])
+         assert metrics.metrics is not None
+         status["epochs"][-1].update({"eval_metrics_percent_rounded_3dp": metrics.metrics,
+             "eval_overall_percent": float(result[0]), "ece_percent": float(result[1]),
+@@ -337,6 +366,9 @@
+                 original.main()
+                 assert status["completed_epochs"] == 10 and len(status["checkpoint_loads"]) == 1
+                 assert status["h2t_calls"] == (0 if arm == "dr" else 850)
++                status["channel_rng"]["final_state_sha256"] = hashlib.sha256(channel_generator.get_state().numpy().tobytes()).hexdigest()
++                assert protected_files(BASE) == json.loads((folder/"protected_original_before.json").read_text(encoding="utf-8"))
++                status["original_artifacts_unchanged"] = True
+                 assert check_sources() == preflight["runtime_files"]
+                 assert sha(STAGE1["path"]) == STAGE1["sha256"]
+                 for relative, expected in preflight["runtime_files"].items():
+@@ -374,7 +406,8 @@
+     parser.add_argument("--arm", choices=["dr", "h2t"])
+     args = parser.parse_args()
+     assert all(c.isalnum() or c in "_-" for c in args.suite_id)
+-    folder = BASE/"stage2_runs"/args.suite_id
++    folder = SUITE
++    assert SUITE.name == args.suite_id
+     if args.action == "prepare":
+         prepare(folder, args.suite_id)
+     else:

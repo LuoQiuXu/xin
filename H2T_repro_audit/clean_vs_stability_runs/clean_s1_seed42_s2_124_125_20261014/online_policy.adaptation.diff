@@ -1,0 +1,30 @@
+--- clean_seed123/clean_online_policy.py
++++ stability/online_policy.py
+@@ -1,4 +1,4 @@
+-"""Three-arm adaptation of the reviewed VS policy; scoring / sampling rules unchanged."""
++"""Two-arm adaptation of the reviewed VS policy; scoring / sampling rules unchanged."""
+ import numpy as np
+ import torch
+ import torch.nn.functional as F
+@@ -31,7 +31,6 @@
+     assert np.isfinite(s).all()
+     assert ((s >= 0)&(s <= 1)).all()
+     pools = {'Uniform-PerSample':np.ones((len(h),64),dtype=bool),
+-        'High-VS':selected_bool(top_indices(s,48,True)),
+         'Low-VS':selected_bool(top_indices(s,48,False))}
+     masks = {}
+     for name,pool in pools.items():
+@@ -40,11 +39,11 @@
+         assert np.all(np.diff(np.sort(choice,axis=1),axis=1) > 0)
+         assert np.take_along_axis(pool,choice,axis=1).all()
+         masks[name] = choice
+-    for name in ['High-VS','Low-VS']:
++    for name in ['Low-VS']:
+         assert np.array_equal(masks[name][reason > 0],masks['Uniform-PerSample'][reason > 0])
+     return {'GAP':gap,'scores':s,'pools':pools,'masks':masks,'fallback':reason,'donor_classes':h,
+         'GAP_sha256':array_hash(gap),'score_sha256':array_hash(s),
+-        'all_three_masks_sha256':array_hash(*[masks[k] for k in ARMS])}
++        'all_two_masks_sha256':array_hash(*[masks[k] for k in ARMS])}
+ 
+ 
+ def selected_statistics(trace,chosen):

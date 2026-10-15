@@ -1,0 +1,55 @@
+{
+  "files": {
+    "train": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T\\data\\cifar100\\cifar-100-python\\train",
+      "bytes": 155249918,
+      "md5": "16019d7e3df5f24257cddd939b257f8d",
+      "expected_torchvision_md5": "16019d7e3df5f24257cddd939b257f8d",
+      "sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+      "verified": true
+    },
+    "test": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T\\data\\cifar100\\cifar-100-python\\test",
+      "bytes": 31049707,
+      "md5": "f0ef6b0ae62326f3e7ffdfab6717acfc",
+      "expected_torchvision_md5": "f0ef6b0ae62326f3e7ffdfab6717acfc",
+      "sha256": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+      "verified": true
+    },
+    "meta": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T\\data\\cifar100\\cifar-100-python\\meta",
+      "bytes": 1473,
+      "md5": "7973b15100ade9c7d40fb424638fde48",
+      "expected_torchvision_md5": "7973b15100ade9c7d40fb424638fde48",
+      "sha256": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+      "verified": true
+    },
+    "cifar-100-python.tar.gz": {
+      "path": "D:\\xiangmuxunlian\\新\\H2T\\data\\cifar100\\cifar-100-python.tar.gz",
+      "bytes": 80052224,
+      "md5": "703db12c359bd9481a3c7b9e2e604569",
+      "expected_torchvision_md5": "eb9058c3a382ffc7106e4002c42a8d85",
+      "sha256": "c872f654958f0b7ed8d31cf4e74a117f57b7564acaed352c99a333f50b2a6271",
+      "verified": false
+    }
+  },
+  "archive_scan": {
+    "members_seen": [
+      {
+        "name": "cifar-100-python",
+        "bytes": 0
+      },
+      {
+        "name": "cifar-100-python/file.txt~",
+        "bytes": 0
+      },
+      {
+        "name": "cifar-100-python/train",
+        "bytes": 155249918
+      }
+    ],
+    "complete": false,
+    "error_type": "EOFError",
+    "error": "Compressed file ended before the end-of-stream marker was reached"
+  }
+}

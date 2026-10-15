@@ -1,0 +1,122 @@
+--- clean_seed123/dryrun_train_one
++++ stability/dryrun_train_one
+@@ -1,25 +1,24 @@
+-def dryrun():
+-    assert not (ROOT/'arms').exists()
+-    lock_stage2()
+-    check_stage2_sources()
+-    plan = np.load(ROOT/'sampling_plan.npz',allow_pickle=False)
+-    noise = np.load(ROOT/'gumbel_noise_float64.npy',mmap_mode='r',allow_pickle=False)
++def dryrun(seed):
++    assert not any(outdir(seed,a).exists() for a in ARMS)
++    check_sources()
++    plan = np.load(plan_dir(seed)/'sampling_plan.npz',allow_pickle=False)
++    noise = np.load(plan_dir(seed)/'gumbel_noise_float64.npy',mmap_mode='r',allow_pickle=False)
+     labels = np.load(ROOT/'train_labels.npy',allow_pickle=False)
+     rec,don = plan['receivers'][0,:BATCH],plan['donors'][0,:BATCH]
+     results = {}
+     expected = None
+     for arm in ARMS:
+-        cfg,tr,bb,cls,CE,methods,p,q = frozen_models()
++        cfg,tr,bb,cls,CE,methods,p,q = frozen_models(seed)
+         initial = {'backbone':state_hash(bb),'classifier':state_hash(cls)}
+         frozen = {k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
+-        aug = torch.Generator().manual_seed(S2_SEED+300009)
++        aug = torch.Generator().manual_seed(seed+300009)
+         ri,di = augment(rec,don,aug,tr['train_transform'])
+         with torch.no_grad():
+             receiver,donor = bb(ri.cuda()),bb(di.cuda())
+         trace = online_masks(receiver,labels[don],noise[0,:BATCH])
+         controls = {'initial':initial,'images':array_hash(ri.numpy(),di.numpy()),
+             'features':array_hash(receiver.cpu().numpy(),donor.cpu().numpy()),
+-            'S':trace['score_sha256'],'all_masks':trace['all_three_masks_sha256']}
++            'S':trace['score_sha256'],'all_masks':trace['all_two_masks_sha256']}
+         if expected is None:
+             expected = controls
+         else:
+@@ -47,21 +46,21 @@
+             'classifier_updated':True,'backbone_BN_affine_and_buffers_bitwise_unchanged':True,
+             'inputs_features_score_and_noise_paired':True}
+     guard_pass()
+-    dump(ROOT/'stage2_dryrun_verification.json',{'passed':True,'completed_at':now(),'arms':results,
+-        'seed':123,'controls':expected,'no_old_checkpoint_or_statistics':True,
++    dump(plan_dir(seed)/'dryrun_verification.json',{'passed':True,'completed_at':now(),'arms':results,
++        'seed':seed,'controls':expected,'no_old_checkpoint_or_statistics':True,
+         'disposable_updates_discarded':True,'formal_classifiers_freshly_reinitialized':True})
+-    print('CLEAN STAGE II DRYRUN PASS:three paired masks,16 complete channels,labels exact,classifier-only updates,BB/BN unchanged',flush=True)
++    print('STABILITY DRYRUN PASS:two paired masks,16 complete channels,labels exact,classifier-only updates,BB/BN unchanged',flush=True)
+ 
+-def train_one(arm):
+-    out = ROOT/'arms'/arm
++def train_one(seed,arm):
++    out = outdir(seed,arm)
+     assert not out.exists(), 'Refuse overwrite or stage2 resume'
+     (out/'checkpoints').mkdir(parents=True)
+-    cfg,tr,bb,cls,CE,methods,s1,q = frozen_models()
+-    cfg.name = ROOT.name+'_'+arm
++    cfg,tr,bb,cls,CE,methods,s1,q = frozen_models(seed)
++    cfg.name = ROOT.name+f'_seed{seed}_'+arm
+     cfg.model_dir = str(out/'checkpoints')
+     (out/'effective.yaml').write_text(cfg.dump(),encoding='utf-8')
+     experiment = read(ROOT/'protocol.json')
+-    experiment.update({'arm':arm,'clean_stage1_sha256':sha(s1),'classifier_initialization':'same Clean StageI best fc; fresh empty independent SGD',
++    experiment.update({'arm':arm,'seed':seed,'clean_stage1_sha256':sha(s1),'classifier_initialization':'same Clean StageI best fc; fresh empty independent SGD',
+         'statistics_sha256':sha(ROOT/'class_feature_statistics.npz'),'output':str(out)})
+     dump(out/'experiment_config.json',experiment)
+     frozen = {k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
+@@ -71,16 +70,16 @@
+     labels = np.load(ROOT/'train_labels.npy',allow_pickle=False)
+     val_labels = np.load(ROOT/'validation_labels.npy',allow_pickle=False)
+     val_bank = np.load(ROOT/'validation_feature_maps.npy',mmap_mode='r',allow_pickle=False)
+-    plan = np.load(ROOT/'sampling_plan.npz',allow_pickle=False)
+-    noise = np.load(ROOT/'gumbel_noise_float64.npy',mmap_mode='r',allow_pickle=False)
+-    aug = torch.Generator().manual_seed(S2_SEED+300009)
++    plan = np.load(plan_dir(seed)/'sampling_plan.npz',allow_pickle=False)
++    noise = np.load(plan_dir(seed)/'gumbel_noise_float64.npy',mmap_mode='r',allow_pickle=False)
++    aug = torch.Generator().manual_seed(seed+300009)
+     criterion = CE(cfg,np.bincount(labels,minlength=100)).cuda()
+     reference = None
+     if arm != ARMS[0]:
+-        with (ROOT/'arms'/ARMS[0]/'batches.csv').open(encoding='utf-8') as f:
++        with (outdir(seed,ARMS[0])/'batches.csv').open(encoding='utf-8') as f:
+             reference = list(csv.DictReader(f))
+-        assert len(reference) == 850 and initial == read(ROOT/'arms'/ARMS[0]/'status.json')['initial_state_hashes']
+-    status = {'state':'running','started_at':now(),'arm':arm,'seed':123,'epochs':[],
++        assert len(reference) == 850 and initial == read(outdir(seed,ARMS[0])/'status.json')['initial_state_hashes']
++    status = {'state':'running','started_at':now(),'arm':arm,'seed':seed,'epochs':[],
+         'best_epoch':None,'best_validation':None,'initial_state_hashes':initial,'TEST_used':False,'fresh_optimizer':True}
+     dump(out/'status.json',status)
+     # Identical disposable eval-mode GPU warmup in each arm.
+@@ -91,7 +90,7 @@
+     torch.cuda.synchronize()
+     actual = np.empty((10,N,16),dtype=np.uint8)
+     composition = {k:np.empty((10,N),dtype=np.float64) for k in ['V','B','ratio','score','common_with_uniform','fallback']}
+-    saved_scores = np.lib.format.open_memmap(ROOT/'online_clean_scores_float64.npy',mode='w+',dtype=np.float64,shape=(10,N,64)) if arm == ARMS[0] else None
++    saved_scores = np.lib.format.open_memmap(plan_dir(seed)/'online_scores_float64.npy',mode='w+',dtype=np.float64,shape=(10,N,64)) if arm == ARMS[0] else None
+     headers = [*PAIR_KEYS,'loss','lr','mask_sha256','augmentation_seconds','feature_seconds','scoring_seconds',
+         'fusion_seconds','update_seconds','mean_V','mean_B','mean_variance_fraction','mean_selected_score',
+         'mean_common_Uniform','fallback_draws']
+@@ -130,7 +129,7 @@
+                     'ambient_cpu_rng_sha256':tensor_hash(torch.get_rng_state()),
+                     'ambient_cuda_rng_sha256':tensor_hash(torch.cuda.get_rng_state()),
+                     'gumbel_sha256':array_hash(noise[epoch,start:end]),'online_gap_sha256':trace['GAP_sha256'],
+-                    'online_scores_sha256':trace['score_sha256'],'all_three_masks_sha256':trace['all_three_masks_sha256']}
++                    'online_scores_sha256':trace['score_sha256'],'all_two_masks_sha256':trace['all_two_masks_sha256']}
+                 if reference is not None:
+                     assert all(str(row[k]) == reference[epoch*85+batch][k] for k in PAIR_KEYS), ('paired batch differs',arm,epoch,batch)
+                 t = time.perf_counter()
+@@ -181,7 +180,7 @@
+             status['epochs'].append(entry)
+             checkpoint = {'epoch':epoch+1,'state_dict_model':frozen,
+                 'state_dict_classifier':{k:v.detach().cpu().clone() for k,v in cls.state_dict().items()},
+-                'optimizer':optimizer.state_dict(),'validation':val,'arm':arm,'seed':123,
++                'optimizer':optimizer.state_dict(),'validation':val,'arm':arm,'seed':seed,
+                 'Clean_StageI_sha256':sha(s1),'VS_statistics_sha256':sha(ROOT/'class_feature_statistics.npz'),
+                 'split_sha256':sha(ROOT/'split_indices.npz'),'TEST_used':False}
+             if improved:torch.save(checkpoint,out/'checkpoints/model_best.pth.tar')
+@@ -213,4 +212,4 @@
+             'backbone_BN_saved_bitwise_exact':True,'validation_reload_exact':True}
+     dump(out/'checkpoint_validation.json',checks);dump(out/'status.json',status)
+     guard_pass()
+-    print(f'COMPLETE CLEAN {arm}:10epochs,850SGD updates; independent Clean initialization; no TEST',flush=True)
++    print(f'COMPLETE CLEAN {arm}:10epochs,850SGD updates; independent Clean initialization; no TEST',flush=True)

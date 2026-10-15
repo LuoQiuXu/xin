@@ -1,0 +1,21 @@
+{
+  "files": {
+    "audit_dataset_protocol.py": "50a910a97a8d737d3c38a7dd45a5d5dd9e2b64edbf3fb947323ee99f1cf87acd",
+    "audit_evidence.json": "2ab66fea82059abf13750a7b3ffceffde213cd72bca5d5d52b6ac33900866032",
+    "checkpoint_metadata_verified.csv": "f5b6fe1e6bce665acfb8dacb00045bdd0a6ee983ef2b3dbbd5326b6d635573e7",
+    "dataset_class_counts.csv": "f84490179efba6bc16b2c64cd0c72b4ee563d91272ca19c12ab44a375e3bde35",
+    "DATASET_PROTOCOL_AUDIT.md": "ac5c728f8249bcc23616edbe4f0903b94c29e46ce85092bd37cccffe92245c85",
+    "historical_before.json": "1266baa4e48445f6391d2729d4f2604a5b06b47666c7bd7840f3d27e5011932c",
+    "historical_verification.json": "116a749b0b144c6d2dd8275d3c881ea73776ecd8937ae074f7fced24889ecfb1",
+    "raw_file_integrity.json": "9421da953a1cf0a7f7655875be373aa43bf757f42b8408c1aefaa3f9043293bc",
+    "raw_indices_verified.csv": "3c7e793ae43ed346601eaf1dc97a3535de9054d05c81b56c4217670eab3989da",
+    "source_records.json": "e785f7198cfb44ec430900d6abd7263647cd6ceda45185334a5c72c6bf5046d5",
+    "stage1_epoch_selection_verified.csv": "8794786aecc73cfd655c09c8181f3e631d9a0302eccbd03513602956c4e1decf",
+    "vs_saved_validation_verified.csv": "f42ccd42e030ad23b98d46f1648966c159870aafd0fd2fc935581214eebbaa58",
+    "write_dataset_report.py": "6680d7e5e39aac8a71c332adb98416cd1d330ef39a013a4ea40e3e4b21563127"
+  },
+  "root_report": "D:\\xiangmuxunlian\\新\\DATASET_PROTOCOL_AUDIT.md",
+  "root_report_sha256": "ac5c728f8249bcc23616edbe4f0903b94c29e46ce85092bd37cccffe92245c85",
+  "historical_files_unchanged": true,
+  "training_or_test_evaluation_started": false
+}

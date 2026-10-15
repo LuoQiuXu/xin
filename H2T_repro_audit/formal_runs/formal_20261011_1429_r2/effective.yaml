@@ -1,0 +1,79 @@
+H2T: -1.0
+ResLT:
+  gamma: 0.7
+alpha: 1.0
+backbone: resnet32_fe
+batch_size: 128
+classifier: Classifier
+data_path: "D:\\xiangmuxunlian\\\u65B0\\H2T\\data\\cifar100"
+dataset: cifar100
+deterministic: true
+dist_backend: nccl
+dist_url: tcp://224.66.41.62:23456
+distributed: false
+gpu: null
+head_class_idx:
+- 0
+- 36
+imb_factor: 0.01
+log_dir: logs
+loss:
+  CE:
+    reweight_CE: false
+  LDAM:
+    max_m: 0.5
+    reweight_epoch: -1
+    s: 30
+  RIDE:
+    additional_diversity_factor: -0.2
+    base_diversity_temperature: 1.0
+    base_loss_factor: 1.0
+    max_m: 0.5
+    reweight: false
+    reweight_epoch: -1
+    reweight_factor: 0.05
+    s: 30
+  ResLT:
+    beta: 0.99
+    smooth: 0.0
+  add_extra_info: false
+  type: CrossEntropyLoss
+lr: 0.1
+lr_scheduler:
+  lr_factor: 0.1
+  lr_step:
+  - 160
+  - 180
+  type: multistep
+med_class_idx:
+- 36
+- 71
+mixup: true
+mode: stage1
+model_dir: ckps
+momentum: 0.9
+multiprocessing_distributed: false
+name: cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2
+num_classes: 100
+num_epochs: 200
+num_experts: 1
+print_freq: 40
+rank: -1
+resume: ''
+sampler:
+  dual_sample:
+    enable: false
+    type: long-tailed
+  type: default
+  weighted_sampler:
+    type: balance
+shift_bn: false
+smooth_head: null
+smooth_tail: null
+tail_class_idx:
+- 71
+- 100
+use_norm: false
+weight_decay: 0.0002
+workers: 0
+world_size: -1

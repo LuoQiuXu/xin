@@ -1,0 +1,101 @@
+# Python caches, virtual environments and build products
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Model weights and exported models; publish separately as release assets
+*.pt
+*.pth
+*.pth.tar
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+
+# Downloaded datasets and archives; keep datasets/ Python source code
+**/data/
+cifar-100-python/
+cifar-10-batches-py/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.rar
+
+# Large image/feature banks, logits, scores, noise and mask arrays
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+# Small, locked data protocols and class statistics are useful for reproduction
+!**/split_indices.npz
+!**/sampling_plan.npz
+!**/class_feature_statistics.npz
+
+# Generated training outputs; keep canonical scripts/configuration outside these
+outputs/
+saved/
+checkpoints/
+feature_banks/
+feature_cache/
+matplotlib_cache/
+runs/
+wandb/
+lightning_logs/
+tmp/
+temp/
+*.log
+*.out
+*.tfevents.*
+*.jsonl
+*.ndjson
+**/batches.csv
+**/historical_before.json
+
+# Redundant generated source snapshots; keep the actual runnable source
+source_snapshot/
+stage2_source_snapshot/
+
+# Local editor/agent state and image inspection crops
+.idea/
+.vscode/
+.agents/
+.codex/
+.codex-analysis-crops/
+.codex-image-crops/
+.codex-plan-crops/
+
+# Local secrets (configuration JSON/YAML and summary CSV remain tracked)
+.env
+.env.*
+!.env.example
+!.env.sample
+credentials.json
+credentials.local.json
+*service-account*.json
+
+# OS metadata and temporary editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Intentionally kept: *.py, *.yaml, *.yml, ordinary *.json, summary *.csv,
+# *.md, LICENSE, dependency files and selected scientific figures.

@@ -1,0 +1,43 @@
+{
+  "declared_at": "2026-10-14T14:02:41+08:00",
+  "seeds": [
+    124,
+    125
+  ],
+  "methods": [
+    "Uniform-PerSample",
+    "Low-VS"
+  ],
+  "epochs_each": 10,
+  "updates_each": 850,
+  "batch_size": 128,
+  "last_batch": 95,
+  "rho": 0.25,
+  "channels": 64,
+  "replace": 16,
+  "Clean_StageI_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "statistics_sha256": "e81a4897a965d642f832bd6429e0e5a7d136725daaa069d9ded96f87ab64aef9",
+  "epsilon": 4.2622689356882903e-07,
+  "classifier_init": "fresh independent Clean StageI best fc; empty SGD state after dryrun",
+  "optimizer": "same original SGD lr.1,momentum.9,wd.0005,nesterovFalse",
+  "scheduler": "verbatim original StageII cosine, factor.2",
+  "score": "v_reg/(v_reg+(mu_h-current_augmented_receiver_GAP)^2+fixed_epsilon)",
+  "candidate_pool": 48,
+  "Low-VS": "bottom48 then uniform16 without replacement using shared Gumbel",
+  "Uniform": "all64 then uniform16 without replacement using shared Gumbel",
+  "fallback": "donor n<20 or score ptp<=1e-12 -> same Uniform; nonfinite stop; identical seed123 rule",
+  "RNG": "Python,NumPy,Torch,CUDA set per124/125; BS Python seed, IS Torch offset100003,augmentation Torch offset300009,Gumbel NumPy offset700021",
+  "primary": "fixed epoch10 99-class TRAIN validation; best validation epoch descriptive only",
+  "validation": "same locked1980 TRAIN holdout,20/class1..99,class0missing,100 logits; no TEST",
+  "seed123": "already observed pilot only; no retrain,no weights initialization; report separately from new124/125",
+  "stability_summary": "new124/125 paired deltas mean and sampleSD ddof1; n=2 not significance evidence",
+  "TEST": "no image/label decode, no CIFAR100(train=False), no TEST metrics/selection; opaque preflightMD5 only",
+  "no_hyperparameter_search": true,
+  "no_extra_seeds": true,
+  "stop_after124_125": true,
+  "arm": "Uniform-PerSample",
+  "seed": 124,
+  "clean_stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "classifier_initialization": "same Clean StageI best fc; fresh empty independent SGD",
+  "output": "D:\\xiangmuxunlian\\新\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\uniform_seed124"
+}

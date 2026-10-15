@@ -1,0 +1,8 @@
+{
+  "phase": "final_report",
+  "installed_at": "2026-10-13T22:13:24+08:00",
+  "official_test_image_or_label_loads": 0,
+  "allowed_integrity_open_count": 0,
+  "blocked_attempts": [],
+  "CIFAR100_trainFalse_calls": 0
+}

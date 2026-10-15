@@ -1,0 +1,27 @@
+{
+  "seed": 125,
+  "batches_each": 850,
+  "equal_control_rows": {
+    "epoch": 850,
+    "batch": 850,
+    "size": 850,
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "augmentation_state_after_sha256": 850,
+    "ambient_cpu_rng_sha256": 850,
+    "ambient_cuda_rng_sha256": 850,
+    "gumbel_sha256": 850,
+    "online_gap_sha256": 850,
+    "online_scores_sha256": 850,
+    "all_two_masks_sha256": 850
+  },
+  "same_initialization_hashes": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "same_inputs_BS_IS_augmentation_features_scores_noise": true,
+  "only_mask_differs": true,
+  "independent_empty_SGD": true,
+  "verified_at": "2026-10-14T14:21:25+08:00"
+}

@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-13T22:18:09+08:00",
+  "passed": true,
+  "StageI_epochs": 200,
+  "StageI_updates": 17000,
+  "StageII": {
+    "Uniform-PerSample": {
+      "epochs": 10,
+      "updates": 850,
+      "sample_draws": 108470,
+      "checkpoint_reloads_verified": 2
+    },
+    "High-VS": {
+      "epochs": 10,
+      "updates": 850,
+      "sample_draws": 108470,
+      "checkpoint_reloads_verified": 2
+    },
+    "Low-VS": {
+      "epochs": 10,
+      "updates": 850,
+      "sample_draws": 108470,
+      "checkpoint_reloads_verified": 2
+    }
+  },
+  "all_masks16_unique_channels": true,
+  "validation_classes": 99,
+  "validation_samples": 1980,
+  "class0_preserved_output_missing_validation": true,
+  "TEST_used": false,
+  "historical_protected_files": 2344,
+  "historical_files_unchanged": true,
+  "previous_report_live_log_resealed": []
+}

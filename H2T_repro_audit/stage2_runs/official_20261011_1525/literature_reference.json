@@ -1,0 +1,24 @@
+{
+  "verified_date": "2026-10-11",
+  "paper": {
+    "title": "Feature Fusion from Head to Tail for Long-Tailed Visual Recognition",
+    "url": "https://arxiv.org/html/2306.06963v3",
+    "table": "Table 5: Impact of different samplers",
+    "dataset": "CIFAR-100-LT IF=100",
+    "paper_best_fusion_ratio": 0.3
+  },
+  "table5": {
+    "stage1": {"overall": 39.55, "head": 67.86, "medium": 38.51, "tail": 5.66},
+    "dr": {"overall": 45.68, "head": 63.67, "medium": 46.63, "tail": 22.21},
+    "h2t": {"overall": 47.73, "head": 62.0, "medium": 50.17, "tail": 27.07}
+  },
+  "readme": {
+    "url": "https://github.com/Keke921/H2T#results-and-models",
+    "local_source": "runtime/README.md",
+    "if100_stage1_overall": 39.55,
+    "if100_stage2_h2t_overall": 47.80,
+    "dr_only_result_available": false,
+    "author_states_repository_config_rerun_slightly_better_than_paper": true
+  },
+  "environment_observed": {"driver": "591.74", "gpu_total_mib": 8151}
+}

@@ -1,0 +1,42 @@
+--- original_observer/evaluate_stage2.py
++++ control_observer/evaluate_bn_audit.py
+@@ -13,10 +13,11 @@
+ import numpy as np
+ import torch
+ 
+-from formal_stage1 import dump, sha
++from bn_audit_helpers import dump, sha
+ 
+-BASE = Path(__file__).resolve().parent
+-RUNTIME = BASE/"runtime"
++SUITE = Path(__file__).resolve().parent
++BASE = SUITE.parent.parent
++RUNTIME = SUITE/"runtime"
+ sys.path.insert(0, str(RUNTIME))
+ 
+ 
+@@ -78,7 +79,7 @@
+         finally:
+             handle.remove()
+         after = {k:v.detach().cpu() for k,v in model.named_buffers()}
+-        assert all(torch.equal(v,after[k]) for k,v in before.items())
++        assert all(v.numpy().tobytes() == after[k].contiguous().numpy().tobytes() for k,v in before.items())
+         captures["official_acc1"] = float(result[0])
+         captures["ece"] = float(result[1])
+         return result
+@@ -86,7 +87,7 @@
+     os.chdir(RUNTIME)
+     sys.argv = ["eval-modifed.py", "--cfg", "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+         "data_path", str(BASE.parent/"H2T/data/cifar100"), "resume", str(checkpoint_path),
+-        "H2T", str(status["H2T"]), "name", status["run_name"]+"_"+kind+"_eval"]
++        "H2T", str(status["H2T"]), "shift_bn", "False", "name", status["run_name"]+"_"+kind+"_eval"]
+     random.seed(123)
+     np.random.seed(123)
+     torch.manual_seed(123)
+@@ -121,4 +122,5 @@
+     parser.add_argument("--arm",choices=["dr","h2t"],required=True)
+     parser.add_argument("--kind",choices=["best","final"],required=True)
+     args = parser.parse_args()
+-    evaluate(BASE/"stage2_runs"/args.suite_id,args.arm,args.kind)
++    assert SUITE.name == args.suite_id
++    evaluate(SUITE,args.arm,args.kind)
