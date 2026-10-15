@@ -31,6 +31,7 @@ SEED=124/125；五臂：No-Fusion，Uniform-PerSample，Low-VS，Frequency-Only�
 
 步骤1：静态核对两份新文件和旧冻结训练组件，预检必需的 StageI/统计/图像/验证特征/计划文件是否在本地。仅修复新目录内确实阻塞执行的错误。
 从用户本地仓库根目录执行：
+python H2T_repro_audit/ravs_v1/test_policy.py
 python H2T_repro_audit/ravs_v1/run_ravs_v1.py preflight
 应看到 PREFLIGHT PASS，生成 ravs_v1/results/preflight.json。失败立即停止，不删除保护/配对规则。
 
