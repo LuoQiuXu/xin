@@ -1,0 +1,18 @@
+{
+  "algorithm_changed": false,
+  "fixes": [
+    "Frequency-Only diagnostic hardness now reports actual constant0.5",
+    "Low-VS diagnostic candidate pool reports48/fallback64",
+    "preflight checks finite CE,zero updates and frozen states",
+    "runtime flags reflected in effective config",
+    "historical files protected from writes",
+    "durable progress and failure registry",
+    "epoch pairing/parameter/memory/timing evidence persisted"
+  ],
+  "new_training_budget": 10,
+  "seeds": [
+    124,
+    125
+  ],
+  "TEST_allowed": false
+}

@@ -42,10 +42,21 @@ def test_policy():
             assert diag["candidate_pool_size"][0] == 64
             assert np.array_equal(mask[0],uniform[0])
             assert np.array_equal(mask[3],uniform[3])
+        if arm == "Frequency-Only":
+            assert np.array_equal(diag["hardness"], np.full(batch, 0.5))
+            expected = np.clip(np.floor(64 - 16 * 0.75 * f + 0.5),48,64).astype(int)
+            expected[trace["fallback"] > 0] = 64
+            assert np.array_equal(diag["candidate_pool_size"],expected)
         if arm == "RAVS-V1":
             assert diag["candidate_pool_size"][2] < diag["candidate_pool_size"][1]
         if arm == "Low-VS":
             assert np.array_equal(mask,trace["masks"]["Low-VS"])
+    # Equal clean logits imply h=.5, so the two gated strategies must coincide.
+    center = np.zeros((batch,100))
+    fr, fd = choose("Frequency-Only",trace,y,counts,center,noise)
+    rv, rd = choose("RAVS-V1",trace,y,counts,center,noise)
+    assert np.array_equal(fr,rv)
+    assert np.array_equal(fd["candidate_pool_size"],rd["candidate_pool_size"])
     print("PASS: endpoints, frequency gate, margin ordering, fallback,16 distinct channels")
 
 

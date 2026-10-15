@@ -1,0 +1,10 @@
+{
+  "Gate1": "both seed delta Overall(RAVS-Low)>=0; mean delta Overall>=0.15pp; mean delta Tail>=0; mean delta Head>=0",
+  "Gate2_Overall_route": "both seed delta Overall(RAVS-Frequency)>=0; mean delta Overall>=0.10pp",
+  "Gate2_Tail_route": "both seed delta Tail(RAVS-Frequency)>=0; mean delta Overall>=0; mean delta Tail>=0.35pp",
+  "direction_consistency": "nonnegative per seed on the outcome used for the gate; equality permitted",
+  "success": "Gate1 and (Gate2_Overall_route or Gate2_Tail_route); exploratory,not significance",
+  "primary_epoch": 10,
+  "best_epoch": "sensitivity only",
+  "stop_after_exactly_ten_runs": true
+}

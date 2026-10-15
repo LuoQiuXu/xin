@@ -1,0 +1,77 @@
+{
+  "status": "completed",
+  "seed": 124,
+  "arm": "Low-VS",
+  "updates": 850,
+  "last": {
+    "seed": 124,
+    "arm": "Low-VS",
+    "epoch": 10,
+    "lr": 0.0004894348372981928,
+    "train_loss": 1.4762982413814267,
+    "Overall": 47.323232323232325,
+    "Head": 59.857142857142854,
+    "OfficialMedium": 51.0,
+    "Tail": 27.75862068965517,
+    "Many": 60.588235294117645,
+    "Medium": 50.714285714285715,
+    "Few": 28.333333333333332,
+    "Macro": 47.323232323232325,
+    "validation_CE": 2.1530343566278014,
+    "mean_hardness": 0.25230872801087173,
+    "mean_omega": null,
+    "mean_candidate_pool_size": null,
+    "mean_fallback": 0.02811837374389232,
+    "mean_frequency_need": 0.5077856939037826,
+    "training_seconds": 5.154760199999146,
+    "peak_allocated_mib": 115.96826171875,
+    "peak_reserved_mib": 148.0,
+    "same_Uniform_mask_fraction": 0.033004517378076886,
+    "K_count_48": 10542,
+    "K_count_49": 0,
+    "K_count_50": 0,
+    "K_count_51": 0,
+    "K_count_52": 0,
+    "K_count_53": 0,
+    "K_count_54": 0,
+    "K_count_55": 0,
+    "K_count_56": 0,
+    "K_count_57": 0,
+    "K_count_58": 0,
+    "K_count_59": 0,
+    "K_count_60": 0,
+    "K_count_61": 0,
+    "K_count_62": 0,
+    "K_count_63": 0,
+    "K_count_64": 305
+  },
+  "best_epoch": 9,
+  "best_overall": 47.42424242424242,
+  "initial_hashes": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "classifier_max_abs_changes": {
+    "module.fc.weight": 0.33047282695770264,
+    "module.fc.bias": 0.12386062741279602
+  },
+  "pairing_counts_vs_No_Fusion": {
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "scores_sha256": 850,
+    "gumbel_sha256": 850
+  },
+  "backbone_state_entries_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "checkpoint_sha256": {
+    "best": "3417b960e2b61b3fb59ccbc9ef01be5e88cec7300838992cbcab3b6d9041220a",
+    "final": "6605670ff5870736cf6bb82fda6cfb39e628822a1d028080e20f5fbd88d60659"
+  },
+  "validation_reload_exact": true,
+  "final_backbone_hash": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "TEST_used": false,
+  "elapsed_seconds": 51.89425829999891
+}

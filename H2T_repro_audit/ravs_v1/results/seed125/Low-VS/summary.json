@@ -1,0 +1,77 @@
+{
+  "status": "completed",
+  "seed": 125,
+  "arm": "Low-VS",
+  "updates": 850,
+  "last": {
+    "seed": 125,
+    "arm": "Low-VS",
+    "epoch": 10,
+    "lr": 0.0004894348372981928,
+    "train_loss": 1.448848102008559,
+    "Overall": 47.17171717171717,
+    "Head": 59.57142857142857,
+    "OfficialMedium": 50.714285714285715,
+    "Tail": 27.93103448275862,
+    "Many": 60.44117647058823,
+    "Medium": 50.285714285714285,
+    "Few": 28.5,
+    "Macro": 47.17171717171717,
+    "validation_CE": 2.153165967536695,
+    "mean_hardness": 0.25357378845363066,
+    "mean_omega": null,
+    "mean_candidate_pool_size": null,
+    "mean_fallback": 0.02811837374389232,
+    "mean_frequency_need": 0.5047400188519633,
+    "training_seconds": 5.157323699997505,
+    "peak_allocated_mib": 115.96826171875,
+    "peak_reserved_mib": 148.0,
+    "same_Uniform_mask_fraction": 0.032082603484834514,
+    "K_count_48": 10542,
+    "K_count_49": 0,
+    "K_count_50": 0,
+    "K_count_51": 0,
+    "K_count_52": 0,
+    "K_count_53": 0,
+    "K_count_54": 0,
+    "K_count_55": 0,
+    "K_count_56": 0,
+    "K_count_57": 0,
+    "K_count_58": 0,
+    "K_count_59": 0,
+    "K_count_60": 0,
+    "K_count_61": 0,
+    "K_count_62": 0,
+    "K_count_63": 0,
+    "K_count_64": 305
+  },
+  "best_epoch": 6,
+  "best_overall": 47.22222222222222,
+  "initial_hashes": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "classifier_max_abs_changes": {
+    "module.fc.weight": 0.3529154062271118,
+    "module.fc.bias": 0.12557578086853027
+  },
+  "pairing_counts_vs_No_Fusion": {
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "scores_sha256": 850,
+    "gumbel_sha256": 850
+  },
+  "backbone_state_entries_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "checkpoint_sha256": {
+    "best": "f03f623ed51a4a0342ead8e6b199175c86a47c61a4dd0bfe005bc875311b43ed",
+    "final": "f1ad2574a43b5ce48682dd1cb21a37cf875fc4eb7e6c751cd7d3c54b4a2a4bdd"
+  },
+  "validation_reload_exact": true,
+  "final_backbone_hash": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "TEST_used": false,
+  "elapsed_seconds": 52.27947729999869
+}

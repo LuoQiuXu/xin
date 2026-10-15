@@ -82,10 +82,15 @@ def choose(
         assert np.isfinite(hardness).all(), "RAVS requires current clean logits"
         strength = need * (0.5 + 0.5 * hardness)
     elif arm == "Frequency-Only":
+        # Diagnostic h must describe the gate actually used, not unused online h.
+        hardness = np.full(n, 0.5)
         strength = need * 0.75
     else:
         strength = np.full(n, float("nan"))
     sizes = np.full(n, MAX_POOL, dtype=np.int64)
+    if arm == "Low-VS":
+        sizes[:] = MIN_POOL
+        sizes[np.asarray(trace["fallback"]) > 0] = MAX_POOL
     if arm in ("RAVS-V1", "Frequency-Only"):
         # Fixed half-up rounding, pool=64 at omega0 and pool=48 at omega1.
         sizes = np.floor(MAX_POOL - (MAX_POOL - MIN_POOL) * strength + 0.5).astype(np.int64)

@@ -1,0 +1,77 @@
+{
+  "status": "completed",
+  "seed": 125,
+  "arm": "RAVS-V1",
+  "updates": 850,
+  "last": {
+    "seed": 125,
+    "arm": "RAVS-V1",
+    "epoch": 10,
+    "lr": 0.0004894348372981928,
+    "train_loss": 1.206412249549123,
+    "Overall": 46.76767676767677,
+    "Head": 59.857142857142854,
+    "OfficialMedium": 49.857142857142854,
+    "Tail": 27.24137931034483,
+    "Many": 60.73529411764706,
+    "Medium": 49.42857142857143,
+    "Few": 27.833333333333332,
+    "Macro": 46.76767676767677,
+    "validation_CE": 2.152223490705394,
+    "mean_hardness": 0.2514938412453443,
+    "mean_omega": 0.31715145462443395,
+    "mean_candidate_pool_size": 59.06739190559602,
+    "mean_fallback": 0.02811837374389232,
+    "mean_frequency_need": 0.5047400188519633,
+    "training_seconds": 5.190716599998268,
+    "peak_allocated_mib": 115.96826171875,
+    "peak_reserved_mib": 148.0,
+    "same_Uniform_mask_fraction": 0.3380658246519775,
+    "K_count_48": 0,
+    "K_count_49": 0,
+    "K_count_50": 4,
+    "K_count_51": 21,
+    "K_count_52": 51,
+    "K_count_53": 233,
+    "K_count_54": 513,
+    "K_count_55": 885,
+    "K_count_56": 1080,
+    "K_count_57": 1025,
+    "K_count_58": 937,
+    "K_count_59": 995,
+    "K_count_60": 1040,
+    "K_count_61": 1074,
+    "K_count_62": 1014,
+    "K_count_63": 1083,
+    "K_count_64": 892
+  },
+  "best_epoch": 5,
+  "best_overall": 47.27272727272727,
+  "initial_hashes": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "classifier_max_abs_changes": {
+    "module.fc.weight": 0.3639042377471924,
+    "module.fc.bias": 0.12919265031814575
+  },
+  "pairing_counts_vs_No_Fusion": {
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "scores_sha256": 850,
+    "gumbel_sha256": 850
+  },
+  "backbone_state_entries_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "checkpoint_sha256": {
+    "best": "7c4f157d4ff531db279d4bc3c8e4e45500f409d9c16790520e4037ab78de74de",
+    "final": "d6a7289a85675af299d783c66decff342f1e1af393589b7b749e207e56dc10a9"
+  },
+  "validation_reload_exact": true,
+  "final_backbone_hash": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "TEST_used": false,
+  "elapsed_seconds": 52.4823572000023
+}

@@ -1,0 +1,23 @@
+{
+  "status": "complete",
+  "new_runs": 10,
+  "seeds": [
+    124,
+    125
+  ],
+  "arms": [
+    "No-Fusion",
+    "Uniform-PerSample",
+    "Low-VS",
+    "Frequency-Only",
+    "RAVS-V1"
+  ],
+  "epochs_each": 10,
+  "updates_total": 8500,
+  "fully_matched": true,
+  "Go": false,
+  "TEST_used": false,
+  "StageI_retraining": 0,
+  "no_further_training": true,
+  "historical_files_unchanged": 277
+}

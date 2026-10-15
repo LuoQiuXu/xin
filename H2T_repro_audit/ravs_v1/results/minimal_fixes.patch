@@ -1,0 +1,335 @@
+--- provided/ravs_policy.py
++++ reviewed/ravs_policy.py
+@@ -82,10 +82,15 @@
+         assert np.isfinite(hardness).all(), "RAVS requires current clean logits"
+         strength = need * (0.5 + 0.5 * hardness)
+     elif arm == "Frequency-Only":
++        # Diagnostic h must describe the gate actually used, not unused online h.
++        hardness = np.full(n, 0.5)
+         strength = need * 0.75
+     else:
+         strength = np.full(n, float("nan"))
+     sizes = np.full(n, MAX_POOL, dtype=np.int64)
++    if arm == "Low-VS":
++        sizes[:] = MIN_POOL
++        sizes[np.asarray(trace["fallback"]) > 0] = MAX_POOL
+     if arm in ("RAVS-V1", "Frequency-Only"):
+         # Fixed half-up rounding, pool=64 at omega0 and pool=48 at omega1.
+         sizes = np.floor(MAX_POOL - (MAX_POOL - MIN_POOL) * strength + 0.5).astype(np.int64)
+--- provided/run_ravs_v1.py
++++ reviewed/run_ravs_v1.py
+@@ -33,12 +33,14 @@
+ from reused_train_helpers import augment, fuse, scheduler, optimizer_for
+ from online_policy import online_masks
+ from ravs_policy import ARMS, choose, self_test
++from run_safeguards import environment, history_manifest, protect, check_history, source_hashes, stamp
+ 
+ SEEDS = (124, 125)
+ RESULTS = HERE / "results"
+ GROUPS = ("Overall", "Head", "OfficialMedium", "Tail",
+           "Many", "Medium", "Few", "Macro", "validation_CE")
+ AUDIT_EVENTS = []
++HISTORY_EVENTS = []
+ PROTOCOL = {
+     "method": "RAVS-H2T V1 receiver-adaptive VS candidate pooling",
+     "stage1_seed": 42, "stage1_selection": "TRAIN-only validation, epoch184",
+@@ -65,7 +67,7 @@
+ 
+ def json_write(path, obj):
+     path = Path(path)
+-    assert path.resolve().is_relative_to(HERE.resolve()), path
++    assert path.resolve().is_relative_to(RESULTS.resolve()), path
+     path.parent.mkdir(parents=True, exist_ok=True)
+     path.write_text(json.dumps(obj, ensure_ascii=False, indent=2,
+                                allow_nan=False), encoding="utf-8")
+@@ -73,7 +75,7 @@
+ 
+ def csv_write(path, rows):
+     path = Path(path)
+-    assert rows and path.resolve().is_relative_to(HERE.resolve()), path
++    assert rows and path.resolve().is_relative_to(RESULTS.resolve()), path
+     path.parent.mkdir(parents=True, exist_ok=True)
+     with path.open("w", encoding="utf-8", newline="") as f:
+         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+@@ -157,6 +159,7 @@
+ def fresh(seed):
+     cfg,tr,bb,cls,CE,methods,p,q = frozen_models(seed)
+     configure_compute()
++    cfg.deterministic = True  # reflect the already-declared common runtime flags
+     initial = {"backbone":state_hash(bb), "classifier":state_hash(cls)}
+     assert not any(p.requires_grad for p in bb.parameters())
+     return cfg,tr,bb,cls,CE,initial,p
+@@ -187,10 +190,19 @@
+         raise RuntimeError("CUDA required for this existing H2T code path")
+     self_test()
+     check_sources()
++    frozen_history = history_manifest(OLD,sha)
++    hist_path=RESULTS/"historical_manifest.json"
++    if hist_path.is_file():
++        assert json.loads(hist_path.read_text(encoding="utf-8"))==frozen_history
++    else: json_write(hist_path,frozen_history)
++    split=np.load(OLD/"split_indices.npz",allow_pickle=False)
++    assert len(np.intersect1d(split["train_raw_indices"],split["validation_raw_indices"]))==0
+     results = {}
+     for seed in SEEDS:
+         y,val_y,val_bank,plan,noise = load_data(seed)
+         cfg,tr,bb,cls,CE,initial,p = fresh(seed)
++        frozen={k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
++        initial_classifier=state_hash(cls)
+         aug = torch.Generator().manual_seed(seed + 300009)
+         warmup(tr,bb)
+         rec,don = plan["receivers"][0,:BATCH],plan["donors"][0,:BATCH]
+@@ -201,6 +213,8 @@
+         trace = online_masks(receiver,y[don],noise[0,:BATCH])
+         counts = np.bincount(y,minlength=100)
+         masks = {}
++        finite_losses={}
++        criterion=CE(cfg,counts).cuda()
+         for arm in ARMS:
+             chosen,diag = choose(arm,trace,y[rec],counts,logits,noise[0,:BATCH])
+             if chosen is not None:
+@@ -210,33 +224,54 @@
+                 assert torch.equal(mixed[~m],receiver[~m])
+                 masks[arm] = array_hash(chosen)
+             else:
++                mixed=receiver
++                assert chosen is None
+                 masks[arm]="no-fusion"
++            with torch.no_grad():
++                z=cls(mixed)
++                target=torch.from_numpy(y[rec].copy()).cuda()
++                loss=criterion(z,target,extra_info=None)
++                assert z.shape==(len(rec),100) and torch.isfinite(z).all() and torch.isfinite(loss)
++                assert np.array_equal(target.cpu().numpy(),y[rec])
++                finite_losses[arm]=float(loss)
+             if arm in ("Frequency-Only","RAVS-V1"):
+                 assert (diag["candidate_pool_size"]>=48).all()
+                 assert (diag["candidate_pool_size"]<=64).all()
++        check_frozen(bb,frozen)
++        assert state_hash(cls)==initial_classifier and all(p.grad is None for p in cls.parameters())
+         check_test_guard()
+         results[str(seed)] = {
+             "inputs_sha":{p.name:sha(p) for p in inputs(seed)},
+             "initial_state_hashes":initial,
+             "first_batch_signature":signatures(rec,don,y,ri,di,receiver,donor,noise[0,:BATCH],trace),
+-            "mask_examples_sha":masks,
++            "mask_examples_sha":masks,"no_update_CE_losses":finite_losses,
++            "backbone_BN_bitwise_unchanged":True,"backward_calls":0,"optimizer_steps":0,
+             "TEST_used":False
+         }
+         print(f"PREFLIGHT seed {seed}: 5 policies, 16 full channels, model frozen",flush=True)
+-    json_write(RESULTS/"preflight.json", {"status":"PASS","seeds":results,"protocol":PROTOCOL})
++    assert history_manifest(OLD,sha)==frozen_history
++    json_write(RESULTS/"preflight.json", {"status":"PASS","seeds":results,"protocol":PROTOCOL,
++        "environment":environment(),"source_hashes":source_hashes(sys.modules[__name__]),
++        "checkpoint_sha256":sha(OLD/"locked/clean_stage1_best.pth"),
++        "statistics_sha256":sha(OLD/"class_feature_statistics.npz"),"history_files_unchanged":len(frozen_history)})
+     print("PREFLIGHT PASS. Historical sources were not modified.",flush=True)
+ 
+ 
+ def run(seed,arm):
+     if not (RESULTS/"preflight.json").is_file():
+         raise RuntimeError("Run preflight first.")
++    pre=json.loads((RESULTS/"preflight.json").read_text(encoding="utf-8"))
++    assert pre["status"]=="PASS" and pre["source_hashes"]==source_hashes(sys.modules[__name__])
++    check_sources()
+     y,val_y,val_bank,plan,noise=load_data(seed)
+     output=RESULTS/f"seed{seed}"/arm
+     if output.exists():
+         raise FileExistsError(f"Refuse to overwrite or implicitly resume {output}")
+     cfg,tr,bb,cls,CE,initial,s1=fresh(seed)
++    assert initial==pre["seeds"][str(seed)]["initial_state_hashes"]
+     optimizer=optimizer_for(cfg,cls)
+     assert not optimizer.state
++    initial_classifier={k:v.detach().cpu().clone() for k,v in cls.state_dict().items()}
+     frozen={k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
+     warmup(tr,bb)
+     aug=torch.Generator().manual_seed(seed+300009)
+@@ -255,6 +290,7 @@
+         **PROTOCOL,"seed":seed,"arm":arm,"initial_hashes":initial,
+         "StageI_sha256":sha(s1),
+         "VS_statistics_sha256":sha(OLD/"class_feature_statistics.npz"),
++        "environment":environment(),"source_hashes":source_hashes(sys.modules[__name__]),
+     })
+     (output/"effective.yaml").write_text(cfg.dump(),encoding="utf-8")
+     epoch_rows=[]
+@@ -262,14 +298,19 @@
+     best=-1.
+     best_epoch=None
+     n_updates=0
++    pairing_counts={key:0 for key in ("indices_sha256","images_sha256","features_sha256","scores_sha256","gumbel_sha256")}
+     started=time.perf_counter()
+     with (output/"train.log").open("w",encoding="utf-8",buffering=1) as log:
+         for epoch in range(10):
+             cls.train()
+             schedule(optimizer,epoch,cfg)
++            torch.cuda.reset_peak_memory_stats()
++            epoch_started=time.perf_counter()
+             loss_sum=0.
+             diagnostics={"hardness":[], "omega":[], "candidate_pool_size":[],
+                          "fallback":[], "frequency_need":[]}
++            pool_counts=np.zeros(17,dtype=np.int64)
++            same_uniform=0;eligible_samples=0
+             for batch,start in enumerate(range(0,N,BATCH)):
+                 end=min(N,start+BATCH)
+                 rec,don=plan["receivers"][epoch,start:end],plan["donors"][epoch,start:end]
+@@ -283,12 +324,24 @@
+                 chosen,diag=choose(arm,trace,y[rec],np.bincount(y,minlength=100),
+                                    clean_logits,g)
+                 with torch.no_grad():
+-                    mixed=receiver if chosen is None else fuse(receiver,donor,chosen)[0]
++                    assert receiver.shape==(end-start,64,8,8) and not receiver.requires_grad
++                    if chosen is None: mixed=receiver
++                    else:
++                        mixed,copy_mask=fuse(receiver,donor,chosen)
++                        complete=copy_mask[:,:,None,None].expand_as(mixed)
++                        assert torch.equal(mixed[complete],donor[complete])
++                        assert torch.equal(mixed[~complete],receiver[~complete])
++                        same_uniform+=int((np.sort(chosen,axis=1)==np.sort(trace["masks"]["Uniform-PerSample"],axis=1)).all(1).sum())
++                    assert np.array_equal(target.cpu().numpy(),y[rec])
++                if arm!="No-Fusion":
++                    pool_counts+=np.bincount(diag["candidate_pool_size"]-48,minlength=17)
++                    eligible_samples+=len(rec)
+                 sig=signatures(rec,don,y,ri,di,receiver,donor,g,trace)
+                 if control_signatures is not None:
+                     expected=control_signatures[len(batch_rows)]
+                     for key in ("indices_sha256","images_sha256","features_sha256",
+                                 "scores_sha256","gumbel_sha256"):
++                        pairing_counts[key]+=int(sig[key]==expected[key])
+                         if sig[key] != expected[key]:
+                             raise RuntimeError(
+                                 f"Within-run input parity failed seed={seed} arm={arm} "
+@@ -297,7 +350,7 @@
+                             )
+                 logits=cls(mixed)
+                 loss=criterion(logits,target,extra_info=None)
+-                assert torch.isfinite(loss).item()
++                assert torch.isfinite(logits).all() and torch.isfinite(loss).item()
+                 optimizer.zero_grad(set_to_none=True)
+                 loss.backward()
+                 assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in cls.parameters())
+@@ -311,7 +364,14 @@
+                             diagnostics[key].extend(arr.tolist())
+                 loss_sum+=float(loss.detach())*(end-start)
+                 n_updates+=1
++                if batch%40==0:
++                    progress=f"{arm} seed{seed} epoch {epoch+1}/10 batch{batch}/85 loss={float(loss.detach()):.6f}"
++                    print(progress,flush=True);log.write(progress+"\n")
++            torch.cuda.synchronize()
++            epoch_seconds=time.perf_counter()-epoch_started
+             check_frozen(bb,frozen)
++            classifier_changes={k:float((v.detach().cpu()-initial_classifier[k]).abs().max()) for k,v in cls.state_dict().items()}
++            assert all(v>0 for v in classifier_changes.values())
+             val,logits_val,pred_val=evaluate(cls,val_y,feature_maps=val_bank)
+             if val["Overall"]>best:
+                 best=val["Overall"];best_epoch=epoch+1
+@@ -330,9 +390,14 @@
+                     "train_loss":loss_sum/N,
+                     **{key:val[key] for key in GROUPS},
+                     **{f"mean_{key}":float(np.mean(v)) if v else None
+-                        for key,v in diagnostics.items()}}
++                        for key,v in diagnostics.items()},
++                    "training_seconds":epoch_seconds,"peak_allocated_mib":torch.cuda.max_memory_allocated()/1024**2,
++                    "peak_reserved_mib":torch.cuda.max_memory_reserved()/1024**2,
++                    "same_Uniform_mask_fraction":same_uniform/N if arm!="No-Fusion" else None,
++                    **{f"K_count_{k}":int(pool_counts[k-48]) if arm!="No-Fusion" else None for k in range(48,65)}}
+             epoch_rows.append(record)
+             csv_write(output/"epoch_metrics.csv",epoch_rows)
++            csv_write(output/"batch_signatures.csv",batch_rows)
+             line=(f"{arm} seed{seed} epoch {epoch+1}/10 "
+                   f"Overall={val['Overall']:.4f} Tail={val['Tail']:.4f} "
+                   f"Few={val['Few']:.4f} Head={val['Head']:.4f}")
+@@ -352,13 +417,20 @@
+         "status":"completed","seed":seed,"arm":arm,"updates":850,
+         "last":epoch_rows[-1],"best_epoch":best_epoch,"best_overall":best,
+         "initial_hashes":initial,
++        "classifier_max_abs_changes":classifier_changes,
++        "pairing_counts_vs_No_Fusion":pairing_counts if arm!="No-Fusion" else {k:850 for k in pairing_counts},
++        "backbone_state_entries_bitwise_unchanged":len(frozen),"BN_counters":sorted({int(v) for k,v in frozen.items() if k.endswith("num_batches_tracked")}),
++        "checkpoint_sha256":{kind:sha(output/f"checkpoints/{kind}.pth") for kind in ("best","final")},
++        "validation_reload_exact":True,
+         "final_backbone_hash":state_hash(bb),
+         "TEST_used":False,"elapsed_seconds":time.perf_counter()-started,
+     })
+     check_test_guard()
+-
+-
+-def report():
++    check_history(sys.modules[__name__])
++    print(f"COMPLETE {arm} seed{seed}:10epochs,850updates; BB/BN fixed",flush=True)
++
++
++def report_original():
+     rows=[]
+     pair_rows=[]
+     for seed in SEEDS:
+@@ -445,6 +517,11 @@
+     print("MATCHED",not mismatch,flush=True)
+ 
+ 
++def report():
++    from analyze_ravs_results import report as analyze
++    return analyze(sys.modules[__name__])
++
++
+ def main():
+     parser=argparse.ArgumentParser()
+     parser.add_argument("action", choices=("preflight","train","report"))
+@@ -452,15 +529,24 @@
+     parser.add_argument("--arm",choices=ARMS)
+     args=parser.parse_args()
+     forbid_official_test()
+-    if args.action=="preflight":
+-        preflight()
+-    elif args.action=="train":
+-        if args.seed is None or args.arm is None:
+-            parser.error("train requires --seed and --arm")
+-        run(args.seed,args.arm)
+-    else:
+-        report()
+-    check_test_guard()
++    protect(HERE.parent,HERE,HISTORY_EVENTS)
++    if args.action=="train" and (args.seed is None or args.arm is None):
++        parser.error("train requires --seed and --arm")
++    status_path=RESULTS/"run_registry.json"
++    registry=json.loads(status_path.read_text(encoding="utf-8")) if status_path.is_file() else []
++    entry={"action":args.action,"seed":args.seed,"arm":args.arm,"started_at":stamp(),"status":"running"}
++    registry.append(entry);json_write(status_path,registry)
++    try:
++        if args.action=="preflight":preflight()
++        elif args.action=="train":run(args.seed,args.arm)
++        else:report()
++        check_test_guard();assert not HISTORY_EVENTS
++        entry.update({"status":"completed","finished_at":stamp(),"TEST_events":AUDIT_EVENTS,"historical_write_events":HISTORY_EVENTS})
++    except BaseException:
++        import traceback
++        entry.update({"status":"failed","finished_at":stamp(),"traceback":traceback.format_exc(),"TEST_events":AUDIT_EVENTS,"historical_write_events":HISTORY_EVENTS})
++        raise
++    finally:json_write(status_path,registry)
+ 
+ 
+ if __name__=="__main__":
+--- provided/test_policy.py
++++ reviewed/test_policy.py
+@@ -42,10 +42,21 @@
+             assert diag["candidate_pool_size"][0] == 64
+             assert np.array_equal(mask[0],uniform[0])
+             assert np.array_equal(mask[3],uniform[3])
++        if arm == "Frequency-Only":
++            assert np.array_equal(diag["hardness"], np.full(batch, 0.5))
++            expected = np.clip(np.floor(64 - 16 * 0.75 * f + 0.5),48,64).astype(int)
++            expected[trace["fallback"] > 0] = 64
++            assert np.array_equal(diag["candidate_pool_size"],expected)
+         if arm == "RAVS-V1":
+             assert diag["candidate_pool_size"][2] < diag["candidate_pool_size"][1]
+         if arm == "Low-VS":
+             assert np.array_equal(mask,trace["masks"]["Low-VS"])
++    # Equal clean logits imply h=.5, so the two gated strategies must coincide.
++    center = np.zeros((batch,100))
++    fr, fd = choose("Frequency-Only",trace,y,counts,center,noise)
++    rv, rd = choose("RAVS-V1",trace,y,counts,center,noise)
++    assert np.array_equal(fr,rv)
++    assert np.array_equal(fd["candidate_pool_size"],rd["candidate_pool_size"])
+     print("PASS: endpoints, frequency gate, margin ordering, fallback,16 distinct channels")
+ 
+ 
