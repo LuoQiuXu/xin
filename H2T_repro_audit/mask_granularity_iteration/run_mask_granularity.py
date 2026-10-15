@@ -25,7 +25,7 @@ sys.path.insert(0, str(OLD))
 import numpy as np
 import torch
 from common import (N, BATCH, seed_all, array_hash, state_hash, sha, metrics, evaluate,
-                    csv_write, check_frozen)
+                    check_frozen)
 from stability_models import (frozen_models, outdir, plan_dir, PAIR_KEYS, check_sources)
 from reused_train_helpers import augment, fuse, tensor_hash, scheduler, optimizer_for
 from online_policy import online_masks, selected_statistics
@@ -51,6 +51,14 @@ def install_local_test_guard():
 
 def guard_check():
     assert not _TEST_EVENTS, _TEST_EVENTS
+
+def csv_write(path, rows):
+    assert rows and path.resolve().is_relative_to(HERE), "Outputs must remain under new experiment directory"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
 
 ARM = "Uniform-BatchShared"
 SEEDS = (124, 125)
