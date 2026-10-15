@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-15T19:22:55.638600+08:00",
+  "passed": true,
+  "formal_new_runs": 2,
+  "seeds": [
+    124,
+    125
+  ],
+  "epochs_each": 10,
+  "updates_total": 1700,
+  "old_control_retraining": false,
+  "StageI_retraining": false,
+  "official_TEST_used": false,
+  "historical_files_unchanged": 277,
+  "training_sources_unchanged_after_start": true,
+  "all_13_historical_fields_exact": false,
+  "continuation_authorized_by_user": true,
+  "all_shared_masks_equal_historical_first_Uniform": true,
+  "frozen_BB_BN_saved_states_exact": true,
+  "four_best_final_checkpoint_hashes_verified": true,
+  "new_source_manifest": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mask_granularity_iteration\\results\\source_manifest.json"
+}

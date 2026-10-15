@@ -1,0 +1,288 @@
+--- strict_preflight
++++ authorized_continuation
+@@ -119,124 +119,147 @@
+ 
+ 
+ def train(seed):
++    import time
++    from PIL import Image
++    from preflight_checks import dump,history_manifest
+     ensure_inputs(seed)
+-    output = RESULTS / f"shared_seed{seed}"
+-    if output.exists():
+-        raise FileExistsError(f"Refusing to overwrite previous run: {output}")
+-    output.mkdir(parents=True)
+-    (output/"checkpoints").mkdir()
+-    (output/"protocol.json").write_text(json.dumps({**PROTOCOL, "seed": seed}, indent=2), encoding="utf-8")
+-    reference = control_rows(seed)
+-    cfg, tr, bb, cls, CE, methods, s1, q = frozen_models(seed)
+-    cfg.name = f"mask_granularity_shared_seed{seed}"
+-    cfg.model_dir = str(output/"checkpoints")
+-    cfg.shift_bn = False
+-    (output/"effective.yaml").write_text(cfg.dump(), encoding="utf-8")
+-    init_bb = state_hash(bb)
+-    init_cls = state_hash(cls)
+-    frozen = {k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
+-    optimizer = optimizer_for(cfg,cls)
+-    assert not optimizer.state
+-    labels = np.load(OLD/"train_labels.npy",allow_pickle=False)
+-    val_labels = np.load(OLD/"validation_labels.npy",allow_pickle=False)
+-    val_bank = np.load(OLD/"validation_feature_maps.npy", mmap_mode="r",allow_pickle=False)
+-    plan = np.load(plan_dir(seed)/"sampling_plan.npz",allow_pickle=False)
+-    noise = np.load(plan_dir(seed)/"gumbel_noise_float64.npy",mmap_mode="r",allow_pickle=False)
+-    aug = torch.Generator().manual_seed(seed+300009)
+-    criterion = CE(cfg,np.bincount(labels,minlength=100)).cuda()
+-    lr_schedule = scheduler()
+-    records, masks = [], np.empty((10,N,16),dtype=np.uint8)
+-    equality = {key:0 for key in PAIR_KEYS}
+-    best = -1.0
+-    batch_counter = 0
++    baseline=json.loads((RESULTS/'historical_readonly_baseline.json').read_text(encoding='utf-8'))
++    assert history_manifest(OLD,sha)==baseline
++    output=RESULTS/f'shared_seed{seed}'
++    if output.exists():raise FileExistsError(f'Refusing to overwrite previous run: {output}')
++    cfg,tr,bb,cls,CE,methods,s1,q=frozen_models(seed)
++    init_bb,init_cls=state_hash(bb),state_hash(cls)
++    reference_state=json.loads((outdir(seed,'Uniform-PerSample')/'status.json').read_text(encoding='utf-8'))['initial_state_hashes']
++    assert {'backbone':init_bb,'classifier':init_cls}==reference_state
++    output.mkdir(parents=True);(output/'checkpoints').mkdir()
++    cfg.name=f'mask_granularity_shared_seed{seed}';cfg.model_dir=str(output/'checkpoints');cfg.shift_bn=False
++    (output/'effective.yaml').write_text(cfg.dump(),encoding='utf-8')
++    dump(output/'protocol.json',{**PROTOCOL,'seed':seed,'historical_hash_gate_override':True,
++        'full_13_fields_recorded':True,'initial_state_matches_control':True,
++        'user_authorization':'2026-10-15: continue despite preflight mismatch; fixed requested environment',
++        'source_hashes':{name:sha(HERE/name) for name in ['run_mask_granularity.py','mask_policy.py','preflight_checks.py']},
++        'Clean_StageI_sha256':sha(s1),'VS_statistics_sha256':sha(OLD/'class_feature_statistics.npz')})
++    reference=control_rows(seed)
++    frozen={k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
++    initial_fc={k:v.detach().cpu().clone() for k,v in cls.state_dict().items()}
++    optimizer=optimizer_for(cfg,cls);assert not optimizer.state
++    labels=np.load(OLD/'train_labels.npy',allow_pickle=False)
++    val_labels=np.load(OLD/'validation_labels.npy',allow_pickle=False)
++    val_bank=np.load(OLD/'validation_feature_maps.npy',mmap_mode='r',allow_pickle=False)
++    plan=np.load(plan_dir(seed)/'sampling_plan.npz',allow_pickle=False)
++    noise=np.load(plan_dir(seed)/'gumbel_noise_float64.npy',mmap_mode='r',allow_pickle=False)
++    original_masks=np.load(outdir(seed,'Uniform-PerSample')/'actual_masks.npz',allow_pickle=False)['masks']
++    aug=torch.Generator().manual_seed(seed+300009)
++    criterion=CE(cfg,np.bincount(labels,minlength=100)).cuda();lr_schedule=scheduler()
++    images=np.load(OLD/'train_images.npy',mmap_mode='r',allow_pickle=False)[:BATCH]
++    with torch.no_grad():
++        warm=torch.stack([tr['eval_transform'](Image.fromarray(v)) for v in images]).cuda();bb(warm);bb(warm)
++    torch.cuda.synchronize()
++    records=[];masks=np.empty((10,N,16),dtype=np.uint8)
++    composition={k:np.empty((10,N),dtype=np.float64) for k in ['V','B','ratio','score','common_with_uniform','fallback','GAP_L2','feature_map_L2']}
++    equality={key:0 for key in PAIR_KEYS};mismatch_rows=[];batch_rows=[];best=-1.;counter=0
++    initial_time=time.perf_counter();best_epoch=None
++    log=(output/'training.log').open('w',encoding='utf-8',buffering=1)
++    def message(text):log.write(text+'\n');print(text,flush=True)
++    dump(output/'status.json',{'status':'running','seed':seed,'epochs_completed':0,'updates':0})
+     for epoch in range(10):
+-        cls.train()
+-        lr_schedule(optimizer,epoch,cfg)
+-        weighted_loss = 0.
++        cls.train();lr_schedule(optimizer,epoch,cfg);torch.cuda.reset_peak_memory_stats()
++        start_epoch=time.perf_counter();weighted_loss=0.
+         for batch,start in enumerate(range(0,N,BATCH)):
+-            end = min(N,start+BATCH)
+-            rec,don = plan["receivers"][epoch,start:end],plan["donors"][epoch,start:end]
+-            target = torch.from_numpy(labels[rec].copy()).cuda()
+-            ri,di = augment(rec,don,aug,tr["train_transform"])
++            end=min(N,start+BATCH)
++            rec,don=plan['receivers'][epoch,start:end],plan['donors'][epoch,start:end]
++            target=torch.from_numpy(labels[rec].copy()).cuda()
++            ri,di=augment(rec,don,aug,tr['train_transform'])
++            with torch.no_grad():receiver,donor=bb(ri.cuda()),bb(di.cuda())
++            assert receiver.shape==(end-start,64,8,8) and not receiver.requires_grad
++            g=noise[epoch,start:end];trace=online_masks(receiver,labels[don],g)
++            row={'epoch':epoch+1,'batch':batch,'size':end-start,
++                'indices_sha256':array_hash(rec,don,labels[rec],labels[don]),
++                'images_sha256':array_hash(ri.numpy(),di.numpy()),
++                'features_sha256':array_hash(receiver.cpu().numpy(),donor.cpu().numpy()),
++                'augmentation_state_after_sha256':tensor_hash(aug.get_state()),
++                'ambient_cpu_rng_sha256':tensor_hash(torch.get_rng_state()),
++                'ambient_cuda_rng_sha256':tensor_hash(torch.cuda.get_rng_state()),
++                'gumbel_sha256':array_hash(g),'online_gap_sha256':trace['GAP_sha256'],
++                'online_scores_sha256':trace['score_sha256'],'all_two_masks_sha256':trace['all_two_masks_sha256']}
++            changed=[]
++            for key in PAIR_KEYS:
++                expected=reference[counter][key];actual=str(row[key]);matches=actual==expected
++                equality[key]+=int(matches)
++                if not matches:
++                    changed.append(key);mismatch_rows.append({'seed':seed,'epoch':epoch+1,'batch':batch,'field':key,'expected':expected,'actual':actual})
++            chosen=choose(ARM,trace)
++            assert np.array_equal(chosen,np.broadcast_to(original_masks[epoch,start],chosen.shape)), 'Shared masks must equal sealed Uniform first mask'
+             with torch.no_grad():
+-                receiver,donor = bb(ri.cuda()),bb(di.cuda())
+-            g = noise[epoch,start:end]
+-            trace = online_masks(receiver,labels[don],g)
+-            row = {
+-                "epoch": epoch+1, "batch":batch, "size":end-start,
+-                "indices_sha256":array_hash(rec,don,labels[rec],labels[don]),
+-                "images_sha256":array_hash(ri.numpy(),di.numpy()),
+-                "features_sha256":array_hash(receiver.cpu().numpy(),donor.cpu().numpy()),
+-                "augmentation_state_after_sha256":tensor_hash(aug.get_state()),
+-                "ambient_cpu_rng_sha256":tensor_hash(torch.get_rng_state()),
+-                "ambient_cuda_rng_sha256":tensor_hash(torch.cuda.get_rng_state()),
+-                "gumbel_sha256":array_hash(g),
+-                "online_gap_sha256":trace["GAP_sha256"],
+-                "online_scores_sha256":trace["score_sha256"],
+-                "all_two_masks_sha256":trace["all_two_masks_sha256"],
+-            }
+-            for key in PAIR_KEYS:
+-                if str(row[key]) != reference[batch_counter][key]:
+-                    raise AssertionError(f"Control mismatch seed={seed} batch={batch_counter} key={key}")
+-                equality[key] += 1
+-            chosen = choose(ARM,trace)
+-            with torch.no_grad():
+-                mixed,_ = fuse(receiver,donor,chosen)
+-            assert np.array_equal(target.cpu().numpy(),labels[rec])
+-            masks[epoch,start:end] = chosen
+-            logits = cls(mixed)
+-            loss = criterion(logits,target,extra_info=None)
+-            assert torch.isfinite(loss)
+-            optimizer.zero_grad()
+-            loss.backward()
++                mixed,mask=fuse(receiver,donor,chosen)
++                full=mask[:,:,None,None].expand_as(mixed)
++                assert torch.equal(mixed[full],donor[full]) and torch.equal(mixed[~full],receiver[~full])
++                delta=mixed-receiver
++                gap_delta=torch.nn.functional.avg_pool2d(delta,8).flatten(1)
++                composition['GAP_L2'][epoch,start:end]=gap_delta.norm(dim=1).cpu().numpy()
++                composition['feature_map_L2'][epoch,start:end]=delta.flatten(1).norm(dim=1).cpu().numpy()
++            assert np.array_equal(target.cpu().numpy(),labels[rec]) and torch.isfinite(mixed).all()
++            masks[epoch,start:end]=chosen
++            selected=selected_statistics(trace,chosen)
++            for key,value in selected.items():composition[key][epoch,start:end]=value
++            logits=cls(mixed);loss=criterion(logits,target,extra_info=None)
++            assert torch.isfinite(logits).all() and torch.isfinite(loss)
++            optimizer.zero_grad();loss.backward()
+             assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in cls.parameters())
+-            optimizer.step()
+-            weighted_loss += float(loss.detach())*(end-start)
+-            batch_counter += 1
++            optimizer.step();weighted_loss+=float(loss.detach())*(end-start);counter+=1
++            row.update({'loss':float(loss.detach()),'lr':optimizer.param_groups[0]['lr'],
++                'shared_mask_sha256':array_hash(chosen),'mismatching_fields':';'.join(changed)})
++            batch_rows.append(row)
++            if batch%40==0:message(f'Shared seed={seed} epoch={epoch+1}/10 batch={batch}/85 loss={float(loss.detach()):.6f}; differing control fields={len(changed)}')
++        torch.cuda.synchronize();train_seconds=time.perf_counter()-start_epoch
+         check_frozen(bb,frozen)
+-        val,logits,preds = evaluate(cls,val_labels,feature_maps=val_bank)
+-        improved = val["Overall"] > best
+-        if improved: best=val["Overall"]
+-        checkpoint = {
+-            "epoch":epoch+1,
+-            "state_dict_model":frozen,
+-            "state_dict_classifier":{k:v.detach().cpu().clone() for k,v in cls.state_dict().items()},
+-            "validation":val, "arm":ARM, "seed":seed, "TEST_used":False,
+-            "Clean_StageI_sha256":sha(s1),
+-            "VS_statistics_sha256":sha(OLD/"class_feature_statistics.npz"),
+-        }
+-        if improved: torch.save(checkpoint,output/"checkpoints/model_best.pth.tar")
+-        if epoch==9: torch.save(checkpoint,output/"checkpoints/model_final.pth.tar")
+-        np.savez_compressed(output/f"validation_epoch{epoch+1:02d}.npz",
+-                            logits=logits,predictions=preds,labels=val_labels)
+-        records.append({"arm":ARM,"seed":seed,"epoch":epoch+1,
+-                        "train_loss":weighted_loss/N, "lr":optimizer.param_groups[0]["lr"],
+-                        **{k:val[k] for k in ("Overall","Head","OfficialMedium","Tail",
+-                                                "Many","Medium","Few","Macro","validation_CE")}})
+-        csv_write(output/"epoch_validation_metrics.csv",records)
++        fc_change={k:float((v.detach().cpu()-initial_fc[k]).abs().max()) for k,v in cls.state_dict().items()}
++        assert all(v>0 for v in fc_change.values())
++        val,logits,preds=evaluate(cls,val_labels,feature_maps=val_bank)
++        improved=val['Overall']>best
++        if improved:best=val['Overall'];best_epoch=epoch+1
++        checkpoint={'epoch':epoch+1,'state_dict_model':frozen,
++            'state_dict_classifier':{k:v.detach().cpu().clone() for k,v in cls.state_dict().items()},
++            'optimizer':optimizer.state_dict(),'validation':val,'arm':ARM,'seed':seed,'TEST_used':False,
++            'Clean_StageI_sha256':sha(s1),'VS_statistics_sha256':sha(OLD/'class_feature_statistics.npz'),
++            'split_sha256':sha(OLD/'split_indices.npz'),'strict_historical_feature_parity':False}
++        if improved:torch.save(checkpoint,output/'checkpoints/model_best.pth.tar')
++        if epoch==9:torch.save(checkpoint,output/'checkpoints/model_final.pth.tar')
++        np.savez_compressed(output/f'validation_epoch{epoch+1:02d}.npz',logits=logits,predictions=preds,labels=val_labels)
++        records.append({'arm':ARM,'seed':seed,'epoch':epoch+1,'train_loss':weighted_loss/N,
++            'lr':optimizer.param_groups[0]['lr'],**{k:val[k] for k in ['Overall','Head','OfficialMedium','Tail','Many','Medium','Few','Macro','validation_CE']},
++            'training_seconds':train_seconds,'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
++            'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2})
++        csv_write(output/'epoch_validation_metrics.csv',records);csv_write(output/'batches.csv',batch_rows)
++        if mismatch_rows:csv_write(output/'control_mismatches.csv',mismatch_rows)
++        dump(output/'status.json',{'status':'running','seed':seed,'epochs_completed':epoch+1,'updates':counter,
++            'equal_fields':equality,'classifier_max_abs_changes':fc_change,'backbone_BN_bitwise_unchanged':True})
+         guard_check()
+-        print(f"shared seed={seed} epoch={epoch+1}/10 "
+-              f"overall={val['Overall']:.4f} Tail={val['Tail']:.4f} Few={val['Few']:.4f}", flush=True)
+-    assert batch_counter==850 and all(v==850 for v in equality.values())
+-    np.savez_compressed(output/"actual_masks.npz",masks=masks)
+-    for kind in ("best","final"):
+-        ck = torch.load(output/f"checkpoints/model_{kind}.pth.tar",
+-                        map_location="cpu",weights_only=False)
+-        assert ck["TEST_used"] is False and ck["arm"]==ARM
+-        assert all(torch.equal(v,frozen[k]) for k,v in ck["state_dict_model"].items())
+-        cls.load_state_dict(ck["state_dict_classifier"],strict=True)
++        message(f'Shared seed={seed} epoch={epoch+1}/10 Overall={val["Overall"]:.4f} Head={val["Head"]:.4f} Medium={val["OfficialMedium"]:.4f} Tail={val["Tail"]:.4f} Few={val["Few"]:.4f}; {train_seconds:.2f}s; BB/BN frozen')
++    assert counter==850
++    np.savez_compressed(output/'actual_masks.npz',masks=masks)
++    np.savez_compressed(output/'sampling_composition.npz',**composition)
++    reloads={}
++    for kind in ['best','final']:
++        ck=torch.load(output/f'checkpoints/model_{kind}.pth.tar',map_location='cpu',weights_only=False)
++        assert all(v.numpy().tobytes()==frozen[k].numpy().tobytes() for k,v in ck['state_dict_model'].items())
++        cls.load_state_dict(ck['state_dict_classifier'],strict=True)
+         loaded,_,_=evaluate(cls,val_labels,feature_maps=val_bank)
+-        assert loaded==ck["validation"], f"Checkpoint reload mismatch {kind}"
+-    summary = {
+-        "status":"complete", "seed":seed, "epoch10":records[-1],
+-        "best":max(records,key=lambda r:r["Overall"]),
+-        "initial_backbone_hash":init_bb,"initial_classifier_hash":init_cls,
+-        "paired_control_fields_verified":equality, "paired_batches":850,
+-        "stage1_frozen":state_hash(bb)==init_bb, "TEST_used":False,
+-        "final_checkpoint_sha256":sha(output/"checkpoints/model_final.pth.tar"),
+-    }
+-    (output/"summary.json").write_text(json.dumps(summary,indent=2),encoding="utf-8")
+-    print(f"TRAIN PASS seed={seed}: 850 fully paired batches, frozen BB/BN, 10 epochs", flush=True)
++        assert loaded==ck['validation']
++        reloads[kind]={'epoch':ck['epoch'],'metrics':loaded,'sha256':sha(output/f'checkpoints/model_{kind}.pth.tar'),
++            'validation_reload_exact':True,'all_backbone_BN_state_entries_bitwise_unchanged':len(frozen)}
++    check_frozen(bb,frozen);assert history_manifest(OLD,sha)==baseline
++    summary={'status':'complete','seed':seed,'epoch10':records[-1],'best':max(records,key=lambda x:x['Overall']),
++        'best_epoch':best_epoch,'initial_backbone_hash':init_bb,'initial_classifier_hash':init_cls,
++        'paired_control_fields_verified':equality,'compared_batches':850,'all_13_fields_exact':all(x==850 for x in equality.values()),
++        'historical_mismatch_authorized':True,'mismatching_field_records':len(mismatch_rows),
++        'stage1_frozen':state_hash(bb)==init_bb,'classifier_changed':fc_change,'TEST_used':False,
++        'updates':850,'epochs':10,'run_seconds':time.perf_counter()-initial_time,
++        'checkpoints':reloads,'all_shared_masks_equal_sealed_Uniform_first_masks':True}
++    dump(output/'summary.json',summary);dump(output/'status.json',{'status':'complete','seed':seed,'epochs_completed':10,'updates':850})
++    log.close();message_text=f'TRAIN COMPLETE seed={seed}:850 updates,10epochs; historical 13-field equality={equality}'
++    print(message_text,flush=True)
++
+ 
+ 
+ def csv_records(path):
+@@ -293,7 +316,8 @@
+ 
+ def report():
+     if all((RESULTS/f"shared_seed{s}/summary.json").is_file() for s in SEEDS):
+-        return report_completed()
++        from scientific_report import report as full_report
++        return full_report(sys.modules[__name__])
+     from blocked_report import report as report_preflight_failure
+     return report_preflight_failure(sys.modules[__name__])
+ 
+@@ -319,10 +343,13 @@
+     try:
+         if args.action=="preflight":preflight()
+         elif args.action=="train":
+-            gate=RESULTS/"preflight_pass.json"
+-            if not gate.is_file():raise RuntimeError("Strict preflight pass required before training")
+-            env=json.loads(gate.read_text(encoding="utf-8"))["environment"]
+-            assert env["python"]==sys.executable and env["torch"]==torch.__version__ and env["cuda"]==torch.version.cuda
++            gate=RESULTS/"continuation_authorization.json"
++            if not gate.is_file():raise RuntimeError("Explicit user continuation authorization required")
++            authorization=json.loads(gate.read_text(encoding="utf-8"))
++            assert authorization["authorized_seeds"]==[124,125]
++            assert sys.executable.casefold()==authorization["python"].casefold()
++            assert torch.__version__==authorization["torch"] and torch.version.cuda==authorization["cuda"]
++            print("USER-AUTHORIZED CONTINUATION: all 13 control fields recorded; exact historical hash gate waived",flush=True)
+             train(args.seed)
+         else:report()
+         guard_check()

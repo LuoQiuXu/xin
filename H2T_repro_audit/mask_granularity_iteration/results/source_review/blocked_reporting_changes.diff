@@ -1,0 +1,25 @@
+--- reviewed/strict_preflight
++++ reviewed/blocked_reporting
+@@ -244,7 +244,7 @@
+         return list(csv.DictReader(f))
+ 
+ 
+-def report():
++def report_completed():
+     for seed in SEEDS:
+         ensure_inputs(seed)
+         assert (RESULTS/f"shared_seed{seed}/summary.json").is_file(), f"train seed{seed} first"
+@@ -290,6 +290,13 @@
+     for row in flip_rows:print(json.dumps(row,ensure_ascii=False))
+ 
+ 
++
++def report():
++    if all((RESULTS/f"shared_seed{s}/summary.json").is_file() for s in SEEDS):
++        return report_completed()
++    from blocked_report import report as report_preflight_failure
++    return report_preflight_failure(sys.modules[__name__])
++
+ def main():
+     parser=argparse.ArgumentParser()
+     parser.add_argument("action",choices=("preflight","train","report"))

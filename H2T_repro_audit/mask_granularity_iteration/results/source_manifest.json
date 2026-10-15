@@ -1,0 +1,23 @@
+{
+  "new_sources": {
+    "blocked_report.py": "c35f774f62bd72637bf1303483b105cace854c589e024934d06c4a1d3b9a1fc7",
+    "mask_policy.py": "f048dc0be45814035041aaafd7602d30955841b160cbb8c214c816842bc4c856",
+    "preflight_checks.py": "b7f88deecd93e52db63062ba8a82deba35af8ec237603efdbd4b9845c043c716",
+    "run_mask_granularity.py": "f9931a8177c7050a14dc718485d0816ec4fd00d0c1c5658d195f72c91d166a05",
+    "scientific_report.py": "f07bdd5f4f83d4bb0421690711606162a357476cf3976f757d3c24629d6269bc",
+    "seal_results.py": "55f02f261eaa76a1ee491f6d2fce6dc4d32b0642867d644b752103a778df70b1",
+    "write_scientific_report.py": "1bae3ebafdad6645631d0c89186503c3a247612298b06c252be6b26a05e845d0"
+  },
+  "historical_source_lock_sha256": "954664d2508e36db01700f18bf469a53315b80cadc0d9150b9b3dec57b7ee24a",
+  "historical_checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "historical_statistics_sha256": "e81a4897a965d642f832bd6429e0e5a7d136725daaa069d9ded96f87ab64aef9",
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "package_versions": {
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "Pillow": "12.3.0",
+    "PyYAML": "6.0.3",
+    "yacs": "0.1.8"
+  }
+}

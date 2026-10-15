@@ -1,0 +1,5 @@
+seed,arm,kind,epoch,path,sha256
+124,Uniform-BatchShared,best,4,D:\xiangmuxunlian\xin\H2T_repro_audit\mask_granularity_iteration\results\shared_seed124\checkpoints\model_best.pth.tar,82abfc22a6f002fcf883a1fda8a5ac722db1b3065830e9c3daf7f90c0753626f
+124,Uniform-BatchShared,final,10,D:\xiangmuxunlian\xin\H2T_repro_audit\mask_granularity_iteration\results\shared_seed124\checkpoints\model_final.pth.tar,9bdcc7a68ca99331810b302c01176c5bcce6b40c460300ed011fd757b4b033b2
+125,Uniform-BatchShared,best,5,D:\xiangmuxunlian\xin\H2T_repro_audit\mask_granularity_iteration\results\shared_seed125\checkpoints\model_best.pth.tar,4511f1684aacf09c22c434b42ef50190cea0314e9c4f08e9a100e2b63c85e6ed
+125,Uniform-BatchShared,final,10,D:\xiangmuxunlian\xin\H2T_repro_audit\mask_granularity_iteration\results\shared_seed125\checkpoints\model_final.pth.tar,53fa8f01325b2c0f4b77b4c99fd28bc2c506d70bf5ec1f2da44445291a1b4235

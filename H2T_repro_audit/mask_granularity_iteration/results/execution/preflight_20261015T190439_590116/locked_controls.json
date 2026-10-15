@@ -1,0 +1,26 @@
+{
+  "124/Uniform-PerSample": {
+    "status_sha256": "981d538bc1dfac7a95005ca654deb4ffb4ada28e55b87241f5d3b71e255dccfa",
+    "epoch10_sha256": "83a73dd5cc64b6b5ca16ebdc9fa4c0deb318bf5b78f815ec0909b1bff43d019c",
+    "metrics_sha256": "76619963c28fc4fed5638838ca9a8dfa6341f8e06e8c54abee31f7d9b99cd814",
+    "actual_masks_sha256": "ff338c86f60470ddda5c9ed8919b6dc969f25ceba8013837283fe47cb7de785c"
+  },
+  "124/Low-VS": {
+    "status_sha256": "fb314bd357abb6c0cab40545acbf707687cda8c79afb4232bf3684429ecc604d",
+    "epoch10_sha256": "2e13ba428f99ceb24e6672cc83319833619cba032b87e9b5a70f849c2b3c8f0a",
+    "metrics_sha256": "2cf1e82702ee17274f9f8cbf829e981413d006655983fb53aeda9b3b5bdff47c",
+    "actual_masks_sha256": "23e3a66a3eb71cabe7b822f9c4cadaa517e3d8a698e00119858c94cd96a24986"
+  },
+  "125/Uniform-PerSample": {
+    "status_sha256": "388699c2e6ef47e33027ef920e7749daeb0c15c6c06e983a270facdf14e0607f",
+    "epoch10_sha256": "ef6149464d63e16361e13efb583d78a3ed2a2b5444003d4fcd75ad2524f56cf0",
+    "metrics_sha256": "f2218b744a0ab04e0cbb26fd1a4e7c39f51b5777d7a06db2403c37a2a47b2361",
+    "actual_masks_sha256": "c07860955c08e70c92e1fc18ecdb9e3facc905a8077c0d13f29172f1a9e9934f"
+  },
+  "125/Low-VS": {
+    "status_sha256": "6057aa22685b4b7bd0aa85852c3850a5cf7ef52042db37bca676ea4d5917f4a2",
+    "epoch10_sha256": "f0e5004a7bebfd5e715e9bac8537420d1f3de981359e544eebe3b1b3fdf1f8d9",
+    "metrics_sha256": "286ab832123754db869e7fca255047d11721b37fa21e2b2115ca6f82cdcae7fb",
+    "actual_masks_sha256": "8fbd5a75b6ff64fe724acd2d7ccb78b3a06c4db7f86ff0717ab0a68891e1e584"
+  }
+}

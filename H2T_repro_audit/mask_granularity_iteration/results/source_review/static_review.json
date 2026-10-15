@@ -1,0 +1,17 @@
+{
+  "historical_source_edited": false,
+  "new_files_only": true,
+  "fixes": [
+    "disable historical bytecode writes",
+    "enforce historical experiment read-only at OS audit events",
+    "record status and full exceptions under new results",
+    "load actual Clean model and validate 13 reference fields without updates before training",
+    "verify actual raw TRAIN membership and official LT indices",
+    "preserve all strict evidence conditions"
+  ],
+  "training_updates_in_preflight": 0,
+  "seed_budget": [
+    124,
+    125
+  ]
+}

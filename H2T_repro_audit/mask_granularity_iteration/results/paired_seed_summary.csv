@@ -1,0 +1,25 @@
+comparison,metric,seeds,n_seeds,mean_delta_pp,sample_sd_pp_ddof1,positive_seeds,negative_seeds,opposite_signs
+Uniform-PerSample - Uniform-BatchShared,Overall,"124,125",2,-0.17676767676767824,0.1071373910888789,0,2,False
+Uniform-PerSample - Uniform-BatchShared,Head,"124,125",2,0.0714285714285765,0.30304576336566463,1,1,True
+Uniform-PerSample - Uniform-BatchShared,OfficialMedium,"124,125",2,-0.5,0.10101525445521821,0,2,False
+Uniform-PerSample - Uniform-BatchShared,Tail,"124,125",2,-0.0862068965517242,0.12191496227354276,0,1,False
+Uniform-PerSample - Uniform-BatchShared,Many,"124,125",2,0.07352941176470651,0.31195887405289124,1,1,True
+Uniform-PerSample - Uniform-BatchShared,Medium,"124,125",2,-0.5,0.10101525445521821,0,2,False
+Uniform-PerSample - Uniform-BatchShared,Few,"124,125",2,-0.08333333333333393,0.11785113019775875,0,1,False
+Uniform-PerSample - Uniform-BatchShared,Macro,"124,125",2,-0.1767676767676747,0.10713739108887388,0,2,False
+Low-VS - Uniform-BatchShared,Overall,"124,125",2,0.10101010101010033,0.14284985478516016,1,0,False
+Low-VS - Uniform-BatchShared,Head,"124,125",2,-0.35714285714285765,0.10101525445522323,0,2,False
+Low-VS - Uniform-BatchShared,OfficialMedium,"124,125",2,-0.07142857142857295,0.10101525445522323,0,1,False
+Low-VS - Uniform-BatchShared,Tail,"124,125",2,0.8620689655172384,0.24382992454708552,2,0,False
+Low-VS - Uniform-BatchShared,Many,"124,125",2,-0.44117647058823906,0.2079725827019275,0,2,False
+Low-VS - Uniform-BatchShared,Medium,"124,125",2,0.0,0.0,0,0,False
+Low-VS - Uniform-BatchShared,Few,"124,125",2,0.8333333333333321,0.2357022603955175,2,0,False
+Low-VS - Uniform-BatchShared,Macro,"124,125",2,0.10101010101010033,0.14284985478516016,1,0,False
+Low-VS - Uniform-PerSample,Overall,"124,125",2,0.27777777777777857,0.03571246369628125,2,0,False
+Low-VS - Uniform-PerSample,Head,"124,125",2,-0.42857142857143415,0.20203050891044144,0,2,False
+Low-VS - Uniform-PerSample,OfficialMedium,"124,125",2,0.42857142857142705,0.20203050891044144,2,0,False
+Low-VS - Uniform-PerSample,Tail,"124,125",2,0.9482758620689626,0.12191496227354276,2,0,False
+Low-VS - Uniform-PerSample,Many,"124,125",2,-0.5147058823529456,0.10398629135096375,0,2,False
+Low-VS - Uniform-PerSample,Medium,"124,125",2,0.5,0.10101525445521821,2,0,False
+Low-VS - Uniform-PerSample,Few,"124,125",2,0.9166666666666661,0.11785113019775875,2,0,False
+Low-VS - Uniform-PerSample,Macro,"124,125",2,0.277777777777775,0.03571246369628627,2,0,False

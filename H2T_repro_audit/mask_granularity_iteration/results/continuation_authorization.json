@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-10-15T19:13:20.095183+08:00",
+  "user_instruction": "继续执行，不管失败条件了，缺什么环境在指定python环境里自己pip install",
+  "authorized_seeds": [
+    124,
+    125
+  ],
+  "new_arm": "Uniform-BatchShared",
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "torch": "2.14.1+cu132",
+  "cuda": "13.2",
+  "all_13_fields_recorded": true,
+  "historical_bitwise_gate_waived": true,
+  "historical_files_read_only": true,
+  "no_old_control_retraining": true,
+  "no_official_TEST": true
+}

@@ -1,0 +1,10 @@
+{
+  "stage": "final_integrity_seal",
+  "error_type": "KeyError",
+  "error_message": "new_updates",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 15, in <module>\nKeyError: 'new_updates'\n",
+  "cause": "The finalization checker read new_updates, while STOP_COMPLETED.json uses updates_total",
+  "resolved": "Use the existing correct updates_total field; no training/checkpoint/evaluation repeated",
+  "training_affected": false,
+  "seal_files_created_before_failure": false
+}

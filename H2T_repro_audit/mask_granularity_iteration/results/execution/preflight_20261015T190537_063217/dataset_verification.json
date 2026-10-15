@@ -1,0 +1,14 @@
+{
+  "LT": 10847,
+  "validation": 1980,
+  "classes_outputs": 100,
+  "missing_validation_classes": [
+    0
+  ],
+  "raw_train_path": "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100\\cifar-100-python\\train",
+  "raw_train_sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+  "raw_ID_overlap": 0,
+  "train_and_validation_pixels_match_raw_TRAIN": true,
+  "LT_formula_and_official_index_reconstruction": true,
+  "split_sha256": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1"
+}

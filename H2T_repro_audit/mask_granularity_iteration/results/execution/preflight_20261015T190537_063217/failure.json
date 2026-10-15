@@ -1,0 +1,7 @@
+{
+  "action": "preflight",
+  "seed": null,
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mask_granularity_iteration\\run_mask_granularity.py\", line 313, in main\n    if args.action==\"preflight\":preflight()\n                                ^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mask_granularity_iteration\\run_mask_granularity.py\", line 118, in preflight\n    return strict_preflight(sys.modules[__name__])\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mask_granularity_iteration\\preflight_checks.py\", line 184, in preflight\n    raise RuntimeError('Strict historical 13-field pairing preflight failed; no training permitted. See '+str(r.CURRENT/'pairing_preflight.csv'))\nRuntimeError: Strict historical 13-field pairing preflight failed; no training permitted. See D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mask_granularity_iteration\\results\\execution\\preflight_20261015T190537_063217\\pairing_preflight.csv\n",
+  "TEST_access_events": [],
+  "historical_write_events": []
+}

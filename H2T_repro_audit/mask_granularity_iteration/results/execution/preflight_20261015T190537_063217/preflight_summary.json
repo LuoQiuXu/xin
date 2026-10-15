@@ -1,0 +1,63 @@
+{
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_total_mib": 8150.5625
+  },
+  "dataset": {
+    "LT": 10847,
+    "validation": 1980,
+    "classes_outputs": 100,
+    "missing_validation_classes": [
+      0
+    ],
+    "raw_train_path": "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100\\cifar-100-python\\train",
+    "raw_train_sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "raw_ID_overlap": 0,
+    "train_and_validation_pixels_match_raw_TRAIN": true,
+    "LT_formula_and_official_index_reconstruction": true,
+    "split_sha256": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1"
+  },
+  "paired_fields": {
+    "124": {
+      "epoch": 1,
+      "batch": 1,
+      "size": 1,
+      "indices_sha256": 1,
+      "images_sha256": 1,
+      "features_sha256": 0,
+      "augmentation_state_after_sha256": 1,
+      "ambient_cpu_rng_sha256": 1,
+      "ambient_cuda_rng_sha256": 1,
+      "gumbel_sha256": 1,
+      "online_gap_sha256": 0,
+      "online_scores_sha256": 0,
+      "all_two_masks_sha256": 1
+    }
+  },
+  "mismatches": [
+    {
+      "seed": 124,
+      "epoch": 1,
+      "batch": 0,
+      "mismatching_fields": [
+        "features_sha256",
+        "online_gap_sha256",
+        "online_scores_sha256"
+      ]
+    }
+  ],
+  "historical_files_unchanged": 277,
+  "backward_calls": 0,
+  "optimizer_steps": 0,
+  "old_controls_retrained": false,
+  "checkpoint_rebuilt": false,
+  "TEST_used": false,
+  "passed": false
+}

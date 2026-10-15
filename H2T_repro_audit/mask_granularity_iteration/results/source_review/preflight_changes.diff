@@ -1,0 +1,82 @@
+--- provided/run_mask_granularity.py
++++ reviewed/run_mask_granularity.py
+@@ -13,6 +13,7 @@
+ import hashlib
+ import json
+ import sys
++sys.dont_write_bytecode = True
+ from pathlib import Path
+ import os
+ import torchvision
+@@ -113,25 +114,8 @@
+ 
+ 
+ def preflight():
+-    self_test()
+-    for seed in SEEDS:
+-        ensure_inputs(seed)
+-        plan = np.load(plan_dir(seed)/"sampling_plan.npz", allow_pickle=False)
+-        gumbel = np.load(plan_dir(seed)/"gumbel_noise_float64.npy", mmap_mode="r")
+-        assert plan["receivers"].shape == (10, N)
+-        assert plan["donors"].shape == (10, N)
+-        assert gumbel.shape == (10, N, 64)
+-        assert len(control_rows(seed)) == 850
+-        for epoch in (0, 9):
+-            for start in (0, 128, N-95):
+-                end = min(N, start+128)
+-                g = gumbel[epoch, start:end]
+-                uniform = np.argsort(-g, axis=1, kind="stable")[:, :16].astype(np.uint8)
+-                shared = choose(ARM, {"masks":{"Uniform-PerSample":uniform, "Low-VS":uniform}})
+-                assert shared.shape[0] == end-start
+-                assert np.array_equal(shared[0], uniform[0])
+-        print(f"PREFLIGHT PASS seed={seed}, inputs locked and 850 reference batches", flush=True)
+-    print("PREFLIGHT PASS: policy, local checkpoints, reference controls", flush=True)
++    from preflight_checks import preflight as strict_preflight
++    return strict_preflight(sys.modules[__name__])
+ 
+ 
+ def train(seed):
+@@ -313,12 +297,38 @@
+     args=parser.parse_args()
+     if args.action=="train" and args.seed is None:
+         parser.error("--seed 124 or --seed 125 required")
+-    # Preserve clean train-only rule for every action, including reporting.
++    # All status/exception/protection logs are scoped to the new results directory.
++    from datetime import datetime, timezone, timedelta
++    import traceback
++    from preflight_checks import dump, protect_history
++    global CURRENT
++    stamp=datetime.now(timezone(timedelta(hours=8))).strftime("%Y%m%dT%H%M%S_%f")
++    CURRENT=RESULTS/"execution"/(args.action+("_"+str(args.seed) if args.seed else "")+"_"+stamp)
++    CURRENT.mkdir(parents=True,exist_ok=False)
++    history_write_events=[]
+     install_local_test_guard()
+-    if args.action=="preflight":preflight()
+-    elif args.action=="train":train(args.seed)
+-    else:report()
+-    guard_check()
++    protect_history(OLD,history_write_events)
++    dump(CURRENT/"status.json",{"state":"running","action":args.action,"seed":args.seed})
++    try:
++        if args.action=="preflight":preflight()
++        elif args.action=="train":
++            gate=RESULTS/"preflight_pass.json"
++            if not gate.is_file():raise RuntimeError("Strict preflight pass required before training")
++            env=json.loads(gate.read_text(encoding="utf-8"))["environment"]
++            assert env["python"]==sys.executable and env["torch"]==torch.__version__ and env["cuda"]==torch.version.cuda
++            train(args.seed)
++        else:report()
++        guard_check()
++        assert not history_write_events
++        dump(CURRENT/"status.json",{"state":"completed","action":args.action,"seed":args.seed})
++    except BaseException:
++        dump(CURRENT/"failure.json",{"action":args.action,"seed":args.seed,"traceback":traceback.format_exc(),
++            "TEST_access_events":_TEST_EVENTS,"historical_write_events":history_write_events})
++        dump(CURRENT/"status.json",{"state":"failed","action":args.action,"seed":args.seed})
++        raise
++    finally:
++        dump(CURRENT/"protection.json",{"TEST_access_events":_TEST_EVENTS,
++            "historical_write_events":history_write_events,"output_directory":str(CURRENT)})
+ 
+ 
+ if __name__=="__main__":

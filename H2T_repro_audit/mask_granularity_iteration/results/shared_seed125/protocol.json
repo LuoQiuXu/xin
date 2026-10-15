@@ -1,0 +1,38 @@
+{
+  "purpose": "Separate mask granularity from VS filtering",
+  "existing_controls": [
+    "Uniform-PerSample",
+    "Low-VS"
+  ],
+  "new_arm": "Uniform-BatchShared",
+  "batch_shared_rule": "tile Uniform-PerSample mask of first item of each actual minibatch",
+  "nominal_original_H2T_4D_semantics": "one mask per minibatch",
+  "not_equivalent_to_official_sampling_rng": true,
+  "stage1_seed": 42,
+  "stage2_seeds": [
+    124,
+    125
+  ],
+  "epoch_primary": 10,
+  "epochs": 10,
+  "rho": 0.25,
+  "batch_size": 128,
+  "backbone_bn": "frozen eval",
+  "classifier": "SGD only",
+  "dataset": "clean CIFAR100-LT train-only 99-class holdout, class0 missing; 100 logits",
+  "test_access": false,
+  "no_stage1_retraining": true,
+  "run_only_new_arm": true,
+  "seed": 125,
+  "historical_hash_gate_override": true,
+  "full_13_fields_recorded": true,
+  "initial_state_matches_control": true,
+  "user_authorization": "2026-10-15: continue despite preflight mismatch; fixed requested environment",
+  "source_hashes": {
+    "run_mask_granularity.py": "f9931a8177c7050a14dc718485d0816ec4fd00d0c1c5658d195f72c91d166a05",
+    "mask_policy.py": "f048dc0be45814035041aaafd7602d30955841b160cbb8c214c816842bc4c856",
+    "preflight_checks.py": "b7f88deecd93e52db63062ba8a82deba35af8ec237603efdbd4b9845c043c716"
+  },
+  "Clean_StageI_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "VS_statistics_sha256": "e81a4897a965d642f832bd6429e0e5a7d136725daaa069d9ded96f87ab64aef9"
+}
