@@ -369,7 +369,7 @@ def report():
                          **{k:summary["last"][k] for k in GROUPS},
                          **{f"matched_{k}":v for k,v in matching.items()}})
         for arm in ARMS[1:]:
-            for base in ("No-Fusion","Uniform-PerSample","Low-VS"):
+            for base in ("No-Fusion","Uniform-PerSample","Low-VS","Frequency-Only"):
                 if arm==base:continue
                 m,p,_=by_arm[arm]
                 ref,rp,_=by_arm[base]
