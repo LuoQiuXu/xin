@@ -14,6 +14,8 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+import os
+import torchvision
 
 HERE = Path(__file__).resolve().parent
 OLD = HERE.parent / "clean_vs_stability_runs" / "clean_s1_seed42_s2_124_125_20261014"
@@ -23,11 +25,32 @@ sys.path.insert(0, str(OLD))
 import numpy as np
 import torch
 from common import (N, BATCH, seed_all, array_hash, state_hash, sha, metrics, evaluate,
-                    csv_write, check_frozen, install_test_guard, guard_pass, dump)
+                    csv_write, check_frozen)
 from stability_models import (frozen_models, outdir, plan_dir, PAIR_KEYS, check_sources)
 from reused_train_helpers import augment, fuse, tensor_hash, scheduler, optimizer_for
 from online_policy import online_masks, selected_statistics
 from mask_policy import choose, self_test
+
+_TEST_EVENTS = []
+def install_local_test_guard():
+    forbidden = os.path.normcase(os.path.abspath(OLD.parent.parent.parent / "H2T/data/cifar100/cifar-100-python/test"))
+    def audit(event, args):
+        if event == "open" and args and isinstance(args[0], (str, bytes, os.PathLike)):
+            checked = os.path.normcase(os.path.abspath(os.fsdecode(args[0])))
+            if checked == forbidden:
+                _TEST_EVENTS.append(checked)
+                raise RuntimeError("Official CIFAR100 TEST file access prohibited")
+    sys.addaudithook(audit)
+    previous = torchvision.datasets.CIFAR100.__init__
+    def protected(self, root, train=True, *args, **kwargs):
+        if not train:
+            _TEST_EVENTS.append("CIFAR100(train=False)")
+            raise RuntimeError("Official CIFAR100 TEST loading prohibited")
+        return previous(self, root, train, *args, **kwargs)
+    torchvision.datasets.CIFAR100.__init__ = protected
+
+def guard_check():
+    assert not _TEST_EVENTS, _TEST_EVENTS
 
 ARM = "Uniform-BatchShared"
 SEEDS = (124, 125)
@@ -199,7 +222,7 @@ def train(seed):
                         **{k:val[k] for k in ("Overall","Head","OfficialMedium","Tail",
                                                 "Many","Medium","Few","Macro","validation_CE")}})
         csv_write(output/"epoch_validation_metrics.csv",records)
-        guard_pass()
+        guard_check()
         print(f"shared seed={seed} epoch={epoch+1}/10 "
               f"overall={val['Overall']:.4f} Tail={val['Tail']:.4f} Few={val['Few']:.4f}", flush=True)
     assert batch_counter==850 and all(v==850 for v in equality.values())
@@ -283,11 +306,11 @@ def main():
     if args.action=="train" and args.seed is None:
         parser.error("--seed 124 or --seed 125 required")
     # Preserve clean train-only rule for every action, including reporting.
-    install_test_guard(f"mask_granularity_{args.action}_{args.seed}")
+    install_local_test_guard()
     if args.action=="preflight":preflight()
     elif args.action=="train":train(args.seed)
     else:report()
-    guard_pass()
+    guard_check()
 
 
 if __name__=="__main__":
