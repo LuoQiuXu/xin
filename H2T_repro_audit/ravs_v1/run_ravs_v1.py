@@ -242,6 +242,13 @@ def run(seed,arm):
     aug=torch.Generator().manual_seed(seed+300009)
     criterion=CE(cfg,np.bincount(y,minlength=100)).cuda()
     schedule=scheduler()
+    control_signatures = None
+    if arm != "No-Fusion":
+        control_path = RESULTS/f"seed{seed}"/"No-Fusion"/"batch_signatures.csv"
+        if not control_path.is_file():
+            raise FileNotFoundError("Train No-Fusion first for exact within-seed pairing: "+str(control_path))
+        control_signatures = csv_read(control_path)
+        assert len(control_signatures) == 850
     output.mkdir(parents=True)
     (output/"checkpoints").mkdir()
     json_write(output/"config.json", {
@@ -277,6 +284,17 @@ def run(seed,arm):
                                    clean_logits,g)
                 with torch.no_grad():
                     mixed=receiver if chosen is None else fuse(receiver,donor,chosen)[0]
+                sig=signatures(rec,don,y,ri,di,receiver,donor,g,trace)
+                if control_signatures is not None:
+                    expected=control_signatures[len(batch_rows)]
+                    for key in ("indices_sha256","images_sha256","features_sha256",
+                                "scores_sha256","gumbel_sha256"):
+                        if sig[key] != expected[key]:
+                            raise RuntimeError(
+                                f"Within-run input parity failed seed={seed} arm={arm} "
+                                f"epoch={epoch+1} batch={batch} field={key}. "
+                                "Stop; do not bypass for training."
+                            )
                 logits=cls(mixed)
                 loss=criterion(logits,target,extra_info=None)
                 assert torch.isfinite(loss).item()
@@ -284,7 +302,6 @@ def run(seed,arm):
                 loss.backward()
                 assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in cls.parameters())
                 optimizer.step()
-                sig=signatures(rec,don,y,ri,di,receiver,donor,g,trace)
                 batch_rows.append({"epoch":epoch+1,"batch":batch,"size":end-start,
                                    **sig,"mask_sha256":array_hash(chosen) if chosen is not None else "none"})
                 for key,values in diag.items():
