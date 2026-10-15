@@ -1,0 +1,67 @@
+RAVS-H2T V1 / Codex 正式实验任务（2026-10-15）
+
+关联代码：H2T_repro_audit/ravs_v1/ravs_policy.py
+        H2T_repro_audit/ravs_v1/run_ravs_v1.py
+
+核心科学问题：已验证 VS 评分池会改变实际通道和融合统计组成，这轮不再重复机制审计；实现 receiver-adaptive VS 通道增强算法，判断类别频率和在线困难度门控能否比固定 Low-VS 提高 Tail/Few，同时减少 Head 损失。严格与 Frequency-Only 对照，才能判断困难度的额外作用。
+
+权限边界（严格）：
+- 你只负责用户已经准备好的本地工作目录内的最小修复、预检、训练和报告。
+- 绝对不能执行、设计、推荐或自动化任何 Git、GitHub 的版本控制/仓库同步/分支/提交/PR 操作。这些完全由用户自行操作。
+- 禁止覆盖历史 Clean 实验文件、重新训练 Stage I、访问 CIFAR100 官方 TEST 图像/标签。
+- 不额外引入 donor selection、PI-H2T ratio、PIF、复杂网络、新 loss 或额外评分函数。
+- 缺历史 checkpoint/训练缓存应直接报告缺项，不可生成假数据。
+
+算法冻结：
+S_c=V_d,c/(V_d,c+(mu_d,c-z_receiver,c)^2+eps)，复用旧 online_policy；
+m_i=l_y-max_{j!=y}l_j；hard_i=sigmoid(-m_i/(std(logits_i)+1e-8))；
+freq_i=clip(log(500/n_y)/log(100),0,1);
+omega_RAVS=freq_i*(0.5+0.5*hard_i)；
+omega_FrequencyOnly=0.75*freq_i；
+K_i=clip(floor(64-16*omega_i+0.5),48,64)。
+所有方法（No-Fusion 除外）固定16/64个完整8x8通道；K最低S候选池中用同一个Gumbel基础随机流Uniform抽样16个。供体类别n<20或评分平坦时回退Uniform；非有限分数直接错误退出。hard_i由当前接收者未融合前 logits 在 no_grad 中计算，不添加监督损失或训练模块。
+
+实验固定：
+Clean StageI seed42 epoch184，CIFAR100-LT IF100、ResNet32、完全冻结 Backbone/BN；
+StageII仅训练线性分类器；SGD/CE/原 LR 调度、10epochs、batch128，固定epoch10为主指标；
+每 seed 使用原有采样计划和增强/Gumbel方案，在同一当前运行环境中全部重训；
+SEED=124/125；五臂：No-Fusion，Uniform-PerSample，Low-VS，Frequency-Only，RAVS-V1；
+验证仅原TRAIN未见1980图像（1..99类每类20，class0缺失），保留100维logits；
+不要混入旧 48.xx、47.xx 或使用官方 TEST 选择。
+
+步骤1：静态核对两份新文件和旧冻结训练组件，预检必需的 StageI/统计/图像/验证特征/计划文件是否在本地。仅修复新目录内确实阻塞执行的错误。
+从用户本地仓库根目录执行：
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py preflight
+应看到 PREFLIGHT PASS，生成 ravs_v1/results/preflight.json。失败立即停止，不删除保护/配对规则。
+
+步骤2：必须依次执行，No-Fusion 先跑用于新实验环境的样本、增强、特征和随机流逐batch核对，后续各臂第一处失配即停：
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 124 --arm No-Fusion
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 124 --arm Uniform-PerSample
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 124 --arm Low-VS
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 124 --arm Frequency-Only
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 124 --arm RAVS-V1
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 125 --arm No-Fusion
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 125 --arm Uniform-PerSample
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 125 --arm Low-VS
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 125 --arm Frequency-Only
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py train --seed 125 --arm RAVS-V1
+
+每臂应完成10 epochs/850 optimizer步骤，生成 config.json、effective.yaml、train.log、batch_signatures.csv、epoch_metrics.csv、validation_epoch10.npz、best/final classifier ckpt及 summary.json；仅写入 ravs_v1/results/。原有checkpoint及统计原封不动。失败不要覆盖不完整结果目录，先报告错误并向用户确认下一步。
+
+步骤3：仅全部成功后：
+python H2T_repro_audit/ravs_v1/run_ravs_v1.py report
+产生 results/RAVS_V1_RESULTS.md、scientific_summary.json、all_arms_epoch10.csv、paired_epoch10.csv。
+追加一份中文 RAVS_V1_SCIENTIFIC_REPORT.md，展示各组 Overall/Head/Medium/Tail/Many/Few 的 epoch10/best、每种子配对正确数净变化，并严谨解释：
+核心对照 RAVS vs Low-VS（新增自适应有效吗）、RAVS vs Frequency-Only（困难度是否有额外作用）、vs Uniform、vs No-Fusion；
+是否减少Head损失且保留Tail/Few收益；
+是否确实全部850个batch的输入/特征/VS分数/Gumbel相同；
+若表现只由某些少数类别或几张图驱动，要明确写出。
+不要声称STAGE II冻结backbone改善了表征本身，不要声称99类TRAIN holdout等于官方100类TEST。
+
+事先Go/No-Go（探索性，不是统计显著性）：
+Gate1：对Low-VS两个seed的Overall都不低，平均>=+0.15pp，均值Tail与Head均不下降。
+Gate2：对Frequency-Only方向基本一致，平均Overall>=+0.10pp；或者平均Overall不下降而平均Tail>=+0.35pp。
+Gate1/Gate2同时成立才值得保留完整困难度感知V1进入下一轮；仅Gate1成立表明可能是频率门控有效；都不成立就停止本V1，不追加调参、其他seed或网络。
+所有比较必须同时给出真实净增图像数量、epoch10和best敏感性，并说明同一TRAIN holdout重复使用和只有一个StageI基座的局限。
+
+任务结束后停止。由用户自行把报告和CSV/检查点等上传GitHub，再交给ChatGPT做下一轮深度分析。禁止任何版本控制操作。
