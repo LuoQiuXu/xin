@@ -346,12 +346,18 @@ def report():
     core="GU-LowVS - LowVS-Full"
     control="GU-LowVS - GU-Shuffled"
     mean_full=avg(core,"d_Overall_pp");mean_perm=avg(control,"d_Overall_pp")
+    gu_rows=[r for r in rows if r["arm"]=="GU-LowVS"]
+    not_collapsed=all(max(r["alpha0_pct"],r["alphaHalf_pct"],r["alphaFull_pct"])<95.0
+                      for r in gu_rows)
     gate=(mean_full>0 and mean_perm>0 and
-          avg(core,"d_Tail_pp")>=0 and
-          all(r["d_Overall_pp"]>=0 for r in paired if r["comparison"]==core))
+          avg(core,"d_Tail_pp")>=0 and avg(control,"d_Head_pp")>=-0.15 and
+          all(r["d_Overall_pp"]>=0 for r in paired if r["comparison"]==core)
+          and not_collapsed)
     summary={"status":"complete","protocol":PROTOCOL,"epoch10":rows,
              "pairwise":paired,"go_exploratory":gate,
              "mean_gain_vs_full":mean_full,"mean_gain_vs_shuffled":mean_perm,
+             "head_delta_vs_shuffled":avg(control,"d_Head_pp"),
+             "utility_noncollapsed":not_collapsed,
              "assessment":"development-only: two StageII seeds, same StageI, same reused TRAIN validation"}
     save_json(RESULTS/"scientific_summary.json",summary)
     lines=["# GU-LowVS V1 | primary epoch10, Clean TRAIN validation",
