@@ -166,9 +166,6 @@ def train(seed,arm):
     output=RESULTS/f"seed{seed}"/arm
     if output.exists():raise FileExistsError(f"No overwrite/resume: {output}")
     cfg,tr,bb,cls,CE,initial,s1=base.fresh(seed)
-    assert initial==json.loads(pre.read_text(encoding="utf-8"))["data"][str(seed)] | {
-        "dummy":"unused"
-    } if False else True  # comparison below avoids editing prior preflight representation
     assert initial["backbone"]==json.loads(pre.read_text(encoding="utf-8"))["data"][str(seed)]["backbone_hash"]
     assert initial["classifier"]==json.loads(pre.read_text(encoding="utf-8"))["data"][str(seed)]["initial_classifier_hash"]
     reference_x,reference_y=load_reference(y,s1)
