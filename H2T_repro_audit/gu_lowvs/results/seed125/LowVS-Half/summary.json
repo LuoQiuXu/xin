@@ -1,0 +1,60 @@
+{
+  "seed": 125,
+  "arm": "LowVS-Half",
+  "status": "complete",
+  "updates": 850,
+  "last": {
+    "seed": 125,
+    "arm": "LowVS-Half",
+    "epoch": 10,
+    "train_loss": 0.6490620388966657,
+    "lr": 0.0004894348372981928,
+    "training_seconds": 5.251642100003664,
+    "peak_allocated_mib": 120.67626953125,
+    "peak_reserved_mib": 150.0,
+    "reference_gradient_sha256": "91e43cd0b93b52489727ee9dae38d636aafddba7e541bdeb6235dcc6651c12d8",
+    "reference_gradient_norm": 0.06610564887523651,
+    "alpha0_count": 0,
+    "alphaHalf_count": 10847,
+    "alphaFull_count": 0,
+    "alpha0_pct": 0.0,
+    "alphaHalf_pct": 100.0,
+    "alphaFull_pct": 0.0,
+    "mean_predicted_gain": null,
+    "Overall": 47.17171717171717,
+    "Head": 61.714285714285715,
+    "OfficialMedium": 50.0,
+    "Tail": 26.20689655172414,
+    "Many": 62.64705882352941,
+    "Medium": 49.714285714285715,
+    "Few": 26.666666666666668,
+    "Macro": 47.17171717171717,
+    "validation_CE": 2.181536318075777
+  },
+  "best_epoch": 10,
+  "best_Overall": 47.17171717171717,
+  "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "train_bank_sha256": "74fa31ebbbf54b1fbbd1559f5c3161b1ddf9406f884d854bb3664bcec3c909d7",
+  "paired_fields_verified": 4250,
+  "frozen_backbone": true,
+  "official_TEST_used": false,
+  "official_TEST_events": [],
+  "historical_write_events": [],
+  "protected_historical_files": 411,
+  "classifier_parameter_max_abs_changes": {
+    "module.fc.weight": 0.5121093988418579,
+    "module.fc.bias": 0.13097603619098663
+  },
+  "backbone_state_tensors_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "lowvs_masks_paired": 850,
+  "shuffle_histogram_checks": 0,
+  "validation_reload_exact": true,
+  "elapsed_seconds": 53.37322499998845,
+  "checkpoint_sha256": {
+    "best": "881c3becd575bf4986a2c27c3bd68a99d00dcb96fe1dc297b2aa56d9454b424c",
+    "final": "e4241c113cd120a74e8b5a3d2313ab93466024fe4d2d261a49e576ceaf6fda75"
+  }
+}

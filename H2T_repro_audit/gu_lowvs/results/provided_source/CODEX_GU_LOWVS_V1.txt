@@ -1,0 +1,90 @@
+GU-LowVS V1 — Codex 本地执行指令（2026-10-16）
+=====================================================
+
+任务性质：正式方法原型，不再重复VS统计审计。用户独立负责所有Git/仓库操作。
+严禁你执行、设计、建议、添加或自动化任何版本控制、GitHub同步、分支、提交、合并或PR操作。
+只对用户已准备的本地工作目录执行审查、最小必要bug修复、训练、汇总与报告。禁止更改历史实验。
+执行结束后停止，由用户自行上传产物，再交给ChatGPT进行深度分析。
+
+【科学动机】
+Clean Stage II的Low-VS相对Uniform平均Overall +0.278pp、Tail +0.948pp，但Head下降。
+RAVS-V1根据训练样本margin调整候选池未提供收益，不能把“样本困难”当作“融合有训练价值”。
+本轮保留原Low-VS的Bottom48 -> 随机16通道，固定供体、融合通道数、原CE标签。
+只研究选中通道的融合程度alpha∈{0,0.5,1}是否应由该增强所诱导的分类器更新方向决定。
+
+【V1算法，禁止事后调参】
+固定Clean Stage I seed42 epoch184,ResNet32, frozen backbone/BN，StageII仅6500参数线性FC。
+用原始10847张TRAIN图像和eval transform抽取干净GAP特征构建训练参考库；不能使用验证集或官方TEST。
+在每个epoch开始、分类器W,b当前值上，计算100类别等权重的干净TRAIN交叉熵梯度
+    G_ref = grad_(W,b) [ (1/100)*sum_c (1/n_c)*sum_{i:y_i=c} CE(W f_i+b,c) ]
+对每个训练batch，按历史VS分数从Bottom48候选池随机选固定16个完整8x8通道（供体计数<20等维持旧回退）；
+构造alpha=0、0.5、1的融合特征z_alpha，保持接收者真实标签。
+计算样本交叉熵对当前线性分类器的解析梯度g_alpha，计算score_alpha=<G_ref,g_alpha>；
+GU-LowVS选择三个候选中score最大的alpha。此score来自TRAIN，绝不从开发验证集读取参数、预测或梯度。
+用no_grad完成路由，最后只对选择后的融合特征执行原CE梯度更新，不新增损失项/可学习门控模型。
+一阶近似：L_ref(theta-eta*g_alpha)≈L_ref(theta)-eta*<G_ref,g_alpha>。
+这是“干净训练经验风险的局部代理效用”，不是“已证明改进未来泛化”。忽略Momentum与wd对一步更新方向的影响，如实说明。
+
+【严格限定四组、两个StageII seeds】
+A LowVS-Full：原Low-VS的完整替换alpha=1，重训作为同环境基线。
+B LowVS-Half：所有训练样本固定alpha=0.5；检验“只变柔和就能提高准确率”。
+C GU-LowVS：按TRAIN参考梯度效用，为各样本选alpha∈{0,0.5,1}。
+D GU-Shuffled：仍计算当前训练分类器上的GU选择，但将一个minibatch内的alpha分配确定性打乱，使该batch的alpha频数完全不变；用于检验样本级效用匹配是否有帮助。注意C/D训练轨迹独立，跨组总体alpha频数可能不同，不能宣称严格跨组频数匹配。
+先seed124四组，再seed125四组；各10epoch/850参数更新。总计8次StageII训练，绝不训练StageI。
+固定当前训练环境、同一已封存sample/donor/Gumbel/增强计划。
+新分支独立目录：H2T_repro_audit/gu_lowvs/；参考数据和训练输出仅写到gu_lowvs/results/。
+不使用历史checkpoint作为新的直接训练控制；可以在论述中引用历史No-Fusion/Uniform/RAVS作为背景，必须标识不是本轮配对训练。
+
+【本地执行顺序：从项目仓库根目录】
+步骤0：静态核对utility_policy.py/run_gu_lowvs.py，源文件及CUDA可用情况。不要重构旧仓库，不复制大型模型，不动历史产物。
+步骤1：运行策略单元测试 + 零训练预检
+    python H2T_repro_audit/gu_lowvs/test_utility_policy.py
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py preflight
+测试必须PASS；发现真正的接口bug只能最小修改本轮gu_lowvs/目录新代码并保留修改记录；不得改旧实现、弱化配对校验或隐式重跑。
+步骤2：从原始TRAIN提取一次评估变换特征库（无需训练）
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py prepare
+必须核对10847x64的训练特征/label、数据来源、每类n>0、StageI SHA与冻结backbone、非有限值；仅 TRAIN 源，绝不把1980张开发验证集加入训练参考库。
+步骤3：按下列固定顺序运行，一组失败则立即停止，不继续其余组：
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm LowVS-Full
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm LowVS-Half
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm GU-LowVS
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm GU-Shuffled
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm LowVS-Full
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm LowVS-Half
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm GU-LowVS
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm GU-Shuffled
+新组每个batch必须与同seed的LowVS-Full配对：真实样本索引、增强图像、冻结特征、VS分数、Gumbel哈希完全一致(850/850)；失败不得忽略。
+步骤4：只有8组全部完成才执行：
+    python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py report
+
+【输出要求】
+必要产物：
+  results/gu_lowvs? 不是。正确目录是：
+  H2T_repro_audit/gu_lowvs/results/
+  其中包含 preflight.json、balanced_clean_train_bank.npz、每个seed/arm下epochs.csv、
+  batch_signatures.csv、validation_epoch10.npz、checkpoints/best.pth/final.pth、summary.json，
+  以及统一GU_LOWVS_V1_RESULTS.md、epoch10.csv、paired.csv、per_class.csv、scientific_summary.json。
+不要把其他历史目录当成这轮输出。
+
+额外撰写一份中文 GU_LOWVS_SCIENTIFIC_REPORT.md：
+1) 逐seed固定epoch10：Overall、Head、Tail、Few、Many、Medium与No-Fusion历史背景注明非配对；
+2) GU-LowVS vs LowVS-Full、LowVS-Half、GU-Shuffled分别比较总体、头尾、逐图配对净得失；
+3) 两seed每epoch的alpha0/0.5/1比例、可否出现几乎全选alpha0或alpha1的退化；
+4) 特别回答GU是否比打乱决策的对照更好，否则只有“增强强度分布改变”，没有证据支持“样本效用匹配”；
+5) best epoch仅作敏感性参考，主要口径固定epoch10；
+6) 分类头训练梯度的预测作用只是一阶干净训练风险代理，不能证明测试梯度价值/表征变好；
+7) 缺类0，开发验证集1980张被多轮使用，2个StageII seeds共用1套StageI，不称统计显著；
+8) 任何缺文件/失败/模型无法加载/旧文件被改动必须列出，不得造结果。
+
+【预先科学判据】
+正向进入后续研究至少要求：
+(a) GU-LowVS在两个seeds固定epoch10的Overall相对LowVS-Full都不降低，平均Tail不降低；
+(b) GU-LowVS相对GU-Shuffled平均Overall正向，且不能有明显Head损失；
+(c) GU不是只选择alpha0(相当于无融合)，也不只选择alpha1(退化LowVS-Full)。
+上述为探索性筛选标准，不是发表级证据。若不满足，停止GU这一规则，不能临时更改参考目标、alpha档位、筛seed、改epoch选择或继续搜索参数。
+如果GU-LowVS效果与LowVS-Half接近，说明收益可能仅来自混合强度变化，不应包装成效用感知成功。
+
+【边界与交付】
+当前只是冻结Backbone上的分类器增强研究，不是新的表征学习机制；GU自适应alpha与PI-H2T的ratio可能存在概念重叠，论文新颖性以后需要文献比对和独立性能证明。
+保留CPU测试、预检、训练和分析必要产物，不添加庞大审计平台、不追求环境/代码重构完美。
+只提供实际完成情况与中文报告，最后停止；所有Git/仓库操作完全由用户本人执行。训练结果上传后交给ChatGPT结合整个H2T/VS/RAVS历史深度分析。

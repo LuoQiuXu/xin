@@ -1,0 +1,60 @@
+{
+  "seed": 125,
+  "arm": "GU-LowVS",
+  "status": "complete",
+  "updates": 850,
+  "last": {
+    "seed": 125,
+    "arm": "GU-LowVS",
+    "epoch": 10,
+    "train_loss": 0.716628664768796,
+    "lr": 0.0004894348372981928,
+    "training_seconds": 5.2097726999927545,
+    "peak_allocated_mib": 120.67822265625,
+    "peak_reserved_mib": 150.0,
+    "reference_gradient_sha256": "ad42594a00bace0333c65cb2bb552316e95c1bf6a4cda19204f34c9c6376807c",
+    "reference_gradient_norm": 0.04384596645832062,
+    "alpha0_count": 5891,
+    "alphaHalf_count": 1440,
+    "alphaFull_count": 3516,
+    "alpha0_pct": 54.30994745090808,
+    "alphaHalf_pct": 13.275560062690145,
+    "alphaFull_pct": 32.41449248640177,
+    "mean_predicted_gain": 0.0016828474236752367,
+    "Overall": 46.515151515151516,
+    "Head": 63.285714285714285,
+    "OfficialMedium": 48.57142857142857,
+    "Tail": 23.79310344827586,
+    "Many": 64.26470588235294,
+    "Medium": 48.42857142857143,
+    "Few": 24.166666666666668,
+    "Macro": 46.515151515151516,
+    "validation_CE": 2.1989057367498224
+  },
+  "best_epoch": 7,
+  "best_Overall": 46.717171717171716,
+  "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "train_bank_sha256": "74fa31ebbbf54b1fbbd1559f5c3161b1ddf9406f884d854bb3664bcec3c909d7",
+  "paired_fields_verified": 4250,
+  "frozen_backbone": true,
+  "official_TEST_used": false,
+  "official_TEST_events": [],
+  "historical_write_events": [],
+  "protected_historical_files": 411,
+  "classifier_parameter_max_abs_changes": {
+    "module.fc.weight": 0.4479702115058899,
+    "module.fc.bias": 0.12435253709554672
+  },
+  "backbone_state_tensors_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "lowvs_masks_paired": 850,
+  "shuffle_histogram_checks": 0,
+  "validation_reload_exact": true,
+  "elapsed_seconds": 54.555520900001284,
+  "checkpoint_sha256": {
+    "best": "63f28474735b10758111335316e5552aad8c2e20491ca210a88a7968b4125716",
+    "final": "cc15a8f988bd2ae6066157a9739806eb88e27c3ebe749a7a4b1d72a5a26d5a17"
+  }
+}

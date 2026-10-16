@@ -15,6 +15,8 @@ import csv
 import json
 import os
 import sys
+import time
+import traceback
 from pathlib import Path
 
 sys.dont_write_bytecode = True
@@ -23,7 +25,7 @@ PARENT = HERE.parent
 RAVS = PARENT / "ravs_v1"
 sys.path.insert(0, str(RAVS))
 import run_ravs_v1 as base
-from run_safeguards import protect, history_manifest
+from run_safeguards import protect, history_manifest, environment, stamp
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -59,13 +61,13 @@ PROTOCOL = {
 
 
 def save_json(path, x):
-    p=Path(path);assert p.resolve().is_relative_to(HERE.resolve()),p
+    p=Path(path);assert p.resolve().is_relative_to(RESULTS.resolve()),p
     p.parent.mkdir(parents=True,exist_ok=True)
     p.write_text(json.dumps(x,ensure_ascii=False,indent=2,allow_nan=False),encoding="utf-8")
 
 
 def save_csv(path, rows):
-    p=Path(path);assert rows and p.resolve().is_relative_to(HERE.resolve()),p
+    p=Path(path);assert rows and p.resolve().is_relative_to(RESULTS.resolve()),p
     p.parent.mkdir(parents=True,exist_ok=True)
     with p.open("w",newline="",encoding="utf-8") as f:
         writer=csv.DictWriter(f,fieldnames=list(rows[0]))
@@ -76,6 +78,18 @@ def save_csv(path, rows):
 def read_csv(path):
     with Path(path).open("r",newline="",encoding="utf-8") as f:
         return list(csv.DictReader(f))
+
+
+def source_hashes():
+    return {name:sha(HERE/name) for name in ("run_gu_lowvs.py","utility_policy.py","test_utility_policy.py")}
+
+
+def verify_history():
+    manifest=RESULTS/"historical_manifest.json"
+    expected=json.loads(manifest.read_text(encoding="utf-8"))
+    for folder, hashes in expected.items():
+        assert history_manifest(Path(folder),sha)==hashes, ("Historical files changed",folder)
+    return sum(len(v) for v in expected.values())
 
 
 def inputs(seed):
@@ -89,6 +103,35 @@ def preflight():
     test_policy()
     assert torch.cuda.is_available()
     assert not (RESULTS/"preflight.json").exists(), "Never overwrite existing experiment"
+    # Verify actual cached pixels and labels against original TRAIN raw IDs.
+    import pickle
+    split=np.load(base.OLD/"split_indices.npz",allow_pickle=False)
+    ti=split["train_raw_indices"];vi=split["validation_raw_indices"]
+    assert ti.shape==(N,) and vi.shape==(1980,)
+    assert len(np.unique(ti))==N and len(np.unique(vi))==1980
+    assert len(np.intersect1d(ti,vi))==0
+    import common
+    train_file=common.DATA/"cifar-100-python/train"
+    with train_file.open("rb") as handle:raw=pickle.load(handle,encoding="latin1")
+    raw_images=raw["data"].reshape(-1,3,32,32).transpose(0,2,3,1)
+    raw_labels=np.asarray(raw["fine_labels"],dtype=np.int64)
+    cached_images=np.load(base.OLD/"train_images.npy",mmap_mode="r",allow_pickle=False)
+    cached_labels=np.load(base.OLD/"train_labels.npy",allow_pickle=False)
+    assert np.array_equal(cached_images,raw_images[ti])
+    assert np.array_equal(cached_labels,raw_labels[ti])
+    assert np.array_equal(np.load(base.OLD/"validation_labels.npy",allow_pickle=False),raw_labels[vi])
+    assert np.array_equal(np.load(base.OLD/"validation_images.npy",mmap_mode="r",allow_pickle=False),raw_images[vi])
+    expected_counts=np.asarray([int(500*0.01**(c/99)) for c in range(100)])
+    assert np.array_equal(np.bincount(cached_labels,minlength=100),expected_counts)
+    data_protocol={"official_TRAIN":str(train_file),"official_TRAIN_sha256":sha(train_file),
+        "TRAIN_raw_index_sha256":array_hash(ti),"validation_raw_index_sha256":array_hash(vi),
+        "train_samples":N,"validation_samples":1980,"raw_index_overlap":0,
+        "cached_pixels_and_labels_match_original_TRAIN":True,
+        "class_counts":expected_counts.tolist(),"validation_missing_classes":[0],
+        "reference_uses_only_LT_TRAIN":True}
+    save_json(RESULTS/"dataset_protocol.json",data_protocol)
+    historical={str(folder):history_manifest(folder,sha) for folder in (base.OLD,RAVS)}
+    save_json(RESULTS/"historical_manifest.json",historical)
     data={}
     for seed in SEEDS:
         y,vy,vbank,plan,noise=inputs(seed)
@@ -105,7 +148,12 @@ def preflight():
         assert torch.equal(full[mask[:,:,None,None].expand_as(full)],
                            donor[mask[:,:,None,None].expand_as(full)])
         assert all(not p.requires_grad for p in bb.parameters())
+        assert torch.equal(full[~mask[:,:,None,None].expand_as(full)],
+                           receiver[~mask[:,:,None,None].expand_as(full)])
+        assert receiver.shape==donor.shape==(BATCH,64,8,8)
+        assert all(not m.training for m in bb.modules())
         assert all(p.grad is None for p in cls.parameters())
+        assert state_hash(bb)==initial["backbone"] and state_hash(cls)==initial["classifier"]
         data[str(seed)]={
             "backbone_hash":initial["backbone"],
             "initial_classifier_hash":initial["classifier"],
@@ -114,6 +162,8 @@ def preflight():
         }
     save_json(RESULTS/"preflight.json",{
         "status":"PASS", "protocol":PROTOCOL, "data":data,
+        "environment":environment(),"new_source_sha256":source_hashes(),
+        "protected_historical_files":verify_history(),"data_protocol":data_protocol,
         "train_source_sha256":sha(base.OLD/"train_images.npy"),
         "test_used":False,"validation_used_for_reference":False,
     })
@@ -142,7 +192,22 @@ def prepare():
     assert state_hash(bb)==before
     BANK.parent.mkdir(parents=True,exist_ok=True)
     np.savez_compressed(BANK,features=x,labels=y,
-                        stage1_sha256=np.array(sha(s1)),split=np.array("TRAIN only"))
+                        stage1_sha256=np.array(sha(s1)),split=np.array("TRAIN only"),
+                        raw_indices=np.load(base.OLD/"split_indices.npz",allow_pickle=False)["train_raw_indices"])
+    # Exercise the actual GPU utility path without any model update.
+    before_head=state_hash(cls)
+    xr=torch.from_numpy(x.copy()).cuda();yr=torch.from_numpy(y.copy()).long().cuda()
+    gW,gb=reference_gradient(xr,yr,cls)
+    assert not gW.requires_grad and not gb.requires_grad
+    assert state_hash(bb)==before and state_hash(cls)==before_head
+    assert all(p.grad is None for p in bb.parameters())
+    assert all(p.grad is None for p in cls.parameters())
+    save_json(RESULTS/"reference_bank_provenance.json",{
+        "shape":list(x.shape),"labels_shape":list(y.shape),"class_counts":np.bincount(y,minlength=100).tolist(),
+        "stage1_sha256":sha(s1),"bank_sha256":sha(BANK),"backbone_before":before,
+        "backbone_after":state_hash(bb),"classifier_unchanged":True,
+        "eval_transform":str(tr["eval_transform"]),"TEST_used":False,
+        "train_val_raw_index_overlap":0,"GPU_reference_gradient_finite":True})
     print("PREPARE PASS:",BANK,"shape",x.shape,"sha256",sha(BANK),flush=True)
 
 
@@ -154,14 +219,21 @@ def load_reference(y,s1):
     assert str(data["stage1_sha256"])==sha(s1)
     assert str(data["split"])=="TRAIN only"
     assert np.isfinite(x).all()
+    raw=np.load(base.OLD/"split_indices.npz",allow_pickle=False)["train_raw_indices"]
+    assert np.array_equal(data["raw_indices"],raw)
+    locked=json.loads((RESULTS/"reference_bank_provenance.json").read_text(encoding="utf-8"))
+    assert sha(BANK)==locked["bank_sha256"]
     return torch.from_numpy(x.copy()).cuda(),torch.from_numpy(y.copy()).long().cuda()
 
 
 def train(seed,arm):
     assert seed in SEEDS and arm in ARMS
+    started=time.perf_counter()
     pre=RESULTS/"preflight.json"
     if not pre.is_file():raise RuntimeError("preflight first")
     assert json.loads(pre.read_text(encoding="utf-8"))["status"]=="PASS"
+    assert source_hashes()==json.loads(pre.read_text(encoding="utf-8"))["new_source_sha256"]
+    verify_history()
     y,vy,vbank,plan,noise=inputs(seed)
     output=RESULTS/f"seed{seed}"/arm
     if output.exists():raise FileExistsError(f"No overwrite/resume: {output}")
@@ -170,6 +242,11 @@ def train(seed,arm):
     assert initial["classifier"]==json.loads(pre.read_text(encoding="utf-8"))["data"][str(seed)]["initial_classifier_hash"]
     reference_x,reference_y=load_reference(y,s1)
     weights_initial={k:v.detach().cpu().clone() for k,v in bb.state_dict().items()}
+    classifier_initial={k:v.detach().cpu().clone() for k,v in cls.state_dict().items()}
+    chosen_actions=np.zeros((10,N),dtype=np.uint8)
+    applied_actions=np.zeros((10,N),dtype=np.uint8)
+    action_histogram_checks=0
+    mask_pair_checks=0
     base.warmup(tr,bb)
     generator=torch.Generator().manual_seed(seed+300009)
     optimizer=optimizer_for(cfg,cls)
@@ -184,14 +261,19 @@ def train(seed,arm):
     (output/"checkpoints").mkdir()
     save_json(output/"config.json",{**PROTOCOL,"seed":seed,"arm":arm,
               "bank_sha256":sha(BANK),"stage1_sha256":sha(s1),
-              "initial_hashes":initial})
+              "initial_hashes":initial,"environment":environment(),"source_sha256":source_hashes()})
+    (output/"effective.yaml").write_text(cfg.dump(),encoding="utf-8")
+    torch.cuda.reset_peak_memory_stats()
     rows=[];signatures=[];best=-1.0;best_epoch=0;total_steps=0;pair_count=0
     with (output/"train.log").open("w",encoding="utf-8",buffering=1) as log:
         for epoch in range(10):
+            epoch_started=time.perf_counter()
             cls.train()
             adjust(optimizer,epoch,cfg)
             gW,gb=reference_gradient(reference_x,reference_y,cls)
             assert torch.isfinite(gW).all() and torch.isfinite(gb).all()
+            reference_sha=array_hash(gW.cpu().numpy(),gb.cpu().numpy())
+            assert not gW.requires_grad and not gb.requires_grad
             nr=np.zeros(3,dtype=np.int64)
             advantage_sum=0.;advantage_n=0;train_loss=0.
             for batch,start in enumerate(range(0,N,BATCH)):
@@ -212,6 +294,8 @@ def train(seed,arm):
                             raise RuntimeError(f"paired batch mismatch seed={seed} "
                                                f"arm={arm} epoch={epoch+1} batch={batch} key={key}")
                         pair_count+=1
+                    assert array_hash(trace["masks"]["Low-VS"])==previous[total_steps]["lowvs_mask_sha256"]
+                    mask_pair_checks+=1
                 with torch.no_grad():
                     if arm=="LowVS-Full":
                         action=torch.full((len(rec),),2,device="cuda",dtype=torch.uint8)
@@ -221,12 +305,20 @@ def train(seed,arm):
                         action,scores=utility_actions(receiver,full,target,cls,gW,gb)
                         gain=scores.max(1).values-scores[:,0]
                         advantage_sum+=float(gain.sum());advantage_n+=len(rec)
+                        assert torch.equal(action,scores.argmax(1).to(torch.uint8))
+                        chosen_actions[epoch,start:end]=action.cpu().numpy()
                         if arm=="GU-Shuffled":
                             # Same action histogram for this batch, but recipients permuted
                             # deterministically without touching shared torch/augmentation RNG.
                             perm=np.random.default_rng(
                                 seed*100000+epoch*1000+batch).permutation(len(rec))
+                            before_counts=torch.bincount(action.long(),minlength=3)
                             action=action[torch.as_tensor(perm,device=action.device)]
+                            assert torch.equal(before_counts,torch.bincount(action.long(),minlength=3))
+                            action_histogram_checks+=1
+                    if arm in ("LowVS-Full","LowVS-Half"):
+                        chosen_actions[epoch,start:end]=action.cpu().numpy()
+                    applied_actions[epoch,start:end]=action.cpu().numpy()
                     nr+=np.bincount(action.cpu().numpy(),minlength=3)
                     mixed=apply_actions(receiver,full,action)
                     if arm=="LowVS-Full":assert torch.equal(mixed,full)
@@ -240,10 +332,18 @@ def train(seed,arm):
                 train_loss+=float(loss.detach())*len(rec)
                 signatures.append({"epoch":epoch+1,"batch":batch,
                                    "size":len(rec),**sig,
+                                   "lowvs_mask_sha256":array_hash(trace["masks"]["Low-VS"]),
+                                   "selected_action_sha256":array_hash(chosen_actions[epoch,start:end]),
+                                   "applied_action_sha256":array_hash(applied_actions[epoch,start:end]),
                                    "alpha0":int((action==0).sum()),
                                    "alpha_half":int((action==1).sum()),
                                    "alpha_full":int((action==2).sum())})
                 total_steps+=1
+                if batch%40==0:
+                    progress=f"seed{seed} {arm} epoch{epoch+1}/10 batch{batch}/85 loss={float(loss.detach()):.6f}"
+                    print(progress,flush=True);log.write(progress+"\n")
+            torch.cuda.synchronize()
+            training_seconds=time.perf_counter()-epoch_started
             assert nr.sum()==N
             check_frozen(bb,weights_initial)
             m,logits,pred=evaluate(cls,vy,feature_maps=vbank)
@@ -251,14 +351,20 @@ def train(seed,arm):
                 best=m["Overall"];best_epoch=epoch+1
                 torch.save({"seed":seed,"arm":arm,"epoch":epoch+1,
                     "classifier":{k:v.detach().cpu().clone() for k,v in cls.state_dict().items()},
-                    "test_used":False},output/"checkpoints/best.pth")
+                    "test_used":False,"stage1_sha256":sha(s1),"train_bank_sha256":sha(BANK)},output/"checkpoints/best.pth")
             if epoch==9:
                 torch.save({"seed":seed,"arm":arm,"epoch":10,
                     "classifier":{k:v.detach().cpu().clone() for k,v in cls.state_dict().items()},
-                    "test_used":False},output/"checkpoints/final.pth")
+                    "test_used":False,"stage1_sha256":sha(s1),"train_bank_sha256":sha(BANK)},output/"checkpoints/final.pth")
                 np.savez_compressed(output/"validation_epoch10.npz",
                                     labels=vy,logits=logits,predictions=pred)
             record={"seed":seed,"arm":arm,"epoch":epoch+1,"train_loss":train_loss/N,
+                    "lr":optimizer.param_groups[0]["lr"],"training_seconds":training_seconds,
+                    "peak_allocated_mib":torch.cuda.max_memory_allocated()/1024**2,
+                    "peak_reserved_mib":torch.cuda.max_memory_reserved()/1024**2,
+                    "reference_gradient_sha256":reference_sha,
+                    "reference_gradient_norm":float(torch.sqrt(gW.square().sum()+gb.square().sum())),
+                    "alpha0_count":int(nr[0]),"alphaHalf_count":int(nr[1]),"alphaFull_count":int(nr[2]),
                     "alpha0_pct":100*nr[0]/N,"alphaHalf_pct":100*nr[1]/N,
                     "alphaFull_pct":100*nr[2]/N,
                     "mean_predicted_gain":advantage_sum/advantage_n if advantage_n else None,
@@ -273,6 +379,12 @@ def train(seed,arm):
     assert total_steps==850 and len(signatures)==850
     assert pair_count==(0 if arm=="LowVS-Full" else 850*len(KEYS))
     assert state_hash(bb)==initial["backbone"]
+    changes={k:float((v.detach().cpu()-classifier_initial[k]).abs().max()) for k,v in cls.state_dict().items()}
+    assert all(value>0 for value in changes.values())
+    assert mask_pair_checks==(0 if arm=="LowVS-Full" else 850)
+    assert action_histogram_checks==(850 if arm=="GU-Shuffled" else 0)
+    np.savez_compressed(output/"actions.npz",selected=chosen_actions,applied=applied_actions)
+    protected=verify_history()
     for name in ("best","final"):
         ck=torch.load(output/f"checkpoints/{name}.pth",map_location="cpu",weights_only=False)
         assert ck["arm"]==arm and ck["test_used"] is False
@@ -286,7 +398,15 @@ def train(seed,arm):
         "last":rows[-1],"best_epoch":best_epoch,"best_Overall":best,
         "stage1_sha256":sha(s1),"train_bank_sha256":sha(BANK),
         "paired_fields_verified":pair_count,"frozen_backbone":state_hash(bb)==initial["backbone"],
-        "official_TEST_used":False})
+        "official_TEST_used":False,"official_TEST_events":base.AUDIT_EVENTS,
+        "historical_write_events":HISTORY_EVENTS,"protected_historical_files":protected,
+        "classifier_parameter_max_abs_changes":changes,
+        "backbone_state_tensors_bitwise_unchanged":len(weights_initial),
+        "BN_counters":sorted({int(v) for k,v in weights_initial.items() if k.endswith("num_batches_tracked")}),
+        "lowvs_masks_paired":mask_pair_checks,
+        "shuffle_histogram_checks":action_histogram_checks,
+        "validation_reload_exact":True,"elapsed_seconds":time.perf_counter()-started,
+        "checkpoint_sha256":{k:sha(output/f"checkpoints/{k}.pth") for k in ("best","final")}})
     print("TRAIN PASS",seed,arm,flush=True)
 
 
@@ -389,14 +509,24 @@ def main():
     args=parser.parse_args()
     base.forbid_official_test()
     protect(PARENT,HERE,HISTORY_EVENTS)
-    if args.action=="preflight":preflight()
-    elif args.action=="prepare":prepare()
-    elif args.action=="train":
-        if args.seed is None or args.arm is None:parser.error("train requires --seed and --arm")
-        train(args.seed,args.arm)
-    else:report()
-    base.check_test_guard()
-    assert not HISTORY_EVENTS
+    if args.action=="train" and (args.seed is None or args.arm is None):
+        parser.error("train requires --seed and --arm")
+    registry_path=RESULTS/"run_registry.json"
+    registry=json.loads(registry_path.read_text(encoding="utf-8")) if registry_path.is_file() else []
+    entry={"action":args.action,"seed":args.seed,"arm":args.arm,"started_at":stamp(),"status":"running"}
+    registry.append(entry);save_json(registry_path,registry)
+    try:
+        if args.action=="preflight":preflight()
+        elif args.action=="prepare":prepare()
+        elif args.action=="train":train(args.seed,args.arm)
+        else:report()
+        base.check_test_guard()
+        assert not HISTORY_EVENTS
+        entry.update(status="completed",finished_at=stamp(),TEST_events=base.AUDIT_EVENTS,historical_write_events=HISTORY_EVENTS)
+    except BaseException:
+        entry.update(status="failed",finished_at=stamp(),traceback=traceback.format_exc(),TEST_events=base.AUDIT_EVENTS,historical_write_events=HISTORY_EVENTS)
+        raise
+    finally:save_json(registry_path,registry)
 
 if __name__=="__main__":
     main()

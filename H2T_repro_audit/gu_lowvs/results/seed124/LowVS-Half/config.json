@@ -1,0 +1,59 @@
+{
+  "question": "Does train-only first-order balanced gradient utility improve Low-VS augmentation?",
+  "methods": [
+    "LowVS-Full",
+    "LowVS-Half",
+    "GU-LowVS",
+    "GU-Shuffled"
+  ],
+  "seeds": [
+    124,
+    125
+  ],
+  "epochs": 10,
+  "primary_epoch": 10,
+  "batch_size": 128,
+  "stage1": "same clean seed42 epoch184",
+  "backbone": "frozen ResNet-32, BN in eval throughout",
+  "sampling": "BS receiver, IS donor, paired Gumbel and augmentations",
+  "vs": "exact original Bottom48 -> uniformly 16 channels, donor fallback unchanged",
+  "alphas": [
+    0.0,
+    0.5,
+    1.0
+  ],
+  "utility": "argmax of analytic per-example CE gradient dot balanced clean-TRAIN reference gradient, no validation",
+  "reference": "once per epoch exact class-balanced CE gradient on all original TRAIN eval-transform GAP vectors",
+  "permitted_outputs": "only this results directory",
+  "stage1_train": false,
+  "test_access": false,
+  "validation": "TRAIN-only reused development holdout, 1980 images of 99 classes, class0 absent",
+  "limitations": "utility is local surrogate for clean TRAIN risk, not future generalization; momentum and weight decay not in score",
+  "seed": 124,
+  "arm": "LowVS-Half",
+  "bank_sha256": "74fa31ebbbf54b1fbbd1559f5c3161b1ddf9406f884d854bb3664bcec3c909d7",
+  "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "initial_hashes": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "total_mib": 8150.5625,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "cudnn_allow_tf32": false,
+    "matmul_allow_tf32": false
+  },
+  "source_sha256": {
+    "run_gu_lowvs.py": "aeb0e212ae75615363d30fa3c6175ee38af3519a915e97dc0e5b5fb85bde5ece",
+    "utility_policy.py": "765c00b72c9e16118f683fe265a4436efc13ad5d40a171ea504f355d1e9e0975",
+    "test_utility_policy.py": "c7275262506d37177662a223e53128bbf098bcffc55f90b624d78e695e2f4b44"
+  }
+}

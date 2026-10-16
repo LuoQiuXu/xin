@@ -1,0 +1,17 @@
+seed,arm,kind,path,sha256
+124,LowVS-Full,best,results/seed124/LowVS-Full/checkpoints/best.pth,5485d4e50eb8501a03e736a2310155b02529ba3791610d7d1cc8b1b8d1c9e15e
+124,LowVS-Full,final,results/seed124/LowVS-Full/checkpoints/final.pth,c9eff9ad75fba665628c956b6c37c4d115d29f2476379d7ee50e909745b49595
+124,LowVS-Half,best,results/seed124/LowVS-Half/checkpoints/best.pth,1f10183215f543891f2aea9a4546832b221580c817f749970514f902a3156629
+124,LowVS-Half,final,results/seed124/LowVS-Half/checkpoints/final.pth,1cf40a79b7cf230c89227ba51584463d4b3614fd05568a4a3ddfa2805b4d2e73
+124,GU-LowVS,best,results/seed124/GU-LowVS/checkpoints/best.pth,8c87b7c79c3ee975d7bd1408125ab52a2dfa48450888cf8416be678d1b37335c
+124,GU-LowVS,final,results/seed124/GU-LowVS/checkpoints/final.pth,72d39bafa89f3df343b6bf20b904ea6c0d3e991b6653abeb8583932ed88e41be
+124,GU-Shuffled,best,results/seed124/GU-Shuffled/checkpoints/best.pth,5e139351d740742438957829a4c115ba6e1ffc2364b574934d250aeafd5ee3b6
+124,GU-Shuffled,final,results/seed124/GU-Shuffled/checkpoints/final.pth,e014c881d46e0e8bb984930a4c21d70c70555a7adb07a060102c35c9956afa9a
+125,LowVS-Full,best,results/seed125/LowVS-Full/checkpoints/best.pth,6a42e3e38fb4e102ebdba6c1d89e4104b4e9da9ce00c65a55c45381774a148a7
+125,LowVS-Full,final,results/seed125/LowVS-Full/checkpoints/final.pth,9d58bc8fa5f5d4074f6b131f2c0849c76ba286cb026c4ff7a5e634e3dda6f6b8
+125,LowVS-Half,best,results/seed125/LowVS-Half/checkpoints/best.pth,881c3becd575bf4986a2c27c3bd68a99d00dcb96fe1dc297b2aa56d9454b424c
+125,LowVS-Half,final,results/seed125/LowVS-Half/checkpoints/final.pth,e4241c113cd120a74e8b5a3d2313ab93466024fe4d2d261a49e576ceaf6fda75
+125,GU-LowVS,best,results/seed125/GU-LowVS/checkpoints/best.pth,63f28474735b10758111335316e5552aad8c2e20491ca210a88a7968b4125716
+125,GU-LowVS,final,results/seed125/GU-LowVS/checkpoints/final.pth,cc15a8f988bd2ae6066157a9739806eb88e27c3ebe749a7a4b1d72a5a26d5a17
+125,GU-Shuffled,best,results/seed125/GU-Shuffled/checkpoints/best.pth,87ab404a796e8b3124408904ee5995309bbf61d4ef861160656d40740834d734
+125,GU-Shuffled,final,results/seed125/GU-Shuffled/checkpoints/final.pth,b3e62bd59e630e1324aa47cefb4db7446c4044aa3f116c76ea0505bfdcefaa03

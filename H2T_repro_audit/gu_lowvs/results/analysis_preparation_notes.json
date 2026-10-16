@@ -1,0 +1,7 @@
+{
+  "kind": "report preparation only",
+  "failed_text_replacement_attempts": 1,
+  "error": "AssertionError: text anchor did not match; no source file was written",
+  "impact_on_training": "none; no training-critical file changed; no optimizer retry",
+  "resolution": "Inserted report-only additions using a confirmed unique report-join anchor"
+}

@@ -1,0 +1,60 @@
+{
+  "seed": 125,
+  "arm": "GU-Shuffled",
+  "status": "complete",
+  "updates": 850,
+  "last": {
+    "seed": 125,
+    "arm": "GU-Shuffled",
+    "epoch": 10,
+    "train_loss": 0.8187621172269918,
+    "lr": 0.0004894348372981928,
+    "training_seconds": 5.1947221999871545,
+    "peak_allocated_mib": 120.6787109375,
+    "peak_reserved_mib": 150.0,
+    "reference_gradient_sha256": "c9739882e19f7bdca8d6fc9f9f1bed900dfe8d76db399b26c0c0048ae47e5eae",
+    "reference_gradient_norm": 0.07109463214874268,
+    "alpha0_count": 6004,
+    "alphaHalf_count": 1098,
+    "alphaFull_count": 3745,
+    "alpha0_pct": 55.35171015027196,
+    "alphaHalf_pct": 10.122614547801236,
+    "alphaFull_pct": 34.5256753019268,
+    "mean_predicted_gain": 0.0042684424129006745,
+    "Overall": 46.81818181818182,
+    "Head": 60.857142857142854,
+    "OfficialMedium": 49.57142857142857,
+    "Tail": 26.551724137931036,
+    "Many": 61.76470588235294,
+    "Medium": 49.285714285714285,
+    "Few": 27.0,
+    "Macro": 46.81818181818182,
+    "validation_CE": 2.1686052495783024
+  },
+  "best_epoch": 8,
+  "best_Overall": 47.070707070707066,
+  "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "train_bank_sha256": "74fa31ebbbf54b1fbbd1559f5c3161b1ddf9406f884d854bb3664bcec3c909d7",
+  "paired_fields_verified": 4250,
+  "frozen_backbone": true,
+  "official_TEST_used": false,
+  "official_TEST_events": [],
+  "historical_write_events": [],
+  "protected_historical_files": 411,
+  "classifier_parameter_max_abs_changes": {
+    "module.fc.weight": 0.42828893661499023,
+    "module.fc.bias": 0.13004517555236816
+  },
+  "backbone_state_tensors_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "lowvs_masks_paired": 850,
+  "shuffle_histogram_checks": 850,
+  "validation_reload_exact": true,
+  "elapsed_seconds": 53.9865720999951,
+  "checkpoint_sha256": {
+    "best": "87ab404a796e8b3124408904ee5995309bbf61d4ef861160656d40740834d734",
+    "final": "b3e62bd59e630e1324aa47cefb4db7446c4044aa3f116c76ea0505bfdcefaa03"
+  }
+}

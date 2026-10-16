@@ -1,0 +1,16 @@
+{
+  "status": "static review complete",
+  "algorithm_file_unchanged": true,
+  "provided_runner_sha256": "469106e3dba456651321e4e69bb3cb681a82f152563fddec6d0a935fb46ea978",
+  "scope": "Only new gu_lowvs code and results changed; historical helpers reused read-only",
+  "changes": [
+    "result-path bounds",
+    "TRAIN raw-ID/pixel provenance",
+    "unchanged historical hashes",
+    "same full-swap mask pairing",
+    "shuffle histogram assertions",
+    "timing/frozen-state/classifier-update/checkpoint provenance evidence",
+    "durable status and error logs"
+  ],
+  "scientific_rule_note": "Provided numerical gate is stricter than task text; retain original gate and report both."
+}

@@ -1,0 +1,94 @@
+GU-LowVS V1：Codex 本地科学实验执行指令
+日期：2026-10-16
+仓库：LuoQiuXu/xin
+代码分支：experiment/gu-lowvs-utility-20261016
+核心文件：H2T_repro_audit/gu_lowvs/utility_policy.py
+        H2T_repro_audit/gu_lowvs/run_gu_lowvs.py
+        H2T_repro_audit/gu_lowvs/test_utility_policy.py
+详细方法说明：H2T_repro_audit/gu_lowvs/README.md
+
+【零 Git 操作要求】
+你（Codex）只对用户本人已准备好的本地工作目录进行静态核查、预检、训练和报告。
+禁止执行、设计、建议、自动化任何 Git、GitHub、分支、提交、同步、合并或 PR 操作。
+所有版本控制由用户亲自处理。不得修改历史 H2T/VS/RAVS 源文件及实验产物。
+
+【研究问题】
+已确认固定 Low-VS 选择的候选通道比 Uniform 在当前 Clean Stage II 有小幅 Tail 收益。
+RAVS-V1 通过接收样本困难度调候选池失败。不要再修改 VS、随机池或困难度。
+本轮严格保持 VS Bottom48 -> 随机16完整通道，检验“替换多少”能否依据训练效用决定。
+
+【固定数学方案，禁止事后调参】
+融合：F(alpha)=F_receiver+alpha*(F_LowVS_full-F_receiver)，alpha∈{0,0.5,1}。
+使用与验证集分离的原始10847张 TRAIN 数据、eval transform、固定 Clean StageI ResNet32
+抽取一次10847x64 GAP 特征；不准将1980张开发验证图像加入参考集。
+每个 epoch 开始，使用当前分类器 W,b 计算100类别等权的干净 TRAIN 风险梯度 G_ref：
+L_ref=(1/100)*sum_c[(1/n_c)*sum_{i:y_i=c} CE(W f_i+b,c)]。
+对每个融合候选 alpha，利用解析线性分类器 CE 梯度 g_alpha 计算
+score_alpha=<G_ref,g_alpha>，选择 argmax score_alpha。
+这对应一阶近似：L_ref(theta-eta*g_alpha)≈L_ref(theta)-eta*<G_ref,g_alpha>。
+不含momentum/weight decay的影响，也不能证明真正的未来泛化效用。
+路由无梯度；分类头才根据最终混合特征与接收者硬标签反向传播。
+禁止使用验证集/TEST 的logits、梯度、标签做策略选择。
+
+【四组对照；只训练两个Stage II种子】
+1 LowVS-Full：固定alpha=1（原Low-VS增强）
+2 LowVS-Half：固定alpha=0.5（纯增强强度对照）
+3 GU-LowVS：每样本按TRAIN梯度效用选alpha=0/0.5/1
+4 GU-Shuffled：先算效用动作，再在batch内确定性打乱alpha与接收样本的对应。
+  在每个batch中保留alpha数量分布，打破效用与特定样本之间的匹配；
+  但C/D两个独立训练过程的跨组动作分布可能不同，不能宣称跨组完美匹配。
+使用种子124、125，每组10个epoch、850次optimizer.step，总计8组。
+全部重训同环境的LowVS-Full基准，不把旧时代checkpoint直接作为严格配对训练结果。
+完全冻结 Clean StageI seed42 epoch184 Backbone和BN；StageII只训练100类线性分类器。
+保持BS Receiver、IS Donor、相同配对计划、增强、Gumbel、CE、SGD、scheduler及batch128。
+
+【步骤一：单元测试与预检】
+从用户本地项目根目录运行：
+python H2T_repro_audit/gu_lowvs/test_utility_policy.py
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py preflight
+必须PASS；缺锁定模型/特征/统计/采样计划/CUDA时停止。
+仅允许修复本次gu_lowvs新增代码内确定的接口bug；不得改历史源或为跑通删校验。
+
+【步骤二：生成一次TRAIN-only参考特征】
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py prepare
+确认balanced_clean_train_bank.npz中的features是(10847,64)，labels全部是历史TRAIN样本，
+类0也有训练样本，stage1 SHA正确，backbone不更新，绝无官方TEST数据。
+该步骤仅做冻结模型的特征抽取，不训练Stage I。
+
+【步骤三：按顺序训练；任何失败立即停止】
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm LowVS-Full
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm LowVS-Half
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm GU-LowVS
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 124 --arm GU-Shuffled
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm LowVS-Full
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm LowVS-Half
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm GU-LowVS
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py train --seed 125 --arm GU-Shuffled
+
+每个非基准臂需在850个batch逐一对齐LowVS-Full：
+Receiver/Donor索引、增强图像、冻结特征、VS分数、Gumbel哈希，不能豁免。
+只能写入H2T_repro_audit/gu_lowvs/results/；已有实验目录不得覆盖或自动续训。
+
+【步骤四：出结果】
+python H2T_repro_audit/gu_lowvs/run_gu_lowvs.py report
+需要：GU_LOWVS_V1_RESULTS.md、epoch10.csv、paired.csv、per_class.csv、
+scientific_summary.json，全部实际8组的epochs.csv、batch_signatures.csv、
+validation_epoch10.npz、best/final classifier checkpoints、summary.json。
+再写中文GU_LOWVS_SCIENTIFIC_REPORT.md；至少讨论：
+- 两个种子的固定epoch10 Overall/Head/Tail/Few/Many/Medium，best仅辅助；
+- GU对LowVS-Full、LowVS-Half、GU-Shuffled的实际配对净正确数；
+- alpha=0/0.5/1每个epoch比例，以及是否退化成全零融合或始终完全替换；
+- GU比Half强是否只是改变强度，GU比Shuffled强才支持“按样本效用匹配”；
+- 训练参考效用不能等价于独立测试效果，两个种子同一Stage I、反复使用的
+  1980张TRAIN开发验证集和缺少class0验证样本等限制；
+- 任何训练失败、配对失败、权重变化、TEST触碰情况要如实披露。
+
+【Go / No-Go（探索性，不是统计显著性）】
+GU在两个种子固定epoch10的Overall对Full均不下降、平均Tail不下降；
+GU对Shuffled平均Overall为正，没有明显Head退步；选择动作不能基本全为0或1。
+否则停止GU-LowVS V1；禁止搜索更多alpha档位、更换TRAIN参考梯度定义、
+筛选epoch或追加种子试图挽救结果。
+
+【结束条件】
+完成预注册实验与报告后立即停止，不进行任何Git操作。
+由用户本人将产物上传GitHub，再让ChatGPT对照旧H2T/VS/RAVS开展第一性原理分析。

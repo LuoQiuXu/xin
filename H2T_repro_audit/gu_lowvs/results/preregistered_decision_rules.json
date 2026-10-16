@@ -1,0 +1,23 @@
+{
+  "locked_before_training": true,
+  "primary_epoch": 10,
+  "seeds": [
+    124,
+    125
+  ],
+  "text_gate": [
+    "both GU-minus-Full Overall >=0",
+    "mean GU-minus-Full Tail >=0",
+    "mean GU-minus-Shuffled Overall >0",
+    "no material Head loss",
+    "no collapse to alpha0 or alpha1"
+  ],
+  "provided_runner_gate": {
+    "mean_Overall_vs_Full": ">0 (extra strict condition compared with task text)",
+    "mean_Overall_vs_Shuffled": ">0",
+    "mean_Head_vs_Shuffled_pp": ">=-0.15",
+    "each_seed_max_final_action_pct": "<95 (includes half as well; stricter than text)"
+  },
+  "report_both_text_and_runner_gate": true,
+  "no_posthoc_gate_changes": true
+}
