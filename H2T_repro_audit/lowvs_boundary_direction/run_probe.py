@@ -74,7 +74,6 @@ def run(seed):
     self_test()
     folder=RESULTS/f"seed{seed}"
     if folder.exists():raise FileExistsError("Do not overwrite or resume: "+str(folder))
-    (folder).mkdir(parents=True)
     (base,N,BATCH,sha,array_hash,state_hash,check_frozen,check_sources,
      augment,online_masks,torch)=get_old()
     base.forbid_official_test()
@@ -134,6 +133,7 @@ def run(seed):
                        -data["margin_diff_direction_at_r"],atol=1e-8)
     check_frozen(bb,frozen)
     assert state_hash(bb)==initial["backbone"] and state_hash(cls)==initial["classifier"]
+    folder.mkdir(parents=True,exist_ok=False)
     file=folder/"train_epoch1_boundary_probe.npz"
     np.savez_compressed(file,**data)
     save_json(folder/"provenance.json",{
