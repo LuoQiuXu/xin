@@ -38,6 +38,8 @@ def masks(receiver_gap, donor_labels, counts, means, variances, epsilon,
             "mean_original_VS":float(S.mean()),
             "mean_lowVS_selected_VS":float(np.take_along_axis(S,L,axis=1).mean()),
             "mean_uniform_selected_VS":float(np.take_along_axis(S,U,axis=1).mean()),
+            "per_sample_uniform_selected_VS":np.take_along_axis(S,U,axis=1).mean(1),
+            "per_sample_lowVS_selected_VS":np.take_along_axis(S,L,axis=1).mean(1),
             "mean_U_L_mask_overlap":float(np.mean([np.intersect1d(a,b).size for a,b in zip(U,L)]))
             }
 
