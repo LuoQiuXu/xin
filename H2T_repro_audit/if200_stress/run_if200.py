@@ -342,8 +342,10 @@ def augment(images,rec,don,generator,transform):
     prior=torch.get_rng_state().clone()
     with torch.random.fork_rng(devices=[]):
         torch.set_rng_state(generator.get_state())
-        a=[transform(Image.fromarray(images[int(i)])) for i in rec]
-        b=[transform(Image.fromarray(images[int(i)])) for i in don]
+        a,b=[],[]
+        for r,d in zip(rec,don):
+            b.append(transform(Image.fromarray(images[int(d)])))
+            a.append(transform(Image.fromarray(images[int(r)])))
         generator.set_state(torch.get_rng_state())
     assert torch.equal(torch.get_rng_state(),prior)
     return torch.stack(a),torch.stack(b)
@@ -410,8 +412,8 @@ def train(seed,arm):
             for label,flag in (("Tail",y[r]>=71),("Head",y[r]<=35)):
                 n=int(flag.sum())
                 if n:
-                    group_totals[label]["u"]+=diag["mean_uniform_selected_VS"]*n
-                    group_totals[label]["l"]+=diag["mean_lowVS_selected_VS"]*n
+                    group_totals[label]["u"]+=float(diag["per_sample_uniform_selected_VS"][flag].sum())
+                    group_totals[label]["l"]+=float(diag["per_sample_lowVS_selected_VS"][flag].sum())
                     group_totals[label]["n"]+=n
             tgt=torch.as_tensor(y[r],dtype=torch.long,device="cuda")
             output=fc(mixed);loss=nn.functional.cross_entropy(output,tgt)
