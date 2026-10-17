@@ -210,22 +210,33 @@ def preflight():
     if not torch.cuda.is_available():raise RuntimeError("CUDA is needed for full pairwise CUDA replay")
     assert not (RESULTS/"preflight.json").exists(),"Do not overwrite"
     xx,y,vx,vy,idx,raw=data()
-    _,ev=tfms()
-    # Check the nested subset, LT counts and model dimensions, without any training.
+    tr,ev=tfms()
+    # Disposable true batch128 StageI backward: rule out laptop 8GB OOM
+    # before launching 200 epochs. Formal training will reinitialize from seed42.
     seedall(42);bb,fc=model()
-    with torch.no_grad():
-        z=bb(torch.stack([ev(Image.fromarray(q)) for q in xx[:8]]).cuda())
-        assert z.shape==(8,64,8,8)
-        assert fc(z).shape==(8,100)
+    bb.train();fc.train()
+    x=torch.stack([tr(Image.fromarray(q)) for q in xx[:BATCH]]).cuda()
+    t=torch.as_tensor(y[:BATCH],dtype=torch.long,device="cuda")
+    mixed,ta,tb,lam=mixup_data(x,t,alpha=1.)
+    out=fc(bb(mixed))
+    dry_loss=lam*nn.functional.cross_entropy(out,ta)+(1-lam)*nn.functional.cross_entropy(out,tb)
+    assert out.shape==(BATCH,100) and torch.isfinite(dry_loss)
+    dry_loss.backward()
+    assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in list(bb.parameters())+list(fc.parameters()))
+    peak=float(torch.cuda.max_memory_allocated()/1024**2)
+    del mixed,out,dry_loss,x,t,bb,fc
+    torch.cuda.empty_cache()
     source_files={s:sha(SOURCE/s) for s in ("train_images.npy","train_labels.npy","validation_images.npy",
                                          "validation_labels.npy","split_indices.npz")}
     js(RESULTS/"preflight.json",{"passed":True,"num_train":N,"num_val":len(vy),
         "train_counts":counts200().tolist(),"source_sha256":source_files,
         "nested_index_sha256":hash_data(idx),"raw_id_sha256":hash_data(raw),
         "validation_source":"same untouched 1980-image TRAIN holdout, class0 absent",
-        "GPU":torch.cuda.get_device_name(0),"training_done":False,"official_TEST_used":False,
+        "GPU":torch.cuda.get_device_name(0),"real_batch128_mixup_backward":True,
+        "dryrun_peak_allocated_MiB":peak,"dryrun_discarded":True,
+        "training_done":False,"official_TEST_used":False,
         "protocol":PROTOCOL})
-    print("PREFLIGHT PASS: IF200 nested 9502 images, TEST not touched; GPU forward")
+    print("PREFLIGHT PASS: IF200 nested 9502 images; disposable real batch128 backward; peak_allocated_MiB",round(peak,1))
 
 def s1lr(epoch):
     # Original multistep: epoch+1 <= 5 warmup; drops after 160 and 180.
