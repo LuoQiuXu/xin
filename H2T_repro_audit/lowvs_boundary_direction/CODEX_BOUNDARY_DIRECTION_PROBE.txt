@@ -1,0 +1,84 @@
+CODEX：Low-VS 判别边界方向机制验证（不训练新模型）
+研究协议版本：2026-10-17
+GitHub分支：experiment/lowvs-boundary-direction-20261017
+代码目录：H2T_repro_audit/lowvs_boundary_direction/
+脚本：geometry.py、run_probe.py；原理说明：README.md
+
+【最高优先级规则】
+禁止执行、设计、建议、生成任何 Git/GitHub/分支/合并/PR/提交/同步/版本控制操作。
+用户已自行准备本地源码；用户自己负责后续上传。不要对历史结果执行覆盖、清理或恢复。
+本次不训练 Stage I、不训练 Stage II、不优化分类器、不做任何超参数扫描。
+只能在新目录内修复明确的阻塞接口bug，不得放松原先训练记录的哈希配对检查。
+不读取CIFAR100官方TEST；不使用TRAIN留出验证的logits来选择掩码、竞争类别或阈值。
+
+【一、本轮唯一核心科学问题】
+以前LowVS-Full vs Uniform-Full：Tail平均+0.948pp；逐样本配平GAP扰动强度后，
+LowVS-Matched vs Uniform-Matched：Tail平均仅+0.172pp，两个seed一正一负。
+Low-VS较大的扰动强度有贡献迹象，但通道方向的独立价值尚未确定。
+本轮只检查在同一分类器、同一真实接收/供体特征上，Low-VS替换向量的
+单位长度方向是否更系统地影响正确类别与当前最强竞争类别的判别间隔。
+
+【二、数学定义（必须遵守符号；不得用验证集决定竞争类别）】
+使用Clean StageI seed42 epoch184锁定checkpoint，冻结ResNet32/BN/StageI分类器W,b。
+只回放StageII已有采样计划的第一个epoch，各执行seed124和125，共2×10847训练draw。
+同一收/供体随机增强、Gumbel及在线VS分数，生成Uniform随机16/64和Low-VS Bottom48随机16通道。
+GAP接收向量z，GAP供体向量zh。dU=M_U ⊙(zh-z)，dL=M_L ⊙(zh-z)。
+在融合前、固定StageI头W,b上确定 j*=argmax_{j!=y} (w_j^T z+b_j)，然后整个审计固定该j*。
+qU=(w_y-w_j*)^T dU/(||dU||+epsilon)；qL同理，epsilon数值安全。
+另外给出cosine (除以||w_y-w_j*||)以及接收类别y vs供体类别h的 q_yh（仅h!=y）。
+r=min(||dU||,||dL||)。
+验证严格恒等式：
+  Full判别间隔(L-U) = r(qL-qU) + (nL-r)qL-(nU-r)qU。
+第一项是等GAP范数时的“固定边界方向贡献”；后项是剩余幅度贡献。
+该恒等式只解释固定StageI线性margin，不能解释StageII最终准确率差或表示学习。
+
+负q=即刻压缩初始true-vs-j* margin，可能是有益训练压力，也可能是破坏性错误混合；
+正q=即刻增大margin，也不等于更好的泛化。禁止把任一方向自动称为好方向。
+
+【三、预声明样本群体；不要事后选择好看的类别】
+主群体TailEligible：接收y为71..99、供体h!=y、VS非fallback、两掩码实际不同。
+副群体AllEligible、HeadEligible、TailEligibleDonorHead；
+再分尾类初始分类正确/错误。保持真实类标签和固定j*。
+主指标：mean(qL-qU)、P(qL<qU)、mean(cosL-cosU)、mean matched margin L-U。
+还报告nU/nL、Full和Matched即时CE差、预测变化率、margin跨越率、样本数量。
+seed124/125是同一StageI、共享训练源图的增强视图，不是独立训练泛化试验。
+无p-hacking：不得用大样本draw数冒充独立统计显著性。
+
+【四、最短执行顺序，从本地仓库根目录】
+0. 检查两个脚本存在，旧实验锁定文件和实际CIFAR TRAIN数据存在；
+   前次结果目录lowvs_norm_direction/results/seed124和seed125的Uniform-Full/
+   batch_signatures.csv 均存在；缺失就停止，不重构采样。
+1. python H2T_repro_audit/lowvs_boundary_direction/geometry.py
+2. python H2T_repro_audit/lowvs_boundary_direction/run_probe.py run --seed 124
+3. python H2T_repro_audit/lowvs_boundary_direction/run_probe.py run --seed 125
+4. python H2T_repro_audit/lowvs_boundary_direction/run_probe.py report
+
+总计只有170个batch的GPU冻结前向，无任何optimizer.step()。
+每个batch对比旧实验的indices/images/features/scores/Gumbel及Uniform/LowVS掩码哈希；
+如果失败，禁止绕过。两种子的各10847个训练draw写入本轮results/seed*/NPZ。
+成功后可运行只读式统计/绘图，但不得额外训练或调参。
+
+【五、必须交付的东西】
+新目录 results/seed124/train_epoch1_boundary_probe.npz 和 seed125同名文件；
+对应provenance.json；results/group_summary.csv、per_class_summary.csv、
+scientific_summary.json、BOUNDARY_DIRECTION_RESULTS.md。
+再单独写一份简洁中文 BOUNDARY_DIRECTION_SCIENTIFIC_REPORT.md：
+- 直接贴主群体TailEligible的两个seed数值和样本量，注明并非独立图像；
+- 以 HeadEligible、TailEligibleDonorHead和尾类初始分对/分错作合理对照；
+- 解释q<0/正的含义（即时边界挑战或保持），绝不直接归因于泛化收益；
+- 校验Full差值的代数拆分、相同范数r、fallback、mask相同对照；
+- 结合上轮LowVS-Full的Tail增益以及Matched不稳定，但不可用其验证结果选择本轮方向；
+- 给出三种科学判断之一：更明显的边界方向干扰、主要表现为幅度效应、
+  或方向与组别相关、整体不确定；不得发明额外阈值或选择有利epoch。
+- 最后一节简要提出作者数据集IF50/100/200的未来stress-test设计，不马上执行。
+
+【六、停止与下一步路径】
+两seed主指标方向明显一致且类条件清楚：下一阶段才考虑把方向/强度联合引入新方法，
+仍需有效监督信息与外部泛化验证，不能仅用q就设计门控。
+若q对初始边界无稳定影响：暂停Low-VS方向方法，不再调整K/alpha/难度评分。
+若方向随供体/接收者类别变化：记录可迁移的潜在失败条件，将来设计跨数据集挑战。
+未来数据集研究应依次在作者公开配置CIFAR100-LT IF50/100/200检查
+同StageI、相同采样和schedule下DR、原H2T、Low-VS的Head/Tail、
+worst-class与危险供体影响；外部数据集需另行验证代码与8GB显存可行性。
+不能以不同Backbone/训练预算的结果直接宣称H2T“不泛化”。
+本轮完成后停止。全部Git操作由用户自行执行；结果上传后交ChatGPT深度解读。
