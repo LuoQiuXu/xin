@@ -1,0 +1,102 @@
+[
+  {
+    "action": "preflight",
+    "seed": null,
+    "arm": null,
+    "started_at": "2026-10-16T22:39:01+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:39:04+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 124,
+    "arm": "Uniform-Full",
+    "started_at": "2026-10-16T22:39:29+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:40:26+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 124,
+    "arm": "LowVS-Full",
+    "started_at": "2026-10-16T22:40:29+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:41:26+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 124,
+    "arm": "Uniform-Matched",
+    "started_at": "2026-10-16T22:41:29+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:42:26+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 124,
+    "arm": "LowVS-Matched",
+    "started_at": "2026-10-16T22:42:28+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:43:26+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 125,
+    "arm": "Uniform-Full",
+    "started_at": "2026-10-16T22:43:28+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:44:25+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 125,
+    "arm": "LowVS-Full",
+    "started_at": "2026-10-16T22:44:28+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:45:25+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 125,
+    "arm": "Uniform-Matched",
+    "started_at": "2026-10-16T22:45:27+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:46:24+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "train",
+    "seed": 125,
+    "arm": "LowVS-Matched",
+    "started_at": "2026-10-16T22:46:27+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:47:24+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  },
+  {
+    "action": "report",
+    "seed": null,
+    "arm": null,
+    "started_at": "2026-10-16T22:48:34+08:00",
+    "status": "completed",
+    "finished_at": "2026-10-16T22:48:34+08:00",
+    "TEST_events": [],
+    "historical_write_events": []
+  }
+]

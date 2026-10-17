@@ -1,0 +1,3 @@
+seed,paired_training_draws,batches,max_pair_gap_error,max_target_error_U,max_target_error_L,max_relative_to_tolerance,norm_tolerance_failures,n_exact_zero_U,n_exact_zero_L,n_either_below_epsilon,nU_smaller,nL_smaller,equal_original_norms
+124,108470,850,9.5367431640625e-07,9.5367431640625e-07,9.5367431640625e-07,0.002338638762012124,0,0,0,0,91672,13246,3552
+125,108470,850,1.430511474609375e-06,9.5367431640625e-07,1.430511474609375e-06,0.0023930876050144434,0,0,0,0,91806,13121,3543

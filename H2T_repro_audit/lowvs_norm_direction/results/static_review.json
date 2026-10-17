@@ -1,0 +1,11 @@
+{
+  "provided_norm_policy_unchanged": true,
+  "numerical_matching_formula_unchanged": true,
+  "changes": [
+    "persist missing per-example and per-batch norm/alpha evidence",
+    "freeze/parameter/timing/reload evidence",
+    "historical-file and TEST guards",
+    "durable execution log and source hashes"
+  ],
+  "historical_code_modified": false
+}

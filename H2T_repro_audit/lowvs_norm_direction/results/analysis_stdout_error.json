@@ -1,0 +1,9 @@
+{
+  "phase": "offline analysis console forwarding after artifacts and integrity PASS",
+  "training_affected": false,
+  "training_retries": 0,
+  "initial_log": "console/04_scientific_analysis.log",
+  "error_traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 9, in <module>\nUnicodeEncodeError: 'gbk' codec can't encode character '\\ufffd' in position 6: illegal multibyte sequence",
+  "resolution": "Set PYTHONIOENCODING=utf-8 in parent and child; rerun only offline report with a new log. Read NPZ arrays once without changing values.",
+  "retry_log": "console/05_scientific_analysis_utf8.log"
+}

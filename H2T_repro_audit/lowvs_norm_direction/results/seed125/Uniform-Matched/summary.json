@@ -1,0 +1,71 @@
+{
+  "status": "completed",
+  "seed": 125,
+  "arm": "Uniform-Matched",
+  "steps": 850,
+  "best_epoch": 6,
+  "best_Overall": 47.22222222222222,
+  "last": {
+    "seed": 125,
+    "arm": "Uniform-Matched",
+    "epoch": 10,
+    "train_loss": 1.1206593581847004,
+    "lr": 0.0004894348372981928,
+    "training_seconds": 5.358872800003155,
+    "peak_allocated_mib": 122.48388671875,
+    "peak_reserved_mib": 148.0,
+    "Overall": 46.86868686868687,
+    "Head": 60.142857142857146,
+    "OfficialMedium": 50.142857142857146,
+    "Tail": 26.896551724137932,
+    "Many": 61.029411764705884,
+    "Medium": 49.714285714285715,
+    "Few": 27.5,
+    "Macro": 46.86868686868687,
+    "validation_CE": 2.1570146888193458,
+    "mean_original_norm_uniform": 3.473923324538539,
+    "mean_original_norm_lowvs": 3.897213299746798,
+    "mean_matched_norm_uniform": 3.4610160433049244,
+    "mean_matched_norm_lowvs": 3.461016060185672,
+    "mean_alpha_uniform": 0.9961279792324941,
+    "mean_alpha_lowvs": 0.8914911399033143,
+    "mean_target_norm": 3.4610160433049244,
+    "mean_zero_norm_pairs": 0.0,
+    "head_alpha_uniform": 0.9956419547989686,
+    "head_alpha_lowvs": 0.8950294772345908,
+    "tail_alpha_uniform": 0.9963193246318154,
+    "tail_alpha_lowvs": 0.8902852272699018
+  },
+  "TEST_used": false,
+  "backbone_frozen": true,
+  "all_batches_paired": true,
+  "paired_field_counts": {
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "scores_sha256": 850,
+    "gumbel_sha256": 850,
+    "uniform_mask_sha256": 850,
+    "lowvs_mask_sha256": 850
+  },
+  "backbone_state_tensors_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "classifier_parameter_max_abs_changes": {
+    "module.fc.weight": 0.40988433361053467,
+    "module.fc.bias": 0.12942788004875183
+  },
+  "checkpoint_sha256": {
+    "best": "df6d477593a35404feeba0f8423a40f482dbcb6bd81a7cc782fd440d1751500a",
+    "final": "c45857ad5599906131a7b6fc958199cc2cc15225385bdef6b1799bc4c733537a"
+  },
+  "checkpoint_reload_exact": true,
+  "elapsed_seconds": 56.9281570000021,
+  "max_sample_gap_norm_error": 1.430511474609375e-06,
+  "norm_tolerance_failures": 0,
+  "norm_diagnostics_sha256": "e2cced28c6f5081bf02b3f450fa5ad4620ef3c7f6720ee87a1ab8ad64c78032b",
+  "protected_historical_files": 543,
+  "official_TEST_events": [],
+  "historical_write_events": []
+}

@@ -1,0 +1,71 @@
+{
+  "status": "completed",
+  "seed": 125,
+  "arm": "LowVS-Matched",
+  "steps": 850,
+  "best_epoch": 5,
+  "best_Overall": 46.96969696969697,
+  "last": {
+    "seed": 125,
+    "arm": "LowVS-Matched",
+    "epoch": 10,
+    "train_loss": 1.2145200945149153,
+    "lr": 0.0004894348372981928,
+    "training_seconds": 5.454056600006879,
+    "peak_allocated_mib": 122.48388671875,
+    "peak_reserved_mib": 148.0,
+    "Overall": 46.717171717171716,
+    "Head": 60.0,
+    "OfficialMedium": 50.0,
+    "Tail": 26.724137931034484,
+    "Many": 60.88235294117647,
+    "Medium": 49.57142857142857,
+    "Few": 27.333333333333332,
+    "Macro": 46.717171717171716,
+    "validation_CE": 2.1581265073834044,
+    "mean_original_norm_uniform": 3.473923324538539,
+    "mean_original_norm_lowvs": 3.897213299746798,
+    "mean_matched_norm_uniform": 3.4610160433049244,
+    "mean_matched_norm_lowvs": 3.461016060185672,
+    "mean_alpha_uniform": 0.9961279792324941,
+    "mean_alpha_lowvs": 0.8914911399033143,
+    "mean_target_norm": 3.4610160433049244,
+    "mean_zero_norm_pairs": 0.0,
+    "head_alpha_uniform": 0.9956419547989686,
+    "head_alpha_lowvs": 0.8950294772345908,
+    "tail_alpha_uniform": 0.9963193246318154,
+    "tail_alpha_lowvs": 0.8902852272699018
+  },
+  "TEST_used": false,
+  "backbone_frozen": true,
+  "all_batches_paired": true,
+  "paired_field_counts": {
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "scores_sha256": 850,
+    "gumbel_sha256": 850,
+    "uniform_mask_sha256": 850,
+    "lowvs_mask_sha256": 850
+  },
+  "backbone_state_tensors_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "classifier_parameter_max_abs_changes": {
+    "module.fc.weight": 0.40653419494628906,
+    "module.fc.bias": 0.12748216092586517
+  },
+  "checkpoint_sha256": {
+    "best": "7685b6a20842bc5c8a2ec1de7c5db18a4668bd283f5025505131e0bec82444eb",
+    "final": "56b5b0331020e9281b68cbad6afac40cc642d867c79be25d8e51cc78c7f2b202"
+  },
+  "checkpoint_reload_exact": true,
+  "elapsed_seconds": 57.48875279999629,
+  "max_sample_gap_norm_error": 1.430511474609375e-06,
+  "norm_tolerance_failures": 0,
+  "norm_diagnostics_sha256": "e2cced28c6f5081bf02b3f450fa5ad4620ef3c7f6720ee87a1ab8ad64c78032b",
+  "protected_historical_files": 543,
+  "official_TEST_events": [],
+  "historical_write_events": []
+}

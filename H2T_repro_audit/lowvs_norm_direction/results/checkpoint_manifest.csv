@@ -1,0 +1,17 @@
+seed,arm,kind,epoch,path,sha256
+124,Uniform-Full,best,4,results/seed124/Uniform-Full/checkpoints/best.pth,6a05d7f762fd205315a41e90d61a1974f7170ae219227c6859a835b96086f122
+124,Uniform-Full,final,10,results/seed124/Uniform-Full/checkpoints/final.pth,c852d36c041943088fcbf8cf77b2688cc8f374b5e57564c3c7588fff0b444dd1
+124,LowVS-Full,best,9,results/seed124/LowVS-Full/checkpoints/best.pth,eabffde429341a86dac8889d69e43e5f262d8313f2bde9ac8604f3b7830cea47
+124,LowVS-Full,final,10,results/seed124/LowVS-Full/checkpoints/final.pth,c0ff77505181acc9910cc0e4f56cf9a3d822d93f59c8dd601e7511b83647cf4b
+124,Uniform-Matched,best,4,results/seed124/Uniform-Matched/checkpoints/best.pth,394572559f3e5833d53614280f9c79150aac47ca2b942fc55feeb3808727c107
+124,Uniform-Matched,final,10,results/seed124/Uniform-Matched/checkpoints/final.pth,a1f65d7934e45bcf67c0906d0f1423bde6559455443648a814b704098f186673
+124,LowVS-Matched,best,9,results/seed124/LowVS-Matched/checkpoints/best.pth,5f581ad6d85c9ac001efae1960a53bf278f2c86af664504de473a4846fea7886
+124,LowVS-Matched,final,10,results/seed124/LowVS-Matched/checkpoints/final.pth,ae0aea4d1588c51f6c22860b12763a891e7af1995f9c3169c09279aaf1ef8669
+125,Uniform-Full,best,6,results/seed125/Uniform-Full/checkpoints/best.pth,a0dbbfb1b286acf435396b557d0749478c52846520c5b3f2ff6f7567ccf10888
+125,Uniform-Full,final,10,results/seed125/Uniform-Full/checkpoints/final.pth,f7f7b591b4ac430bc4b0b677c0c9fc7ac533d598c180c4dfef15966797fe8ad8
+125,LowVS-Full,best,6,results/seed125/LowVS-Full/checkpoints/best.pth,4464a78a5156855be92aa2e860dc85b1e3652fae3f02e93a926c1a32c5565aaa
+125,LowVS-Full,final,10,results/seed125/LowVS-Full/checkpoints/final.pth,ea640a15bd16394d67b8e027dc15cedc323e47358749bbc9fd2c12fd697cf9c9
+125,Uniform-Matched,best,6,results/seed125/Uniform-Matched/checkpoints/best.pth,df6d477593a35404feeba0f8423a40f482dbcb6bd81a7cc782fd440d1751500a
+125,Uniform-Matched,final,10,results/seed125/Uniform-Matched/checkpoints/final.pth,c45857ad5599906131a7b6fc958199cc2cc15225385bdef6b1799bc4c733537a
+125,LowVS-Matched,best,5,results/seed125/LowVS-Matched/checkpoints/best.pth,7685b6a20842bc5c8a2ec1de7c5db18a4668bd283f5025505131e0bec82444eb
+125,LowVS-Matched,final,10,results/seed125/LowVS-Matched/checkpoints/final.pth,56b5b0331020e9281b68cbad6afac40cc642d867c79be25d8e51cc78c7f2b202

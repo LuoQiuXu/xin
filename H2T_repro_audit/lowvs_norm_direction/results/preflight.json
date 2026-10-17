@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "protocol": {
+    "question": "After equal GAP perturbation magnitude, does LowVS beat Uniform?",
+    "seeds": [
+      124,
+      125
+    ],
+    "arms": [
+      "Uniform-Full",
+      "LowVS-Full",
+      "Uniform-Matched",
+      "LowVS-Matched"
+    ],
+    "stage1": "Clean seed42 epoch184",
+    "epochs": 10,
+    "primary_epoch": 10,
+    "batch_size": 128,
+    "stage1_backbone_bn": "frozen eval",
+    "only_train": "100-way linear FC",
+    "score_and_masks": "reviewed online VS: Uniform64/Low48 -> random16 whole channels",
+    "target_norm": "r=min(norm(GAP(deltaU_full)),norm(GAP(deltaL_full)))",
+    "scaling": "alphaU=r/nU, alphaL=r/nL; alpha in [0,1], zero-norm safe",
+    "controls": "paired BS/IS, augmentations, VS scores, both masks and Gumbel",
+    "validation": "1980 TRAIN holdout, class1..99; class0 absent, 100 logits",
+    "official_TEST_used": false,
+    "interpretation": "GAP L2 matched, NOT guaranteed feature-map L2 or semantic orientation match"
+  },
+  "checks": {
+    "124": {
+      "initial": {
+        "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+        "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+      },
+      "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "first_batch_signature": {
+        "indices_sha256": "289fc26728d8478237145233275d0c181c09006dd26953755d61ca1a2570234f",
+        "images_sha256": "31adb012eef95c10d878b690038624c5ce565207c7fb844550f35d4ebd2880a3",
+        "features_sha256": "575612c7d78a51eba412beb38f0c3877b75f460075905230dc5b64305816657a",
+        "scores_sha256": "b2aee217d029113bc6340d8e21a4ba012a4fc95bb3a11834ca7f71db2eae6376",
+        "gumbel_sha256": "c52ca542a26e4b179d876822efc922bf265cd01fa0b2ce47c40269971894dc9c"
+      },
+      "no_grad_losses": {
+        "Uniform-Full": 1.6582205295562744,
+        "LowVS-Full": 1.984560489654541,
+        "Uniform-Matched": 1.6525487899780273,
+        "LowVS-Matched": 1.7149015665054321
+      },
+      "max_gap_norm_discrepancy": 9.5367431640625e-07,
+      "max_target_error_uniform": 4.76837158203125e-07,
+      "max_target_error_lowvs": 9.5367431640625e-07,
+      "uniform_mask_sha256": "505d76b4849e8a278499db82c3cc1b92059c7872b4ee61cee85a1347a5c71b1c",
+      "lowvs_mask_sha256": "3802f2eebd4aaec07344d113d093ecdb75bd979b1e03af5b56b2eba339f4fb5d"
+    },
+    "125": {
+      "initial": {
+        "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+        "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+      },
+      "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "first_batch_signature": {
+        "indices_sha256": "872bf8eeaf11d6d242c3bae7854c0adcbfdf68582715f56850a000f09b68f737",
+        "images_sha256": "ff7b8a6e8fdecbe16fcfe575e50cac3812f4db5e18d6589b89695f3dc9914f2f",
+        "features_sha256": "c7289005c6d6db03c554d2d96b643cf4af8fd041b3cdd7b962d9b5acb73cea1c",
+        "scores_sha256": "375d67c33f878e25eb67100505a38033555b266e8b20f60ce0fa9639ee47a1f1",
+        "gumbel_sha256": "585a53ad621866f03b9337153698008d8044250620fa56254d33432f7c388557"
+      },
+      "no_grad_losses": {
+        "Uniform-Full": 1.9580237865447998,
+        "LowVS-Full": 2.3258767127990723,
+        "Uniform-Matched": 1.9503706693649292,
+        "LowVS-Matched": 2.079834222793579
+      },
+      "max_gap_norm_discrepancy": 4.76837158203125e-07,
+      "max_target_error_uniform": 4.76837158203125e-07,
+      "max_target_error_lowvs": 4.76837158203125e-07,
+      "uniform_mask_sha256": "4e3c38af180038da529c1fcfffe1c91d11a05b2f29fc7f698fe024a6275a4157",
+      "lowvs_mask_sha256": "ada0c203a30a4f7194f05598a288f74ea1410206a9b5b833f0bb1b8dd13d9662"
+    }
+  },
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "total_mib": 8150.5625,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "cudnn_allow_tf32": false,
+    "matmul_allow_tf32": false
+  },
+  "new_source_sha256": {
+    "run_experiment.py": "9b9fa56c2d63ea19ffd8baafa3b077741f6c63e03995919633582f5034d558b3",
+    "norm_policy.py": "6c23b7acb1d2c9e52bb2214e47c5f19d25bc6a80274bb6667685e8b1dc933984"
+  },
+  "protected_historical_files": 543,
+  "matching_tolerance": "1e-5 + 1e-4 * per-example target",
+  "norm_epsilon": 1e-12
+}

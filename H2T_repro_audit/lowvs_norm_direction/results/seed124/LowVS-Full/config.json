@@ -1,0 +1,52 @@
+{
+  "question": "After equal GAP perturbation magnitude, does LowVS beat Uniform?",
+  "seeds": [
+    124,
+    125
+  ],
+  "arms": [
+    "Uniform-Full",
+    "LowVS-Full",
+    "Uniform-Matched",
+    "LowVS-Matched"
+  ],
+  "stage1": "Clean seed42 epoch184",
+  "epochs": 10,
+  "primary_epoch": 10,
+  "batch_size": 128,
+  "stage1_backbone_bn": "frozen eval",
+  "only_train": "100-way linear FC",
+  "score_and_masks": "reviewed online VS: Uniform64/Low48 -> random16 whole channels",
+  "target_norm": "r=min(norm(GAP(deltaU_full)),norm(GAP(deltaL_full)))",
+  "scaling": "alphaU=r/nU, alphaL=r/nL; alpha in [0,1], zero-norm safe",
+  "controls": "paired BS/IS, augmentations, VS scores, both masks and Gumbel",
+  "validation": "1980 TRAIN holdout, class1..99; class0 absent, 100 logits",
+  "official_TEST_used": false,
+  "interpretation": "GAP L2 matched, NOT guaranteed feature-map L2 or semantic orientation match",
+  "seed": 124,
+  "arm": "LowVS-Full",
+  "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "statistics_sha256": "e81a4897a965d642f832bd6429e0e5a7d136725daaa069d9ded96f87ab64aef9",
+  "initial_hashes": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "total_mib": 8150.5625,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "cudnn_allow_tf32": false,
+    "matmul_allow_tf32": false
+  },
+  "source_sha256": {
+    "run_experiment.py": "9b9fa56c2d63ea19ffd8baafa3b077741f6c63e03995919633582f5034d558b3",
+    "norm_policy.py": "6c23b7acb1d2c9e52bb2214e47c5f19d25bc6a80274bb6667685e8b1dc933984"
+  }
+}

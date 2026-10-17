@@ -1,0 +1,23 @@
+{
+  "locked_before_training": true,
+  "seeds": [
+    124,
+    125
+  ],
+  "arms": [
+    "Uniform-Full",
+    "LowVS-Full",
+    "Uniform-Matched",
+    "LowVS-Matched"
+  ],
+  "epochs": 10,
+  "primary_epoch": 10,
+  "matching_norm": "per-sample GAP L2; r=min(nU,nL)",
+  "matching_tolerance": "1e-5 + 1e-4*target (supplied policy unchanged)",
+  "epsilon": 1e-12,
+  "A": "Matched Tail gains positive in both seeds, no material Overall reversal and Full has same direction",
+  "B": "Full benefits but Matched vanishes or reverses: magnitude plausible, not uniquely causal",
+  "C": "Weak/few-image or inconsistent effects: pause VS method development",
+  "no_posthoc_numeric_effect_thresholds": true,
+  "no_extra_seeds_or_training": true
+}

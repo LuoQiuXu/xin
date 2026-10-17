@@ -1,0 +1,254 @@
+{
+  "passed": true,
+  "verified_at": "2026-10-16T22:52:11+08:00",
+  "runs": 8,
+  "updates": 6800,
+  "protected_historical_files": 543,
+  "norm_tolerance_failures": 0,
+  "per_seed_norm_verification": [
+    {
+      "seed": 124,
+      "paired_training_draws": 108470,
+      "batches": 850,
+      "max_pair_gap_error": 9.5367431640625e-07,
+      "max_target_error_U": 9.5367431640625e-07,
+      "max_target_error_L": 9.5367431640625e-07,
+      "max_relative_to_tolerance": 0.002338638762012124,
+      "norm_tolerance_failures": 0,
+      "n_exact_zero_U": 0,
+      "n_exact_zero_L": 0,
+      "n_either_below_epsilon": 0,
+      "nU_smaller": 91672,
+      "nL_smaller": 13246,
+      "equal_original_norms": 3552
+    },
+    {
+      "seed": 125,
+      "paired_training_draws": 108470,
+      "batches": 850,
+      "max_pair_gap_error": 1.430511474609375e-06,
+      "max_target_error_U": 9.5367431640625e-07,
+      "max_target_error_L": 1.430511474609375e-06,
+      "max_relative_to_tolerance": 0.0023930876050144434,
+      "norm_tolerance_failures": 0,
+      "n_exact_zero_U": 0,
+      "n_exact_zero_L": 0,
+      "n_either_below_epsilon": 0,
+      "nU_smaller": 91806,
+      "nL_smaller": 13121,
+      "equal_original_norms": 3543
+    }
+  ],
+  "paired_batch_count_each": 850,
+  "paired_fields": 8,
+  "checkpoint_files_verified": 16,
+  "frozen_backbone_and_BN": true,
+  "policy_bytewise_unchanged": true,
+  "training_core_unchanged_after_preflight": true,
+  "TEST_events": [],
+  "historical_write_events": [],
+  "details": [
+    {
+      "seed": 124,
+      "arm": "Uniform-Full",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.38191163539886475,
+        "module.fc.bias": 0.1302250325679779
+      }
+    },
+    {
+      "seed": 124,
+      "arm": "LowVS-Full",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.33047282695770264,
+        "module.fc.bias": 0.12386062741279602
+      }
+    },
+    {
+      "seed": 124,
+      "arm": "Uniform-Matched",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.38342511653900146,
+        "module.fc.bias": 0.13017666339874268
+      }
+    },
+    {
+      "seed": 124,
+      "arm": "LowVS-Matched",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.3822498321533203,
+        "module.fc.bias": 0.12662813067436218
+      }
+    },
+    {
+      "seed": 125,
+      "arm": "Uniform-Full",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.40910041332244873,
+        "module.fc.bias": 0.12932556867599487
+      }
+    },
+    {
+      "seed": 125,
+      "arm": "LowVS-Full",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.3529154062271118,
+        "module.fc.bias": 0.12557578086853027
+      }
+    },
+    {
+      "seed": 125,
+      "arm": "Uniform-Matched",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.40988433361053467,
+        "module.fc.bias": 0.12942788004875183
+      }
+    },
+    {
+      "seed": 125,
+      "arm": "LowVS-Matched",
+      "steps": 850,
+      "matched": {
+        "indices_sha256": 850,
+        "images_sha256": 850,
+        "features_sha256": 850,
+        "scores_sha256": 850,
+        "gumbel_sha256": 850,
+        "uniform_mask_sha256": 850,
+        "lowvs_mask_sha256": 850,
+        "norm_diagnostics_sha256": 850
+      },
+      "frozen_state_tensors": 186,
+      "BN_counters": [
+        15640
+      ],
+      "checkpoint_reload_exact": true,
+      "classifier_parameter_changes": {
+        "module.fc.weight": 0.40653419494628906,
+        "module.fc.bias": 0.12748216092586517
+      }
+    }
+  ],
+  "source_sha256": {
+    "analyze_results.py": "cdb4b3b37e36d52026a5f56068cd3e2bd289fe87e4b17e945661106ea7580a3f",
+    "norm_policy.py": "6c23b7acb1d2c9e52bb2214e47c5f19d25bc6a80274bb6667685e8b1dc933984",
+    "run_experiment.py": "9b9fa56c2d63ea19ffd8baafa3b077741f6c63e03995919633582f5034d558b3"
+  },
+  "report_sha256": "e3c8680ddb5e279df9283bd57706e5f10efe1be813d22714e128893a2355e5ac",
+  "Markdown_tables_verified": 10,
+  "offline_analysis_stdout_retries": 1,
+  "training_retries": 0,
+  "documentation_only_fixes_after_analysis": true
+}

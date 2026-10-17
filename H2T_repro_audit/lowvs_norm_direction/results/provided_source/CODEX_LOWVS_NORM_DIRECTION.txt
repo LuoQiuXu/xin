@@ -1,0 +1,55 @@
+Low-VS / Uniform：扰动范数与通道方向归因实验，Codex 执行指令（2026-10-16）
+
+分支：experiment/lowvs-norm-direction-20261016
+新目录：H2T_repro_audit/lowvs_norm_direction/
+文件：norm_policy.py / run_experiment.py / README.md
+【完全禁止Codex的所有Git、GitHub、版本控制、分支、提交、同步、合并、PR操作】
+用户自行准备代码和上传结果。只允许修改新目录内确定的程序阻塞bug；禁止改旧模型、旧实验文件、旧训练器。不得生成假checkpoint/数据。
+
+一、研究问题
+Low-VS比Uniform-PerSample有小幅Tail收益，但是它也增加了实际GAP扰动范数。检验配平每个receiver/donor的GAP L2后，Low-VS是否仍有优势。
+不再设计新方法、K/评分/自适应门控。这个实验不能直接证明语义有用通道。
+原始H2T batch-shared随机掩码不同于Uniform-PerSample，本轮不声称直接确认比原始H2T更强。
+
+二、固定算法
+同一Clean StageI seed42 epoch184，冻结ResNet32+BN；StageII只训练100类FC，CE, SGD, 10epochs, batch128，seeds124/125。
+原历史BS receiver、IS donor、增强、供体类别统计和fallback、Gumbel，完整拷贝16个8x8通道。
+先得到Uniform-Full、LowVS-Full两种扰动δU、δL，其GAP范数nU,nL；配对公共目标r=min(nU,nL)。
+Matched-U: δU*=δU*(r/nU)；Matched-L: δL*=δL*(r/nL)，零范数安全取0，alpha始终在[0,1]，不放大、不改选中通道。
+四组：Uniform-Full、LowVS-Full、Uniform-Matched、LowVS-Matched。
+Matched是连续缩放，不是原始硬替换；仅GAP范数逐样本配平，未配平完整空间图范数、梯度、语义。
+
+三、按顺序执行（从项目根目录）
+python H2T_repro_audit/lowvs_norm_direction/norm_policy.py
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py preflight
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm Uniform-Full
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm LowVS-Full
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm Uniform-Matched
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm LowVS-Matched
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm Uniform-Full
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm LowVS-Full
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm Uniform-Matched
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm LowVS-Matched
+python H2T_repro_audit/lowvs_norm_direction/run_experiment.py report
+
+所有组850步骤；每个seed先Uniform-Full建立配对签名，其余三组必须每个batch一致：采样索引、增强像素、冻结特征、在线VS分数、Gumbel、Uniform和LowVS各自真实掩码；失配即停。
+StageI不能重训；官方CIFAR100 TEST绝不能读取、评估或选模；开发验证只用于epoch评估，绝不能参与融合决策。
+完成后只写入lowvs_norm_direction/results/，失败不覆盖和不隐式续训。
+
+四、报告
+查看 epoch10.csv、paired.csv、classifier_hybrids.csv、scientific_summary.json、NORM_DIRECTION_RESULTS.md；另写中文 LOWVS_NORM_DIRECTION_SCIENTIFIC_REPORT.md。
+主要比较固定第10epoch：
+A LowVS-Full - Uniform-Full
+B LowVS-Matched - Uniform-Matched
+分别展示各seed Overall/Head/Medium/Tail/Few、增正确/失正确/净正确图片数量、best epoch仅供敏感性分析。
+展示每种子原始GAP范数、配平GAP范数逐batch误差、两种alpha的分布和头尾分组；不要用均值相等冒充逐样本相等。
+classifier_hybrids.csv的 W/b 互换只是后验参数干预，无法独立证明偏置是唯一机制。
+对三类解释做保守判断：范数单因子、通道身份/类别条件方向、分类头偏置。
+验证为原TRAIN留出1980张、99类(class0缺失)，反复用于开发，两种子共享一个StageI，不能声称最终显著性或测试泛化。
+
+五、退出规则
+配平后LowVS依然方向一致领先，说明GAP强度不足以完全解释，值得研究方向。
+配平后优势消失，幅度解释更可信但不是独立证明。
+所有收益只有几张图或seed方向矛盾，就暂停LowVS方法开发。
+不追加alpha,K,seed,loss,优化器扫描；不设计下一代增强模块。
+实验结束后停止；结果由用户自行上传GitHub，之后交给ChatGPT分析。

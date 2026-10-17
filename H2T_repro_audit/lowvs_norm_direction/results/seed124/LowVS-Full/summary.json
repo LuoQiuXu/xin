@@ -1,0 +1,71 @@
+{
+  "status": "completed",
+  "seed": 124,
+  "arm": "LowVS-Full",
+  "steps": 850,
+  "best_epoch": 9,
+  "best_Overall": 47.42424242424242,
+  "last": {
+    "seed": 124,
+    "arm": "LowVS-Full",
+    "epoch": 10,
+    "train_loss": 1.4762982413814267,
+    "lr": 0.0004894348372981928,
+    "training_seconds": 5.514471999995294,
+    "peak_allocated_mib": 122.48388671875,
+    "peak_reserved_mib": 148.0,
+    "Overall": 47.323232323232325,
+    "Head": 59.857142857142854,
+    "OfficialMedium": 51.0,
+    "Tail": 27.75862068965517,
+    "Many": 60.588235294117645,
+    "Medium": 50.714285714285715,
+    "Few": 28.333333333333332,
+    "Macro": 47.323232323232325,
+    "validation_CE": 2.1530343566278014,
+    "mean_original_norm_uniform": 3.4717878002477285,
+    "mean_original_norm_lowvs": 3.883580039456834,
+    "mean_matched_norm_uniform": 3.4581028764298667,
+    "mean_matched_norm_lowvs": 3.4581028792433246,
+    "mean_alpha_uniform": 0.9958265214358935,
+    "mean_alpha_lowvs": 0.8939587872753916,
+    "mean_target_norm": 3.4581028876836983,
+    "mean_zero_norm_pairs": 0.0,
+    "head_alpha_uniform": 0.9947920027533672,
+    "head_alpha_lowvs": 0.8974415495995498,
+    "tail_alpha_uniform": 0.9964010767843787,
+    "tail_alpha_lowvs": 0.8916925028533417
+  },
+  "TEST_used": false,
+  "backbone_frozen": true,
+  "all_batches_paired": true,
+  "paired_field_counts": {
+    "indices_sha256": 850,
+    "images_sha256": 850,
+    "features_sha256": 850,
+    "scores_sha256": 850,
+    "gumbel_sha256": 850,
+    "uniform_mask_sha256": 850,
+    "lowvs_mask_sha256": 850
+  },
+  "backbone_state_tensors_bitwise_unchanged": 186,
+  "BN_counters": [
+    15640
+  ],
+  "classifier_parameter_max_abs_changes": {
+    "module.fc.weight": 0.33047282695770264,
+    "module.fc.bias": 0.12386062741279602
+  },
+  "checkpoint_sha256": {
+    "best": "eabffde429341a86dac8889d69e43e5f262d8313f2bde9ac8604f3b7830cea47",
+    "final": "c0ff77505181acc9910cc0e4f56cf9a3d822d93f59c8dd601e7511b83647cf4b"
+  },
+  "checkpoint_reload_exact": true,
+  "elapsed_seconds": 57.68922499999462,
+  "max_sample_gap_norm_error": 9.5367431640625e-07,
+  "norm_tolerance_failures": 0,
+  "norm_diagnostics_sha256": "51c99f91b5412aa6bd7e02b825a81edb7f08e2e75c4d17fa76b080b85a2e981d",
+  "protected_historical_files": 543,
+  "official_TEST_events": [],
+  "historical_write_events": []
+}

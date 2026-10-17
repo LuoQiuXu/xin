@@ -1,0 +1,7 @@
+{
+  "scope": "offline report preparation",
+  "failed_text_anchor_attempts": 2,
+  "error": "Text replacement AssertionErrors; neither attempt wrote source",
+  "resolution": "AST confirmed original newline correct; no newline fix needed. Only conditional report wording improved.",
+  "training_impact": "none; no training-core changes or retries"
+}

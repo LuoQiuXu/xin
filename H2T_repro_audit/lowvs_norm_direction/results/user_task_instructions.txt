@@ -1,0 +1,66 @@
+Low-VS 为什么优于 Uniform？扰动范数—方向归因实验（Codex 指令）
+版本：2026-10-16 | 协议冻结 V1
+仓库：LuoQiuXu/xin
+分支（由用户自行准备）：experiment/lowvs-norm-direction-20261016
+新目录：H2T_repro_audit/lowvs_norm_direction/
+主程序：run_experiment.py；策略测试：norm_policy.py；说明：README.md
+
+【目标】
+本轮不是新论文方法，也不新增自适应网络。真正检验：Low-VS 相对逐样本 Uniform 的收益，有多少能够由 GAP 扰动幅度增大解释；配平幅度后，Low-VS 的不同通道身份／类别条件方向是否还有额外分类收益。
+历史事实：Low-VS 在 Clean seed124/125 的 epoch10 比逐样本 Uniform 平均 Overall +0.2778pp、Tail +0.9483pp；样本数很少且复用同一验证集。原始 H2T 的 batch-shared 随机掩码并不等同于这里的 Uniform-PerSample。本次明确只对照这两种逐样本策略；不声称已经全面超越原始 H2T。
+
+【不可变科学设计】
+始终使用已封存 Clean Stage I（seed42 epoch184），ResNet32 Backbone和BN冻结，Stage II 仅训练100类线性FC；10epochs，batch128；同样 BS receiver、IS donor、随机数据增强、原始VS评分／小供体样本回退、Gumbel、16个完整8x8通道、原始CE/SGD/学习率计划；StageII seed124和125。
+从同一实际的receiver/donor增强特征以及相同Gumbel，计算原始Uniform64->16掩码 MU 和 Low-VS Bottom48->16掩码 ML；计算完整替换对应特征差 deltaU、deltaL。在 GAP 空间定义 nU=||GAP(deltaU)||2，nL=||GAP(deltaL)||2，r=min(nU,nL)。
+构造两种配平扰动：deltaU*=aU*deltaU，deltaL*=aL*deltaL，其中 aU=r/nU、aL=r/nL。范数为0时安全设0，且所有alpha∈[0,1]，不放大扰动。每个样本的16个完整特征图通道使用同一个alpha。
+数学限制：此操作是按GAP范数控制，并非配平完整8x8特征图范数，也不是把两种扰动方向或语义配成相同。配平后不能继续称“原始硬替换”，这是用于机制识别的连续缩放对照。
+
+四组且只能四组：
+  Uniform-Full：原始逐样本随机16个通道、完整硬替换
+  LowVS-Full：原始Low-VS随机16个通道、完整硬替换
+  Uniform-Matched：同一随机掩码，施加alphaU以获得公共r
+  LowVS-Matched：同一Low-VS掩码，施加alphaL以获得公共r
+固定第10epoch为主结果，best-epoch仅作敏感性参考。各组必须在同一新环境重训，不能拿旧运行结果充当配对对照。
+
+【强制权限边界】
+Codex不得执行或设计任何git/GitHub/版本控制/同步/提交/分支/合并/PR命令。用户自行管理仓库。
+禁止修改任何已有H2T、VS、RAVS、GU历史脚本、模型、数据和结果。
+禁止重训StageI；禁止读取CIFAR100官方TEST图片或标签；禁止把1980张开发验证图像用于训练/选扰动。
+如缺失训练输入、stage1 checkpoint、统计文件或封存plans，明确报错停下，禁止用生成数据补齐。
+只修复本轮新增目录的确定性bug，不允许放松原有配对或指标核查。
+
+【运行顺序，从本地仓库根目录】
+1. CPU数学单测、检查所需原始文件、CUDA预检：
+   python H2T_repro_audit/lowvs_norm_direction/norm_policy.py
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py preflight
+   预检必须PASS，检查两种掩码、训练输入签名、四组有限CE、真实GAP范数差。
+2. 固定顺序跑8组。每个seed先Uniform-Full建立训练环境与850 batch基准；其余三组逐batch配对 receiver/donor索引、实际增强图像、冻结特征、VS分数、Gumbel、两个mask哈希，一旦失配立即停止：
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm Uniform-Full
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm LowVS-Full
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm Uniform-Matched
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 124 --arm LowVS-Matched
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm Uniform-Full
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm LowVS-Full
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm Uniform-Matched
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py train --seed 125 --arm LowVS-Matched
+3. 八组全部完成才汇总：
+   python H2T_repro_audit/lowvs_norm_direction/run_experiment.py report
+
+【必须保留的实证证据】
+H2T_repro_audit/lowvs_norm_direction/results/ 下：preflight.json；各seed/arm下epochs.csv、batch_signatures.csv、checkpoints/final.pth与best.pth、validation_epoch10.npz、summary.json；综合epoch10.csv、paired.csv、classifier_hybrids.csv、scientific_summary.json、NORM_DIRECTION_RESULTS.md。
+请额外撰写一份中文科学报告 LOWVS_NORM_DIRECTION_SCIENTIFIC_REPORT.md，至少包括：
+(1) 两种子的每组Overall、Head、Tail、Few、Many、Medium、best/epoch10和逐样本wins/losses/net图数。
+(2) 平配前后的真实GAP L2统计，尤其 matched norm U/L是否每batch相等；报告缩放alpha分布、Head/Tail alpha差异、零范数数量。如果只做到总体均值匹配而没有逐样本配平，实验无效。
+(3) 关键配对：LowVS-Full − Uniform-Full，LowVS-Matched − Uniform-Matched。绝对指标必须在同样的训练预算与环境内比较。
+(4) 通过classifier_hybrids.csv报告W/b交叉组合的结果，并解释其只能诊断分类头变化，不能证明偏置是唯一因果来源。
+(5) 清楚区分实际干预、模型性能、机制解释；不要把GAP方向优势写成“证明尾类语义通道有用”或“Backbone表征得到增强”。
+(6) 验证数据只有99类、class0缺失、1980张官方TRAIN留出、历经多轮开发使用；只有单一Clean StageI，两种StageII seed，没有独立终检，禁止发表级显著性结论。
+
+【预先决策规则：不做后验调参】
+情形A：配平后 LowVS-Matched 仍在两个种子Tail方向一致为正，Overall不出现明显反向，且Full差异有相同方向，则“GAP范数大小不是充分解释”的证据增强，下一阶段才研究通道方向/语义关联。
+情形B：Full有优势但Matched消失或反向，优先考虑扰动强度效应；但不等价于证明幅度是唯一原因（缩放改变增强分布）。
+情形C：Full与Matched都很弱/种子矛盾/仅少数图片，暂停围绕VS的算法开发，避免把噪声当创新；可先转向真正表征层的科学问题。
+W/b互换主要复制Tail结果时，分类器偏置解释需优先审视，不能轻率声称学到了鲁棒表征。
+
+【退出条件】
+一次协议跑完即停。不加入新α、更多K、更复杂评分器、新损失、多专家或“挽救失败”的seed/epoch选择，不自动追加实验。不覆盖旧产物。用户上传本轮产物后再交给ChatGPT做第一性原理分析。
