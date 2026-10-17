@@ -113,6 +113,12 @@ def data():
               "validation_labels.npy","split_indices.npz"]
     for s in required:
         if not (SOURCE/s).is_file():raise FileNotFoundError(f"Restore TRAIN-only locked {SOURCE/s}")
+    lock=RESULTS/"preflight.json"
+    if lock.is_file():
+        locked=json.loads(lock.read_text(encoding="utf-8"))["source_sha256"]
+        for name,expected in locked.items():
+            if sha(SOURCE/name)!=expected:
+                raise RuntimeError(f"Immutable TRAIN source changed since preflight: {name}")
     y100=np.load(SOURCE/"train_labels.npy",allow_pickle=False)
     x100=np.load(SOURCE/"train_images.npy",mmap_mode="r",allow_pickle=False)
     valx=np.load(SOURCE/"validation_images.npy",mmap_mode="r",allow_pickle=False)
@@ -186,10 +192,15 @@ def vals(fc,labels,bb=None,images=None,ev=None,maps=None):
     correct=np.bincount(labels[pred==labels],minlength=100)
     denom=np.bincount(labels,minlength=100)
     per=100*correct/np.maximum(denom,1)
+    counts=counts200()
+    many=np.flatnonzero((counts>100)&(denom>0))
+    med=np.flatnonzero((counts>=20)&(counts<=100)&(denom>0))
+    few=np.flatnonzero((counts<20)&(denom>0))
     ans={"Overall":float(100*np.mean(pred==labels)),
          "Head":float(per[1:36].mean()), # class0 absent from TRAIN dev
          "OfficialMedium":float(per[36:71].mean()),"Tail":float(per[71:100].mean()),
-         "WorstClass":float(per[1:100].min()),
+         "Many":float(per[many].mean()),"Medium":float(per[med].mean()),
+         "Few":float(per[few].mean()),"WorstClass":float(per[1:100].min()),
          "Macro":float(per[1:100].mean()),
          "CE":float(np.mean(np.logaddexp.reduce(logits,axis=1)-logits[np.arange(len(labels)),labels]))}
     return ans,logits,pred
