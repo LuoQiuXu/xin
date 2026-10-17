@@ -1,0 +1,44 @@
+{
+  "seed": 125,
+  "status": "complete",
+  "draws": 10847,
+  "paired_historical_batches": 85,
+  "train_only": true,
+  "official_TEST_used": false,
+  "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "stage1_classifier_hash": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+  "stage1_backbone_hash": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "norm_dir_signatures_csv_sha256": "81b64beb870fd16012b7442047d2e897c699637510bdddbe8bab62aa6f5106bf",
+  "probe_file_sha256": "07a9b4374b3b5d28888fd952a1eaaf684c0c7b3a5a368feba4525325cfc2ae2c",
+  "frozen": true,
+  "optimizer_steps": 0,
+  "backward_calls": 0,
+  "classifier_eval_and_requires_grad_false": true,
+  "backbone_state_tensors_unchanged": 186,
+  "classifier_state_tensors_unchanged": 2,
+  "BN_counters": [
+    15640
+  ],
+  "pairing_counts": {
+    "indices_sha256": 85,
+    "images_sha256": 85,
+    "features_sha256": 85,
+    "scores_sha256": 85,
+    "gumbel_sha256": 85,
+    "uniform_mask_sha256": 85,
+    "lowvs_mask_sha256": 85
+  },
+  "max_direct_identity_residual": 8.881784197001252e-15,
+  "max_matched_norm_error": 8.881784197001252e-16,
+  "native_fc_float32_vs_matrix_float64_max_logit_error": 3.9961701254753734e-06,
+  "official_pool_vs_mean_max_difference": 1.9073486328125e-06,
+  "protected_historical_files": 669,
+  "elapsed_seconds": 5.539118500018958,
+  "source_sha256": {
+    "geometry.py": "48ce1812e7bbaac210524558cd107b2721dc7412e437dba8fbff33ed87648382",
+    "run_probe.py": "1b82d1739108748b458966f6cc69b15d35fa6686f2bc12478b1f8b89ae972469"
+  },
+  "validation_values_loaded_for_probe": false,
+  "official_TEST_events": [],
+  "historical_write_events": []
+}

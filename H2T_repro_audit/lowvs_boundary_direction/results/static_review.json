@@ -1,0 +1,14 @@
+{
+  "geometry_formula_bytewise_unchanged": true,
+  "fixed_issues": [
+    "reference FC explicitly eval and requires_grad false",
+    "use original avg_pool2d GAP and compare with online VS GAP",
+    "primary-population metadata includes different masks",
+    "avoid loading validation values into probe calculations",
+    "direct logits independently verify fixed-margin identity and signs",
+    "frozen-state, history/test guards and durable logs"
+  ],
+  "denominator": "max(norm,1e-12), per controlling task and supplied geometry implementation; local older prose used norm+eps",
+  "GPU_batches": 170,
+  "training_allowed": false
+}

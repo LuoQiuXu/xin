@@ -1,0 +1,308 @@
+{
+  "protocol": {
+    "question": "Does Low-VS select GAP perturbation directions systematically different in fixed Stage-I true-vs-competitor classifier geometry?",
+    "primary_reference": "Clean Stage-I seed42 epoch184 (W,b), before any StageII update",
+    "sample_plan": "StageII plan seed124/125 epoch1 only, all 10847 receiver/donor draws per seed; same augmented images, VS statistics and masks",
+    "primary_population": "Tail receiver (71-99), h != y, no VS fallback, and different actual masks",
+    "primary_quantities": [
+      "mean(qL-qU)",
+      "fraction(qL<qU)",
+      "mean cosL-cosU",
+      "mean matched_margin(L-U)"
+    ],
+    "q": "(W_y-W_j*) dot delta / ||delta||, j* fixed from clean Stage-I logits on receiver excluding true label",
+    "secondary": "y vs donor h margin when h != y; Head/Medium; clean correctly/incorrectly classified; instantaneous CE; fixed algebraic decomposition",
+    "matched": "r=min(||deltaU||2,||deltaL||2); same per-draw GAP norm; no StageII training",
+    "scope": "original LT TRAIN only; existing dev accuracy not used to choose samples or policies",
+    "limits": "Same underlying backbone and repeated source images; descriptive, not independent sample-level significance",
+    "no_training": true,
+    "official_TEST_used": false,
+    "new_module": false
+  },
+  "stage1_probe_sha256": {
+    "124": "877b8f4e4bb0b896f14b8fc5ebe47dd50fae8fc7f0428cd990f080155aac4623",
+    "125": "07a9b4374b3b5d28888fd952a1eaaf684c0c7b3a5a368feba4525325cfc2ae2c"
+  },
+  "primary_TailEligible": [
+    {
+      "seed": 124,
+      "group": "TailEligible",
+      "class_id": null,
+      "n": 3064,
+      "fraction_fallback": 0.0,
+      "fraction_masks_identical": 0.0,
+      "fraction_clean_correct": 0.485313315926893,
+      "mean_nU": 3.479739808420427,
+      "mean_nL": 3.9096032744005247,
+      "mean_r": 3.4675338758473546,
+      "mean_alpha_U": 0.9962186648725326,
+      "mean_alpha_L": 0.8895438350905241,
+      "mean_qU": -0.17809351955555003,
+      "mean_qL": -0.21540998437828807,
+      "mean_qL_minus_qU": -0.03731646482273808,
+      "fraction_qL_less_qU": 0.5953002610966057,
+      "mean_cosL_minus_cosU": -0.014451779710150991,
+      "mean_donor_qL_minus_qU": -0.1807156423300122,
+      "mean_matched_margin_L_minus_U": -0.12191006406167804,
+      "mean_full_margin_L_minus_U": -0.22126955906618903,
+      "mean_extra_magnitude_term": -0.09935949500451104,
+      "mean_loss_full_L_minus_U": 0.460543923778858,
+      "mean_loss_matched_L_minus_U": 0.1753338379685588,
+      "flip_full_L_minus_U": 0.10966057441253274,
+      "flip_matched_L_minus_U": 0.04960835509138384,
+      "correct_full_L_minus_U": -0.07049608355091384,
+      "correct_matched_L_minus_U": -0.036879895561357706,
+      "fraction_donor_is_competitor": 0.02349869451697128
+    },
+    {
+      "seed": 125,
+      "group": "TailEligible",
+      "class_id": null,
+      "n": 2986,
+      "fraction_fallback": 0.0,
+      "fraction_masks_identical": 0.0,
+      "fraction_clean_correct": 0.4959812458137977,
+      "mean_nU": 3.447969496939832,
+      "mean_nL": 3.8851283835200303,
+      "mean_r": 3.435440493047747,
+      "mean_alpha_U": 0.9962856596277792,
+      "mean_alpha_L": 0.8870954518330637,
+      "mean_qU": -0.17928774473277806,
+      "mean_qL": -0.21966523882443287,
+      "mean_qL_minus_qU": -0.040377494091654774,
+      "fraction_qL_less_qU": 0.5857334226389819,
+      "mean_cosL_minus_cosU": -0.015458080057966082,
+      "mean_donor_qL_minus_qU": -0.17667770776137756,
+      "mean_matched_margin_L_minus_U": -0.12825628848591503,
+      "mean_full_margin_L_minus_U": -0.2289081207942368,
+      "mean_extra_magnitude_term": -0.10065183230832181,
+      "mean_loss_full_L_minus_U": 0.461388167483757,
+      "mean_loss_matched_L_minus_U": 0.17534885462365402,
+      "flip_full_L_minus_U": 0.10616208975217689,
+      "flip_matched_L_minus_U": 0.037843268586738144,
+      "correct_full_L_minus_U": -0.07300736771600805,
+      "correct_matched_L_minus_U": -0.030810448760884124,
+      "fraction_donor_is_competitor": 0.023777628935030142
+    }
+  ],
+  "explanation": "Matched signed-margin decomposition is algebraically exact at the FROZEN Stage-I W,b; not an attribution of Stage-II generalization.",
+  "conclusion_warning": "No metric here independently proves positive long-tail generalization or semantic feature importance.",
+  "judgement": "更明显的即时判别边界干扰（单位长度方向在两增强视图中同向）；未证明训练收益",
+  "primary_direction_consistent_negative": true,
+  "population_diagnostics": [
+    {
+      "seed": 124,
+      "group": "All",
+      "draws": 10847,
+      "unique_receiver_images": 4715,
+      "fraction_of_all_draws": 1.0,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 124,
+      "group": "AllEligible",
+      "draws": 10386,
+      "unique_receiver_images": 4559,
+      "fraction_of_all_draws": 0.9574997695215267,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 124,
+      "group": "Head",
+      "draws": 3847,
+      "unique_receiver_images": 3026,
+      "fraction_of_all_draws": 0.3546602747303402,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 124,
+      "group": "Medium",
+      "draws": 3819,
+      "unique_receiver_images": 1403,
+      "fraction_of_all_draws": 0.35207891582926154,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 124,
+      "group": "Tail",
+      "draws": 3181,
+      "unique_receiver_images": 286,
+      "fraction_of_all_draws": 0.2932608094403983,
+      "fraction_of_Tail_draws": 1.0
+    },
+    {
+      "seed": 124,
+      "group": "HeadEligible",
+      "draws": 3640,
+      "unique_receiver_images": 2888,
+      "fraction_of_all_draws": 0.3355766571402231,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 124,
+      "group": "TailEligible",
+      "draws": 3064,
+      "unique_receiver_images": 286,
+      "fraction_of_all_draws": 0.2824744168894625,
+      "fraction_of_Tail_draws": 0.963219113486325
+    },
+    {
+      "seed": 124,
+      "group": "TailEligibleDonorHead",
+      "draws": 2603,
+      "unique_receiver_images": 286,
+      "fraction_of_all_draws": 0.23997418641098922,
+      "fraction_of_Tail_draws": 0.8182961332914178
+    },
+    {
+      "seed": 124,
+      "group": "TailEligibleCleanCorrect",
+      "draws": 1487,
+      "unique_receiver_images": 206,
+      "fraction_of_all_draws": 0.13708859592514058,
+      "fraction_of_Tail_draws": 0.46746306193021064
+    },
+    {
+      "seed": 124,
+      "group": "TailEligibleCleanWrong",
+      "draws": 1577,
+      "unique_receiver_images": 194,
+      "fraction_of_all_draws": 0.14538582096432193,
+      "fraction_of_Tail_draws": 0.4957560515561144
+    },
+    {
+      "seed": 125,
+      "group": "All",
+      "draws": 10847,
+      "unique_receiver_images": 4722,
+      "fraction_of_all_draws": 1.0,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 125,
+      "group": "AllEligible",
+      "draws": 10378,
+      "unique_receiver_images": 4565,
+      "fraction_of_all_draws": 0.9567622384069328,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 125,
+      "group": "Head",
+      "draws": 3993,
+      "unique_receiver_images": 3059,
+      "fraction_of_all_draws": 0.3681202175716788,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 125,
+      "group": "Medium",
+      "draws": 3742,
+      "unique_receiver_images": 1377,
+      "fraction_of_all_draws": 0.3449801788512953,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 125,
+      "group": "Tail",
+      "draws": 3112,
+      "unique_receiver_images": 286,
+      "fraction_of_all_draws": 0.28689960357702593,
+      "fraction_of_Tail_draws": 1.0
+    },
+    {
+      "seed": 125,
+      "group": "HeadEligible",
+      "draws": 3768,
+      "unique_receiver_images": 2924,
+      "fraction_of_all_draws": 0.34737715497372545,
+      "fraction_of_Tail_draws": null
+    },
+    {
+      "seed": 125,
+      "group": "TailEligible",
+      "draws": 2986,
+      "unique_receiver_images": 286,
+      "fraction_of_all_draws": 0.27528348852217205,
+      "fraction_of_Tail_draws": 0.9595115681233933
+    },
+    {
+      "seed": 125,
+      "group": "TailEligibleDonorHead",
+      "draws": 2523,
+      "unique_receiver_images": 285,
+      "fraction_of_all_draws": 0.23259887526505024,
+      "fraction_of_Tail_draws": 0.8107326478149101
+    },
+    {
+      "seed": 125,
+      "group": "TailEligibleCleanCorrect",
+      "draws": 1481,
+      "unique_receiver_images": 203,
+      "fraction_of_all_draws": 0.13653544758919517,
+      "fraction_of_Tail_draws": 0.4758997429305913
+    },
+    {
+      "seed": 125,
+      "group": "TailEligibleCleanWrong",
+      "draws": 1505,
+      "unique_receiver_images": 188,
+      "fraction_of_all_draws": 0.13874804093297685,
+      "fraction_of_Tail_draws": 0.48361182519280205
+    }
+  ],
+  "replay_verification": [
+    {
+      "seed": 124,
+      "draws": 10847,
+      "paired_batches": 85,
+      "unique_receivers": 4715,
+      "Tail_draws": 3181,
+      "Tail_unique_receivers": 286,
+      "fallback_draws": 305,
+      "same_mask_draws": 355,
+      "different_mask_fraction": 0.9672720567898958,
+      "same_label_draws": 111,
+      "eligible_draws": 10386,
+      "TailEligible_draws": 3064,
+      "TailEligible_unique_receivers": 286,
+      "TailEligible_fraction_of_Tail": 0.963219113486325,
+      "mean_mask_overlap_channels": 12.095418087950586,
+      "max_independent_identity_residual": 9.325873406851315e-15,
+      "max_matched_norm_error": 1.7763568394002505e-15,
+      "nonzero_sub_epsilon_norms": 0,
+      "zero_norms": 0,
+      "sign_mismatch_U": 0,
+      "sign_mismatch_L": 0,
+      "native_FC_logit_error_max": 3.6429577612295816e-06,
+      "official_pool_vs_mean_max_difference": 2.384185791015625e-06
+    },
+    {
+      "seed": 125,
+      "draws": 10847,
+      "paired_batches": 85,
+      "unique_receivers": 4722,
+      "Tail_draws": 3112,
+      "Tail_unique_receivers": 286,
+      "fallback_draws": 305,
+      "same_mask_draws": 357,
+      "different_mask_fraction": 0.9670876740112474,
+      "same_label_draws": 118,
+      "eligible_draws": 10378,
+      "TailEligible_draws": 2986,
+      "TailEligible_unique_receivers": 286,
+      "TailEligible_fraction_of_Tail": 0.9595115681233933,
+      "mean_mask_overlap_channels": 12.120494145846777,
+      "max_independent_identity_residual": 8.881784197001252e-15,
+      "max_matched_norm_error": 8.881784197001252e-16,
+      "nonzero_sub_epsilon_norms": 0,
+      "zero_norms": 0,
+      "sign_mismatch_U": 0,
+      "sign_mismatch_L": 0,
+      "native_FC_logit_error_max": 3.9961701254753734e-06,
+      "official_pool_vs_mean_max_difference": 1.9073486328125e-06
+    }
+  ],
+  "future_stress_tests_executed": false,
+  "external_candidate": "Tiny ImageNet-200, conditional on data and 8GB feasibility verification; not downloaded"
+}

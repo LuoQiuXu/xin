@@ -1,0 +1,23 @@
+{
+  "primary": "TailEligible: y71..99, h!=y, fallback0, actual masks differ",
+  "secondary": [
+    "AllEligible",
+    "HeadEligible",
+    "TailEligibleDonorHead",
+    "TailEligibleCleanCorrect",
+    "TailEligibleCleanWrong"
+  ],
+  "quantities": [
+    "mean(qL-qU)",
+    "P(qL<qU)",
+    "mean(cosL-cosU)",
+    "mean matched fixed-margin(L-U)"
+  ],
+  "seeds": [
+    124,
+    125
+  ],
+  "epoch": 1,
+  "no_effect_thresholds_or_search": true,
+  "interpretation": "q sign describes current frozen boundary interaction; no benefit/generality assertion"
+}

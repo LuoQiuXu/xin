@@ -1,0 +1,50 @@
+CODEX：Low-VS 判别边界方向机制验证（2026-10-17）
+GitHub分支：experiment/lowvs-boundary-direction-20261017
+代码目录：H2T_repro_audit/lowvs_boundary_direction/
+源码：geometry.py、run_probe.py；设计说明：README.md
+
+【版本控制禁止】
+Codex 严禁执行、建议、生成或设计任何 Git / GitHub / commit / push / pull / branch / merge / PR / 版本控制操作。用户本人处理代码同步及结果上传。
+
+【目标与方法】
+先前Low-VS在Full模式下相对Uniform有尾类增益，但GAP扰动范数配平后增益在两个seed上不稳定。
+本轮不发明新算法，不训练任何神经网络，只解释现有Low-VS的方向机制。
+读取固定Clean StageI seed42 epoch184的ResNet32/BN/分类器W,b，三者全部冻结；只重放封存StageII计划seed124/125各第1个epoch的实际接收者、供体、增广、Gumbel和16通道掩码（各85个batch）。
+接收样本的GAP为z、供体为zh，δU、δL为各自掩码作用于zh-z的真实64维扰动。
+以原始z和固定StageI分类器定义 j*=argmax(j!=y)(w_j^T z+b_j)；两种融合都用同一个j*。
+qU=(w_y-w_j*)^TδU/max(||δU||,eps)，qL同理，同时计算cosine、真实类别相对供体类别的方向投影、固定StageI即时CE与flip。
+令nU=||δU||，nL=||δL||，r=min(nU,nL)，验证严格恒等式：
+Full固定margin差(L-U) = r(qL-qU)+(nL-r)qL-(nU-r)qU。
+这是线性margin的代数分解，不是最终验证准确率或泛化收益的因果分解。
+q<0仅表示当前true-vs-competitor margin下降，既可能形成有效训练压力，也可能造成标签不一致；不能直接认定越负越有效。
+
+【主要分析群体和指标】
+主群体 TailEligible：接收者71..99、供体类别与接收类别不同、非fallback、U/L实际掩码不同。
+主指标：mean(qL-qU)、P(qL<qU)、mean(cosL-cosU)、配平时固定margin(L-U)。
+副群体：AllEligible、HeadEligible、TailEligibleDonorHead、TailEligibleCleanCorrect/Wrong。
+两个种子分别报告，严禁将重复训练抽样视为21,694张独立图片，也不能用此推导独立泛化显著性。
+
+【执行命令，必须依次运行；仓库根目录】
+python H2T_repro_audit/lowvs_boundary_direction/geometry.py
+python H2T_repro_audit/lowvs_boundary_direction/run_probe.py run --seed 124
+python H2T_repro_audit/lowvs_boundary_direction/run_probe.py run --seed 125
+python H2T_repro_audit/lowvs_boundary_direction/run_probe.py report
+
+本地须存在已封存Clean StageI checkpoint、TRAIN数据、采样plans，及：
+H2T_repro_audit/lowvs_norm_direction/results/seed124/Uniform-Full/batch_signatures.csv
+H2T_repro_audit/lowvs_norm_direction/results/seed125/Uniform-Full/batch_signatures.csv
+脚本逐batch核对indices/images/features/scores/Gumbel及U/L两种掩码哈希。任何失配立刻停止，不绕过、不重建原始实验。
+严禁官方CIFAR100 TEST访问；严禁更新StageI或StageII；不得修改旧源码及旧实验产物。
+
+【输出】
+所有结果只在H2T_repro_audit/lowvs_boundary_direction/results/。
+每个seed应有train_epoch1_boundary_probe.npz、provenance.json。
+统一文件：group_summary.csv、per_class_summary.csv、scientific_summary.json、BOUNDARY_DIRECTION_RESULTS.md。
+额外写简洁中文 BOUNDARY_DIRECTION_SCIENTIFIC_REPORT.md，逐seed贴主指标、Head及供体Head对照，报告样本数与掩码有效比例，检查margin分解和符号。
+区分“即时更强判别干扰”和“最终泛化改进”；不得以q方向直接声称Low-VS具有语义判别能力。
+若方向指标不稳定则停止Low-VS方向模块研发，不再扫描K/alpha/困难度。完成后停止，由用户自行上传结果。
+
+【未来跨数据集研究，只规划、不执行】
+作者公开仓库有CIFAR100-LT IF50/100/200的配置。后续先在这些作者已提供的设置中，以同样StageI、采样、BN、训练预算，比较DR无融合、原始H2T、Low-VS的Overall/Head/Tail/Few/worst-class与头尾混淆。
+其次再选一个非作者完整发布配置、数据完整且适配8GB显存的外部长尾数据集。
+不允许把不同backbone、数据划分、训练预算下的精度差直接解释为H2T机制失效。必须形成可信失败模式，再提出相应新方法。

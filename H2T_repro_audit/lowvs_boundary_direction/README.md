@@ -20,8 +20,8 @@ From the clean, unperturbed receiver and **fixed Stage-I W,b** choose
 
 Then compute for each vector
 
-\`q_U=(w_y-w_j*)^T δ_U / (||δ_U||2 + eps)\`,
-\`q_L=(w_y-w_j*)^T δ_L / (||δ_L||2 + eps)\`.
+\`q_U=(w_y-w_j*)^T δ_U / max(||δ_U||2, eps)\`,
+\`q_L=(w_y-w_j*)^T δ_L / max(||δ_L||2, eps)\`.
 
 Also report signed cosine, donor-vs-receiver class projection \`q_yh\` (when h≠y), original and matched fixed-competitor margin changes, and immediate Stage-I loss/flip diagnostics.
 

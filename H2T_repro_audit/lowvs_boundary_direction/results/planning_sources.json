@@ -1,0 +1,9 @@
+{
+  "planning_only": true,
+  "consulted_date": "2026-10-17",
+  "local_author_config_root": "../clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/runtime/config/cifar100",
+  "external_candidate_primary_source": "https://cs231n.stanford.edu/reports/2017/pdfs/12.pdf",
+  "external_candidate_not_downloaded": true,
+  "external_GPU_feasibility_not_measured": true,
+  "future_experiments_executed": false
+}
