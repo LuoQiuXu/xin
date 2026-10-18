@@ -1,0 +1,12 @@
+{
+  "AST_passed": true,
+  "provided_losses_bytewise_unchanged": true,
+  "provided_runner_bytewise_unchanged": true,
+  "blocking_bugs_found": [],
+  "core_source_changes": false,
+  "history_files_locked": 985,
+  "source_files_locked": 40,
+  "auxiliary_objectives": "Provided formula: sum over y>=71 / actual full batch size; lambda .5; detached current clean top-competitor index; margin zero.",
+  "execution_helper": "Only console/status/source verification and read-only protection; no training/policy function changes.",
+  "no_training_or_inference_started": true
+}

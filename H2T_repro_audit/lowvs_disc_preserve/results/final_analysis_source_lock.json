@@ -1,0 +1,8 @@
+{
+  "H2T_repro_audit/lowvs_disc_preserve/CODEX_LOWVS_DISC_PRESERVE.txt": "011b79479f65343681ec9eaf422fab33627cb7e893ddce81536c0b023dda7c16",
+  "H2T_repro_audit/lowvs_disc_preserve/execute_step.py": "dc427bc9698ee8d7f18e9d07c28ce8d02ce92567a37226392e6ffce3bf78adb2",
+  "H2T_repro_audit/lowvs_disc_preserve/losses.py": "94bb68913b04ba6a3c3e0315cb6c780b8637d113324d897780708c9ea46440bf",
+  "H2T_repro_audit/lowvs_disc_preserve/README.md": "6419de24d36c6288831cb5240dc0e137dfd176acfda560641fe70dc3dadb94da",
+  "H2T_repro_audit/lowvs_disc_preserve/run_pilot.py": "70c6a73e4ebaaac7d567b505e102748247026e52f6c6f12a354101c9cada0863",
+  "H2T_repro_audit/lowvs_disc_preserve/write_scientific_report.py": "c5d291f653c06ab64d64b56eaf70020fafa05b22455780bb6f3891bd75ee482b"
+}

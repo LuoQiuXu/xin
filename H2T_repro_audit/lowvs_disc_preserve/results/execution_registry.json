@@ -1,0 +1,315 @@
+[
+  {
+    "args": [
+      "losses"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\losses.py"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "losses.py",
+      "losses"
+    ],
+    "started_at": "2026-10-18T13:41:14+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:41:20+08:00",
+    "seconds": 6.076962299994193
+  },
+  {
+    "args": [
+      "preflight"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "preflight"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "preflight",
+      "preflight"
+    ],
+    "started_at": "2026-10-18T13:41:30+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:41:38+08:00",
+    "seconds": 7.735265700001037
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS",
+      "train_seed_124_arm_LowVS"
+    ],
+    "started_at": "2026-10-18T13:42:17+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:43:15+08:00",
+    "seconds": 58.16278460001922
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-CleanCE"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-CleanCE"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-CleanCE",
+      "train_seed_124_arm_LowVS-CleanCE"
+    ],
+    "started_at": "2026-10-18T13:43:16+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:44:15+08:00",
+    "seconds": 59.184432400012156
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-TopCompetitor"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-TopCompetitor"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-TopCompetitor",
+      "train_seed_124_arm_LowVS-TopCompetitor"
+    ],
+    "started_at": "2026-10-18T13:44:16+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:45:15+08:00",
+    "seconds": 59.30279739998514
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS",
+      "train_seed_125_arm_LowVS"
+    ],
+    "started_at": "2026-10-18T13:45:16+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:46:14+08:00",
+    "seconds": 58.062523300002795
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-CleanCE"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-CleanCE"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-CleanCE",
+      "train_seed_125_arm_LowVS-CleanCE"
+    ],
+    "started_at": "2026-10-18T13:46:15+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:47:14+08:00",
+    "seconds": 59.04881609999575
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-TopCompetitor"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-TopCompetitor"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-TopCompetitor",
+      "train_seed_125_arm_LowVS-TopCompetitor"
+    ],
+    "started_at": "2026-10-18T13:47:15+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:48:16+08:00",
+    "seconds": 59.073536300013075
+  },
+  {
+    "args": [
+      "report"
+    ],
+    "actual_protocol_command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+      "report"
+    ],
+    "command_with_guards": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\execute_step.py",
+      "_child",
+      "run_pilot.py",
+      "report",
+      "report"
+    ],
+    "started_at": "2026-10-18T13:49:21+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-18T13:49:27+08:00",
+    "seconds": 5.941371799999615
+  }
+]

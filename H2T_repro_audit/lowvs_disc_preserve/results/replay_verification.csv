@@ -1,0 +1,7 @@
+seed,arm,historical_batches,internal_batches,indices_sha256,images_sha256,features_sha256,scores_sha256,gumbel_sha256,uniform_mask_sha256,lowvs_mask_sha256
+124,LowVS,850,0,850,850,850,850,850,850,850
+124,LowVS-CleanCE,850,850,850,850,850,850,850,850,850
+124,LowVS-TopCompetitor,850,850,850,850,850,850,850,850,850
+125,LowVS,850,0,850,850,850,850,850,850,850
+125,LowVS-CleanCE,850,850,850,850,850,850,850,850,850
+125,LowVS-TopCompetitor,850,850,850,850,850,850,850,850,850

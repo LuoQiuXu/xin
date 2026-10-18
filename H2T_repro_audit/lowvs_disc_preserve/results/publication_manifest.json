@@ -1,0 +1,87 @@
+{
+  "publication_date": "2026-10-18",
+  "repository": "LuoQiuXu/xin",
+  "branch": "experiment/lowvs-disc-preserve-20261018",
+  "base_commit": "7e172e98762b615b3aad9439c3334a03d2ce70b1",
+  "experiment_manifest_sha256": "debecd4823c01144f654e69a6f8759e7cf4fc2a92956e30149c0e7c61eb668fb",
+  "sealed_experiment_files_verified": 131,
+  "experiment_artifacts_unchanged": true,
+  "review_package": {
+    "path": "results/LOWVS_DISC_REVIEW_PACKAGE.zip",
+    "bytes": 6071056,
+    "sha256": "746ad9e268fe43ec479bed391c2cd54a73527a1537a316ce79c2fbec293a42c2",
+    "entries": 132
+  },
+  "contents": "Runnable source, Chinese scientific report, all CSV summaries and paired batch records, full console logs and warnings, guards/provenance, source/config snapshots, and saved TRAIN-holdout validation labels/logits/predictions.",
+  "NPZ_fields": {
+    "results/seed124/LowVS/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed124/LowVS-CleanCE/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed124/LowVS-TopCompetitor/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/LowVS/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/LowVS-CleanCE/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/LowVS-TopCompetitor/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ]
+  },
+  "excluded": [
+    {
+      "path": "results/seed124/LowVS/final_fc.pth",
+      "bytes": 28013,
+      "sha256": "690a2d9cdf4fc46a0e8e274d0831e2cbe661e3d08ee7e8a3262538a191fc1e4e"
+    },
+    {
+      "path": "results/seed124/LowVS-CleanCE/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "3ea1d9cbfd724da01efbd7197575a2fc2054d0108ae623a8fef3143df6068128"
+    },
+    {
+      "path": "results/seed124/LowVS-TopCompetitor/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "1edeeac30f4420ec113f8373107f406b2966c62443cc39648a0080142626e9fa"
+    },
+    {
+      "path": "results/seed125/LowVS/final_fc.pth",
+      "bytes": 28013,
+      "sha256": "03a14170928c632f82a590841b1a3638106631fe205b9aac1b37078d8034639c"
+    },
+    {
+      "path": "results/seed125/LowVS-CleanCE/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "487300ddaec8509df9eb70f1b09524caa2bfbe65f26e1244a2c55672f5d91cb2"
+    },
+    {
+      "path": "results/seed125/LowVS-TopCompetitor/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "97236a59042940ffa8d131fd30662d5d20d5a65e77ace53f9c941e4b5a64c9c0"
+    }
+  ],
+  "excluded_categories": [
+    "model weights",
+    "raw images",
+    "large feature caches"
+  ],
+  "no_training_or_evaluation_during_publication": true,
+  "note": "The sealed experiment manifest is preserved, including hashes for local-only weights. Publication is authorized by the subsequent user request."
+}

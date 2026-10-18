@@ -1,0 +1,17 @@
+{
+  "completed": true,
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\losses.py"
+  ],
+  "seconds": 4.7885542000003625,
+  "guard_events": [],
+  "traceback": null,
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "torch": "2.14.1+cu132",
+  "torchvision": "0.29.1+cu132",
+  "numpy": "2.5.2",
+  "cuda": "13.2",
+  "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "peak_allocated_MiB": 0.0,
+  "peak_reserved_MiB": 0.0
+}

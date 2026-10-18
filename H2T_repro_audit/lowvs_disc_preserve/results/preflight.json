@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "checks": {
+    "124": {
+      "initial": {
+        "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+        "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+      },
+      "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "historical_signature_sha256": "b1f39caf713c995769401a1bbbcf263a7e0b54352c1838ef9f46382edb3fce86",
+      "first_batch_signature": {
+        "indices_sha256": "289fc26728d8478237145233275d0c181c09006dd26953755d61ca1a2570234f",
+        "images_sha256": "31adb012eef95c10d878b690038624c5ce565207c7fb844550f35d4ebd2880a3",
+        "features_sha256": "575612c7d78a51eba412beb38f0c3877b75f460075905230dc5b64305816657a",
+        "scores_sha256": "b2aee217d029113bc6340d8e21a4ba012a4fc95bb3a11834ca7f71db2eae6376",
+        "gumbel_sha256": "c52ca542a26e4b179d876822efc922bf265cd01fa0b2ce47c40269971894dc9c",
+        "uniform_mask_sha256": "505d76b4849e8a278499db82c3cc1b92059c7872b4ee61cee85a1347a5c71b1c",
+        "lowvs_mask_sha256": "3802f2eebd4aaec07344d113d093ecdb75bd979b1e03af5b56b2eba339f4fb5d"
+      },
+      "losses": {
+        "LowVS": 1.984560489654541,
+        "LowVS-CleanCE": 2.1906683444976807,
+        "LowVS-TopCompetitor": 2.1039843559265137
+      },
+      "tail_count": 31
+    },
+    "125": {
+      "initial": {
+        "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+        "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+      },
+      "stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "historical_signature_sha256": "81b64beb870fd16012b7442047d2e897c699637510bdddbe8bab62aa6f5106bf",
+      "first_batch_signature": {
+        "indices_sha256": "872bf8eeaf11d6d242c3bae7854c0adcbfdf68582715f56850a000f09b68f737",
+        "images_sha256": "ff7b8a6e8fdecbe16fcfe575e50cac3812f4db5e18d6589b89695f3dc9914f2f",
+        "features_sha256": "c7289005c6d6db03c554d2d96b643cf4af8fd041b3cdd7b962d9b5acb73cea1c",
+        "scores_sha256": "375d67c33f878e25eb67100505a38033555b266e8b20f60ce0fa9639ee47a1f1",
+        "gumbel_sha256": "585a53ad621866f03b9337153698008d8044250620fa56254d33432f7c388557",
+        "uniform_mask_sha256": "4e3c38af180038da529c1fcfffe1c91d11a05b2f29fc7f698fe024a6275a4157",
+        "lowvs_mask_sha256": "ada0c203a30a4f7194f05598a288f74ea1410206a9b5b833f0bb1b8dd13d9662"
+      },
+      "losses": {
+        "LowVS": 2.3258767127990723,
+        "LowVS-CleanCE": 2.5971052646636963,
+        "LowVS-TopCompetitor": 2.4877676963806152
+      },
+      "tail_count": 37
+    }
+  },
+  "source_files": {
+    "run_pilot.py": "70c6a73e4ebaaac7d567b505e102748247026e52f6c6f12a354101c9cada0863",
+    "losses.py": "94bb68913b04ba6a3c3e0315cb6c780b8637d113324d897780708c9ea46440bf"
+  },
+  "protocol": {
+    "question": "Does clean tail nearest-competitor discrimination add value beyond extra clean CE on a frozen Low-VS sampler?",
+    "arms": [
+      "LowVS",
+      "LowVS-CleanCE",
+      "LowVS-TopCompetitor"
+    ],
+    "seeds": [
+      124,
+      125
+    ],
+    "stage1": "CLEAN seed42 epoch184 frozen all backbone/BN",
+    "loss": "fused 100-class CE always; auxiliary only tail IDs>=71 on clean receiver; batch-normalized sum",
+    "lambda": 0.5,
+    "margin": 0.0,
+    "competitor": "current clean logits, detach argmax excluding target class",
+    "control": "additional CleanCE uses same tail subset, unperturbed receiver and lambda as competitor arm",
+    "immutable_lowvs": "original online donor-stat Bottom48 -> random16 hard full-channel swaps, fallback n<20",
+    "train": "same BS receiver/IS donor, crops/flips, Gumbel, seed, 850 steps, SGD/Cosine as historical Clean",
+    "primary": "TopCompetitor - CleanCE on epoch10 Tail, Overall, Head; paired validation predictions",
+    "secondary": "CleanCE - LowVS; TopCompetitor - LowVS",
+    "holdout": "1980 original TRAIN val images (20 each classes1..99), no class0; full 100 logits",
+    "scope": "pilot only; one StageI, two correlated stageII runs; not independent test",
+    "official_TEST_used": false,
+    "limitations": "Aux CE and pairwise competitor softplus have different gradient geometry and scale; fixed lambda is not gradient norm matching. Pairwise competitor loss is not by itself novel."
+  },
+  "test_guard_events": [],
+  "official_TEST_used": false
+}

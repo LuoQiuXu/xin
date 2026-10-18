@@ -1,0 +1,38 @@
+{
+  "question": "Does clean tail nearest-competitor discrimination add value beyond extra clean CE on a frozen Low-VS sampler?",
+  "arms": [
+    "LowVS",
+    "LowVS-CleanCE",
+    "LowVS-TopCompetitor"
+  ],
+  "seeds": [
+    124,
+    125
+  ],
+  "stage1": "CLEAN seed42 epoch184 frozen all backbone/BN",
+  "loss": "fused 100-class CE always; auxiliary only tail IDs>=71 on clean receiver; batch-normalized sum",
+  "lambda": 0.5,
+  "margin": 0.0,
+  "competitor": "current clean logits, detach argmax excluding target class",
+  "control": "additional CleanCE uses same tail subset, unperturbed receiver and lambda as competitor arm",
+  "immutable_lowvs": "original online donor-stat Bottom48 -> random16 hard full-channel swaps, fallback n<20",
+  "train": "same BS receiver/IS donor, crops/flips, Gumbel, seed, 850 steps, SGD/Cosine as historical Clean",
+  "primary": "TopCompetitor - CleanCE on epoch10 Tail, Overall, Head; paired validation predictions",
+  "secondary": "CleanCE - LowVS; TopCompetitor - LowVS",
+  "holdout": "1980 original TRAIN val images (20 each classes1..99), no class0; full 100 logits",
+  "scope": "pilot only; one StageI, two correlated stageII runs; not independent test",
+  "official_TEST_used": false,
+  "limitations": "Aux CE and pairwise competitor softplus have different gradient geometry and scale; fixed lambda is not gradient norm matching. Pairwise competitor loss is not by itself novel.",
+  "seed": 124,
+  "arm": "LowVS-TopCompetitor",
+  "stage1_sha": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "source_files": {
+    "run_pilot.py": "70c6a73e4ebaaac7d567b505e102748247026e52f6c6f12a354101c9cada0863",
+    "losses.py": "94bb68913b04ba6a3c3e0315cb6c780b8637d113324d897780708c9ea46440bf"
+  },
+  "initial_state": {
+    "backbone": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+    "classifier": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+  },
+  "historic_signature_sha": "b1f39caf713c995769401a1bbbcf263a7e0b54352c1838ef9f46382edb3fce86"
+}

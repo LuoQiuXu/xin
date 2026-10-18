@@ -1,0 +1,94 @@
+CODEX：Low-VS 基础上的尾类判别保持互补模块（首轮三臂最小实验）
+日期：2026-10-18
+GitHub分支：experiment/lowvs-disc-preserve-20261018
+路径：H2T_repro_audit/lowvs_disc_preserve/
+代码：losses.py、run_pilot.py；说明：README.md。
+
+【最高优先级】
+完全禁止 Codex 进行任何 Git、GitHub、分支、版本控制、commit、push、pull、merge、PR、同步相关操作；用户自行处理全部 Git。
+不得改动原始 Low-VS 的 VS 分数、Bottom48、16通道、融合比例、供体/接收者、Gumbel、BN、StageI、分类器配置或训练计划。
+不得访问官方 CIFAR-100 TEST。不得在旧实验目录写入或删除任何文件。
+不得根据结果追加λ/margin/K/seed/epoch扫描、重跑挑优、改目标损失或扩展第四组。
+仅允许新实验目录中的确定阻塞bug的最小修复；注明修复前后及是否影响实验协议。
+
+【唯一核心科学问题】
+IF100 的 LowVS-Full 对比逐样本 Uniform 有初步性能收益；
+IF200 提醒我们：减少预测Head/纠正类组分配并不等于正确识别尾类。
+在完全冻结 Low-VS 产生机制的情况下，是否能用尾类干净特征的显式竞争类别约束，
+改善尾类真实类别 vs 最强竞争类别的精细判别，并且超越普通额外干净CE的效果？
+
+【严格三臂与数学】
+所有组：同一 Clean StageI seed42 epoch184、冻结 ResNet32/全部BN，100维FC可训练；
+同一receiver/donor采样、crop/flip、实际Low-VS融合及CE主损失，10epochs，SGD/Cosine；
+StageII seeds=124/125，850次真实optimizer.step/arm/seed，batch128，CIFAR100-LT IF100。
+融合向量z_tilde=LowVS(receiver,donor)，分类CE=f_CE(z_tilde,y)。
+干净特征z_clean指的是同一接收图像随机crop/flip后的**未跨类融合**特征，不是未经增强的原始像素。
+
+A LowVS：只训练 CE(fused,y)。
+B LowVS-CleanCE：CE(fused,y) + 0.5 * sum_{y_i>=71} CE(clean_i,y_i)/full_batch_size。
+C LowVS-TopCompetitor：CE(fused,y) + 0.5 * sum_{y_i>=71} softplus(l_j(clean_i)-l_y(clean_i))/full_batch_size。
+C中j=argmax_{k!=y} l_k(clean_i)；当前分类头每个batch在线选，但j选择detach；
+固定zero margin，不引入额外人为margin阈值。
+B、C额外约束使用相同tail样本、相同干净feature、同样0.5系数与相同全batch归一化。
+B与C梯度尺度和方向仍不同；不能因此声称只剩“竞争关系”这一个因果差异。
+不能把pairwise ranking loss本身作为新的首创点或论文最终方法。
+
+【本轮最关键实验比较】
+主要：C - B (验证竞争类别约束是否超越额外干净CE，要求同时检视Tail/Head/Overall/精细分类净正确数)。
+辅助：B - A、C - A，确定是否只因为额外干净监督而提升。
+固定第10epoch为唯一主终点，不根据验证结果选择最优epoch或增加训练。
+训练后检查Head/Tail组间预测错迁移和具体尾类的correct->wrong、wrong->correct数量；
+不能只看Tail->Head错误减少，就宣称尾类被正确识别。
+
+【本地前置文件】
+仓库根目录里要有历史真正完成的Clean数据及checkpoint：
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/
+需要locked/clean_stage1_best.pth、class_feature_statistics.npz、train_images.npy、
+train_labels.npy、validation_feature_maps.npy、validation_labels.npy、
+split_indices.npz、原运行时runtime、plans/124及plans/125的sampling_plan.npz和gumbel_noise_float64.npy。
+此外必须保有上轮实验：
+H2T_repro_audit/lowvs_norm_direction/results/seed124/LowVS-Full/batch_signatures.csv
+H2T_repro_audit/lowvs_norm_direction/results/seed125/LowVS-Full/batch_signatures.csv
+否则停止，恢复源数据；不能生成伪哈希、用新随机数冒充旧计划或跳过配对。
+官方 TEST 不进入训练、报告或模型选择。
+
+【从仓库根目录严格按顺序执行】
+python H2T_repro_audit/lowvs_disc_preserve/losses.py
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py preflight
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 124 --arm LowVS
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 124 --arm LowVS-CleanCE
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 124 --arm LowVS-TopCompetitor
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 125 --arm LowVS
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 125 --arm LowVS-CleanCE
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 125 --arm LowVS-TopCompetitor
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py report
+
+【必须保留的真实性核查】
+三臂同种子每批严格比对全部7项历史哈希：接收者/供体索引、
+随机增强像素、冻结特征、在线VS评分、Gumbel、Uniform掩码和Low-VS掩码。
+每个seed 850batch；每批旧LowVS-Full训练记录与本轮LowVS组均须匹配，否则立即停止。
+冻结ResNet32和BN，包括running统计；FC每臂初始化hash一致且参数实际更新；
+最后checkpoint恢复后验证logits/预测与保存时一致。
+记录每epoch fused CE、额外tail clean loss及其系数化值、实际尾类接收样本数。
+最多6组FC训练，无新StageI、无过多工程架构。
+
+【输出与报告】
+路径统一 H2T_repro_audit/lowvs_disc_preserve/results/。
+每臂：epochs.csv、batch_signatures.csv、final_fc.pth、validation_epoch10.npz、summary.json。
+总表：epoch10.csv、paired.csv、per_class.csv、curves.csv、scientific_summary.json、LOWVS_DISC_RESULTS.md。
+请另写中文 LOWVS_DISC_SCIENTIFIC_REPORT.md，不增加任何新训练：
+(1) 两个seed主对照C-B的 Overall/Head/Tail/Few与逐图wins/losses/net，说明class0缺失、每类20张；
+(2) B-A/C-A各指标；tail实际正确改善 vs 只转移错误组别；
+(3) 比较各arm每epoch趋势，但以epoch10为准；
+(4) 验证历史数据真实来源、BN冻结、0 TEST使用、batch850/seed/arm严格配对；
+(5) 固定λ不能证明梯度预算已配平；TopCompetitor是常见pairwise损失，不可直接称SCI创新；
+(6) 一套StageI+共享验证图像+两个StageII种子不构成独立统计显著性；
+(7) 如果C优于B需同时审查Head下降是否抵消Tail收益；
+(8) 只在下一步有证据时讨论如何进一步设计特征级表征学习模块，不擅自开始训练。
+
+【退出规则】
+C对B在两seed Tail净正确均正，Overall不下降，Head损失可接受：
+保留竞争判别监督作为后续特征级模块候选，但不直接宣称方法创新完成。
+C与B收益相近：普通干净CE是充分备择解释，停止该竞争类别特殊机制。
+C和B均下降或只有1–3张净变化：停止本次候选，不扫描λ和margin试图救分数。
+跑完停止、用户自行上传GitHub，之后由ChatGPT核对全部真实结果再判断下一步论文路线。

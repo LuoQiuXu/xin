@@ -1,0 +1,7 @@
+seed,comparison,Tail_correct_wins,Tail_correct_losses,Tail_correct_net,Head_error_to_correct_Tail,Head_error_to_other_error,correct_Tail_to_Head_error,other_error_to_Head_error,Tail_to_Head_error_delta
+124,LowVS-TopCompetitor - LowVS-CleanCE,2,5,-3,0,1,2,7,8
+124,LowVS-CleanCE - LowVS,12,1,11,8,12,0,0,-20
+124,LowVS-TopCompetitor - LowVS,8,0,8,6,6,0,0,-12
+125,LowVS-TopCompetitor - LowVS-CleanCE,0,6,-6,0,1,2,2,3
+125,LowVS-CleanCE - LowVS,12,1,11,5,8,0,0,-13
+125,LowVS-TopCompetitor - LowVS,6,1,5,3,7,0,0,-10

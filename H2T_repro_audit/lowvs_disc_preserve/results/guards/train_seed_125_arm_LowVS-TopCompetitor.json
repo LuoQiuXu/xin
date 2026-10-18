@@ -1,0 +1,23 @@
+{
+  "completed": true,
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\lowvs_disc_preserve\\run_pilot.py",
+    "train",
+    "--seed",
+    "125",
+    "--arm",
+    "LowVS-TopCompetitor"
+  ],
+  "seconds": 57.65004560002126,
+  "guard_events": [],
+  "traceback": null,
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "torch": "2.14.1+cu132",
+  "torchvision": "0.29.1+cu132",
+  "numpy": "2.5.2",
+  "cuda": "13.2",
+  "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "peak_allocated_MiB": 116.01708984375,
+  "peak_reserved_MiB": 148.0,
+  "reused_TEST_guard_events": []
+}

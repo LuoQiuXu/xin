@@ -1,0 +1,91 @@
+CODEX：Low-VS 基础上的尾类判别保持模块——三臂科学验证
+日期：2026-10-18
+GitHub分支：experiment/lowvs-disc-preserve-20261018
+代码目录：H2T_repro_audit/lowvs_disc_preserve/
+文件：losses.py / run_pilot.py / README.md
+GitHub完整版指令：H2T_repro_audit/lowvs_disc_preserve/CODEX_LOWVS_DISC_PRESERVE.txt
+
+【绝对禁止】
+Codex 不得运行任何 Git/GitHub/分支/提交/推送/合并/PR/同步/版本控制指令，用户自行负责。
+不修改历史的Stage I、Stage II、VS评分、Bottom48、随机16通道、融合比例、供体类别与采样。
+不访问官方CIFAR100 TEST；不修改旧实验文件；不事后追加lambda、margin、K、seed或epoch扫描。
+发现源文件缺失或配对哈希不一致，应停止而不是跳过检查。新代码仅允许最小阻塞bug修复并记录。
+
+【唯一科学命题】
+固定现有Low-VS增强机制之后，在同一尾类接收者的干净（没有跨类融合）特征上施加
+竞争类别判别约束，是否比“仅仅多加一次干净特征CE”更能改善尾类精细分类，
+同时不显著损害Head/Overall？
+IF100历史Low-VS相对Uniform的Tail正向结果是基础，不能再改Low-VS掩码寻找高分。
+IF200已证明纠正Head过预测不能等同于正确识别尾类，是互补模块的动机。
+
+【数学和固定预算】
+Clean StageI seed42 epoch184固定；ResNet32和所有BN冻结。只训练原100维FC，
+StageII seeds124和125；每组10epochs、batch128、850次SGD更新；
+保留历史optimizer、LR/cosine、BS接收、IS供体、两种真实数据增强、Gumbel和Low-VS硬替换。
+主损失始终 CE(FC(LowVS融合特征), 接收标签)。
+
+三组：
+A LowVS：只有融合后的普通CE。
+B LowVS-CleanCE：A + 0.5 * sum_{接收y>=71} CE(FC(干净接收特征),y) / 当前完整batch大小。
+C LowVS-TopCompetitor：A + 0.5 * sum_{接收y>=71} softplus(logit_j-logit_y) / 当前完整batch大小。
+j=当前FC在干净接收特征上、排除真实标签之后的最强竞争类别（argmax）；
+j本身detach，不回传选择操作的梯度；无正margin，固定m=0。
+三个实验组使用相同Low-VS通道掩码和输入；B与C使用相同尾类样本、
+同一额外约束系数0.5和相同全batch归一化。零尾类的batch应精确退化为A。
+辅助监督只影响FC权重，不更新Backbone。
+必须披露：普通CleanCE与TopCompetitor损失函数不同、梯度大小不一定相同，
+同一个系数并不是完全匹配梯度预算；TopCompetitor pairwise ranking并非全新思想。
+
+【训练所需历史数据】
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/
+下需保留locked/clean_stage1_best.pth、class_feature_statistics.npz、
+train_images.npy、train_labels.npy、validation_feature_maps.npy、validation_labels.npy、
+split_indices.npz、plans/124及plans/125/sampling_plan.npz与gumbel_noise_float64.npy和runtime源码。
+另外需要：
+H2T_repro_audit/lowvs_norm_direction/results/seed124/LowVS-Full/batch_signatures.csv
+H2T_repro_audit/lowvs_norm_direction/results/seed125/LowVS-Full/batch_signatures.csv
+如果本地缺少大文件，用户从已有本地源数据恢复，禁止重新构造伪历史实验。
+
+【从仓库根目录顺序执行，完全固定】
+python H2T_repro_audit/lowvs_disc_preserve/losses.py
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py preflight
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 124 --arm LowVS
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 124 --arm LowVS-CleanCE
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 124 --arm LowVS-TopCompetitor
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 125 --arm LowVS
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 125 --arm LowVS-CleanCE
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py train --seed 125 --arm LowVS-TopCompetitor
+python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py report
+
+【必须满足的配对和验收】
+每个seed每组850个真实batch，与上轮LowVS-Full历史记录和本轮LowVS对照在以下字段
+逐batch哈希一致：接收/供体索引、增强图像、冻结特征、在线VS评分、Gumbel噪声、
+Uniform候选掩码、Low-VS实际通道掩码；不一致立即停止。
+训练前FC初始化相同，Backbone与BN完全冻结不改变；每组确实更新FC。
+最后FC checkpoint重新加载的logits、预测和保存前一致。
+严格固定epoch10做主要比较，最好epoch只作诊断，不得验证集挑选epoch。
+官方CIFAR100 TEST零访问，留出验证集1980张，class0缺失，其他99类各20张。
+
+【结果交付】
+新results/目录下：
+  preflight.json；seed124和seed125的三组epochs.csv、batch_signatures.csv、
+  final_fc.pth、validation_epoch10.npz、summary.json；
+  epoch10.csv、paired.csv、per_class.csv、curves.csv、
+  scientific_summary.json、LOWVS_DISC_RESULTS.md。
+另外生成一份简洁的中文LOWVS_DISC_SCIENTIFIC_REPORT.md：
+1. 首先报告 C-B 而不是C-A，两seed分别列Overall/Head/Tail/Few以及净正确图像数。
+2. 报告B-A/C-A，识别是否“额外干净CE”已经足够。
+3. 分开“减少真实Tail→错误Head”与“真正多判对Tail类别”。
+4. 报告头类损失、逐类别正负净变化、验证交叉熵与epoch10准确率。
+5. 真实输入哈希、冻住Backbone/BN、训练次数及官方TEST未读取证据。
+6. 仅一个StageI和两个相关StageII种子、反复使用旧TRAIN验证，不能宣称独立显著性。
+7. 原pairwise loss已有研究，哪怕有效也只作为可继续发展特征级模块的依据。
+8. 解释两个辅助损失梯度尺度未完全配平；不得夸大因果归因。
+
+【预先确定的退出规则】
+C相对B在两seed尾类净收益均正、Overall不下降且Head代价较小：
+支持进一步探索真正特征级判别增强，但尚不足以投稿。
+C≈B：普通干净特征监督解释结果，不宣称竞争类别机制有效。
+C与B均无益/跨seed矛盾或差距仅少量图片：停止本模块试验，
+不进一步搜索系数和margin。
+结果上传由用户自己GitHub操作，跑完交ChatGPT对实验证据做第一性原理分析。
