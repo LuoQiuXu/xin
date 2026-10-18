@@ -1,0 +1,96 @@
+任务名称：OfficeHome-MLT 上的 H2T 供体域条件机制试验（第一轮科学试验）
+
+一、研究目的：只回答一个问题
+我们已在 CIFAR-100-LT 上完成 H2T 原始复现审计、Variation Shift、Low-VS 多种子、掩码粒度、范数配平、边界方向、效用门控、干净判别保持及 IF=200 固定 BN 压力测试。结论是：Low-VS 的额外 Tail 收益未跨设置稳定成立；多个附加损失/门控没有通过预先约定的收益门槛；边界方向探针显示即时干扰，但没有证明训练收益。因此，停止围绕 Low-VS、融合比例、困难度门控继续加模块。
+
+现在检验一个新的现实条件：多域数据中，类别样本数不仅长尾，而且不同域中的同一类别样本数差异很大。H2T 原始通道替换不显式使用供体与接收者的域标签。问题是：在这种条件下，供体来自相同域还是不同域，会不会系统性改变 H2T 的训练收益，尤其是低样本 domain-class 组合？
+
+这是一个机制审计，不是预设新模块有效。结果无论正负都必须报告，不允许通过调参把结果做成正向。
+
+二、公开数据集与官方协议
+使用 MDLT 官方 OfficeHome-MLT 数据划分，不自造 split：
+- 官方代码仓库：https://github.com/YyzHarry/multi-domain-imbalance
+- 固定 CSV 来源：https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/split/OfficeHome.csv
+- 数据根目录预期为 office_home，目录中有 OfficeHome.csv 以及 Art、Clipart、Product、Real World 图像文件夹；CSV 的 path 是相对 office_home 根目录的路径。
+- 官方 CSV 的预期元信息：15,588 行；train=11,688、val=1,300、test=2,600；4 个域、65 类。train 域数量约为 Art=1,452、Clipart=3,390、Product=3,464、Real World=3,382。train 的全局类别数约从 82 到 303（全局 IF 约 0.271）；260 个 domain-class 组合中，训练数为 0 的组合约 2 个，少于 20 个样本的组合约 33 个。以上数字只作为版本核验参考，必须从本地 CSV 重新统计，不能硬编码结果。
+- MDLT OfficeHome 的 per-domain class shot 阈值是 Many >= 60、Few < 20；本实验的分组指标应明确命名为 domain-class Many/Medium/Few，Medium 为 20–59，不要把它与 CIFAR 的 Many/Medium/Few 混为一谈。
+- 这个官方 split 的四个域都出现在 train/val/test 中。因此，本轮验证的是多域长尾下的 domain-class imbalance 和跨域供体迁移，不是严格的 unseen-domain OOD 测试。论文中不得把它描述成未见域泛化。
+
+如果图像数据在本机已存在，使用真实路径。若没有，先完成 CSV 元数据审计并报告缺少的目录；不要伪造数据，也不要擅自下载数 GB 的图片包。允许自动下载上述小型官方 CSV，但必须记录 URL 和 SHA256。
+
+三、最小实验矩阵：4 组，禁止增加新损失
+每个 seed 训练一个 Stage I；该 seed 的四个 Stage II 组共享完全相同的 Stage I checkpoint、初始分类器、接收者采样序列、供体类别序列、通道掩码、batch 顺序和优化器配置。
+
+A. DR-NoFusion：Stage II 采用 class-balanced 接收样本，不替换任何通道。
+B. H2T-Global：接收样本 class-balanced；供体图像从全体 train 实例中自然采样；每个 batch 共享一个随机通道掩码，rho=0.25。
+C. H2T-DomainMatched：接收者、供体类别、通道掩码与 B 配对；对每个接收者，尽量选择相同供体类别且来自接收者同一域的供体图像。
+D. H2T-CrossDomain：接收者、供体类别、通道掩码与 B 配对；对每个接收者，选择相同供体类别、但来自其他域的供体图像。
+
+供体域干预的关键控制：
+1. 每个接收者的 donor class 先按全体 train 实例分布生成一次，四组共享同一序列。B 使用该序列抽到的真实全局供体；C/D 在不改变 donor class 的前提下，按域条件重新选供体图像。这样尽可能只改变供体域，而不是同时改变供体类别。
+2. C 若该 domain-class 组合没有供体图像，才回退到 B 对应的全局供体，并逐条记录 fallback。D 从其他域的同类供体池选择；如果不可能，也必须记录并说明，不能静默改变类别。
+3. 通道掩码遵循原 H2T 的 batch-shared 粒度，不要把 per-sample mask 引入本轮；rho 固定为 0.25，不扫描 K/rho/alpha。
+4. 所有组标签始终是接收者的真实类别。不得用供体标签训练。
+5. 本轮不实现 DSCS/TCPG 或任何新的学习模块。域匹配和跨域供体只是诊断性干预，用于判断盲区是否存在。
+
+四、模型与训练预算（8GB 显存可行）
+使用 ImageNet 预训练 ResNet-18，65 类线性分类头；采用 MDLT 风格的数据增强与归一化。为适配 8GB 显存，固定 ResNet-18、每个域每次 4 张、每次更新总 batch=16，并开启 AMP。不要静默换成随机初始化网络或 ResNet-50。
+Stage I：
+- 训练数据：只使用官方 train split；所有 4 个域每步各抽 4 张，合并为 16 张更新，遵循 MDLT 的跨域 minibatch 思路。
+- Backbone 可训练；BatchNorm running statistics 固定为 eval 模式，但遵循 MDLT 的实现语义，不要悄悄更改 BN 策略。
+- optimizer=Adam，lr=5e-5，weight_decay=0；训练 5,001 updates/seed，评估间隔 100 updates。
+- 增强：RandomResizedCrop(224, scale=(0.7,1.0))、HorizontalFlip、ColorJitter(0.3)、RandomGrayscale、ImageNet mean/std；val/test 使用 Resize(224)+Normalize。
+- Stage I checkpoint 只能按 val 的 domain-class macro accuracy 选择，平局取最早。val 每个域-类别单元等量，因此该指标也应与整体 val accuracy 相符；两者都记录。严禁用 test 选 Stage I epoch。
+- seeds=42,43,44。若实际硬件/时间无法完成三 seed，不得偷偷减少 seed；先完成 smoke test，报告预估耗时，再向用户说明阻塞原因。
+
+Stage II：
+- 冻结整个 backbone 和 BN，只训练 Stage I 线性分类头；每组从同一 Stage I 分类头初始化。
+- 为降低成本，允许先对 train/val 图像用 eval transform 缓存 GAP 特征向量，再进行 feature-space Stage II。必须在报告中明确：这是固定特征的机制 pilot，不是原 H2T 随机增强 Stage II 的逐项严格复现。
+- 对 ResNet-18 的 [B,512,H,W] feature map，若每个通道在所有空间位置整体替换，则 GAP 与通道替换可交换。因此在 512 维 GAP 向量上替换相同通道，数学上应与先替换 feature map 再 GAP 等价。必须写一个 CPU 单元测试验证这个恒等式。
+- 每个 epoch 生成 N_train 个接收者 draw，使 65 类接收次数尽可能均匀（每类 floor/ceil）；接收图像从该类现有 train 图像中均匀抽样。每个接收者有一个固定 donor class，来自全局 train 实例采样分布。各组共享接收者、donor class 和 batch-shared mask 计划。
+- batch size=128（仅为缓存特征的 Stage II batch，不代表图像 backbone batch）；10 epochs；SGD lr=0.01、momentum=0.9、weight_decay=5e-4、CosineAnnealingLR。参数固定，不做超参搜索。
+- Stage II 唯一主终点为 epoch 10。可以记录 val 曲线，但不能按 Stage II val 或 test 选 best checkpoint。epoch 10 final checkpoint 即主结果。
+
+五、测试集隔离（硬约束）
+- Stage I 训练和选模只使用 train/val。
+- Stage II 训练只使用 train features；val 仅用于记录曲线/诊断，不选择 Stage II checkpoint。
+- 在所有 seed、所有 arm 的 Stage II epoch 10 checkpoint 都已保存并锁定之前，不要构造 test DataLoader，不要解码 test 图像，不要读取 test 标签计算指标。
+- 全部 Stage II 结束后，再统一对 test split 做一次最终评估。不得因 test 结果修改方法、超参数或选择 checkpoint。
+- 数据审计可读取 CSV 的 split/path 元数据检查交集，但 test 图像像素与标签只在最终评估阶段进入模型流程。日志明确记录 test evaluation 的开始时间。
+
+六、指标与科学判读
+必须输出：
+1. Overall accuracy。
+2. 四个域分别的 accuracy。
+3. 260 个 domain-class 单元的准确率和 macro 平均。
+4. Domain-class Few (<20 train images)、Medium (20–59)、Many (>=60) 三组准确率。
+5. Worst domain-class cell accuracy、对应域/类别和该 cell 的 test 样本数。
+6. 每组相对 DR-NoFusion 与 H2T-Global 的配对逐图 gain/loss/net；另报告 matched 与 cross-domain 之间的配对变化。
+7. C 的 donor fallback 比例；每组 donor domain 分布、donor class 分布、跨域供体比例；确认 donor class 在四组中完全配对。
+8. 每个 seed 的结果和三 seed 等权均值。seed 数只有 3，不做夸大的显著性宣称，不把所有测试图片当成独立训练重复。
+
+判读规则：
+- 若 H2T-Global 相对 DR-NoFusion 在 domain-class Few 上没有可重复收益，不能声称 H2T 在新条件下有效。
+- 若 CrossDomain 相对 DomainMatched 在至少 2/3 seeds 的 domain-class Few 或 domain-class macro 上下降，且 donor class、mask、receiver、训练预算都已配对，则支持“供体域不匹配可能是迁移风险来源”的假设；这仍不是新模块有效的证据。
+- 若 matched 与 cross-domain 基本相同，或不同 seed 方向混杂，当前假设不成立/证据不足；停止该方向，不追加 K/rho/损失扫描。
+- 只有观察到可重复、可定位的负迁移，下一轮才考虑设计一个域兼容性模块。不要在本轮先实现模块。
+
+七、代码交付要求：小而可信，不做工程堆叠
+只在新目录 H2T_repro_audit/mdlt_domain_probe/ 下新增文件，不改官方 H2T 源码、不改已有实验脚本、不覆盖历史结果。建议最少包含：
+- officehome_data.py：读取官方 CSV、数据集、增强、域标签、split 审计与类别/域统计。
+- officehome_domain_probe.py：Stage I、GAP 特征缓存、四组 Stage II、最终测试、结果汇总。
+- test_officehome_domain_probe.py：只测试关键正确性（split 不交叉、GAP/通道替换恒等式、donor class 配对、domain matched/cross 约束、接收者标签保持、只更新 FC）。
+- README.md：命令、协议、限制和指标解释。
+避免为一个 pilot 构造复杂配置框架、插件系统或几十个审计文件。关键证据保存即可：config.json、environment.json、dataset_audit.json、stage1_epochs.csv、stage2_epochs.csv、epoch10_summary.csv、per_domain.csv、domain_class_metrics.csv、paired_changes.csv、donor_diagnostics.csv、final_report.md、checkpoint SHA256。模型权重和特征缓存保存在本地 output 目录，不提交 Git。
+所有输出写入全新的、唯一的 run 目录；如果目标目录已存在，拒绝覆盖。保存 seed、模型初始化、数据 CSV URL/SHA256、git commit、关键超参数和代码版本信息。
+
+八、执行顺序
+1. 先检查当前 Git 工作区状态，保留用户已有改动，不运行 reset/clean，不覆盖文件。只在分支 experiment/officehome-domain-transfer-pilot-20261018 工作；不要合并到 main。
+2. 先实现最小代码和 README，完成 compileall 与 CPU 单元测试。
+3. 运行 OfficeHome-MLT 元数据/路径审计，输出每个域和 domain-class 的真实统计；检查路径、split 重叠、重复路径、缺失文件。数据不齐则停止正式训练并明确列出缺失项。
+4. 数据完整时先运行 smoke-only：Stage I 最多 20 updates、每组 Stage II 最多 2 个 batch；只验证真实数据前向、loss、梯度、GAP 恒等式和四组执行路径。smoke 输出单独目录。
+5. smoke 通过后运行完整 pilot：seeds 42,43,44；Stage I 5,001 updates；Stage II 4 arms × 10 epochs；最终 test 只在所有 final checkpoint 锁定后统一运行。
+6. 输出最终科学报告，严格按第六节报告正负结果。不要追加实验、扫描超参数或自动修复科学结果不理想的问题。
+7. 提交代码与小型结果报告到本分支；不要提交图像数据、模型 checkpoint、特征缓存或大型压缩包。最后报告实际运行命令、完成/阻塞状态、结果文件位置、改动文件清单与 Git commit SHA。
+
+最终目标不是证明 H2T 必然有问题，也不是现在就提出新模块，而是用一个公开多域长尾基准、一个清晰的供体域干预和三个种子，判断这个现实条件是否真的改变 H2T 的迁移收益。
