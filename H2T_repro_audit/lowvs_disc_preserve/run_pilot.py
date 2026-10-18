@@ -257,7 +257,7 @@ def train(seed,arm):
 
 def report():
     old.forbid_official_test()
-    all_rows=[];changes=[];perclass=[];curves=[]
+    all_rows=[];changes=[];perclass=[];curves=[];group_confusion=[];historical_replay=[]
     for seed in SEEDS:
         by={};val_y=None;control=None
         for arm in ARMS:
@@ -276,6 +276,13 @@ def report():
                 for a,b in zip(sig,control):
                     equal_signatures(a,b,seed,arm,int(a["epoch"]),int(a["batch"]))
             by[arm]=(p,summary["epoch10"],lg)
+            group_names={"Head":lambda v:v<=35,"Medium":lambda v:(v>=36)&(v<=70),
+                         "Tail":lambda v:v>=71}
+            for true_group,true_fn in group_names.items():
+                for predicted_group,pred_fn in group_names.items():
+                    group_confusion.append({"seed":seed,"arm":arm,
+                        "true_group":true_group,"predicted_group":predicted_group,
+                        "count":int((true_fn(val_y)&pred_fn(p)).sum())})
             all_rows.append({"seed":seed,"arm":arm,**{k:summary["epoch10"][k] for k in METRICS}})
             curves+=cread(folder/"epochs.csv")
         comparisons=(("LowVS-CleanCE","LowVS"),
@@ -300,15 +307,32 @@ def report():
                 perclass.append({"seed":seed,"comparison":rec["comparison"],"class_id":c,"n":int(sel.sum()),
                       "wins":int(wins[sel].sum()),"losses":int(losses[sel].sum()),
                       "net":int(wins[sel].sum()-losses[sel].sum())})
+    # Diagnostic: historical LowVS-Full numeric parity, not a chosen baseline.
+    old_table=HISTORY/"epoch10_verified.csv"
+    if old_table.is_file():
+        for historic in cread(old_table):
+            if historic.get("arm")!="LowVS-Full" or int(historic["seed"]) not in SEEDS:
+                continue
+            fresh=next(z for z in all_rows if int(z["seed"])==int(historic["seed"]) and z["arm"]=="LowVS")
+            rec={"seed":int(historic["seed"])}
+            for key in ("Overall","Head","Tail","Few"):
+                rec["delta_"+key+"_pp"]=float(fresh[key])-float(historic[key])
+            rec["within_one_image_overall"]=abs(rec["delta_Overall_pp"])<=100/1980+1e-8
+            historical_replay.append(rec)
     cwrite(RESULTS/"epoch10.csv",all_rows)
     cwrite(RESULTS/"paired.csv",changes)
     cwrite(RESULTS/"per_class.csv",perclass)
+    cwrite(RESULTS/"group_confusion.csv",group_confusion)
+    if historical_replay:cwrite(RESULTS/"historical_replay.csv",historical_replay)
     cwrite(RESULTS/"curves.csv",curves)
     jwrite(RESULTS/"scientific_summary.json",{"protocol":PROTOCOL,"results":all_rows,"pairs":changes,
+        "historical_replay":historical_replay,
         "limits":"Same backbone/same repeated dev images, 2 StageII seeds, fixed margin=0 lambda=0.5; cannot prove representation gains."})
     md=["# Low-VS + clean discriminative preservation: three-arm pilot",
         "","Primary contrast: TopCompetitor vs CleanCE, NOT merely vs LowVS.",
         "Historical LowVS Full signature 850/850 checked in each arm and each seed.",
+        "See group_confusion.csv for true group versus predicted group, not exact-label accuracy.",
+        "See historical_replay.csv for numerical drift from prior sealed LowVS-Full.",
         "Frozen StageI seed42 epoch184; StageII fixed epoch10; 1980 TRAIN holdout class1..99 (20/class); no official TEST.",
         "","| Seed | Arm | Overall | Head | OfficialMedium | Tail | Few | validation CE |",
         "|---|---|---:|---:|---:|---:|---:|---:|"]
