@@ -1,0 +1,18 @@
+{
+  "args": [
+    "preflight"
+  ],
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-u",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+    "preflight"
+  ],
+  "started_at": "2026-10-17T22:46:15+08:00",
+  "status": "failed",
+  "exit_code": 1,
+  "finished_at": "2026-10-17T22:46:15+08:00",
+  "seconds": 0.05491149998852052,
+  "error": "Protocol child failed: ['preflight'], exit=1; do not retry"
+}

@@ -1,0 +1,10 @@
+{
+  "complete": true,
+  "stats_sha256": "8bf754f4ed534afed21efa8696d96ec068cfeac7e6df0324773e85dc285cc1a2",
+  "validation_maps_sha256": "73c92c53b8e30543d1cad8e09708c41165c908f64aedc2e84244ff9ec8dab824",
+  "source": "IF200 TRAIN subset only, class statistics not fitted on TRAIN holdout",
+  "backbone_unchanged": true,
+  "classes_with_n_less20": 39,
+  "checkpoint_sha256": "5abef38180bf85cd5c60c38bae08efe23173bdf4775fe44bc38299458448548f",
+  "official_TEST_used": false
+}

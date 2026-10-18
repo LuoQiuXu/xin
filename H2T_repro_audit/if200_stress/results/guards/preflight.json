@@ -1,0 +1,16 @@
+{
+  "completed": true,
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+    "preflight"
+  ],
+  "seconds": 0.7460942000034265,
+  "guard_events": [],
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "torch": "2.14.1+cu132",
+  "cuda": "13.2",
+  "traceback": null,
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "peak_allocated_MiB": 376.67041015625,
+  "peak_reserved_MiB": 426.0
+}

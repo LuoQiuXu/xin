@@ -1,0 +1,22 @@
+{
+  "complete": true,
+  "fixed_epoch": 200,
+  "checkpoint_sha256": "5abef38180bf85cd5c60c38bae08efe23173bdf4775fe44bc38299458448548f",
+  "validation_epoch200": {
+    "Overall": 35.35353535353536,
+    "Head": 65.57142857142857,
+    "OfficialMedium": 32.714285714285715,
+    "Tail": 2.0689655172413794,
+    "Many": 71.20689655172414,
+    "Medium": 37.41935483870968,
+    "Few": 7.051282051282051,
+    "WorstClass": 0.0,
+    "Macro": 35.35353535353536,
+    "CE": 3.279980421066284
+  },
+  "source_nested_raw_ids_sha256": "e8343e70cb01b96437b45ad865a2072212cc1e3d1305fda43b538da184c02b8b",
+  "backbone_hash": "5de5dd801c37b72224bf52dc38f696fe5e407115758754fe3fdc3958df62fa00",
+  "classifier_hash": "a8e9d399d61537ca6d085a55f131e6924634ff077f12cbb40ad2c9f5f55f44f9",
+  "updates": 15000,
+  "official_TEST_used": false
+}

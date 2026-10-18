@@ -1,0 +1,304 @@
+[
+  {
+    "args": [
+      "policy"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\policy.py"
+    ],
+    "started_at": "2026-10-17T22:45:57+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T22:45:59+08:00",
+    "seconds": 2.1954815999779385
+  },
+  {
+    "args": [
+      "preflight"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "preflight"
+    ],
+    "started_at": "2026-10-17T22:46:15+08:00",
+    "status": "failed",
+    "exit_code": 1,
+    "finished_at": "2026-10-17T22:46:15+08:00",
+    "seconds": 0.05491149998852052,
+    "error": "Protocol child failed: ['preflight'], exit=1; do not retry"
+  },
+  {
+    "args": [
+      "preflight"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "preflight"
+    ],
+    "started_at": "2026-10-17T22:47:29+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T22:47:33+08:00",
+    "seconds": 4.089456299989251
+  },
+  {
+    "args": [
+      "stage1"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "stage1"
+    ],
+    "started_at": "2026-10-17T22:47:54+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:02:56+08:00",
+    "seconds": 902.2560805999965
+  },
+  {
+    "args": [
+      "prepare"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "prepare"
+    ],
+    "started_at": "2026-10-17T23:03:18+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:03:24+08:00",
+    "seconds": 5.8622984000248834
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "DR-NoFusion"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "DR-NoFusion"
+    ],
+    "started_at": "2026-10-17T23:03:37+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:04:52+08:00",
+    "seconds": 75.4244306999899
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "Original-BatchShared"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "Original-BatchShared"
+    ],
+    "started_at": "2026-10-17T23:04:53+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:06:10+08:00",
+    "seconds": 76.86355619999813
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "Uniform-PerSample"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "Uniform-PerSample"
+    ],
+    "started_at": "2026-10-17T23:06:11+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:07:27+08:00",
+    "seconds": 76.34193179997965
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-PerSample"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "124",
+      "--arm",
+      "LowVS-PerSample"
+    ],
+    "started_at": "2026-10-17T23:07:28+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:08:44+08:00",
+    "seconds": 76.60982589999912
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "DR-NoFusion"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "DR-NoFusion"
+    ],
+    "started_at": "2026-10-17T23:08:45+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:10:00+08:00",
+    "seconds": 75.1948027999897
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "Original-BatchShared"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "Original-BatchShared"
+    ],
+    "started_at": "2026-10-17T23:10:01+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:11:17+08:00",
+    "seconds": 75.84377500001574
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "Uniform-PerSample"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "Uniform-PerSample"
+    ],
+    "started_at": "2026-10-17T23:11:18+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:12:35+08:00",
+    "seconds": 77.51503310000408
+  },
+  {
+    "args": [
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-PerSample"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "train",
+      "--seed",
+      "125",
+      "--arm",
+      "LowVS-PerSample"
+    ],
+    "started_at": "2026-10-17T23:12:36+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:13:54+08:00",
+    "seconds": 77.84752860001754
+  },
+  {
+    "args": [
+      "report"
+    ],
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\if200_stress\\run_if200.py",
+      "report"
+    ],
+    "started_at": "2026-10-17T23:14:06+08:00",
+    "status": "completed",
+    "exit_code": 0,
+    "finished_at": "2026-10-17T23:14:10+08:00",
+    "seconds": 3.323507299995981
+  }
+]

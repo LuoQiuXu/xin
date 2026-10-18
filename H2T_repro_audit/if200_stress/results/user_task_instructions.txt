@@ -1,0 +1,102 @@
+CODEX本地执行指令：H2T CIFAR-100-LT IF=200 负迁移压力测试
+日期：2026-10-17
+GitHub分支：experiment/h2t-if200-stress-20261017
+新目录：H2T_repro_audit/if200_stress/
+代码：policy.py、run_if200.py；完整解释：README.md
+GitHub同版完整指令：H2T_repro_audit/if200_stress/CODEX_H2T_IF200_STRESS.txt
+
+【最高优先级】
+禁止Codex执行、设计或建议任何Git/GitHub命令（包括branch、commit、push、merge、PR）。
+所有上传由用户本人进行；只可修改新实验目录中确定的阻塞bug，不得修改历史实验。
+不要读取CIFAR-100官方TEST，不要增跑seed/IF，不要事后改变alpha、K、loss、学习率或epoch。
+有文件缺失、源数据hash变化、OOM或训练配对不一致必须立即停止并如实报告。
+
+【本次唯一科学问题】
+当长尾更严重(IF=200)，原始式H2T跨类融合相比DR（不融合）是否出现负迁移？
+Low-VS相对于逐样本随机选通道是否有独立价值？
+原H2T是batch共享随机16通道，Low-VS是每样本Bottom48选16，
+两者差异包括掩码粒度，因此必须设置Uniform-PerSample对照。
+
+【固定设置】
+CIFAR-100-LT IF200，类别数100，原作者seed0按类指数不平衡，
+每类n_c=int(500*(0.005**(c/99.0)))，总计9502张训练图像。
+本轮从已验证IF100的10847张TRAIN按原始类内顺序截取IF200子集；
+同一1980张来自原始TRAIN的留出验证图像不与IF200训练图像重叠，
+class0无验证样本（其他99类各20张）。
+不要构造新随机划分，也不要使用旧IF100 StageI权重。
+
+StageI：fresh ResNet32+FC, seed42, 200epoch固定终点，不从验证选best。
+CE+MixUp alpha1, SGD lr=.1、wd=2e-4、momentum=.9、batch128、
+5epoch warmup及epoch160/180学习率下降。75次参数更新/epoch。
+StageI训练结束后重新用IF200的TRAIN特征计算类均值、shrinkage方差、epsilon；
+验证图像只生成冻结特征缓存供评估，不参与统计或参数选择。
+
+StageII：两seed124/125；同一个新IF200 StageI，冻结Backbone与全部BN，
+仅优化6500参数FC；10epochs/seed/arm，75updates/epoch；
+作者IF200 YAML lr=.2，lr_factor=.1，单FC组实际初始lr=.02，
+weight decay=.0002，momentum=.9，batch128，CE。
+IF200作者完整StageII还设置shift_bn=True：本次仅是固定BN机制面板，
+不能把它称为原论文完整复现或直接证明原始作者方法失败。
+
+4组：
+A DR-NoFusion：接收者特征，完全不融合
+B Original-BatchShared：整batch随机共享16/64完整通道替换
+C Uniform-PerSample：每个样本随机选16/64
+D LowVS-PerSample：每样本按供体类统计Bottom48→随机16通道替换
+核心比较B-A看原H2T式融合是否负迁移；D-C看VS身份贡献；
+C-B看掩码粒度。D-B混合两种改变，不得称为VS独立增益。
+
+【启动前】
+项目根目录必须存在已冻结IF100的TRAIN数据：
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/
+其中train_images.npy、train_labels.npy、validation_images.npy、
+validation_labels.npy、split_indices.npz及runtime/源码须真实存在。
+注意GitHub可能没上传大体积旧输入：如果本地缺失，应停下让用户恢复，
+绝不可从TEST拼接或随机生成数据。
+
+【从项目仓库根目录，按此顺序运行】
+python H2T_repro_audit/if200_stress/policy.py
+python H2T_repro_audit/if200_stress/run_if200.py preflight
+python H2T_repro_audit/if200_stress/run_if200.py stage1
+python H2T_repro_audit/if200_stress/run_if200.py prepare
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm DR-NoFusion
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm Original-BatchShared
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm Uniform-PerSample
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm LowVS-PerSample
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm DR-NoFusion
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm Original-BatchShared
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm Uniform-PerSample
+python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm LowVS-PerSample
+python H2T_repro_audit/if200_stress/run_if200.py report
+
+各seed的DR首先建立750次batch对照，其他3组必须每批的receiver/donor索引、
+增强图像、冻结Backbone特征、共享/逐样本/LowVS通道掩码及Gumbel联合哈希全部一致。
+必须检查参数冻结、200epoch和10epoch预算、保存的checkpoint预测重现、
+所有输入为原始TRAIN、整个过程零官方TEST访问。
+
+【输出，全部位于if200_stress/results/】
+stage1/stage1_fixed_epoch200.pth、stage1/epochs.csv及summary.json
+stats.npz、stats_provenance.json、validation_maps.npy
+seed*/每个arm/epochs.csv、paired_batches.csv、final_fc.pth、
+validation_epoch10.npz、summary.json
+IF200_STRESS_RESULTS.md、epoch10.csv、paired.csv、per_class.csv、
+scientific_summary.json
+
+另写一份中文IF200_STRESS_SCIENTIFIC_REPORT.md：
+1. 固定epoch10各seed的Overall/Head/Tail/Many/Medium/Few/Macro/WorstClass；
+2. DR vs OriginalShared配对净得失和Head/Tail混淆；逐类别n=20、class0缺失；
+3. UniformPerSample vs OriginalShared的掩码粒度差异；
+4. LowVS vs UniformPerSample的真实VS额外收益；
+5. 是否出现两seed均有Tail回退的负迁移，哪些类别持续受损；
+6. 历史IF100的StageI选模/数据与IF200不同，不可以直接对比绝对精度
+   或将差异认定为IF引起的因果效应；
+7. 所有训练为固定BN对照，不是作者shift_bn=True配方；
+8. 只有一套StageI、重复使用99类开发验证集，不声称统计显著和最终泛化。
+无需复杂分析平台、额外训练、生成图片或重构工程。
+
+【科学退出规则】
+若B相对A在两个seed均明显损害Tail，记录“IF200固定BN负迁移候选”；
+后续先用作者shift_bn=True及独立StageI验证，才能宣称原方法缺陷。
+若没有稳定负迁移，不追加IF50/外部数据集碰运气。
+若D只优于C而不优于B，不声称Low-VS稳定超越原H2T。
+结束后Codex停止且不执行任何Git操作，用户上传结果后交ChatGPT深度分析。

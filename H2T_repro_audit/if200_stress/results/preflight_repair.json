@@ -1,0 +1,12 @@
+{
+  "preflight_syntax_only": true,
+  "failed_attempt_preserved": "console/preflight.log",
+  "failed_status_preserved": "FAILED_STOP.json",
+  "training_or_CUDA_attempted_by_failed_child": false,
+  "reason": "Two pre-existing report expressions missed their closing int() parentheses; module could not parse.",
+  "changes": "Parentheses only in two count differences; cfg filename fix retained; audit log helper now preserves attempt2 separately.",
+  "data_hash_changed": false,
+  "algorithm_changed": false,
+  "no_failed_run_outputs_deleted_or_overwritten": true,
+  "all_python_sources_ast_parse": true
+}

@@ -1,0 +1,12 @@
+{
+  "blocking_bug": "cfg() attempted Path + str, prevented YAML loading; parenthesized filename only",
+  "safety_gap": "Original guard matched only one TEST path and did not protect historical writes. Added audit-only read/write guards and exclusive status/log outputs.",
+  "algorithm_changes": false,
+  "policy_bytewise_unchanged": true,
+  "learning_rate_or_training_budget_changes": false,
+  "preflight_or_training_started": false,
+  "old_files_hashed": 824,
+  "locked_sources": 41,
+  "read_only_search_exception": "Initial rg query used a literal wildcard directory on Windows; corrected subsequent paths, no experiment command failed.",
+  "additional_blocking_bug": "Two report count-difference expressions lacked closing int() parentheses; first preflight failed before imports. Fixed without numerical formula change."
+}

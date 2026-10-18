@@ -1,0 +1,132 @@
+{
+  "publication_date": "2026-10-18",
+  "repository": "LuoQiuXu/xin",
+  "branch": "experiment/h2t-if200-stress-20261017",
+  "base_commit": "e3c5bae1f03b2729da71f0fffcee156a04cf93f1",
+  "experiment_manifest_sha256": "fb52766813a3797b55276cced6562836af1fc0b94c5664019d919535a1e50ae5",
+  "sealed_experiment_files_verified": 151,
+  "experiment_artifacts_unchanged": true,
+  "review_package": {
+    "path": "results/IF200_STRESS_REVIEW_PACKAGE.zip",
+    "bytes": 6621808,
+    "sha256": "ce978961d887a1ba96379936c86cc939ef65ba7d5f972a7f58fcfe3d87ac7e66",
+    "entries": 149
+  },
+  "contents": "Runnable scripts, reports, summary and paired CSVs, full console logs including failed preflight, provenance, source/config snapshots, TRAIN split indices, TRAIN-only class statistics, and saved TRAIN-holdout validation labels/logits/predictions.",
+  "NPZ_fields": {
+    "results/if200_split_indices.npz": [
+      "IF100_local_indices.npy",
+      "train_raw_indices.npy",
+      "validation_raw_indices.npy",
+      "counts.npy"
+    ],
+    "results/seed124/DR-NoFusion/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed124/LowVS-PerSample/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed124/Original-BatchShared/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed124/Uniform-PerSample/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/DR-NoFusion/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/LowVS-PerSample/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/Original-BatchShared/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/seed125/Uniform-PerSample/validation_epoch10.npz": [
+      "labels.npy",
+      "logits.npy",
+      "predictions.npy"
+    ],
+    "results/stats.npz": [
+      "counts.npy",
+      "mean_eval.npy",
+      "variance_eval_regularized.npy",
+      "variance_eval_ddof0.npy",
+      "shrinkage_lambda.npy",
+      "pooled.npy",
+      "epsilon.npy"
+    ]
+  },
+  "excluded": [
+    {
+      "path": "results/seed124/DR-NoFusion/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "e66ee1b9e027270c1b1ff6508af788fe835c4681334619c124dd38787ba97767"
+    },
+    {
+      "path": "results/seed124/LowVS-PerSample/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "91904bc3ddc3596d600247778529cc733fa96769553bfa6236a565a514f5e819"
+    },
+    {
+      "path": "results/seed124/Original-BatchShared/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "623c70e781433528023caa34732da9952800e779377949286aae7c894e166052"
+    },
+    {
+      "path": "results/seed124/Uniform-PerSample/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "0bca51bac7c1d06b8d7db181de6ba14494fc2bc981bcdc8a18b018e9888f355b"
+    },
+    {
+      "path": "results/seed125/DR-NoFusion/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "f2010360f71f5c16f47559eff77744017ab1c1b42ee830b83f8a3973d5af686f"
+    },
+    {
+      "path": "results/seed125/LowVS-PerSample/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "06a34876b6560f5b2224d39d5de0226c715c941c49cfc391a7d29cc9411aa651"
+    },
+    {
+      "path": "results/seed125/Original-BatchShared/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "7b2171dc18f8d971d7a1ce848d2405dd458fd0462e8a7e96d76d4da96f76b466"
+    },
+    {
+      "path": "results/seed125/Uniform-PerSample/final_fc.pth",
+      "bytes": 28077,
+      "sha256": "2ea59ac53375aa40225c0f60739757454d69403bcdc91c7f125bc6c3c0ba4519"
+    },
+    {
+      "path": "results/stage1/stage1_fixed_epoch200.pth",
+      "bytes": 1949539,
+      "sha256": "5abef38180bf85cd5c60c38bae08efe23173bdf4775fe44bc38299458448548f"
+    },
+    {
+      "path": "results/validation_maps.npy",
+      "bytes": 32440448,
+      "sha256": "73c92c53b8e30543d1cad8e09708c41165c908f64aedc2e84244ff9ec8dab824"
+    }
+  ],
+  "excluded_categories": [
+    "model weights",
+    "raw images",
+    "large feature-map cache"
+  ],
+  "no_training_or_evaluation_during_publication": true,
+  "note": "Original experiment manifest is preserved, including hashes for excluded local-only weights/cache. Publication is authorized by the later user request."
+}

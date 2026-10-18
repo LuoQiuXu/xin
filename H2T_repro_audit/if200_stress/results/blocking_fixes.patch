@@ -1,0 +1,39 @@
+--- provided/run_if200.py
++++ if200_stress/run_if200.py
+@@ -90,6 +90,8 @@
+     global _GUARDED
+     if _GUARDED:return
+     _GUARDED=True
++    from runtime_guard import install
++    install(WORK, RESULTS)
+     # Since all input arrays come from a locked TRAIN-only experiment, the
+     # official test file should never be opened or instantiated.
+     forbidden=os.path.normcase(os.path.abspath(WORK/"H2T/data/cifar100/cifar-100-python/test"))
+@@ -150,7 +152,7 @@
+         return self.transform(Image.fromarray(self.images[i])),int(self.labels[i])
+ 
+ def cfg(which):
+-    p=CONFIG/f"cifar100_imb0005_{which}_ce_"+("mixup" if which=="stage1" else "H2T")+".yaml"
++    p=CONFIG / (f"cifar100_imb0005_{which}_ce_" + ("mixup" if which=="stage1" else "H2T") + ".yaml")
+     q=base_config.clone();q.defrost();q.merge_from_file(str(p))
+     assert float(q.imb_factor)==0.005 and q.batch_size==128 and q.workers==0
+     if which=="stage1":
+@@ -502,8 +504,8 @@
+                 c[name+"_net"]=int(wins[sel].sum()-losses[sel].sum())
+                 c[name+"_delta_pp"]=100*float((pa[sel]==truth[sel]).mean()-
+                                                  (pb[sel]==truth[sel]).mean())
+-            c["head_true_to_tail_pred_delta"]=int(((truth<=35)&(pa>=71)).sum()-int(((truth<=35)&(pb>=71)).sum())
+-            c["tail_true_to_head_pred_delta"]=int(((truth>=71)&(pa<=35)).sum()-int(((truth>=71)&(pb<=35)).sum())
++            c["head_true_to_tail_pred_delta"]=int(((truth<=35)&(pa>=71)).sum())-int(((truth<=35)&(pb>=71)).sum())
++            c["tail_true_to_head_pred_delta"]=int(((truth>=71)&(pa<=35)).sum())-int(((truth>=71)&(pb<=35)).sum())
+             paired.append(c)
+             for k in range(1,100):
+                 sel=truth==k
+@@ -555,4 +557,6 @@
+         if a.seed is None or a.arm is None:p.error("train needs --seed and --arm")
+         train(a.seed,a.arm)
+     else:report()
+-if __name__=="__main__":main()
++if __name__=="__main__":
++    from runtime_guard import run_action
++    run_action(main, RESULTS)

@@ -1,0 +1,37 @@
+{
+  "completed": true,
+  "seed": 125,
+  "arm": "DR-NoFusion",
+  "stage1_sha": "5abef38180bf85cd5c60c38bae08efe23173bdf4775fe44bc38299458448548f",
+  "steps": 750,
+  "epochs": 10,
+  "final": {
+    "Overall": 41.868686868686865,
+    "Head": 63.714285714285715,
+    "OfficialMedium": 40.714285714285715,
+    "Tail": 16.896551724137932,
+    "Many": 67.41379310344827,
+    "Medium": 43.064516129032256,
+    "Few": 21.923076923076923,
+    "WorstClass": 0.0,
+    "Macro": 41.86868686868687,
+    "CE": 2.4254817962646484
+  },
+  "classifier_initial_hash": "a8e9d399d61537ca6d085a55f131e6924634ff077f12cbb40ad2c9f5f55f44f9",
+  "backbone_unchanged": true,
+  "BN_frozen": true,
+  "mask_VS_trace_by_group": {
+    "Tail": {
+      "u": 14417.793446861588,
+      "l": 10965.17814538321,
+      "n": 27579
+    },
+    "Head": {
+      "u": 18383.64481718417,
+      "l": 14154.314646561148,
+      "n": 34293
+    }
+  },
+  "paired_all_batches": false,
+  "TEST_used": false
+}

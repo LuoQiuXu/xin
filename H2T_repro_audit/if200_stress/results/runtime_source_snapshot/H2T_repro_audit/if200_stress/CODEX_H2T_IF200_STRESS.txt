@@ -1,0 +1,102 @@
+CODEX 本地执行指令：H2T IF=200 条件性负迁移压力测试
+日期：2026-10-17
+GitHub 分支：experiment/h2t-if200-stress-20261017
+新实验目录：H2T_repro_audit/if200_stress/
+脚本：policy.py、run_if200.py，说明：README.md
+
+【首要禁止事项】
+严禁你（Codex）进行任何 Git/GitHub/版本控制/分支/提交/推送/合并/PR 操作，亦不需要向用户建议这些命令。
+所有代码与产物上传由用户亲自完成。所有数据和旧实验目录只读。仅在新目录修复新脚本中的明确阻塞 bug，保留修复记录。
+不修改历史阶段的源代码、checkpoint、模型评估、选择器、采样协议或训练结果。绝不能载入官方CIFAR100 TEST图像或标签。
+禁止事后搜索alpha、K、类别门槛、epochs、随机种子、loss。不能借失败结果私自增加训练组。
+
+【科学问题】
+此前 Low-VS 在IF100数据中制造更强、具有类别条件方向的即时判别冲突；
+但静态方向评分q本身不能预测最终Tail收益。
+本轮不开发任何新模块：验证在更极端 IF200 中，原始式H2T融合相比不融合，
+会不会产生稳定Tail负迁移；同时用4臂区分原始共享掩码与VS选通道效果。
+
+【为什么只选IF200】
+从已有核查为真的IF100 10847张 LT TRAIN 中，每类按原始顺序截取
+num_c=int(500 * (0.005 ** (c/99.0)))。
+最终IF200=9502 TRAIN图像、100类、尾类最少2张，原TRAIN 1980张99类验证
+与IF200训练原图索引无交集。已知IF50新增图像可能与此旧验证集相交，
+所以本轮不做IF50也不额外下载数据。禁止用IF100 StageI ckpt替代IF200 fresh StageI。
+
+【运行协议】
+StageI：新训练 ResNet32 + 100-way FC，seed42、200epoch、SGD(LR=.1, momentum=.9, wd=2e-4)、
+batch128，原CIFAR crop+flip，CE+MixUp alpha1、warmup5、160/180 multistep。
+选固定epoch200的checkpoint，不依靠重复使用的验证集选择best。
+独立IF200训练集特征统计：每类eval GAP均值、ddof0方差、5/(n+5) shrinkage、
+epsilon=1e-6×全LT特征总体通道方差均值。不能混入验证/TEST。
+StageII：冻结该新StageI Backbone与全部BN，仅训练FC；10epochs，seed124/125，
+75optimizer.step/epoch。IF200作者YAML lr=.2、lr_factor=.1，因此单FC group实际初始LR=.02；
+weight decay=.0002，momentum=.9，batch128，分类CE无额外loss。
+沿用原CIFAR weighted-sampler思想：每次接收者均匀抽类别(BS)，供体每epoch无放回
+一次遍历全IF200实例(IS)；真正CIFAR图像增强；供体和接收者分别经过冻结Backbone。
+这是原方法的固定BN机制对照，不是作者shift_bn=True全配方复现。
+
+四臂/每StageII seed：
+  A DR-NoFusion：仅接收者原始特征，不融合；
+  B Original-BatchShared：batch共享随机16/64完整通道替换；
+  C Uniform-PerSample：每接收样本随机16/64通道替换；
+  D LowVS-PerSample：依供体IF200类别统计Bottom48→随机16完整通道替换。
+受体与供体、图像增强、两种随机掩码、VS分数及Gumbel需对四臂完全配对。
+B vs A评价是否出现融合负迁移；D vs C才隔离VS身份价值；
+C vs B判断掩码粒度。D vs B不能直接全归因于VS（混合了粒度和评分）。
+本轮绝不新增方法。
+
+【从本地项目根目录，严格执行顺序】
+步骤0. 静态检查新代码与IF200两个原作者YAML，确认用户本地有旧Clean训练数组：
+  H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/
+  train_images.npy、train_labels.npy、validation_images.npy、validation_labels.npy、
+  split_indices.npz以及该目录runtime/模型源码。
+注意这些大型历史输入可能只在本地，不在GitHub网页；缺失请停下询问用户恢复旧数据，
+不要从TEST拼接、合成数据、重新划分验证集或更改协议。GPU要求RTX5070 Laptop 8GB。
+步骤1. 纯CPU掩码数学单测+CUDA模型前向及IF200数据真实性预检：
+  python H2T_repro_audit/if200_stress/policy.py
+  python H2T_repro_audit/if200_stress/run_if200.py preflight
+必须PASS，记录IF200总样本9502、100类、验证1980、原图索引无重叠和GPU。
+步骤2. IF200 fresh Stage I正式200epoch（不可因看到训练val结果挑epoch）：
+  python H2T_repro_audit/if200_stress/run_if200.py stage1
+输出 results/stage1/stage1_fixed_epoch200.pth、summary.json、epochs.csv。
+步骤3. 抽取一次TRAIN-only类统计以及原TRAIN留出验证图的冻结特征缓存：
+  python H2T_repro_audit/if200_stress/run_if200.py prepare
+必须核查checkpoint、统计训练源、零TEST访问、未更新Backbone/BN/FC。
+步骤4. 四臂两seed，先每seed DR基准。8次StageII classifier-only训练：
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm DR-NoFusion
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm Original-BatchShared
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm Uniform-PerSample
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 124 --arm LowVS-PerSample
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm DR-NoFusion
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm Original-BatchShared
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm Uniform-PerSample
+  python H2T_repro_audit/if200_stress/run_if200.py train --seed 125 --arm LowVS-PerSample
+每个seed非DR臂必须与DR的750个训练batch逐一哈希一致：
+接收/供体索引、图像增强像素、冻结特征、两套随机/VS掩码、共享掩码、Gumbel；
+任一错误立即停止，不能静默弱化哈希。
+步骤5. 全8组完成后生成统一报告：
+  python H2T_repro_audit/if200_stress/run_if200.py report
+
+【科学交付】
+统一结果：results/IF200_STRESS_RESULTS.md、epoch10.csv、paired.csv、
+per_class.csv、scientific_summary.json；每臂含epochs.csv、paired_batches.csv、
+final_fc.pth、validation_epoch10.npz、summary.json。
+另外撰写中文 IF200_STRESS_SCIENTIFIC_REPORT.md（不新增训练或复杂工程）：
+1. 两StageII种子固定epoch10 Overall/Head/OfficialMedium/Tail/Many/Medium/Few/Macro/WorstClass；
+2. 配对图像的gain/loss和净正确数，Tail→Head/Head→Tail混淆变化；逐类n=20，标注class0缺失；
+3. OriginalShared vs DR：是否两seed Tail一致退步或出现可重复的尾类受损类别；
+4. LowVS vs UniformPerSample：是否有真正的VS额外价值；UniformPerSample vs Shared是否存在粒度混杂；
+5. 对IF100历史正向结果必须注明StageI选择/执行不同，不能把两个IF的差值直接归因于
+   类别稀缺程度。当前是一个StageI seed42，两个StageII seeds，并非统计显著；
+6. 本轮固定BN；作者IF200 YAML shift_bn=True，当前不是原作者完整设置，
+   不得据此直接宣称“原始H2T在IF200失败”；实际失败后需另做作者BN策略确认。
+7. 不能把分类器训练改进写成Backbone表征提升。没有读取官方TEST。
+
+【探索性停止门槛】
+如果OriginalShared在两个种子Tail均输DR：标记“IF200 fixed-BN的负迁移候选”，
+不能马上声称作者方法失效；接下来应验证作者shift_bn=True与独立StageI。
+如果仅LowVS赢Uniform、但不赢Original，不把它包装成替代原始H2T的提升。
+如果没有稳定负迁移或跨种子符号不一致：停止这条IF200单点失败假说，
+不要直接尝试IF50或外部数据集“找坏成绩”。
+任务完成后停止，不执行任何Git操作；用户上传结果后再交给ChatGPT做第一性原理分析。

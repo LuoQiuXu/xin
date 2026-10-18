@@ -1,0 +1,634 @@
+{
+  "passed": true,
+  "finished_at": "2026-10-17T23:14:27+08:00",
+  "dataset_attested": true,
+  "StageI_epochs": 200,
+  "StageI_steps": 15000,
+  "StageII_runs": 8,
+  "StageII_epochs_per_run": 10,
+  "StageII_steps_per_run": 750,
+  "paired_nonDR_batches_identical": 4500,
+  "saved_logits_shape_per_run": [
+    1980,
+    100
+  ],
+  "source_and_historical_hashes_unchanged": true,
+  "historical_files_verified": 824,
+  "guard_processes": 12,
+  "official_TEST_events": 0,
+  "historical_write_events": 0,
+  "StageI_sha256": "5abef38180bf85cd5c60c38bae08efe23173bdf4775fe44bc38299458448548f",
+  "backbone_state_tensors": 186,
+  "BN_modules": 31,
+  "BN_counter_frozen_at": 15000,
+  "classifier_parameters": 6500,
+  "class_group_denominators": {
+    "Head": {
+      "classes": 35,
+      "samples": 700,
+      "class_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    "OfficialMedium": {
+      "classes": 35,
+      "samples": 700,
+      "class_ids": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70
+      ]
+    },
+    "Tail": {
+      "classes": 29,
+      "samples": 580,
+      "class_ids": [
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99
+      ]
+    },
+    "Many": {
+      "classes": 29,
+      "samples": 580,
+      "class_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ]
+    },
+    "Medium": {
+      "classes": 31,
+      "samples": 620,
+      "class_ids": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60
+      ]
+    },
+    "Few": {
+      "classes": 39,
+      "samples": 780,
+      "class_ids": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99
+      ]
+    }
+  },
+  "persistent_lost_classes": {
+    "Original-BatchShared - DR-NoFusion / All": [
+      {
+        "class": 3,
+        "net124": -2,
+        "net125": -1
+      },
+      {
+        "class": 5,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 7,
+        "net124": -2,
+        "net125": -3
+      },
+      {
+        "class": 10,
+        "net124": -2,
+        "net125": -2
+      },
+      {
+        "class": 30,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 33,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 41,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 60,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 62,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 67,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 72,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 77,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 79,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 87,
+        "net124": -2,
+        "net125": -1
+      }
+    ],
+    "Original-BatchShared - DR-NoFusion / Head": [
+      {
+        "class": 3,
+        "net124": -2,
+        "net125": -1
+      },
+      {
+        "class": 5,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 7,
+        "net124": -2,
+        "net125": -3
+      },
+      {
+        "class": 10,
+        "net124": -2,
+        "net125": -2
+      },
+      {
+        "class": 30,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 33,
+        "net124": -1,
+        "net125": -1
+      }
+    ],
+    "Original-BatchShared - DR-NoFusion / Tail": [
+      {
+        "class": 72,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 77,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 79,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 87,
+        "net124": -2,
+        "net125": -1
+      }
+    ],
+    "Uniform-PerSample - Original-BatchShared / All": [
+      {
+        "class": 43,
+        "net124": -1,
+        "net125": -1
+      }
+    ],
+    "Uniform-PerSample - Original-BatchShared / Head": [],
+    "Uniform-PerSample - Original-BatchShared / Tail": [],
+    "LowVS-PerSample - Uniform-PerSample / All": [
+      {
+        "class": 2,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 3,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 5,
+        "net124": -2,
+        "net125": -1
+      },
+      {
+        "class": 6,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 11,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 13,
+        "net124": -4,
+        "net125": -2
+      },
+      {
+        "class": 53,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 73,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 76,
+        "net124": -1,
+        "net125": -1
+      }
+    ],
+    "LowVS-PerSample - Uniform-PerSample / Head": [
+      {
+        "class": 2,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 3,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 5,
+        "net124": -2,
+        "net125": -1
+      },
+      {
+        "class": 6,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 11,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 13,
+        "net124": -4,
+        "net125": -2
+      }
+    ],
+    "LowVS-PerSample - Uniform-PerSample / Tail": [
+      {
+        "class": 73,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 76,
+        "net124": -1,
+        "net125": -1
+      }
+    ],
+    "LowVS-PerSample - Original-BatchShared / All": [
+      {
+        "class": 2,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 3,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 6,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 11,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 13,
+        "net124": -4,
+        "net125": -3
+      },
+      {
+        "class": 39,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 54,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 71,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 76,
+        "net124": -1,
+        "net125": -1
+      }
+    ],
+    "LowVS-PerSample - Original-BatchShared / Head": [
+      {
+        "class": 2,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 3,
+        "net124": -1,
+        "net125": -2
+      },
+      {
+        "class": 6,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 11,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 13,
+        "net124": -4,
+        "net125": -3
+      }
+    ],
+    "LowVS-PerSample - Original-BatchShared / Tail": [
+      {
+        "class": 71,
+        "net124": -1,
+        "net125": -1
+      },
+      {
+        "class": 76,
+        "net124": -1,
+        "net125": -1
+      }
+    ]
+  },
+  "mean_paired_differences": [
+    {
+      "comparison": "Original-BatchShared - DR-NoFusion",
+      "Overall": 0.9848484848484844,
+      "Head": -0.928571428571427,
+      "OfficialMedium": 2.7857142857142847,
+      "Tail": 1.120689655172411,
+      "Many": -0.775862068965516,
+      "Medium": 1.85483870967742,
+      "Few": 1.6025641025641004,
+      "Macro": 0.9848484848484809,
+      "WorstClass": 0.0
+    },
+    {
+      "comparison": "Uniform-PerSample - Original-BatchShared",
+      "Overall": 0.0,
+      "Head": 0.21428571428571175,
+      "OfficialMedium": -0.2857142857142847,
+      "Tail": 0.0862068965517242,
+      "Many": -0.08620689655172242,
+      "Medium": 0.0,
+      "Few": 0.06410256410256565,
+      "Macro": 0.0,
+      "WorstClass": 0.0
+    },
+    {
+      "comparison": "LowVS-PerSample - Uniform-PerSample",
+      "Overall": -0.40404040404040487,
+      "Head": -1.6428571428571423,
+      "OfficialMedium": 0.4285714285714306,
+      "Tail": 0.0862068965517242,
+      "Many": -2.068965517241381,
+      "Medium": 0.24193548387096797,
+      "Few": 0.32051282051282115,
+      "Macro": -0.40404040404040487,
+      "WorstClass": 0.0
+    },
+    {
+      "comparison": "LowVS-PerSample - Original-BatchShared",
+      "Overall": -0.40404040404040487,
+      "Head": -1.4285714285714306,
+      "OfficialMedium": 0.1428571428571459,
+      "Tail": 0.1724137931034484,
+      "Many": -2.155172413793103,
+      "Medium": 0.24193548387096797,
+      "Few": 0.3846153846153868,
+      "Macro": -0.40404040404040487,
+      "WorstClass": 0.0
+    }
+  ],
+  "negative_transfer_candidate_fixed_BN": false,
+  "two_StageII_seeds_not_significance": true,
+  "initial_preflight_syntax_failure_preserved": true,
+  "no_training_failed_or_retried": true,
+  "official_original_recipe_run": false,
+  "no_additional_experiments": true,
+  "no_version_control_operations": true,
+  "max_process_peak_allocated_MiB": 379.4853515625,
+  "scientific_report_sha256": "d7d2e1f83718f65fc239d75a9b8947b38e32fc684eb3cc78c49d82ad203c7136"
+}
