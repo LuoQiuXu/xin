@@ -1,0 +1,98 @@
+[
+  {
+    "seed": 44,
+    "arm": "DR-NoFusion",
+    "epoch": 10,
+    "steps": 920,
+    "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01\\seed44\\output\\DR-NoFusion_epoch10.pth",
+    "sha256": "c5d1cbf88f8bd01edd746e37dc8e54fb00b17d61a2e36d99a58d06ab4a0eee7e",
+    "stage1_sha256": "74c712e46df3063309945471c3238b5d3e9714d06102d9bd171af4377e8c1b94",
+    "initial_classifier_sha256": "cec25640750baed0a3339657044412e923715d226f6649d554c84ba6a058e805",
+    "training_controls_sha256": "e33aa5a88ecbb0dc312d394ab4068a0e8aa36fbbe432a1dac5903612f38696dd",
+    "backbone_bitwise_unchanged": true,
+    "bn_bitwise_unchanged": true,
+    "backbone_gradients_absent": true,
+    "classifier_changed": true,
+    "seconds": 1.3162223999970593,
+    "validation": {
+      "Overall": 75.38461538461539,
+      "DomainClassMacro": 75.38461538461539,
+      "DomainClassMany": 87.84810126582279,
+      "DomainClassMedium": 74.72972972972973,
+      "DomainClassFew": 48.484848484848484,
+      "WorstCell": 0.0
+    }
+  },
+  {
+    "seed": 44,
+    "arm": "H2T-Global",
+    "epoch": 10,
+    "steps": 920,
+    "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01\\seed44\\output\\H2T-Global_epoch10.pth",
+    "sha256": "a232ced0aee9c21850f43fdc64b320276a81fcea3117d617e9d3757bd2cb9610",
+    "stage1_sha256": "74c712e46df3063309945471c3238b5d3e9714d06102d9bd171af4377e8c1b94",
+    "initial_classifier_sha256": "cec25640750baed0a3339657044412e923715d226f6649d554c84ba6a058e805",
+    "training_controls_sha256": "e33aa5a88ecbb0dc312d394ab4068a0e8aa36fbbe432a1dac5903612f38696dd",
+    "backbone_bitwise_unchanged": true,
+    "bn_bitwise_unchanged": true,
+    "backbone_gradients_absent": true,
+    "classifier_changed": true,
+    "seconds": 1.3358085000072606,
+    "validation": {
+      "Overall": 76.07692307692308,
+      "DomainClassMacro": 76.07692307692308,
+      "DomainClassMany": 87.34177215189874,
+      "DomainClassMedium": 76.21621621621621,
+      "DomainClassFew": 48.484848484848484,
+      "WorstCell": 0.0
+    }
+  },
+  {
+    "seed": 44,
+    "arm": "H2T-DomainMatched",
+    "epoch": 10,
+    "steps": 920,
+    "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01\\seed44\\output\\H2T-DomainMatched_epoch10.pth",
+    "sha256": "e2bca048aa2959fe817ca0c3cbb706a62d52345013309959fd8ec4ba2b9bcb9f",
+    "stage1_sha256": "74c712e46df3063309945471c3238b5d3e9714d06102d9bd171af4377e8c1b94",
+    "initial_classifier_sha256": "cec25640750baed0a3339657044412e923715d226f6649d554c84ba6a058e805",
+    "training_controls_sha256": "e33aa5a88ecbb0dc312d394ab4068a0e8aa36fbbe432a1dac5903612f38696dd",
+    "backbone_bitwise_unchanged": true,
+    "bn_bitwise_unchanged": true,
+    "backbone_gradients_absent": true,
+    "classifier_changed": true,
+    "seconds": 1.401567199965939,
+    "validation": {
+      "Overall": 76.07692307692308,
+      "DomainClassMacro": 76.07692307692308,
+      "DomainClassMany": 87.0886075949367,
+      "DomainClassMedium": 76.08108108108108,
+      "DomainClassFew": 49.696969696969695,
+      "WorstCell": 0.0
+    }
+  },
+  {
+    "seed": 44,
+    "arm": "H2T-CrossDomain",
+    "epoch": 10,
+    "steps": 920,
+    "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01\\seed44\\output\\H2T-CrossDomain_epoch10.pth",
+    "sha256": "176111c9eba0f115b075e3adce1c9ad2d306ee33cf4fefeb27ba92b1b7d3286b",
+    "stage1_sha256": "74c712e46df3063309945471c3238b5d3e9714d06102d9bd171af4377e8c1b94",
+    "initial_classifier_sha256": "cec25640750baed0a3339657044412e923715d226f6649d554c84ba6a058e805",
+    "training_controls_sha256": "e33aa5a88ecbb0dc312d394ab4068a0e8aa36fbbe432a1dac5903612f38696dd",
+    "backbone_bitwise_unchanged": true,
+    "bn_bitwise_unchanged": true,
+    "backbone_gradients_absent": true,
+    "classifier_changed": true,
+    "seconds": 1.3597734000068158,
+    "validation": {
+      "Overall": 76.07692307692308,
+      "DomainClassMacro": 76.07692307692308,
+      "DomainClassMany": 87.0886075949367,
+      "DomainClassMedium": 76.08108108108108,
+      "DomainClassFew": 49.696969696969695,
+      "WorstCell": 0.0
+    }
+  }
+]

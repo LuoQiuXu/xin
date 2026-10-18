@@ -1,0 +1,182 @@
+{
+  "status": "PASS",
+  "source_matches_training": true,
+  "test_lock_count": 12,
+  "all_final_checkpoints_precede_test": true,
+  "test_started_utc": "2026-10-18T13:39:26.739050+00:00",
+  "seeds": [
+    {
+      "seed": 42,
+      "stage1_best_update": 4300,
+      "best_val_macro": 72.07692307692308,
+      "successful_stage1_updates": 5001,
+      "amp_overflow_retries": 4,
+      "stage1_total_seconds": 299.207494399976,
+      "stage1_train_seconds": 98.93638840079075,
+      "stage2_arms": 4,
+      "stage2_updates_per_arm": 920,
+      "matched_fallbacks": 290,
+      "cross_fallbacks": 0
+    },
+    {
+      "seed": 43,
+      "stage1_best_update": 3900,
+      "best_val_macro": 71.15384615384616,
+      "successful_stage1_updates": 5001,
+      "amp_overflow_retries": 4,
+      "stage1_total_seconds": 291.708564999979,
+      "stage1_train_seconds": 98.85265900066588,
+      "stage2_arms": 4,
+      "stage2_updates_per_arm": 920,
+      "matched_fallbacks": 280,
+      "cross_fallbacks": 0
+    },
+    {
+      "seed": 44,
+      "stage1_best_update": 5000,
+      "best_val_macro": 71.6923076923077,
+      "successful_stage1_updates": 5001,
+      "amp_overflow_retries": 4,
+      "stage1_total_seconds": 291.4639053000137,
+      "stage1_train_seconds": 98.91993300011382,
+      "stage2_arms": 4,
+      "stage2_updates_per_arm": 920,
+      "matched_fallbacks": 271,
+      "cross_fallbacks": 0
+    }
+  ],
+  "head_changes": [
+    {
+      "seed": 42,
+      "arm": "DR-NoFusion",
+      "classifier_delta_l2": 4.416055398713743,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 42,
+      "arm": "H2T-Global",
+      "classifier_delta_l2": 7.006876875916333,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 42,
+      "arm": "H2T-DomainMatched",
+      "classifier_delta_l2": 6.884701441159599,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 42,
+      "arm": "H2T-CrossDomain",
+      "classifier_delta_l2": 6.9100029977359405,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 43,
+      "arm": "DR-NoFusion",
+      "classifier_delta_l2": 4.791910629249738,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 43,
+      "arm": "H2T-Global",
+      "classifier_delta_l2": 7.196296151083762,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 43,
+      "arm": "H2T-DomainMatched",
+      "classifier_delta_l2": 6.984892923871447,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 43,
+      "arm": "H2T-CrossDomain",
+      "classifier_delta_l2": 7.085961492865643,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 44,
+      "arm": "DR-NoFusion",
+      "classifier_delta_l2": 4.4911525221252315,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 44,
+      "arm": "H2T-Global",
+      "classifier_delta_l2": 7.361366680052179,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 44,
+      "arm": "H2T-DomainMatched",
+      "classifier_delta_l2": 7.292690377287594,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    },
+    {
+      "seed": 44,
+      "arm": "H2T-CrossDomain",
+      "classifier_delta_l2": 7.219004738018409,
+      "classifier_parameters": 33345,
+      "backbone_bitwise_unchanged": true,
+      "bn_bitwise_unchanged": true,
+      "bn_counters": [
+        0
+      ]
+    }
+  ]
+}

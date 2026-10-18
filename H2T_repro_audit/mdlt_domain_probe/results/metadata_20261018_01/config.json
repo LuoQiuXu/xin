@@ -1,0 +1,77 @@
+{
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "arms": [
+    "DR-NoFusion",
+    "H2T-Global",
+    "H2T-DomainMatched",
+    "H2T-CrossDomain"
+  ],
+  "model": "ResNet18",
+  "pretrained": "ResNet18_Weights.IMAGENET1K_V1",
+  "outputs": 65,
+  "stage1_updates": 5001,
+  "stage1_eval_every": 100,
+  "image_batch_per_domain": 4,
+  "image_batch_total": 16,
+  "stage1_optimizer": "Adam",
+  "stage1_lr": 5e-05,
+  "stage1_weight_decay": 0.0,
+  "stage1_amp": true,
+  "stage1_selection": "val domain-class macro, earliest tie",
+  "stage1_bn": "running statistics eval; affine remains trainable",
+  "stage2_backbone_bn": "all frozen; eval-transform cached GAP features",
+  "stage2_epochs": 10,
+  "stage2_batch_size": 128,
+  "stage2_optimizer": "SGD",
+  "stage2_lr": 0.01,
+  "stage2_momentum": 0.9,
+  "stage2_weight_decay": 0.0005,
+  "stage2_scheduler": "CosineAnnealingLR(T_max=10, eta_min=0)",
+  "stage2_primary": "fixed epoch 10; no best selection",
+  "stage2_precision": "float32",
+  "mask": "batch shared uniform without replacement",
+  "rho": 0.25,
+  "channels": 512,
+  "replaced_channels": 128,
+  "cache_batch_size": 16,
+  "loader_workers": 4,
+  "resnet_dropout": 0.0,
+  "domain_matched_fallback": "same global donor only if exact class-domain pool empty",
+  "cross_domain_sampling": "uniform instances in same class outside recipient domain",
+  "cross_domain_fallback": "same global donor only if other-domain class pool empty",
+  "test_policy": "all 3 x 4 epoch10 checkpoints SHA-locked before test dataset construction",
+  "train_eval_resize": [
+    224,
+    224
+  ],
+  "cpu_torch_threads": 4,
+  "command": "audit",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\officehome_domain_probe.py",
+    "audit",
+    "--data-root",
+    "D:\\xiangmuxunlian\\xin\\data\\OfficeHomeDataset_10072016",
+    "--out",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\metadata_20261018_01"
+  ],
+  "git": {
+    "branch": "experiment/officehome-domain-transfer-pilot-20261018",
+    "base_commit": "d8ad79da4cf7feeb64fe4934ed4d881294d60fd2",
+    "initial_status": "?? H2T_repro_audit/mdlt_domain_probe/.gitignore\n?? H2T_repro_audit/mdlt_domain_probe/README.md\n?? H2T_repro_audit/mdlt_domain_probe/officehome_data.py\n?? H2T_repro_audit/mdlt_domain_probe/officehome_domain_probe.py\n?? H2T_repro_audit/mdlt_domain_probe/protocol/\n?? H2T_repro_audit/mdlt_domain_probe/test_officehome_domain_probe.py\n?? H2T_repro_audit/mdlt_domain_probe/verification/"
+  },
+  "source_sha256": {
+    "officehome_data.py": "865b8206436305ad20a7b7cc351603d386a700927db1035755277e5230552687",
+    "officehome_domain_probe.py": "d0c6862fe903a8e7cd8c514197900d921c53341f3bf59aba8dfc923755bf86fe",
+    "test_officehome_domain_probe.py": "3f86f89476ef1711650d537ff26fd16668006fc94297d2c395e049e3e65e1290",
+    "README.md": "8440187314cf2b1209925b4545aa43c290d917c7c6e593512d91c0fbf1f695ac"
+  },
+  "csv_url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/split/OfficeHome.csv",
+  "csv_sha256": "0a6c4e7800f629b8c6b67ba71dd238a83d4f513ac77694ab58796e528985a5b5",
+  "image_root": "D:\\xiangmuxunlian\\xin\\data\\OfficeHomeDataset_10072016",
+  "csv_path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\protocol\\OfficeHome.csv",
+  "created_utc": "2026-10-18T13:20:13.230002+00:00"
+}

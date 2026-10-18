@@ -1,0 +1,6 @@
+{
+  "url": "https://download.pytorch.org/models/resnet18-f37072fd.pth",
+  "path": "D:\\torch_cache\\hub\\checkpoints\\resnet18-f37072fd.pth",
+  "sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+  "head_initial_state_sha256": "7e93013ecfe51027175d2762f87172150c37d38a71504c7c26afb99c9ea239d8"
+}

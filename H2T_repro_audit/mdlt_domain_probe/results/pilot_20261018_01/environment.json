@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-18T13:22:23.770108+00:00",
+  "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+  "torch": "2.14.1+cu132",
+  "torchvision": "0.29.1+cu132",
+  "numpy": "2.5.2",
+  "cuda": "13.2",
+  "cuda_available": true,
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "gpu_total_mib": 8150.5625,
+  "determinism": "fixed streams, cuDNN deterministic, benchmark/TF32 off; no cross-hardware bitwise claim"
+}

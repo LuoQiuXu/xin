@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-18T13:19:53.984434+00:00",
+  "checks": [
+    {
+      "name": "compileall_attempt1",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-m",
+        "compileall",
+        "-q",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe"
+      ],
+      "exit_code": 0,
+      "log": "verification/compileall_attempt1.txt"
+    },
+    {
+      "name": "cpu_tests_attempt1",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe",
+        "-p",
+        "test_officehome_domain_probe.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "verification/cpu_tests_attempt1.txt"
+    }
+  ],
+  "sources": {
+    "officehome_data.py": "865b8206436305ad20a7b7cc351603d386a700927db1035755277e5230552687",
+    "officehome_domain_probe.py": "d0c6862fe903a8e7cd8c514197900d921c53341f3bf59aba8dfc923755bf86fe",
+    "test_officehome_domain_probe.py": "3f86f89476ef1711650d537ff26fd16668006fc94297d2c395e049e3e65e1290"
+  }
+}

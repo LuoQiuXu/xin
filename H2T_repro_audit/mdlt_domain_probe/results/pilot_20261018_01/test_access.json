@@ -1,0 +1,7 @@
+{
+  "started_utc": "2026-10-18T13:39:26.739050+00:00",
+  "phase": "single final evaluation",
+  "all_final_checkpoints_locked": 12,
+  "manifest_sha256": "beb534b642d64cf67440fd90ab6998d49de4e357c37f23daebf50102c9cdf751",
+  "no_stage2_best_selection": true
+}

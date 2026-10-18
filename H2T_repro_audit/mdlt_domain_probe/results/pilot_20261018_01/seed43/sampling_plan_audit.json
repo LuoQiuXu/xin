@@ -1,0 +1,13 @@
+{
+  "train_csv_index_sha256": "82d989a06f30fe79bd2abb6702bd4a9aa7ccab9f5b97a781ad8eb6cdd879928f",
+  "seed": 43,
+  "receiver_donor_class_masks_paired": true,
+  "control_sha256": "bf7a5ac8a33bac828a656ddb78cf36337eb651a3565c071e92ea8b4578a18ad9",
+  "plan_sha256": "efdb4911482487ab257aa2e0aff4687a0959f5fd1589d348e95bf7c132bf6ee6",
+  "receiver_draws_per_epoch": 11688,
+  "receiver_class_count_floor": 179,
+  "receiver_class_count_ceil": 180,
+  "mask_granularity": "one 128-of-512 mask per actual minibatch",
+  "RNG": "independent numpy SeedSequence streams for receiver/global/matched/cross/mask",
+  "not_original_torch_randperm_RNG_path": true
+}

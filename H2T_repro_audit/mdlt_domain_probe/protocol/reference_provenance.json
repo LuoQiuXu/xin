@@ -1,0 +1,35 @@
+{
+  "commit": "2efbfefd34542e365293f798d79f70cee5e54303",
+  "files": [
+    {
+      "path": "mdlt/dataset/split/OfficeHome.csv",
+      "url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/split/OfficeHome.csv",
+      "sha256": "0a6c4e7800f629b8c6b67ba71dd238a83d4f513ac77694ab58796e528985a5b5",
+      "bytes": 664539
+    },
+    {
+      "path": "mdlt/dataset/datasets.py",
+      "url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/datasets.py",
+      "sha256": "f46c0fbf352263831ef8dffd9acb64ecb4e40cf926ba73b8280c3ea1a923d0f1",
+      "bytes": 21409
+    },
+    {
+      "path": "mdlt/models/networks.py",
+      "url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/models/networks.py",
+      "sha256": "00a0d6ac44388af9856f87df8d58cca373aadade0a2802c3776f32735a615526",
+      "bytes": 7070
+    },
+    {
+      "path": "mdlt/hparams_registry.py",
+      "url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/hparams_registry.py",
+      "sha256": "bcdbf335b2fab10e86a5510cb5e31be1ffc45f2a36bf8dd0cbf2ad47a536a17d",
+      "bytes": 6904
+    },
+    {
+      "path": "mdlt/learning/algorithms.py",
+      "url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/learning/algorithms.py",
+      "sha256": "4e6ff1a10deef19ced9523e372c49e0f3eac0c9ae6d450e93126cba2e3226020",
+      "bytes": 37855
+    }
+  ]
+}

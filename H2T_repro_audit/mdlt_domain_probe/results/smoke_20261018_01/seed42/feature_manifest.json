@@ -1,0 +1,14 @@
+{
+  "train": {
+    "path": "output/train_features.npz",
+    "sha256": "50b465312296f2bdec009e0508fe8b3479ce433232ff07f7a71d87446ea2fd52",
+    "transform": "Resize((224,224)), RGB tensor, ImageNet normalization",
+    "dtype": "float32"
+  },
+  "val": {
+    "path": "output/val_features.npz",
+    "sha256": "4ac8e3027d74da19e9e917f8b210fc0e2dab8fcc2878e93701be12c012ad30cf",
+    "transform": "Resize((224,224)), RGB tensor, ImageNet normalization",
+    "dtype": "float32"
+  }
+}

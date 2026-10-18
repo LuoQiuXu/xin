@@ -1,0 +1,44 @@
+{
+  "csv_path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\protocol\\OfficeHome.csv",
+  "csv_url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/split/OfficeHome.csv",
+  "csv_sha256": "0a6c4e7800f629b8c6b67ba71dd238a83d4f513ac77694ab58796e528985a5b5",
+  "mdlt_commit": "2efbfefd34542e365293f798d79f70cee5e54303",
+  "image_root": "D:\\xiangmuxunlian\\xin\\data\\OfficeHomeDataset_10072016",
+  "total_rows": 15588,
+  "split_counts": {
+    "train": 11688,
+    "test": 2600,
+    "val": 1300
+  },
+  "domain_counts_train": {
+    "Art": 1452,
+    "Clipart": 3390,
+    "Product": 3464,
+    "Real World": 3382
+  },
+  "global_class_train_min": 82,
+  "global_class_train_max": 303,
+  "global_train_min_over_max": 0.2706270627062706,
+  "zero_train_cells": 2,
+  "domain_class_group_counts": {
+    "Many": 79,
+    "Medium": 148,
+    "Few": 33
+  },
+  "val_count_per_cell": [
+    5
+  ],
+  "test_count_per_cell_metadata_only": [
+    10
+  ],
+  "duplicate_paths": 0,
+  "split_path_intersections": 0,
+  "resolved_path_aliases": 0,
+  "missing_image_count": 0,
+  "present_image_count": 15588,
+  "missing_domain_directories": [],
+  "ready": true,
+  "audit_decoded_images": 0,
+  "test_pixels_read": false,
+  "all_domains_in_all_splits": true
+}

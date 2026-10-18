@@ -1,0 +1,200 @@
+[
+  {
+    "seed": 42,
+    "arm": "DR-NoFusion",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 42,
+    "arm": "H2T-Global",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 42,
+    "arm": "H2T-DomainMatched",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 42,
+    "arm": "H2T-CrossDomain",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 43,
+    "arm": "DR-NoFusion",
+    "accuracy": 10.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 43,
+        "n_train": 11,
+        "n_eval": 10
+      },
+      {
+        "domain": "Real World",
+        "class_id": 33,
+        "n_train": 8,
+        "n_eval": 10
+      },
+      {
+        "domain": "Real World",
+        "class_id": 52,
+        "n_train": 51,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 43,
+    "arm": "H2T-Global",
+    "accuracy": 20.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      },
+      {
+        "domain": "Art",
+        "class_id": 43,
+        "n_train": 11,
+        "n_eval": 10
+      },
+      {
+        "domain": "Art",
+        "class_id": 50,
+        "n_train": 5,
+        "n_eval": 10
+      },
+      {
+        "domain": "Real World",
+        "class_id": 43,
+        "n_train": 44,
+        "n_eval": 10
+      },
+      {
+        "domain": "Real World",
+        "class_id": 52,
+        "n_train": 51,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 43,
+    "arm": "H2T-DomainMatched",
+    "accuracy": 10.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      },
+      {
+        "domain": "Real World",
+        "class_id": 43,
+        "n_train": 44,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 43,
+    "arm": "H2T-CrossDomain",
+    "accuracy": 10.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 44,
+    "arm": "DR-NoFusion",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 44,
+    "arm": "H2T-Global",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 44,
+    "arm": "H2T-DomainMatched",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  },
+  {
+    "seed": 44,
+    "arm": "H2T-CrossDomain",
+    "accuracy": 0.0,
+    "cells": [
+      {
+        "domain": "Art",
+        "class_id": 33,
+        "n_train": 5,
+        "n_eval": 10
+      }
+    ]
+  }
+]

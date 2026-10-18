@@ -1,0 +1,9 @@
+{
+  "stage1_train_seconds_20_updates": 1.189375699905213,
+  "estimated_3_seed_stage1_train_seconds": 892.2101812838955,
+  "elapsed_smoke_seconds": 67.96864040003857,
+  "stage2_total_actual_updates": 8,
+  "limitation": "20-update timing is approximate; loader startup and cache time differ",
+  "peak_allocated_mib": 429.806640625,
+  "peak_reserved_mib": 660.0
+}

@@ -1,0 +1,20 @@
+{
+  "seed": 43,
+  "updates": 5001,
+  "best_update": 3900,
+  "best_val_macro": 71.15384615384616,
+  "best_checkpoint": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01\\seed43\\output\\stage1_best.pth",
+  "best_sha256": "58e57839cc3758ed7b243abfbdedbc40a466ce8509df4adef2b0aabd92dc3d40",
+  "final_sha256": "e4de867adf9f31eee501b2f3ad8de70f5ec76fede446bb0c25d5e011a0e77b18",
+  "bn_running_bitwise_unchanged": true,
+  "backbone_changed": true,
+  "first_gradient_audit": {
+    "backbone_has_grad": true,
+    "bn_affine_has_grad": true,
+    "classifier_has_grad": true,
+    "all_gradients_finite": true
+  },
+  "amp_skipped_forward_attempts": 4,
+  "train_compute_seconds": 98.85265900066588,
+  "total_seconds": 291.708564999979
+}

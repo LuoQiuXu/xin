@@ -1,0 +1,2 @@
+seed,update,mean_train_loss,Overall,DomainClassMacro,DomainClassMany,DomainClassMedium,DomainClassFew,WorstCell,selected_update_so_far,elapsed_seconds,amp_skipped_forward_attempts
+42,20,4.249072265625,4.3076923076923075,4.3076923076923075,7.0886075949367084,3.5135135135135136,1.2121212121212122,0.0,20,23.489146400010213,1

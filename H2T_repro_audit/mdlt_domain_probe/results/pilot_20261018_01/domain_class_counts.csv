@@ -1,0 +1,261 @@
+domain,class_id,class_name,train,val,test,shot
+Art,0,Alarm_Clock,59,5,10,Medium
+Art,1,Backpack,26,5,10,Medium
+Art,2,Batteries,12,5,10,Few
+Art,3,Bed,25,5,10,Medium
+Art,4,Bike,60,5,10,Many
+Art,5,Bottle,84,5,10,Many
+Art,6,Bucket,25,5,10,Medium
+Art,7,Calculator,18,5,10,Few
+Art,8,Calendar,5,5,10,Few
+Art,9,Candles,61,5,10,Many
+Art,10,Chair,54,5,10,Medium
+Art,11,Clipboards,10,5,10,Few
+Art,12,Computer,29,5,10,Medium
+Art,13,Couch,25,5,10,Medium
+Art,14,Curtains,25,5,10,Medium
+Art,15,Desk_Lamp,8,5,10,Few
+Art,16,Drill,0,5,10,Few
+Art,17,Eraser,3,5,10,Few
+Art,18,Exit_Sign,6,5,10,Few
+Art,19,Fan,30,5,10,Medium
+Art,20,File_Cabinet,7,5,10,Few
+Art,21,Flipflops,31,5,10,Medium
+Art,22,Flowers,75,5,10,Many
+Art,23,Folder,5,5,10,Few
+Art,24,Fork,31,5,10,Medium
+Art,25,Glasses,25,5,10,Medium
+Art,26,Hammer,25,5,10,Medium
+Art,27,Helmet,64,5,10,Many
+Art,28,Kettle,31,5,10,Medium
+Art,29,Keyboard,3,5,10,Few
+Art,30,Knives,57,5,10,Medium
+Art,31,Lamp_Shade,34,5,10,Medium
+Art,32,Laptop,36,5,10,Medium
+Art,33,Marker,5,5,10,Few
+Art,34,Monitor,27,5,10,Medium
+Art,35,Mop,17,5,10,Few
+Art,36,Mouse,3,5,10,Few
+Art,37,Mug,34,5,10,Medium
+Art,38,Notebook,6,5,10,Few
+Art,39,Oven,5,5,10,Few
+Art,40,Pan,4,5,10,Few
+Art,41,Paper_Clip,4,5,10,Few
+Art,42,Pen,5,5,10,Few
+Art,43,Pencil,11,5,10,Few
+Art,44,Postit_Notes,4,5,10,Few
+Art,45,Printer,3,5,10,Few
+Art,46,Push_Pin,9,5,10,Few
+Art,47,Radio,32,5,10,Medium
+Art,48,Refrigerator,34,5,10,Medium
+Art,49,Ruler,0,5,10,Few
+Art,50,Scissors,5,5,10,Few
+Art,51,Screwdriver,15,5,10,Few
+Art,52,Shelf,27,5,10,Medium
+Art,53,Sink,26,5,10,Medium
+Art,54,Sneakers,31,5,10,Medium
+Art,55,Soda,25,5,10,Medium
+Art,56,Speaker,5,5,10,Few
+Art,57,Spoon,31,5,10,Medium
+Art,58,TV,25,5,10,Medium
+Art,59,Table,1,5,10,Few
+Art,60,Telephone,29,5,10,Medium
+Art,61,ToothBrush,28,5,10,Medium
+Art,62,Toys,5,5,10,Few
+Art,63,Trash_Can,6,5,10,Few
+Art,64,Webcam,1,5,10,Few
+Clipart,0,Alarm_Clock,45,5,10,Medium
+Clipart,1,Backpack,41,5,10,Medium
+Clipart,2,Batteries,49,5,10,Medium
+Clipart,3,Bed,83,5,10,Many
+Clipart,4,Bike,84,5,10,Many
+Clipart,5,Bottle,84,5,10,Many
+Clipart,6,Bucket,58,5,10,Medium
+Clipart,7,Calculator,31,5,10,Medium
+Clipart,8,Calendar,63,5,10,Many
+Clipart,9,Candles,84,5,10,Many
+Clipart,10,Chair,84,5,10,Many
+Clipart,11,Clipboards,25,5,10,Medium
+Clipart,12,Computer,84,5,10,Many
+Clipart,13,Couch,49,5,10,Medium
+Clipart,14,Curtains,27,5,10,Medium
+Clipart,15,Desk_Lamp,26,5,10,Medium
+Clipart,16,Drill,33,5,10,Medium
+Clipart,17,Eraser,25,5,10,Medium
+Clipart,18,Exit_Sign,26,5,10,Medium
+Clipart,19,Fan,35,5,10,Medium
+Clipart,20,File_Cabinet,25,5,10,Medium
+Clipart,21,Flipflops,25,5,10,Medium
+Clipart,22,Flowers,84,5,10,Many
+Clipart,23,Folder,84,5,10,Many
+Clipart,24,Fork,46,5,10,Medium
+Clipart,25,Glasses,37,5,10,Medium
+Clipart,26,Hammer,84,5,10,Many
+Clipart,27,Helmet,54,5,10,Medium
+Clipart,28,Kettle,25,5,10,Medium
+Clipart,29,Keyboard,84,5,10,Many
+Clipart,30,Knives,38,5,10,Medium
+Clipart,31,Lamp_Shade,25,5,10,Medium
+Clipart,32,Laptop,84,5,10,Many
+Clipart,33,Marker,56,5,10,Medium
+Clipart,34,Monitor,84,5,10,Many
+Clipart,35,Mop,25,5,10,Medium
+Clipart,36,Mouse,61,5,10,Many
+Clipart,37,Mug,84,5,10,Many
+Clipart,38,Notebook,68,5,10,Many
+Clipart,39,Oven,25,5,10,Medium
+Clipart,40,Pan,36,5,10,Medium
+Clipart,41,Paper_Clip,25,5,10,Medium
+Clipart,42,Pen,84,5,10,Many
+Clipart,43,Pencil,84,5,10,Many
+Clipart,44,Postit_Notes,26,5,10,Medium
+Clipart,45,Printer,72,5,10,Many
+Clipart,46,Push_Pin,25,5,10,Medium
+Clipart,47,Radio,31,5,10,Medium
+Clipart,48,Refrigerator,25,5,10,Medium
+Clipart,49,Ruler,52,5,10,Medium
+Clipart,50,Scissors,84,5,10,Many
+Clipart,51,Screwdriver,60,5,10,Many
+Clipart,52,Shelf,27,5,10,Medium
+Clipart,53,Sink,27,5,10,Medium
+Clipart,54,Sneakers,28,5,10,Medium
+Clipart,55,Soda,46,5,10,Medium
+Clipart,56,Speaker,75,5,10,Many
+Clipart,57,Spoon,45,5,10,Medium
+Clipart,58,TV,84,5,10,Many
+Clipart,59,Table,65,5,10,Many
+Clipart,60,Telephone,84,5,10,Many
+Clipart,61,ToothBrush,24,5,10,Medium
+Clipart,62,Toys,84,5,10,Many
+Clipart,63,Trash_Can,38,5,10,Medium
+Clipart,64,Webcam,25,5,10,Medium
+Product,0,Alarm_Clock,64,5,10,Many
+Product,1,Backpack,84,5,10,Many
+Product,2,Batteries,47,5,10,Medium
+Product,3,Bed,28,5,10,Medium
+Product,4,Bike,29,5,10,Medium
+Product,5,Bottle,47,5,10,Medium
+Product,6,Bucket,32,5,10,Medium
+Product,7,Calculator,66,5,10,Many
+Product,8,Calendar,66,5,10,Many
+Product,9,Candles,41,5,10,Medium
+Product,10,Chair,84,5,10,Many
+Product,11,Clipboards,50,5,10,Medium
+Product,12,Computer,81,5,10,Many
+Product,13,Couch,73,5,10,Many
+Product,14,Curtains,60,5,10,Many
+Product,15,Desk_Lamp,68,5,10,Many
+Product,16,Drill,52,5,10,Medium
+Product,17,Eraser,26,5,10,Medium
+Product,18,Exit_Sign,52,5,10,Medium
+Product,19,Fan,43,5,10,Medium
+Product,20,File_Cabinet,56,5,10,Medium
+Product,21,Flipflops,84,5,10,Many
+Product,22,Flowers,76,5,10,Many
+Product,23,Folder,75,5,10,Many
+Product,24,Fork,26,5,10,Medium
+Product,25,Glasses,52,5,10,Medium
+Product,26,Hammer,42,5,10,Medium
+Product,27,Helmet,75,5,10,Many
+Product,28,Kettle,57,5,10,Medium
+Product,29,Keyboard,84,5,10,Many
+Product,30,Knives,26,5,10,Medium
+Product,31,Lamp_Shade,39,5,10,Medium
+Product,32,Laptop,84,5,10,Many
+Product,33,Marker,41,5,10,Medium
+Product,34,Monitor,83,5,10,Many
+Product,35,Mop,57,5,10,Medium
+Product,36,Mouse,81,5,10,Many
+Product,37,Mug,26,5,10,Medium
+Product,38,Notebook,78,5,10,Many
+Product,39,Oven,53,5,10,Medium
+Product,40,Pan,55,5,10,Medium
+Product,41,Paper_Clip,32,5,10,Medium
+Product,42,Pen,45,5,10,Medium
+Product,43,Pencil,25,5,10,Medium
+Product,44,Postit_Notes,23,5,10,Medium
+Product,45,Printer,84,5,10,Many
+Product,46,Push_Pin,28,5,10,Medium
+Product,47,Radio,28,5,10,Medium
+Product,48,Refrigerator,44,5,10,Medium
+Product,49,Ruler,43,5,10,Medium
+Product,50,Scissors,84,5,10,Many
+Product,51,Screwdriver,25,5,10,Medium
+Product,52,Shelf,34,5,10,Medium
+Product,53,Sink,31,5,10,Medium
+Product,54,Sneakers,84,5,10,Many
+Product,55,Soda,28,5,10,Medium
+Product,56,Speaker,84,5,10,Many
+Product,57,Spoon,32,5,10,Medium
+Product,58,TV,61,5,10,Many
+Product,59,Table,45,5,10,Medium
+Product,60,Telephone,43,5,10,Medium
+Product,61,ToothBrush,27,5,10,Medium
+Product,62,Toys,30,5,10,Medium
+Product,63,Trash_Can,78,5,10,Many
+Product,64,Webcam,83,5,10,Many
+Real World,0,Alarm_Clock,71,5,10,Many
+Real World,1,Backpack,84,5,10,Many
+Real World,2,Batteries,49,5,10,Medium
+Real World,3,Bed,68,5,10,Many
+Real World,4,Bike,84,5,10,Many
+Real World,5,Bottle,63,5,10,Many
+Real World,6,Bucket,65,5,10,Many
+Real World,7,Calculator,58,5,10,Medium
+Real World,8,Calendar,53,5,10,Medium
+Real World,9,Candles,84,5,10,Many
+Real World,10,Chair,81,5,10,Many
+Real World,11,Clipboards,50,5,10,Medium
+Real World,12,Computer,49,5,10,Medium
+Real World,13,Couch,61,5,10,Many
+Real World,14,Curtains,58,5,10,Medium
+Real World,15,Desk_Lamp,47,5,10,Medium
+Real World,16,Drill,36,5,10,Medium
+Real World,17,Eraser,28,5,10,Medium
+Real World,18,Exit_Sign,66,5,10,Many
+Real World,19,Fan,45,5,10,Medium
+Real World,20,File_Cabinet,43,5,10,Medium
+Real World,21,Flipflops,70,5,10,Many
+Real World,22,Flowers,60,5,10,Many
+Real World,23,Folder,42,5,10,Medium
+Real World,24,Fork,21,5,10,Medium
+Real World,25,Glasses,45,5,10,Medium
+Real World,26,Hammer,37,5,10,Medium
+Real World,27,Helmet,45,5,10,Medium
+Real World,28,Kettle,57,5,10,Medium
+Real World,29,Keyboard,60,5,10,Many
+Real World,30,Knives,68,5,10,Many
+Real World,31,Lamp_Shade,63,5,10,Many
+Real World,32,Laptop,52,5,10,Medium
+Real World,33,Marker,8,5,10,Few
+Real World,34,Monitor,56,5,10,Medium
+Real World,35,Mop,31,5,10,Medium
+Real World,36,Mouse,45,5,10,Medium
+Real World,37,Mug,43,5,10,Medium
+Real World,38,Notebook,53,5,10,Medium
+Real World,39,Oven,49,5,10,Medium
+Real World,40,Pan,15,5,10,Few
+Real World,41,Paper_Clip,53,5,10,Medium
+Real World,42,Pen,50,5,10,Medium
+Real World,43,Pencil,44,5,10,Medium
+Real World,44,Postit_Notes,52,5,10,Medium
+Real World,45,Printer,37,5,10,Medium
+Real World,46,Push_Pin,38,5,10,Medium
+Real World,47,Radio,51,5,10,Medium
+Real World,48,Refrigerator,60,5,10,Many
+Real World,49,Ruler,26,5,10,Medium
+Real World,50,Scissors,62,5,10,Many
+Real World,51,Screwdriver,36,5,10,Medium
+Real World,52,Shelf,51,5,10,Medium
+Real World,53,Sink,62,5,10,Many
+Real World,54,Sneakers,73,5,10,Many
+Real World,55,Soda,48,5,10,Medium
+Real World,56,Speaker,66,5,10,Many
+Real World,57,Spoon,39,5,10,Medium
+Real World,58,TV,38,5,10,Medium
+Real World,59,Table,44,5,10,Medium
+Real World,60,Telephone,67,5,10,Many
+Real World,61,ToothBrush,70,5,10,Many
+Real World,62,Toys,52,5,10,Medium
+Real World,63,Trash_Can,66,5,10,Many
+Real World,64,Webcam,34,5,10,Medium

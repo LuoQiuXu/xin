@@ -1,0 +1,13 @@
+seed,arm,classifier_delta_l2,classifier_parameters,backbone_bitwise_unchanged,bn_bitwise_unchanged,bn_counters
+"42","DR-NoFusion","4.416055398713743","33345","true","true","[0]"
+"42","H2T-Global","7.006876875916333","33345","true","true","[0]"
+"42","H2T-DomainMatched","6.884701441159599","33345","true","true","[0]"
+"42","H2T-CrossDomain","6.9100029977359405","33345","true","true","[0]"
+"43","DR-NoFusion","4.791910629249738","33345","true","true","[0]"
+"43","H2T-Global","7.196296151083762","33345","true","true","[0]"
+"43","H2T-DomainMatched","6.984892923871447","33345","true","true","[0]"
+"43","H2T-CrossDomain","7.085961492865643","33345","true","true","[0]"
+"44","DR-NoFusion","4.4911525221252315","33345","true","true","[0]"
+"44","H2T-Global","7.361366680052179","33345","true","true","[0]"
+"44","H2T-DomainMatched","7.292690377287594","33345","true","true","[0]"
+"44","H2T-CrossDomain","7.219004738018409","33345","true","true","[0]"

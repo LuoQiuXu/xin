@@ -1,0 +1,298 @@
+START 2026-10-18T13:22:23.648586+00:00 ['D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\officehome_domain_probe.py', 'run', '--data-root', 'D:\\xiangmuxunlian\\xin\\data\\OfficeHomeDataset_10072016', '--smoke-dir', 'D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\smoke_20261018_01', '--out', 'D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01']
+{"csv_path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\protocol\\OfficeHome.csv", "csv_url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/split/OfficeHome.csv", "csv_sha256": "0a6c4e7800f629b8c6b67ba71dd238a83d4f513ac77694ab58796e528985a5b5", "mdlt_commit": "2efbfefd34542e365293f798d79f70cee5e54303", "image_root": "D:\\xiangmuxunlian\\xin\\data\\OfficeHomeDataset_10072016", "total_rows": 15588, "split_counts": {"train": 11688, "test": 2600, "val": 1300}, "domain_counts_train": {"Art": 1452, "Clipart": 3390, "Product": 3464, "Real World": 3382}, "global_class_train_min": 82, "global_class_train_max": 303, "global_train_min_over_max": 0.2706270627062706, "zero_train_cells": 2, "domain_class_group_counts": {"Many": 79, "Medium": 148, "Few": 33}, "val_count_per_cell": [5], "test_count_per_cell_metadata_only": [10], "duplicate_paths": 0, "split_path_intersections": 0, "resolved_path_aliases": 0, "missing_image_count": 0, "present_image_count": 15588, "missing_domain_directories": [], "ready": true, "audit_decoded_images": 0, "test_pixels_read": false, "all_domains_in_all_splits": true}
+StageI seed=42 update=100/5001 loss=3.54530 val_macro=24.2308 best_update=100
+StageI seed=42 update=200/5001 loss=2.45572 val_macro=41.0769 best_update=200
+StageI seed=42 update=300/5001 loss=1.55991 val_macro=49.7692 best_update=300
+StageI seed=42 update=400/5001 loss=1.49515 val_macro=53.4615 best_update=400
+StageI seed=42 update=500/5001 loss=1.69659 val_macro=54.6923 best_update=500
+StageI seed=42 update=600/5001 loss=0.90451 val_macro=57.4615 best_update=600
+StageI seed=42 update=700/5001 loss=1.03619 val_macro=61.3846 best_update=700
+StageI seed=42 update=800/5001 loss=0.64947 val_macro=60.5385 best_update=700
+StageI seed=42 update=900/5001 loss=0.71786 val_macro=62.1538 best_update=900
+StageI seed=42 update=1000/5001 loss=0.95796 val_macro=63.6923 best_update=1000
+StageI seed=42 update=1100/5001 loss=1.95023 val_macro=65.3077 best_update=1100
+StageI seed=42 update=1200/5001 loss=0.73803 val_macro=65.0000 best_update=1100
+StageI seed=42 update=1300/5001 loss=0.32939 val_macro=64.5385 best_update=1100
+StageI seed=42 update=1400/5001 loss=0.21099 val_macro=68.1538 best_update=1400
+StageI seed=42 update=1500/5001 loss=1.17816 val_macro=65.9231 best_update=1400
+StageI seed=42 update=1600/5001 loss=0.92099 val_macro=63.8462 best_update=1400
+StageI seed=42 update=1700/5001 loss=0.15636 val_macro=68.2308 best_update=1700
+StageI seed=42 update=1800/5001 loss=0.20478 val_macro=66.9231 best_update=1700
+StageI seed=42 update=1900/5001 loss=0.46373 val_macro=69.0769 best_update=1900
+StageI seed=42 update=2000/5001 loss=0.97732 val_macro=65.9231 best_update=1900
+StageI seed=42 update=2100/5001 loss=0.79444 val_macro=68.2308 best_update=1900
+StageI seed=42 update=2200/5001 loss=0.53980 val_macro=68.8462 best_update=1900
+StageI seed=42 update=2300/5001 loss=0.55827 val_macro=67.3077 best_update=1900
+StageI seed=42 update=2400/5001 loss=0.29196 val_macro=68.8462 best_update=1900
+StageI seed=42 update=2500/5001 loss=0.61443 val_macro=69.2308 best_update=2500
+StageI seed=42 update=2600/5001 loss=0.27975 val_macro=69.2308 best_update=2500
+StageI seed=42 update=2700/5001 loss=0.12531 val_macro=70.1538 best_update=2700
+StageI seed=42 update=2800/5001 loss=0.36669 val_macro=69.0000 best_update=2700
+StageI seed=42 update=2900/5001 loss=0.17618 val_macro=67.4615 best_update=2700
+StageI seed=42 update=3000/5001 loss=0.48026 val_macro=70.8462 best_update=3000
+StageI seed=42 update=3100/5001 loss=0.12088 val_macro=71.4615 best_update=3100
+StageI seed=42 update=3200/5001 loss=0.43629 val_macro=68.5385 best_update=3100
+StageI seed=42 update=3300/5001 loss=0.09814 val_macro=69.8462 best_update=3100
+StageI seed=42 update=3400/5001 loss=0.10122 val_macro=66.9231 best_update=3100
+StageI seed=42 update=3500/5001 loss=0.24189 val_macro=67.4615 best_update=3100
+StageI seed=42 update=3600/5001 loss=0.07588 val_macro=69.4615 best_update=3100
+StageI seed=42 update=3700/5001 loss=0.23543 val_macro=68.3077 best_update=3100
+StageI seed=42 update=3800/5001 loss=0.07188 val_macro=69.8462 best_update=3100
+StageI seed=42 update=3900/5001 loss=0.19826 val_macro=70.2308 best_update=3100
+StageI seed=42 update=4000/5001 loss=0.42258 val_macro=70.4615 best_update=3100
+StageI seed=42 update=4100/5001 loss=0.12829 val_macro=70.7692 best_update=3100
+StageI seed=42 update=4200/5001 loss=0.11840 val_macro=71.0769 best_update=3100
+StageI seed=42 update=4300/5001 loss=0.06653 val_macro=72.0769 best_update=4300
+StageI seed=42 update=4400/5001 loss=0.11431 val_macro=70.3846 best_update=4300
+StageI seed=42 update=4500/5001 loss=0.12593 val_macro=68.9231 best_update=4300
+StageI seed=42 update=4600/5001 loss=0.44353 val_macro=68.3077 best_update=4300
+StageI seed=42 update=4700/5001 loss=0.72733 val_macro=69.3077 best_update=4300
+StageI seed=42 update=4800/5001 loss=0.19041 val_macro=70.9231 best_update=4300
+StageI seed=42 update=4900/5001 loss=0.18478 val_macro=70.8462 best_update=4300
+StageI seed=42 update=5000/5001 loss=0.18508 val_macro=70.3846 best_update=4300
+StageI seed=42 update=5001/5001 loss=0.38760 val_macro=69.9231 best_update=4300
+Cached seed=42 split=train n=11688 sha=f1ebed0492cfcf907f4111ca8be34d1806624d713dda05325ce216fb9733c334 seconds=27.5
+Cached seed=42 split=val n=1300 sha=b48725257d09cc48aa74cb586c703d0609a10174cc0641ce2a7a240e17151d0a seconds=9.9
+StageII seed=42 arm=DR-NoFusion epoch=1 steps=92 val=69.0000 Few=38.1818
+StageII seed=42 arm=DR-NoFusion epoch=2 steps=184 val=72.5385 Few=42.4242
+StageII seed=42 arm=DR-NoFusion epoch=3 steps=276 val=71.2308 Few=45.4545
+StageII seed=42 arm=DR-NoFusion epoch=4 steps=368 val=73.0000 Few=43.6364
+StageII seed=42 arm=DR-NoFusion epoch=5 steps=460 val=72.6923 Few=42.4242
+StageII seed=42 arm=DR-NoFusion epoch=6 steps=552 val=73.7692 Few=40.6061
+StageII seed=42 arm=DR-NoFusion epoch=7 steps=644 val=74.2308 Few=42.4242
+StageII seed=42 arm=DR-NoFusion epoch=8 steps=736 val=75.3077 Few=43.0303
+StageII seed=42 arm=DR-NoFusion epoch=9 steps=828 val=75.2308 Few=44.2424
+StageII seed=42 arm=DR-NoFusion epoch=10 steps=920 val=75.6923 Few=45.4545
+StageII seed=42 arm=H2T-Global epoch=1 steps=92 val=66.3077 Few=38.7879
+StageII seed=42 arm=H2T-Global epoch=2 steps=184 val=71.0769 Few=46.6667
+StageII seed=42 arm=H2T-Global epoch=3 steps=276 val=70.3077 Few=37.5758
+StageII seed=42 arm=H2T-Global epoch=4 steps=368 val=72.0000 Few=44.8485
+StageII seed=42 arm=H2T-Global epoch=5 steps=460 val=71.4615 Few=43.0303
+StageII seed=42 arm=H2T-Global epoch=6 steps=552 val=73.9231 Few=41.8182
+StageII seed=42 arm=H2T-Global epoch=7 steps=644 val=73.7692 Few=44.2424
+StageII seed=42 arm=H2T-Global epoch=8 steps=736 val=75.3846 Few=46.6667
+StageII seed=42 arm=H2T-Global epoch=9 steps=828 val=75.9231 Few=44.8485
+StageII seed=42 arm=H2T-Global epoch=10 steps=920 val=75.7692 Few=44.8485
+StageII seed=42 arm=H2T-DomainMatched epoch=1 steps=92 val=67.5385 Few=40.0000
+StageII seed=42 arm=H2T-DomainMatched epoch=2 steps=184 val=69.5385 Few=43.6364
+StageII seed=42 arm=H2T-DomainMatched epoch=3 steps=276 val=71.5385 Few=41.8182
+StageII seed=42 arm=H2T-DomainMatched epoch=4 steps=368 val=72.9231 Few=44.2424
+StageII seed=42 arm=H2T-DomainMatched epoch=5 steps=460 val=74.5385 Few=47.2727
+StageII seed=42 arm=H2T-DomainMatched epoch=6 steps=552 val=74.8462 Few=43.0303
+StageII seed=42 arm=H2T-DomainMatched epoch=7 steps=644 val=74.8462 Few=43.6364
+StageII seed=42 arm=H2T-DomainMatched epoch=8 steps=736 val=75.8462 Few=47.2727
+StageII seed=42 arm=H2T-DomainMatched epoch=9 steps=828 val=76.0000 Few=46.6667
+StageII seed=42 arm=H2T-DomainMatched epoch=10 steps=920 val=76.6923 Few=46.6667
+StageII seed=42 arm=H2T-CrossDomain epoch=1 steps=92 val=67.3077 Few=41.8182
+StageII seed=42 arm=H2T-CrossDomain epoch=2 steps=184 val=71.7692 Few=47.8788
+StageII seed=42 arm=H2T-CrossDomain epoch=3 steps=276 val=72.4615 Few=41.8182
+StageII seed=42 arm=H2T-CrossDomain epoch=4 steps=368 val=70.3846 Few=43.6364
+StageII seed=42 arm=H2T-CrossDomain epoch=5 steps=460 val=72.6923 Few=43.0303
+StageII seed=42 arm=H2T-CrossDomain epoch=6 steps=552 val=74.0769 Few=44.2424
+StageII seed=42 arm=H2T-CrossDomain epoch=7 steps=644 val=73.3846 Few=41.2121
+StageII seed=42 arm=H2T-CrossDomain epoch=8 steps=736 val=75.7692 Few=46.6667
+StageII seed=42 arm=H2T-CrossDomain epoch=9 steps=828 val=75.8462 Few=46.6667
+StageII seed=42 arm=H2T-CrossDomain epoch=10 steps=920 val=75.8462 Few=44.2424
+StageI seed=43 update=100/5001 loss=3.32812 val_macro=21.6154 best_update=100
+StageI seed=43 update=200/5001 loss=2.64037 val_macro=42.0769 best_update=200
+StageI seed=43 update=300/5001 loss=1.45406 val_macro=48.5385 best_update=300
+StageI seed=43 update=400/5001 loss=1.84559 val_macro=52.4615 best_update=400
+StageI seed=43 update=500/5001 loss=1.00826 val_macro=54.6923 best_update=500
+StageI seed=43 update=600/5001 loss=0.51059 val_macro=56.6154 best_update=600
+StageI seed=43 update=700/5001 loss=1.56921 val_macro=59.0769 best_update=700
+StageI seed=43 update=800/5001 loss=0.89506 val_macro=62.9231 best_update=800
+StageI seed=43 update=900/5001 loss=1.15832 val_macro=64.2308 best_update=900
+StageI seed=43 update=1000/5001 loss=1.29805 val_macro=63.5385 best_update=900
+StageI seed=43 update=1100/5001 loss=0.91289 val_macro=62.2308 best_update=900
+StageI seed=43 update=1200/5001 loss=0.43942 val_macro=64.9231 best_update=1200
+StageI seed=43 update=1300/5001 loss=1.64253 val_macro=65.0769 best_update=1300
+StageI seed=43 update=1400/5001 loss=0.88720 val_macro=64.3846 best_update=1300
+StageI seed=43 update=1500/5001 loss=0.83451 val_macro=66.0000 best_update=1500
+StageI seed=43 update=1600/5001 loss=1.20168 val_macro=67.4615 best_update=1600
+StageI seed=43 update=1700/5001 loss=0.53261 val_macro=66.6154 best_update=1600
+StageI seed=43 update=1800/5001 loss=0.69824 val_macro=63.3846 best_update=1600
+StageI seed=43 update=1900/5001 loss=0.57039 val_macro=65.7692 best_update=1600
+StageI seed=43 update=2000/5001 loss=0.78047 val_macro=67.3846 best_update=1600
+StageI seed=43 update=2100/5001 loss=0.41140 val_macro=66.0769 best_update=1600
+StageI seed=43 update=2200/5001 loss=0.14208 val_macro=67.0769 best_update=1600
+StageI seed=43 update=2300/5001 loss=1.30562 val_macro=68.5385 best_update=2300
+StageI seed=43 update=2400/5001 loss=0.44368 val_macro=67.9231 best_update=2300
+StageI seed=43 update=2500/5001 loss=0.17041 val_macro=66.0769 best_update=2300
+StageI seed=43 update=2600/5001 loss=0.37116 val_macro=69.3846 best_update=2600
+StageI seed=43 update=2700/5001 loss=0.38118 val_macro=68.3846 best_update=2600
+StageI seed=43 update=2800/5001 loss=0.73000 val_macro=68.0769 best_update=2600
+StageI seed=43 update=2900/5001 loss=0.19359 val_macro=68.1538 best_update=2600
+StageI seed=43 update=3000/5001 loss=0.20925 val_macro=65.6923 best_update=2600
+StageI seed=43 update=3100/5001 loss=0.15548 val_macro=68.1538 best_update=2600
+StageI seed=43 update=3200/5001 loss=0.58811 val_macro=66.3077 best_update=2600
+StageI seed=43 update=3300/5001 loss=0.30408 val_macro=70.0769 best_update=3300
+StageI seed=43 update=3400/5001 loss=0.31499 val_macro=67.6923 best_update=3300
+StageI seed=43 update=3500/5001 loss=0.28722 val_macro=70.1538 best_update=3500
+StageI seed=43 update=3600/5001 loss=0.57780 val_macro=68.0769 best_update=3500
+StageI seed=43 update=3700/5001 loss=0.30462 val_macro=69.7692 best_update=3500
+StageI seed=43 update=3800/5001 loss=0.33483 val_macro=69.9231 best_update=3500
+StageI seed=43 update=3900/5001 loss=0.05573 val_macro=71.1538 best_update=3900
+StageI seed=43 update=4000/5001 loss=0.03681 val_macro=70.3846 best_update=3900
+StageI seed=43 update=4100/5001 loss=0.15131 val_macro=70.0000 best_update=3900
+StageI seed=43 update=4200/5001 loss=0.10288 val_macro=70.6923 best_update=3900
+StageI seed=43 update=4300/5001 loss=0.19300 val_macro=67.6154 best_update=3900
+StageI seed=43 update=4400/5001 loss=0.42665 val_macro=70.4615 best_update=3900
+StageI seed=43 update=4500/5001 loss=0.22918 val_macro=70.4615 best_update=3900
+StageI seed=43 update=4600/5001 loss=0.24169 val_macro=69.0000 best_update=3900
+StageI seed=43 update=4700/5001 loss=0.75462 val_macro=68.8462 best_update=3900
+StageI seed=43 update=4800/5001 loss=0.31257 val_macro=70.8462 best_update=3900
+StageI seed=43 update=4900/5001 loss=0.48541 val_macro=69.1538 best_update=3900
+StageI seed=43 update=5000/5001 loss=0.20410 val_macro=70.6923 best_update=3900
+StageI seed=43 update=5001/5001 loss=0.41511 val_macro=70.8462 best_update=3900
+Cached seed=43 split=train n=11688 sha=d473005a77c1f866b8f1297f0256ee6b9c7d01e9d23f36621c7224c6ace2a9a2 seconds=27.7
+Cached seed=43 split=val n=1300 sha=eef08084a28f5883d4d14c4a019e25a8922b426d07e9cca073421e4a232ab657 seconds=10.0
+StageII seed=43 arm=DR-NoFusion epoch=1 steps=92 val=66.6154 Few=36.3636
+StageII seed=43 arm=DR-NoFusion epoch=2 steps=184 val=70.8462 Few=44.2424
+StageII seed=43 arm=DR-NoFusion epoch=3 steps=276 val=69.7692 Few=36.9697
+StageII seed=43 arm=DR-NoFusion epoch=4 steps=368 val=71.0000 Few=38.7879
+StageII seed=43 arm=DR-NoFusion epoch=5 steps=460 val=73.4615 Few=44.8485
+StageII seed=43 arm=DR-NoFusion epoch=6 steps=552 val=74.3077 Few=47.2727
+StageII seed=43 arm=DR-NoFusion epoch=7 steps=644 val=75.3077 Few=47.2727
+StageII seed=43 arm=DR-NoFusion epoch=8 steps=736 val=74.4615 Few=46.0606
+StageII seed=43 arm=DR-NoFusion epoch=9 steps=828 val=75.0769 Few=46.6667
+StageII seed=43 arm=DR-NoFusion epoch=10 steps=920 val=74.6154 Few=45.4545
+StageII seed=43 arm=H2T-Global epoch=1 steps=92 val=69.3077 Few=46.6667
+StageII seed=43 arm=H2T-Global epoch=2 steps=184 val=68.8462 Few=40.0000
+StageII seed=43 arm=H2T-Global epoch=3 steps=276 val=70.3846 Few=40.0000
+StageII seed=43 arm=H2T-Global epoch=4 steps=368 val=70.9231 Few=43.6364
+StageII seed=43 arm=H2T-Global epoch=5 steps=460 val=72.2308 Few=44.8485
+StageII seed=43 arm=H2T-Global epoch=6 steps=552 val=74.8462 Few=49.0909
+StageII seed=43 arm=H2T-Global epoch=7 steps=644 val=74.2308 Few=47.2727
+StageII seed=43 arm=H2T-Global epoch=8 steps=736 val=75.4615 Few=48.4848
+StageII seed=43 arm=H2T-Global epoch=9 steps=828 val=75.8462 Few=47.8788
+StageII seed=43 arm=H2T-Global epoch=10 steps=920 val=75.9231 Few=47.2727
+StageII seed=43 arm=H2T-DomainMatched epoch=1 steps=92 val=68.2308 Few=42.4242
+StageII seed=43 arm=H2T-DomainMatched epoch=2 steps=184 val=70.4615 Few=43.0303
+StageII seed=43 arm=H2T-DomainMatched epoch=3 steps=276 val=70.7692 Few=38.1818
+StageII seed=43 arm=H2T-DomainMatched epoch=4 steps=368 val=71.0000 Few=41.8182
+StageII seed=43 arm=H2T-DomainMatched epoch=5 steps=460 val=73.0000 Few=47.8788
+StageII seed=43 arm=H2T-DomainMatched epoch=6 steps=552 val=73.6154 Few=45.4545
+StageII seed=43 arm=H2T-DomainMatched epoch=7 steps=644 val=75.0769 Few=46.6667
+StageII seed=43 arm=H2T-DomainMatched epoch=8 steps=736 val=74.9231 Few=47.2727
+StageII seed=43 arm=H2T-DomainMatched epoch=9 steps=828 val=75.3077 Few=46.6667
+StageII seed=43 arm=H2T-DomainMatched epoch=10 steps=920 val=75.8462 Few=47.2727
+StageII seed=43 arm=H2T-CrossDomain epoch=1 steps=92 val=68.9231 Few=43.6364
+StageII seed=43 arm=H2T-CrossDomain epoch=2 steps=184 val=69.9231 Few=43.0303
+StageII seed=43 arm=H2T-CrossDomain epoch=3 steps=276 val=69.7692 Few=40.6061
+StageII seed=43 arm=H2T-CrossDomain epoch=4 steps=368 val=72.5385 Few=43.6364
+StageII seed=43 arm=H2T-CrossDomain epoch=5 steps=460 val=71.6154 Few=46.6667
+StageII seed=43 arm=H2T-CrossDomain epoch=6 steps=552 val=73.5385 Few=46.6667
+StageII seed=43 arm=H2T-CrossDomain epoch=7 steps=644 val=74.6923 Few=50.3030
+StageII seed=43 arm=H2T-CrossDomain epoch=8 steps=736 val=74.8462 Few=47.8788
+StageII seed=43 arm=H2T-CrossDomain epoch=9 steps=828 val=75.8462 Few=47.8788
+StageII seed=43 arm=H2T-CrossDomain epoch=10 steps=920 val=76.4615 Few=48.4848
+StageI seed=44 update=100/5001 loss=2.04895 val_macro=29.6923 best_update=100
+StageI seed=44 update=200/5001 loss=2.63498 val_macro=43.0000 best_update=200
+StageI seed=44 update=300/5001 loss=1.81395 val_macro=48.8462 best_update=300
+StageI seed=44 update=400/5001 loss=2.22883 val_macro=55.0000 best_update=400
+StageI seed=44 update=500/5001 loss=1.01802 val_macro=60.2308 best_update=500
+StageI seed=44 update=600/5001 loss=0.41843 val_macro=57.3846 best_update=500
+StageI seed=44 update=700/5001 loss=2.03104 val_macro=58.6154 best_update=500
+StageI seed=44 update=800/5001 loss=0.77022 val_macro=60.2308 best_update=500
+StageI seed=44 update=900/5001 loss=0.70298 val_macro=59.3077 best_update=500
+StageI seed=44 update=1000/5001 loss=0.97073 val_macro=63.8462 best_update=1000
+StageI seed=44 update=1100/5001 loss=1.57708 val_macro=61.5385 best_update=1000
+StageI seed=44 update=1200/5001 loss=1.02749 val_macro=63.7692 best_update=1000
+StageI seed=44 update=1300/5001 loss=1.10233 val_macro=65.0769 best_update=1300
+StageI seed=44 update=1400/5001 loss=0.67083 val_macro=65.5385 best_update=1400
+StageI seed=44 update=1500/5001 loss=1.32281 val_macro=64.0000 best_update=1400
+StageI seed=44 update=1600/5001 loss=0.68170 val_macro=65.6154 best_update=1600
+StageI seed=44 update=1700/5001 loss=0.92965 val_macro=67.0000 best_update=1700
+StageI seed=44 update=1800/5001 loss=0.90243 val_macro=63.6154 best_update=1700
+StageI seed=44 update=1900/5001 loss=0.70931 val_macro=67.0769 best_update=1900
+StageI seed=44 update=2000/5001 loss=0.98894 val_macro=66.9231 best_update=1900
+StageI seed=44 update=2100/5001 loss=0.56159 val_macro=68.2308 best_update=2100
+StageI seed=44 update=2200/5001 loss=0.99137 val_macro=66.6154 best_update=2100
+StageI seed=44 update=2300/5001 loss=0.12813 val_macro=68.4615 best_update=2300
+StageI seed=44 update=2400/5001 loss=0.31976 val_macro=67.4615 best_update=2300
+StageI seed=44 update=2500/5001 loss=0.23470 val_macro=67.4615 best_update=2300
+StageI seed=44 update=2600/5001 loss=0.41154 val_macro=67.1538 best_update=2300
+StageI seed=44 update=2700/5001 loss=0.44345 val_macro=66.8462 best_update=2300
+StageI seed=44 update=2800/5001 loss=0.30747 val_macro=67.7692 best_update=2300
+StageI seed=44 update=2900/5001 loss=0.75392 val_macro=67.3077 best_update=2300
+StageI seed=44 update=3000/5001 loss=0.38763 val_macro=70.0769 best_update=3000
+StageI seed=44 update=3100/5001 loss=0.72584 val_macro=66.6154 best_update=3000
+StageI seed=44 update=3200/5001 loss=0.55099 val_macro=69.9231 best_update=3000
+StageI seed=44 update=3300/5001 loss=0.37606 val_macro=67.4615 best_update=3000
+StageI seed=44 update=3400/5001 loss=0.45212 val_macro=68.1538 best_update=3000
+StageI seed=44 update=3500/5001 loss=0.20530 val_macro=67.0000 best_update=3000
+StageI seed=44 update=3600/5001 loss=0.61374 val_macro=68.8462 best_update=3000
+StageI seed=44 update=3700/5001 loss=0.46287 val_macro=69.5385 best_update=3000
+StageI seed=44 update=3800/5001 loss=0.13655 val_macro=68.3846 best_update=3000
+StageI seed=44 update=3900/5001 loss=0.65383 val_macro=68.7692 best_update=3000
+StageI seed=44 update=4000/5001 loss=0.34556 val_macro=69.8462 best_update=3000
+StageI seed=44 update=4100/5001 loss=0.28748 val_macro=69.2308 best_update=3000
+StageI seed=44 update=4200/5001 loss=0.25641 val_macro=70.0000 best_update=3000
+StageI seed=44 update=4300/5001 loss=0.18303 val_macro=68.0000 best_update=3000
+StageI seed=44 update=4400/5001 loss=0.16452 val_macro=70.0769 best_update=3000
+StageI seed=44 update=4500/5001 loss=0.15878 val_macro=67.9231 best_update=3000
+StageI seed=44 update=4600/5001 loss=0.22311 val_macro=70.1538 best_update=4600
+StageI seed=44 update=4700/5001 loss=0.07654 val_macro=69.0000 best_update=4600
+StageI seed=44 update=4800/5001 loss=0.18099 val_macro=70.2308 best_update=4800
+StageI seed=44 update=4900/5001 loss=0.52162 val_macro=70.0000 best_update=4800
+StageI seed=44 update=5000/5001 loss=0.06334 val_macro=71.6923 best_update=5000
+StageI seed=44 update=5001/5001 loss=0.23626 val_macro=71.4615 best_update=5000
+Cached seed=44 split=train n=11688 sha=408cc29e3f19be5d4af7f1fd617328eedebfff934b3d243d6cac8450ca4be1bf seconds=27.8
+Cached seed=44 split=val n=1300 sha=15328eb59047a349b28f28c64400caa1565751958fc36dc3aa9990665a589441 seconds=10.0
+StageII seed=44 arm=DR-NoFusion epoch=1 steps=92 val=67.1538 Few=38.1818
+StageII seed=44 arm=DR-NoFusion epoch=2 steps=184 val=71.3846 Few=45.4545
+StageII seed=44 arm=DR-NoFusion epoch=3 steps=276 val=74.0000 Few=43.0303
+StageII seed=44 arm=DR-NoFusion epoch=4 steps=368 val=72.5385 Few=43.6364
+StageII seed=44 arm=DR-NoFusion epoch=5 steps=460 val=73.6923 Few=48.4848
+StageII seed=44 arm=DR-NoFusion epoch=6 steps=552 val=74.6154 Few=44.8485
+StageII seed=44 arm=DR-NoFusion epoch=7 steps=644 val=75.8462 Few=48.4848
+StageII seed=44 arm=DR-NoFusion epoch=8 steps=736 val=75.7692 Few=47.8788
+StageII seed=44 arm=DR-NoFusion epoch=9 steps=828 val=75.6154 Few=49.6970
+StageII seed=44 arm=DR-NoFusion epoch=10 steps=920 val=75.3846 Few=48.4848
+StageII seed=44 arm=H2T-Global epoch=1 steps=92 val=68.8462 Few=40.0000
+StageII seed=44 arm=H2T-Global epoch=2 steps=184 val=69.9231 Few=40.6061
+StageII seed=44 arm=H2T-Global epoch=3 steps=276 val=70.7692 Few=46.0606
+StageII seed=44 arm=H2T-Global epoch=4 steps=368 val=72.7692 Few=44.2424
+StageII seed=44 arm=H2T-Global epoch=5 steps=460 val=74.1538 Few=49.6970
+StageII seed=44 arm=H2T-Global epoch=6 steps=552 val=73.4615 Few=47.2727
+StageII seed=44 arm=H2T-Global epoch=7 steps=644 val=74.4615 Few=49.6970
+StageII seed=44 arm=H2T-Global epoch=8 steps=736 val=75.4615 Few=49.0909
+StageII seed=44 arm=H2T-Global epoch=9 steps=828 val=75.7692 Few=49.6970
+StageII seed=44 arm=H2T-Global epoch=10 steps=920 val=76.0769 Few=48.4848
+StageII seed=44 arm=H2T-DomainMatched epoch=1 steps=92 val=67.0000 Few=41.2121
+StageII seed=44 arm=H2T-DomainMatched epoch=2 steps=184 val=69.0769 Few=40.6061
+StageII seed=44 arm=H2T-DomainMatched epoch=3 steps=276 val=72.4615 Few=44.2424
+StageII seed=44 arm=H2T-DomainMatched epoch=4 steps=368 val=72.6923 Few=44.8485
+StageII seed=44 arm=H2T-DomainMatched epoch=5 steps=460 val=74.7692 Few=48.4848
+StageII seed=44 arm=H2T-DomainMatched epoch=6 steps=552 val=74.0769 Few=46.6667
+StageII seed=44 arm=H2T-DomainMatched epoch=7 steps=644 val=74.8462 Few=47.8788
+StageII seed=44 arm=H2T-DomainMatched epoch=8 steps=736 val=75.5385 Few=50.3030
+StageII seed=44 arm=H2T-DomainMatched epoch=9 steps=828 val=75.4615 Few=49.6970
+StageII seed=44 arm=H2T-DomainMatched epoch=10 steps=920 val=76.0769 Few=49.6970
+StageII seed=44 arm=H2T-CrossDomain epoch=1 steps=92 val=67.8462 Few=38.7879
+StageII seed=44 arm=H2T-CrossDomain epoch=2 steps=184 val=70.6923 Few=43.6364
+StageII seed=44 arm=H2T-CrossDomain epoch=3 steps=276 val=71.0769 Few=48.4848
+StageII seed=44 arm=H2T-CrossDomain epoch=4 steps=368 val=73.3077 Few=47.8788
+StageII seed=44 arm=H2T-CrossDomain epoch=5 steps=460 val=74.9231 Few=51.5152
+StageII seed=44 arm=H2T-CrossDomain epoch=6 steps=552 val=74.1538 Few=48.4848
+StageII seed=44 arm=H2T-CrossDomain epoch=7 steps=644 val=75.0769 Few=50.9091
+StageII seed=44 arm=H2T-CrossDomain epoch=8 steps=736 val=75.8462 Few=50.3030
+StageII seed=44 arm=H2T-CrossDomain epoch=9 steps=828 val=75.9231 Few=49.0909
+StageII seed=44 arm=H2T-CrossDomain epoch=10 steps=920 val=76.0769 Few=49.6970
+FINAL_TEST_BEGIN 2026-10-18T13:39:26.739050+00:00
+Cached seed=42 split=test n=2600 sha=214581d5b76a1fd742c656449240b1453836deb26757881d16c4e3df8cc25ace seconds=13.1
+FINAL_TEST seed=42 arm=DR-NoFusion {"Overall": 75.34615384615385, "DomainClassMacro": 75.34615384615384, "DomainClassMany": 85.31645569620254, "DomainClassMedium": 75.67567567567568, "DomainClassFew": 50.0, "WorstCell": 0.0}
+FINAL_TEST seed=42 arm=H2T-Global {"Overall": 75.23076923076924, "DomainClassMacro": 75.23076923076923, "DomainClassMany": 82.9113924050633, "DomainClassMedium": 76.21621621621621, "DomainClassFew": 52.42424242424242, "WorstCell": 0.0}
+FINAL_TEST seed=42 arm=H2T-DomainMatched {"Overall": 75.6923076923077, "DomainClassMacro": 75.6923076923077, "DomainClassMany": 84.17721518987342, "DomainClassMedium": 76.48648648648648, "DomainClassFew": 51.81818181818182, "WorstCell": 0.0}
+FINAL_TEST seed=42 arm=H2T-CrossDomain {"Overall": 75.57692307692308, "DomainClassMacro": 75.57692307692308, "DomainClassMany": 84.0506329113924, "DomainClassMedium": 76.55405405405405, "DomainClassFew": 50.90909090909091, "WorstCell": 0.0}
+Cached seed=43 split=test n=2600 sha=3fb1f15715618fa61df6437a5385d776fc3bb4d6ee3c7422d52e0208f898f240 seconds=12.3
+FINAL_TEST seed=43 arm=DR-NoFusion {"Overall": 75.5, "DomainClassMacro": 75.5, "DomainClassMany": 85.31645569620254, "DomainClassMedium": 76.41891891891892, "DomainClassFew": 47.878787878787875, "WorstCell": 10.0}
+FINAL_TEST seed=43 arm=H2T-Global {"Overall": 75.92307692307692, "DomainClassMacro": 75.92307692307692, "DomainClassMany": 84.0506329113924, "DomainClassMedium": 76.75675675675676, "DomainClassFew": 52.72727272727273, "WorstCell": 20.0}
+FINAL_TEST seed=43 arm=H2T-DomainMatched {"Overall": 76.07692307692308, "DomainClassMacro": 76.07692307692308, "DomainClassMany": 84.55696202531645, "DomainClassMedium": 76.6891891891892, "DomainClassFew": 53.03030303030303, "WorstCell": 10.0}
+FINAL_TEST seed=43 arm=H2T-CrossDomain {"Overall": 76.5, "DomainClassMacro": 76.5, "DomainClassMany": 84.9367088607595, "DomainClassMedium": 77.16216216216216, "DomainClassFew": 53.333333333333336, "WorstCell": 10.0}
+Cached seed=44 split=test n=2600 sha=d3b3b0637228cfdb026e3d03ae2762ab1fe000a54485fbb3373a2926eb51cd99 seconds=12.3
+FINAL_TEST seed=44 arm=DR-NoFusion {"Overall": 75.26923076923076, "DomainClassMacro": 75.26923076923077, "DomainClassMany": 84.68354430379746, "DomainClassMedium": 76.21621621621621, "DomainClassFew": 48.484848484848484, "WorstCell": 0.0}
+FINAL_TEST seed=44 arm=H2T-Global {"Overall": 76.23076923076924, "DomainClassMacro": 76.23076923076923, "DomainClassMany": 84.81012658227849, "DomainClassMedium": 77.16216216216216, "DomainClassFew": 51.515151515151516, "WorstCell": 0.0}
+FINAL_TEST seed=44 arm=H2T-DomainMatched {"Overall": 76.6923076923077, "DomainClassMacro": 76.6923076923077, "DomainClassMany": 85.0632911392405, "DomainClassMedium": 77.77027027027027, "DomainClassFew": 51.81818181818182, "WorstCell": 0.0}
+FINAL_TEST seed=44 arm=H2T-CrossDomain {"Overall": 76.1923076923077, "DomainClassMacro": 76.1923076923077, "DomainClassMany": 84.81012658227849, "DomainClassMedium": 76.6891891891892, "DomainClassFew": 53.333333333333336, "WorstCell": 0.0}
+COMPLETE {"peak_allocated_mib": 429.806640625, "peak_reserved_mib": 660.0}
