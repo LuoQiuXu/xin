@@ -61,7 +61,7 @@ python H2T_repro_audit/lowvs_disc_preserve/run_pilot.py report
 
 Results under this directory's **results/** only. The old replay is 850 steps per seed, and every new arm's batch is checked for exact 7-field hash equality to that old experiment AND the current LowVS baseline (receiver/donor IDs, augmented pixels, frozen features, online VS scores, Gumbel, both masks).
 
-Outputs: preflight.json, per-arm final_fc.pth, epoch10 predictions/logits, epochs.csv, batch_signatures.csv, summary.json; aggregate epoch10.csv, paired.csv, per_class.csv, curves.csv, scientific_summary.json, LOWVS_DISC_RESULTS.md.
+Outputs: preflight.json, per-arm final_fc.pth, epoch10 predictions/logits, epochs.csv, batch_signatures.csv, summary.json; aggregate epoch10.csv, paired.csv, per_class.csv, group_confusion.csv, historical_replay.csv (when the prior epoch10_verified.csv is present), curves.csv, scientific_summary.json, LOWVS_DISC_RESULTS.md.
 
 Codex instructions are in \`CODEX_LOWVS_DISC_PRESERVE.txt\`. **All Git/version control is prohibited for Codex**; the user handles it separately.
 
