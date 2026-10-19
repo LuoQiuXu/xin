@@ -59,8 +59,9 @@ Because the classifier is linear after GAP, sum_d q_d is the exact change in the
 For C/D:
 
 1. Reuse the original online donor-statistic Low-VS score, exact Bottom48 candidate set, original Gumbel values, and 16-channel replacement count.
-2. Among the 48 Bottom-VS candidates, protect the 16 channels with the smallest q_d (the least favorable predicted margin-transfer contributions).
+2. On the normal Low-VS path, among the 48 Bottom-VS candidates, protect the 16 channels with the smallest q_d (the least favorable predicted margin-transfer contributions).
 3. Select 16 channels from the remaining 32 using the same Gumbel values used by the corresponding A/B control.
+4. If the original helper activates its pre-existing fallback (e.g., insufficient donor count or flat/non-finite score), preserve the original fallback mask unchanged for that draw and log it. Do not force a Bottom48 pool or apply protection to a fallback draw. Non-finite inputs that the original helper treats as fatal must remain fatal.
 4. Replace those 16 whole 8×8 feature maps with donor channels. No interpolation, no extra loss, no trainable gate, no change to the original Low-VS score or fallback rule.
 
 Do not choose the replacement channels from all 64 channels outside the protected set. That would change the Low-VS candidate policy and confound the protection effect.
