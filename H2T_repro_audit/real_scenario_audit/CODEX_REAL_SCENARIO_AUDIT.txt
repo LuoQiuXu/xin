@@ -64,7 +64,7 @@ Produce a compact artifact inventory with:
 - SHA256 for input files actually used;
 - whether the artifact is validation-only or post-hoc official-test data.
 
-Do not infer that a file exists merely because an old report mentions a similarly named file. Verify each exact path, shape, class count, label range, finite values, and checkpoint/model provenance. If logits or per-sample predictions are unavailable, do not silently substitute aggregate metrics for paired predictions; document the limitation and use the best supported lower-cost analysis.
+Do not infer that a file exists merely because an old report mentions a similarly named file. Verify each exact path, shape, class count, label range, finite values, and checkpoint/model provenance. If logits or per-sample predictions are unavailable, first check whether the exact locked checkpoint and fixed TRAIN-held-out validation split are locally available. If so, an inference-only pass to regenerate per-sample logits is allowed (model.eval(), no optimizer, no gradient, no parameter/BN updates); save input/checkpoint hashes and verify the frozen weights/BN buffers are unchanged. Do not retrain. If this requires reconstructing an uncertain model or changing the split, stop and document the limitation instead of guessing. Do not silently substitute aggregate metrics for paired predictions.
 
 ============================================================
 3. SCREEN B: TEST-TIME CLASS-PRIOR SHIFT (REQUIRED; NO TRAINING)
