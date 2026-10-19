@@ -1,0 +1,131 @@
+CODEX TASK: Run the validation-only H2T transfer-risk probe
+Date: 2026-10-19
+Repository: LuoQiuXu/xin
+Branch: experiment/officehome-transfer-risk-probe-20261019
+
+GOAL
+Run one small, pre-specified mechanism probe using the completed OfficeHome pilot's cached TRAIN/VAL GAP features and saved epoch-10 H2T-Global linear classifier. Do not retrain Stage I or Stage II. Do not read, decode, load, or evaluate TEST data. Do not add a new method or perform hyperparameter search.
+
+SCIENTIFIC QUESTION
+Can a directional feature-compatibility score predict whether a proposed channel substitution increases the receiver's cross-entropy, better than simple perturbation magnitude and domain mismatch?
+
+The script compares:
+1. Actual outcome: delta_CE = CE(fused receiver) - CE(original receiver); positive means harmful under the fixed H2T-Global classifier.
+2. Directional score: first-order Taylor estimate grad_f CE(original) dot masked(donor - receiver).
+3. Baselines: masked relative L2, masked cosine distance, donor-label mismatch, baseline CE/negative margin, and domain mismatch.
+4. A paired CrossDomain-minus-DomainMatched comparison using the same receiver, donor class, and channel mask. Donor image identity necessarily differs between domain conditions.
+
+DO NOT CHANGE THE EXPERIMENT
+- Do not edit transfer_risk_probe.py or its constants while running.
+- Do not change the pilot code, dataset, seeds, backbone, checkpoints, donor-class plan, mask size, candidate count, or scoring definitions.
+- Do not run training, additional seeds, extra arms, test evaluation, or a parameter sweep.
+- If a test or provenance check fails, stop and report the exact error. Do not silently patch code or bypass a guard.
+- Do not run git reset, git clean, or discard/stash local work.
+
+1. PRESERVE LOCAL WORK AND SWITCH TO THE IMPLEMENTATION BRANCH
+Use PowerShell. First inspect:
+    git status --short
+If any tracked file is modified or staged, stop and report it before switching branches. Do not discard it. Existing ignored local pilot caches/checkpoints must be left untouched.
+
+Then:
+    git fetch origin
+
+If the local branch does not exist:
+    git switch --track origin/experiment/officehome-transfer-risk-probe-20261019
+
+If the local branch already exists:
+    git switch experiment/officehome-transfer-risk-probe-20261019
+    git pull --ff-only origin experiment/officehome-transfer-risk-probe-20261019
+
+Verify:
+    git branch --show-current
+It must be:
+    experiment/officehome-transfer-risk-probe-20261019
+
+2. ENVIRONMENT AND INPUTS
+Use the same interpreter and local data layout as the previous pilot:
+    $py = 'D:\app\minicondaaa\envs\xiaoju\python.exe'
+    $project = 'D:\xiangmuxunlian\xin'
+    $module = "$project\H2T_repro_audit\mdlt_domain_probe"
+    $pilot = "$module\results\pilot_20261018_01"
+    $out = "$module\results\transfer_risk_probe_20261019_01"
+
+Set:
+    $env:PYTHONIOENCODING = 'utf-8'
+    $env:PYTHONDONTWRITEBYTECODE = '1'
+
+The pilot directory must exist and have status COMPLETE. Required local artifacts include, for each seed 42/43/44:
+- output/train_features.npz and output/val_features.npz
+- output/sampling_plan.npz
+- output/H2T-Global_epoch10.pth
+- feature_manifest.json, sampling_plan_audit.json, stage1_summary.json
+
+The script validates SHA256 hashes and provenance before scoring. If the output directory already exists, do not overwrite it; choose a fresh suffix such as transfer_risk_probe_20261019_02 and use that path consistently below.
+
+3. COMPILE AND RUN CPU TESTS
+Execute:
+    & $py -m compileall -q $module
+If the exit code is nonzero, stop.
+
+Then:
+    & $py -m unittest discover -s $module -p 'test_*.py' -v
+If any test fails, stop and report the failing test and traceback. Do not run the probe after a failing test.
+
+4. RUN THE SINGLE PRESCRIBED PROBE
+Confirm the output path does not exist, then execute:
+    & $py "$module\transfer_risk_probe.py" --run-dir $pilot --out $out
+
+If the process returns a nonzero exit code, inspect only the generated status.json/traceback and report the failure. Do not rerun with changed settings.
+
+Expected scope:
+- 3 fixed seeds.
+- 1,300 validation receivers per seed.
+- 4 donor-class candidates per receiver.
+- 3 paired donor strategies: Global, DomainMatched, CrossDomain.
+- 46,800 total candidate substitutions.
+- Zero model training steps.
+- No test cache or test predictions read.
+
+5. VERIFY OUTPUTS
+Required outputs:
+- config.json
+- status.json
+- summary.json
+- report.md
+- candidate_level.csv
+- per_seed_arm_summary.csv
+- risk_predictor_summary.csv
+- paired_cross_minus_matched.csv
+
+Verify summary.json:
+- status == "COMPLETE"
+- test_used == false
+- models_trained == 0
+- candidate_substitutions_total == 46800
+
+Verify status.json also states test_used=false and models_trained=0. Check that all required files exist and candidate_level.csv has 46,800 data rows (plus its header). If a check fails, do not alter results; report it.
+
+6. UPLOAD REPRODUCIBLE RESULTS TO GITHUB
+Do not commit model weights, feature caches, images, or other large pilot artifacts. Stage only the new probe result directory:
+    git add "$out"
+
+Inspect:
+    git diff --cached --stat
+    git status --short
+
+Commit and push the new result artifacts on the current branch:
+    git commit -m "Add OfficeHome transfer-risk probe results"
+    git push origin experiment/officehome-transfer-risk-probe-20261019
+
+If the candidate-level CSV is unexpectedly larger than 25 MB, do not silently drop or rewrite it. Report the exact size and pause before committing; the summary files can be committed separately only if the user explicitly approves.
+
+7. FINAL RESPONSE TO THE USER
+Return:
+- branch name and commit SHA for the result artifacts;
+- absolute local output directory;
+- test/compile pass or failure;
+- confirmation that no training was run and test data was not read;
+- the key values from summary.json and the directional-risk gate;
+- file links to report.md, summary.json, risk_predictor_summary.csv, paired_cross_minus_matched.csv, and candidate_level.csv.
+
+Do not make a final scientific claim or launch a follow-up experiment. Preserve the outputs for independent analysis in the next conversation turn.
