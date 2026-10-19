@@ -4,7 +4,7 @@ Repository: LuoQiuXu/xin
 Branch: experiment/officehome-transfer-risk-probe-20261019
 
 GOAL
-Run one small, pre-specified mechanism probe using the completed OfficeHome pilot's cached TRAIN/VAL GAP features and saved epoch-10 H2T-Global linear classifier. Do not retrain Stage I or Stage II. Do not read, decode, load, or evaluate TEST data. Do not add a new method or perform hyperparameter search.
+Run one small, pre-specified mechanism probe using the completed OfficeHome pilot's cached TRAIN/VAL GAP features and saved epoch-10 H2T-Global linear classifier. Do not retrain Stage I or Stage II. Do not read/decode TEST image pixels, load cached TEST features or predictions, or compute test metrics. Parsing the pinned split CSV metadata solely to verify TRAIN/VAL row alignment is allowed; do not use TEST labels/counts for analysis. Do not add a new method or perform hyperparameter search.
 
 SCIENTIFIC QUESTION
 Can a directional feature-compatibility score predict whether a proposed channel substitution increases the receiver's cross-entropy, better than simple perturbation magnitude and domain mismatch?
@@ -84,7 +84,7 @@ Expected scope:
 - 3 paired donor strategies: Global, DomainMatched, CrossDomain.
 - 46,800 total candidate substitutions.
 - Zero model training steps.
-- No test cache or test predictions read.
+- No test image pixels, cached test features, test predictions or test metrics read. The pinned split CSV may be parsed as metadata only to validate train/validation alignment.
 
 5. VERIFY OUTPUTS
 Required outputs:
