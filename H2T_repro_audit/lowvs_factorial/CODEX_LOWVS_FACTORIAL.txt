@@ -80,7 +80,8 @@ C3. 原始 Low-VS mask 与 MarginProtect mask
 - 必须从现有 online_masks 的实际 trace 取得原 Bottom48 candidate pool。如果 trace 未直接暴露候选池，检查原 online_policy.py 并用完全相同的 score/rank/tie/fallback 逻辑重建；用断言验证重建候选池产生的原始16-mask与 online_masks 返回的 Low-VS mask完全一致。不得改动原 helper。
 - 对每个 tail receiver，使用 policy.channel_margin_delta：
   q_d=(W[y,d]-W[j*,d])*(GAP(donor)_d-GAP(receiver)_d)，j* 为当前 unfused receiver logits 的最强非真实类别。
-- 在原 Bottom48 候选中保护 q_d 最小的16个通道，从剩余32个中用同一批原始 Gumbel 值选择16个。不要从所有64个非保护通道选；不得改变 Bottom48。
+- 在正常 Low-VS Bottom48 路径中保护 q_d 最小的16个通道，从剩余32个中用同一批原始 Gumbel 值选择16个。不要从所有64个非保护通道选；不得改变 Bottom48。
+- 如果原 helper 因 donor count / flat score 触发既有 fallback，则 C/D 对该 draw 原样使用 helper 返回的 fallback mask，不强行构造 Bottom48，也不应用 protection，并记录 fallback；原 helper 将非有限输入判为致命错误时仍必须停止。
 - 每个融合样本必须恰好替换16个完整8×8 feature maps。被选通道与 donor 逐位相等，未选通道与 receiver 逐位相等，label仍为 receiver label。
 - q_d是固定当前竞争类别下的即时 margin 变化贡献，不得描述为语义重要性或泛化效用。
 
