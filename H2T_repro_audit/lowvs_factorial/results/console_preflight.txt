@@ -1,0 +1,5 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe D:\xiangmuxunlian\xin\H2T_repro_audit\lowvs_factorial\run_factorial.py preflight
+START 2026-10-19 18:09:00 +0800 CWD D:\xiangmuxunlian\xin
+PREFLIGHT seed=124: historical signature and actual trace/fallback/fusion validated
+PREFLIGHT seed=125: historical signature and actual trace/fallback/fusion validated
+PREFLIGHT PASS; no optimizer updates.

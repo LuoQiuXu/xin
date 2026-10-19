@@ -1,0 +1,4 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe D:\xiangmuxunlian\xin\H2T_repro_audit\lowvs_factorial\run_factorial.py report
+START 2026-10-19 18:20:34 +0800 CWD D:\xiangmuxunlian\xin
+REPORT COMPLETE: epoch10.csv,paired.csv,per_class.csv,group_confusion.csv,factorial_effects.csv and two Chinese reports.
+STOP: no more seeds, models, Stage-I, official TEST or version-control operations.

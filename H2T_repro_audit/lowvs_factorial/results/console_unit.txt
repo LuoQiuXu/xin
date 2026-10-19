@@ -1,0 +1,7 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe D:\xiangmuxunlian\xin\H2T_repro_audit\lowvs_factorial\run_factorial.py unit
+START 2026-10-19 18:08:50 +0800 CWD D:\xiangmuxunlian\xin
+PASS: channel contributions sum to exact fixed-competitor margin delta
+PASS: frequency strata and paired random numbers
+PASS: protected mask is paired, fixed-size, and remains inside Bottom48
+PASS: train-only prototypes and donor-label consistency
+UNIT PASS: 4 provided policy tests plus exact pool/fallback/non-tail coupling.

@@ -1,0 +1,5 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe D:\xiangmuxunlian\xin\H2T_repro_audit\lowvs_factorial\run_factorial.py prepare
+START 2026-10-19 18:09:17 +0800 CWD D:\xiangmuxunlian\xin
+PREPARE seed=124: paired TRAIN-only plans; tail draws=31687
+PREPARE seed=125: paired TRAIN-only plans; tail draws=31715
+PREPARE PASS; original banks/plans/Gumbel untouched.

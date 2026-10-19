@@ -1,0 +1,43 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe D:\xiangmuxunlian\xin\H2T_repro_audit\lowvs_factorial\run_factorial.py train --seed 124 --arm HighAffinityDonor
+START 2026-10-19 18:10:59 +0800 CWD D:\xiangmuxunlian\xin
+seed=124 B epoch=1/10 batch=1/85 updates=1 loss=1.932884
+seed=124 B epoch=1/10 batch=41/85 updates=41 loss=1.567584
+seed=124 B epoch=1/10 batch=85/85 updates=85 loss=1.339581
+EPOCH seed=124 B epoch=1 Overall=46.0606 Head=58.1429 Tail=26.5517 Few=27.1667 seconds=6.40
+seed=124 B epoch=2/10 batch=1/85 updates=86 loss=1.518946
+seed=124 B epoch=2/10 batch=41/85 updates=126 loss=1.380295
+seed=124 B epoch=2/10 batch=85/85 updates=170 loss=1.467208
+EPOCH seed=124 B epoch=2 Overall=45.8586 Head=57.8571 Tail=26.7241 Few=27.1667 seconds=6.45
+seed=124 B epoch=3/10 batch=1/85 updates=171 loss=1.714454
+seed=124 B epoch=3/10 batch=41/85 updates=211 loss=1.561343
+seed=124 B epoch=3/10 batch=85/85 updates=255 loss=1.569504
+EPOCH seed=124 B epoch=3 Overall=46.8182 Head=58.8571 Tail=26.8966 Few=27.3333 seconds=7.68
+seed=124 B epoch=4/10 batch=1/85 updates=256 loss=1.557143
+seed=124 B epoch=4/10 batch=41/85 updates=296 loss=1.433750
+seed=124 B epoch=4/10 batch=85/85 updates=340 loss=1.485964
+EPOCH seed=124 B epoch=4 Overall=47.3232 Head=58.7143 Tail=27.5862 Few=28.1667 seconds=6.32
+seed=124 B epoch=5/10 batch=1/85 updates=341 loss=1.675992
+seed=124 B epoch=5/10 batch=41/85 updates=381 loss=1.367419
+seed=124 B epoch=5/10 batch=85/85 updates=425 loss=1.504540
+EPOCH seed=124 B epoch=5 Overall=46.7677 Head=59.2857 Tail=27.2414 Few=27.8333 seconds=6.35
+seed=124 B epoch=6/10 batch=1/85 updates=426 loss=1.495996
+seed=124 B epoch=6/10 batch=41/85 updates=466 loss=1.420182
+seed=124 B epoch=6/10 batch=85/85 updates=510 loss=1.294686
+EPOCH seed=124 B epoch=6 Overall=46.9192 Head=58.5714 Tail=27.7586 Few=28.3333 seconds=6.50
+seed=124 B epoch=7/10 batch=1/85 updates=511 loss=1.390217
+seed=124 B epoch=7/10 batch=41/85 updates=551 loss=1.558908
+seed=124 B epoch=7/10 batch=85/85 updates=595 loss=1.583974
+EPOCH seed=124 B epoch=7 Overall=46.8687 Head=58.7143 Tail=26.8966 Few=27.5000 seconds=6.40
+seed=124 B epoch=8/10 batch=1/85 updates=596 loss=1.324574
+seed=124 B epoch=8/10 batch=41/85 updates=636 loss=1.427955
+seed=124 B epoch=8/10 batch=85/85 updates=680 loss=1.289169
+EPOCH seed=124 B epoch=8 Overall=47.4242 Head=59.1429 Tail=27.5862 Few=28.1667 seconds=6.35
+seed=124 B epoch=9/10 batch=1/85 updates=681 loss=1.380893
+seed=124 B epoch=9/10 batch=41/85 updates=721 loss=1.380609
+seed=124 B epoch=9/10 batch=85/85 updates=765 loss=1.506045
+EPOCH seed=124 B epoch=9 Overall=47.2222 Head=59.1429 Tail=27.2414 Few=27.8333 seconds=6.42
+seed=124 B epoch=10/10 batch=1/85 updates=766 loss=1.396282
+seed=124 B epoch=10/10 batch=41/85 updates=806 loss=1.305252
+seed=124 B epoch=10/10 batch=85/85 updates=850 loss=1.500717
+EPOCH seed=124 B epoch=10 Overall=47.3737 Head=59.2857 Tail=27.2414 Few=27.8333 seconds=6.40
+COMPLETE seed=124 B HighAffinityDonor:10 epochs,850 updates; BB/BN unchanged; reload exact
