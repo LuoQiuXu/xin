@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from officehome_data import CSV_SHA256, DOMAINS, N_CLASSES, SEEDS, sha256, write_csv, write_json
+from officehome_data import CSV_SHA256, DOMAINS, N_CLASSES, SEEDS, read_protocol, sha256, split_rows, write_csv, write_json
 from officehome_domain_probe import HERE
 
 CANDIDATES_PER_RECEIVER = 4
@@ -142,6 +142,11 @@ def load_seed_inputs(run_dir: Path, seed: int) -> dict:
     checkpoint_path = seed_dir / "output" / "H2T-Global_epoch10.pth"
     if not checkpoint_path.is_file():
         raise FileNotFoundError(f"Missing fixed epoch-10 H2T-Global classifier for seed {seed}")
+    checkpoint_sha256 = sha256(checkpoint_path)
+    pilot_state = json.loads((run_dir / "state_audit.json").read_text(encoding="utf-8"))
+    state_record = next((r for r in pilot_state if r.get("seed") == seed and r.get("arm") == "H2T-Global"), None)
+    if state_record is None or state_record.get("sha256") != checkpoint_sha256:
+        raise ValueError(f"Epoch-10 H2T-Global checkpoint SHA256 mismatch for seed {seed}")
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
     if checkpoint.get("seed") != seed or checkpoint.get("arm") != "H2T-Global" or checkpoint.get("epoch") != 10:
         raise ValueError(f"Unexpected classifier checkpoint metadata for seed {seed}")
@@ -151,8 +156,9 @@ def load_seed_inputs(run_dir: Path, seed: int) -> dict:
     head.load_state_dict(checkpoint["classifier"])
     head.eval()
     return {"seed_dir": seed_dir, "train": loaded["train"], "val": loaded["val"],
-            "plan": plan, "head": head, "checkpoint_sha256": sha256(checkpoint_path),
-            "stage1_sha256": stage1["best_sha256"]}
+            "plan": plan, "head": head, "checkpoint_sha256": checkpoint_sha256,
+            "feature_sha256": {split: manifest[split]["sha256"] for split in ("train", "val")},
+            "plan_sha256": plan_audit["plan_sha256"], "stage1_sha256": stage1["best_sha256"]}
 
 
 def make_candidate_donors(inputs: dict, seed: int) -> dict[str, np.ndarray]:
@@ -556,6 +562,12 @@ def run_probe(run_dir: Path, out: Path) -> dict:
     if len(json.loads((run_dir / "state_audit.json").read_text(encoding="utf-8"))) != len(SEEDS) * 4:
         raise ValueError("Pilot state audit does not contain all 12 seed x arm records")
 
+    # Metadata-only protocol validation: compare cached row order/labels/domains to the pinned CSV.
+    protocol_rows = read_protocol(HERE / "protocol" / "OfficeHome.csv")
+    expected_rows = {split: split_rows(protocol_rows, split) for split in ("train", "val")}
+    for split in ("train", "val"):
+        if not expected_rows[split]:
+            raise ValueError(f"Pinned protocol has no {split} rows")
     out.mkdir(parents=True, exist_ok=False)
     torch.set_num_threads(4)
     seed_outputs = {}
@@ -579,11 +591,21 @@ def run_probe(run_dir: Path, out: Path) -> dict:
         "outcome": "actual delta cross-entropy; positive means harmful",
         "test_used": False,
         "source_sha256": source_hashes,
+        "pinned_protocol_metadata_only_check": True,
     }
     write_json(out / "config.json", input_manifest)
 
     for seed in SEEDS:
         inputs = load_seed_inputs(run_dir, seed)
+        for split in ("train", "val"):
+            cache = inputs[split]
+            protocol_split = expected_rows[split]
+            if not np.array_equal(cache["raw_indices"], np.array([r.index for r in protocol_split], dtype=np.int64)):
+                raise ValueError(f"Seed {seed} {split} cache raw-index order differs from the pinned protocol")
+            if not np.array_equal(cache["labels"], np.array([r.label for r in protocol_split], dtype=np.int64)):
+                raise ValueError(f"Seed {seed} {split} cache labels differ from the pinned protocol")
+            if not np.array_equal(cache["domains"], np.array([r.domain for r in protocol_split], dtype=np.int64)):
+                raise ValueError(f"Seed {seed} {split} cache domains differ from the pinned protocol")
         val = inputs["val"]
         if val_reference is None:
             val_reference = val
@@ -604,6 +626,8 @@ def run_probe(run_dir: Path, out: Path) -> dict:
         seed_outputs[seed] = {"arms": arms, "train": inputs["train"],
                               "stage1_sha256": inputs["stage1_sha256"],
                               "classifier_sha256": inputs["checkpoint_sha256"],
+                              "feature_sha256": inputs["feature_sha256"],
+                              "plan_sha256": inputs["plan_sha256"],
                               "donor_classes": donors["donor_classes"]}
         print(f"Risk probe seed={seed}: evaluated {len(val['labels']) * CANDIDATES_PER_RECEIVER} paired candidate sets", flush=True)
 
@@ -685,6 +709,15 @@ def run_probe(run_dir: Path, out: Path) -> dict:
         "paired_cross_minus_matched": paired_ci,
         "directional_risk_gate": gate,
         "source_sha256": source_hashes,
+        "input_artifact_sha256": {
+            str(seed): {
+                "train_features": seed_outputs[seed]["feature_sha256"]["train"],
+                "val_features": seed_outputs[seed]["feature_sha256"]["val"],
+                "sampling_plan": seed_outputs[seed]["plan_sha256"],
+                "h2t_global_epoch10_classifier": seed_outputs[seed]["classifier_sha256"],
+                "stage1_best_checkpoint": seed_outputs[seed]["stage1_sha256"],
+            } for seed in SEEDS
+        },
         "interpretation_guardrail": "All intervals condition on fixed trained checkpoints; three seeds and repeated validation images are not independent image-level replicates.",
     }
     write_json(out / "summary.json", summary)
