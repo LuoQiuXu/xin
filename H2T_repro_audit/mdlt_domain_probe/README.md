@@ -132,3 +132,22 @@ all paired controls verified. Report Global-DR Few direction separately.
 Even a consistent difference does not establish a useful new module.
 If directions are mixed/small, say evidence is insufficient and stop.
 No automatic follow-up experiment or hyperparameter search is authorized.
+
+
+## Validation-only transfer-risk probe (next iteration)
+
+The next small mechanism experiment is implemented in `transfer_risk_probe.py`, with
+CPU unit tests in `test_transfer_risk_probe.py` and the exact Codex run protocol in
+`CODEX_TRANSFER_RISK_PROBE.txt`.
+
+It reuses the completed pilot's cached train/validation GAP features and fixed
+epoch-10 H2T-Global classifier. It compares actual change in receiver-label
+cross-entropy with a first-order directional risk score, masked perturbation
+magnitude, cosine distance, donor-label mismatch, and domain mismatch. It
+constructs paired Global / DomainMatched / CrossDomain substitutions while
+holding the validation receiver, donor class, and shared channel mask fixed.
+
+This is a validation-only mechanism probe: no retraining, no test-cache access,
+no test evaluation, and no hyperparameter search. The predeclared screening
+gate is exploratory, not a significance test. Do not develop a new module
+unless the directional score shows stable predictive value beyond magnitude.
