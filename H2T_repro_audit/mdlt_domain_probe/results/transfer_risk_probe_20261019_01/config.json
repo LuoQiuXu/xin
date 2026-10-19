@@ -1,0 +1,23 @@
+{
+  "pilot_run_dir": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\pilot_20261018_01",
+  "pilot_config_sha256": "d19662a1e3d34775aa2c20d438a6e997f7e468a7b67783776f35274c92ef52fc",
+  "pilot_status_sha256": "c365274a03dd04837cad459bd62b58583bae176484708bf13c784404dd0f661f",
+  "csv_sha256": "0a6c4e7800f629b8c6b67ba71dd238a83d4f513ac77694ab58796e528985a5b5",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "candidates_per_receiver": 4,
+  "mask": "existing epoch-1 128-of-512 masks; shared across 128 validation receivers and all candidate arms",
+  "donor_class_plan": "first 4 x N_val global donor draws from existing seed-specific Stage-II plan",
+  "classifier": "fixed epoch-10 H2T-Global head per seed",
+  "outcome": "actual delta cross-entropy; positive means harmful",
+  "test_used": false,
+  "source_sha256": {
+    "officehome_data.py": "865b8206436305ad20a7b7cc351603d386a700927db1035755277e5230552687",
+    "officehome_domain_probe.py": "d0c6862fe903a8e7cd8c514197900d921c53341f3bf59aba8dfc923755bf86fe",
+    "transfer_risk_probe.py": "78fc23dabc12fc7d6cd879d719720cbb297f2a6f52ae6f2918316b0f5dce9244"
+  },
+  "pinned_protocol_metadata_only_check": true
+}

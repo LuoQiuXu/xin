@@ -1,0 +1,48 @@
+Risk probe seed=42: evaluated 5200 paired candidate sets
+Risk probe seed=43: evaluated 5200 paired candidate sets
+Risk probe seed=44: evaluated 5200 paired candidate sets
+{
+  "status": "COMPLETE",
+  "test_used": false,
+  "candidate_substitutions_total": 46800,
+  "directional_risk_gate": {
+    "pass": true,
+    "criterion": "In >=2/3 arms, directional AUROC >=0.60 and >=0.05 above masked-relative-L2 AUROC in >=2/3 seeds",
+    "arms": {
+      "H2T-Global": {
+        "pass": true,
+        "passing_seed_count": 3,
+        "seed_pass_flags": {
+          "42": true,
+          "43": true,
+          "44": true
+        }
+      },
+      "H2T-DomainMatched": {
+        "pass": true,
+        "passing_seed_count": 3,
+        "seed_pass_flags": {
+          "42": true,
+          "43": true,
+          "44": true
+        }
+      },
+      "H2T-CrossDomain": {
+        "pass": true,
+        "passing_seed_count": 3,
+        "seed_pass_flags": {
+          "42": true,
+          "43": true,
+          "44": true
+        }
+      }
+    },
+    "passing_arms": [
+      "H2T-Global",
+      "H2T-DomainMatched",
+      "H2T-CrossDomain"
+    ],
+    "note": "Exploratory screening rule, not a significance threshold."
+  },
+  "output": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\results\\transfer_risk_probe_20261019_01"
+}

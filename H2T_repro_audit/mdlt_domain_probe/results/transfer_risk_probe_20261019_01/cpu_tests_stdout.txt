@@ -1,0 +1,19 @@
+test_cell_group_metrics_and_paired_counts (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_cell_group_metrics_and_paired_counts) ... ok
+test_domain_constraints_and_only_empty_pool_fallback (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_domain_constraints_and_only_empty_pool_fallback) ... ok
+test_duplicate_overlap_rejected (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_duplicate_overlap_rejected) ... ok
+test_gap_substitution_commutes_and_copies_whole_channels (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_gap_substitution_commutes_and_copies_whole_channels) ... ok
+test_plan_reproducibility_balance_class_pairing_and_shared_masks (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_plan_reproducibility_balance_class_pairing_and_shared_masks) ... ok
+test_real_pinned_csv_split_disjointness (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_real_pinned_csv_split_disjointness) ... ok
+test_stage1_bn_running_fixed_affine_and_backbone_trainable (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_stage1_bn_running_fixed_affine_and_backbone_trainable) ... ok
+test_stage2_only_classifier_updates (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_stage2_only_classifier_updates) ... ok
+test_test_dataset_blocked_before_any_pixel_open (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_test_dataset_blocked_before_any_pixel_open) ... ok
+test_test_lock_requires_all_12_and_detects_changed_file (test_officehome_domain_probe.OfficeHomeCorrectnessTests.test_test_lock_requires_all_12_and_detects_changed_file) ... ok
+test_average_ranks_and_auc_ties (test_transfer_risk_probe.TransferRiskProbeTests.test_average_ranks_and_auc_ties) ... ok
+test_candidate_donors_preserve_donor_class_and_domain_constraints (test_transfer_risk_probe.TransferRiskProbeTests.test_candidate_donors_preserve_donor_class_and_domain_constraints) ... ok
+test_evaluation_returns_finite_paired_risk_scores (test_transfer_risk_probe.TransferRiskProbeTests.test_evaluation_returns_finite_paired_risk_scores) ... ok
+test_target_margin_uses_true_label_and_excludes_it_from_competitor (test_transfer_risk_probe.TransferRiskProbeTests.test_target_margin_uses_true_label_and_excludes_it_from_competitor) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.408s
+
+OK

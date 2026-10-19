@@ -1,0 +1,42 @@
+{
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "branch": "experiment/officehome-transfer-risk-probe-20261019",
+  "implementation_commit": "6bf9f6cef6e01a7a434b9d22b0becc9d8f4dd389",
+  "compileall_exit_code": 0,
+  "cpu_tests_exit_code": 0,
+  "cpu_tests_passed": 14,
+  "probe_exit_code": 0,
+  "prescribed_probe_executions": 1,
+  "model_retraining_performed": false,
+  "note": "CPU unit tests use synthetic optimization fixtures; no Stage I or Stage II model was retrained.",
+  "test_pixels_features_predictions_read": false,
+  "candidate_substitutions_total": 46800,
+  "candidate_csv_bytes": 9691259,
+  "source_sha256_before": {
+    "officehome_data.py": "865b8206436305ad20a7b7cc351603d386a700927db1035755277e5230552687",
+    "officehome_domain_probe.py": "d0c6862fe903a8e7cd8c514197900d921c53341f3bf59aba8dfc923755bf86fe",
+    "test_officehome_domain_probe.py": "3f86f89476ef1711650d537ff26fd16668006fc94297d2c395e049e3e65e1290",
+    "test_transfer_risk_probe.py": "2b6bfc87beac075c2629de50b0e23a478282afa9eb0e78dbf17fae3326ddb7b7",
+    "transfer_risk_probe.py": "78fc23dabc12fc7d6cd879d719720cbb297f2a6f52ae6f2918316b0f5dce9244"
+  },
+  "source_sha256_after": {
+    "officehome_data.py": "865b8206436305ad20a7b7cc351603d386a700927db1035755277e5230552687",
+    "officehome_domain_probe.py": "d0c6862fe903a8e7cd8c514197900d921c53341f3bf59aba8dfc923755bf86fe",
+    "test_officehome_domain_probe.py": "3f86f89476ef1711650d537ff26fd16668006fc94297d2c395e049e3e65e1290",
+    "test_transfer_risk_probe.py": "2b6bfc87beac075c2629de50b0e23a478282afa9eb0e78dbf17fae3326ddb7b7",
+    "transfer_risk_probe.py": "78fc23dabc12fc7d6cd879d719720cbb297f2a6f52ae6f2918316b0f5dce9244"
+  },
+  "source_unchanged": true,
+  "required_artifact_sha256": {
+    "config.json": "472db3df6d68abc2847deb63b241c7096f02ab41da49c91315d28bca5098af87",
+    "status.json": "962946450f83d3c57f1ebd16ed41fdee5919616a9c3c51f1a09afcdd4adce234",
+    "summary.json": "885243cdc73d77ec676bbbaa644be4f3d8a7deff9f3c382b26bab84384db0ef1",
+    "report.md": "ab0500673bc8dfb8a5c4dc4fb0ab926ac30faa7efa6419e5c2dd59822ddebee5",
+    "candidate_level.csv": "f89de21594312aed1b061ced304a5d791fdc334e8963e76cbfb3262a913d2a22",
+    "per_seed_arm_summary.csv": "bd0f959bcb096c9caa0c57b11a2a9a1adc105e10dccdcacbc44552665b91042a",
+    "risk_predictor_summary.csv": "41757959d57e68faec8c111a822a9a4d94e7e3b9c8b04ea517f09d88e0b0dbdb",
+    "paired_cross_minus_matched.csv": "b0513e03a4852cbafdb583fa0de090a1315301b2841f97cdb92c8924dbdda894"
+  },
+  "preservation": "Scoped .gitattributes retains the result artifacts byte-for-byte in Git.",
+  "artifact_checks": "All eight required files exist; summary/status COMPLETE, test_used=false, models_trained=0; CSV 46800 data rows and nine seed/arm groups of 5200."
+}

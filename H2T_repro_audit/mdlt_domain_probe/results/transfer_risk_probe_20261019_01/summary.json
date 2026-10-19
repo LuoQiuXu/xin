@@ -1,0 +1,114 @@
+{
+  "status": "COMPLETE",
+  "test_used": false,
+  "models_trained": 0,
+  "candidate_sets_per_seed": 5200,
+  "candidate_substitutions_total": 46800,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "arms": [
+    "H2T-Global",
+    "H2T-DomainMatched",
+    "H2T-CrossDomain"
+  ],
+  "paired_cross_minus_matched": {
+    "delta_ce": {
+      "mean": 0.048448480665683746,
+      "ci95": [
+        0.015304655930958689,
+        0.0796348351985216
+      ],
+      "bootstrap_reps": 500,
+      "interpretation": "conditional on fixed trained checkpoints"
+    },
+    "delta_margin": {
+      "mean": -0.04904220625758171,
+      "ci95": [
+        -0.10425255093723536,
+        0.005861817277036603
+      ],
+      "bootstrap_reps": 500,
+      "interpretation": "conditional on fixed trained checkpoints"
+    },
+    "harm_rate": {
+      "mean": 0.002564102564102564,
+      "ci95": [
+        -0.003141025641025641,
+        0.00855929487179487
+      ],
+      "bootstrap_reps": 500,
+      "interpretation": "conditional on fixed trained checkpoints"
+    }
+  },
+  "directional_risk_gate": {
+    "pass": true,
+    "criterion": "In >=2/3 arms, directional AUROC >=0.60 and >=0.05 above masked-relative-L2 AUROC in >=2/3 seeds",
+    "arms": {
+      "H2T-Global": {
+        "pass": true,
+        "passing_seed_count": 3,
+        "seed_pass_flags": {
+          "42": true,
+          "43": true,
+          "44": true
+        }
+      },
+      "H2T-DomainMatched": {
+        "pass": true,
+        "passing_seed_count": 3,
+        "seed_pass_flags": {
+          "42": true,
+          "43": true,
+          "44": true
+        }
+      },
+      "H2T-CrossDomain": {
+        "pass": true,
+        "passing_seed_count": 3,
+        "seed_pass_flags": {
+          "42": true,
+          "43": true,
+          "44": true
+        }
+      }
+    },
+    "passing_arms": [
+      "H2T-Global",
+      "H2T-DomainMatched",
+      "H2T-CrossDomain"
+    ],
+    "note": "Exploratory screening rule, not a significance threshold."
+  },
+  "source_sha256": {
+    "officehome_data.py": "865b8206436305ad20a7b7cc351603d386a700927db1035755277e5230552687",
+    "officehome_domain_probe.py": "d0c6862fe903a8e7cd8c514197900d921c53341f3bf59aba8dfc923755bf86fe",
+    "transfer_risk_probe.py": "78fc23dabc12fc7d6cd879d719720cbb297f2a6f52ae6f2918316b0f5dce9244"
+  },
+  "input_artifact_sha256": {
+    "42": {
+      "train_features": "f1ebed0492cfcf907f4111ca8be34d1806624d713dda05325ce216fb9733c334",
+      "val_features": "b48725257d09cc48aa74cb586c703d0609a10174cc0641ce2a7a240e17151d0a",
+      "sampling_plan": "27bab26182795810bcbe65db71978babd260456111911adb8f04882d0128342c",
+      "h2t_global_epoch10_classifier": "2a127ec879900b2947b0bf8803274428ff429a8939b7086b9a664b0a3bfaf514",
+      "stage1_best_checkpoint": "b340555b4a7f9e300224b0f0e4f8da07af3a1e15a5997369169da77af10c84de"
+    },
+    "43": {
+      "train_features": "d473005a77c1f866b8f1297f0256ee6b9c7d01e9d23f36621c7224c6ace2a9a2",
+      "val_features": "eef08084a28f5883d4d14c4a019e25a8922b426d07e9cca073421e4a232ab657",
+      "sampling_plan": "efdb4911482487ab257aa2e0aff4687a0959f5fd1589d348e95bf7c132bf6ee6",
+      "h2t_global_epoch10_classifier": "f8c4ec9047469c73c6f6bf5930202a8d7732eea828f59e7e60eb26d862d9a509",
+      "stage1_best_checkpoint": "58e57839cc3758ed7b243abfbdedbc40a466ce8509df4adef2b0aabd92dc3d40"
+    },
+    "44": {
+      "train_features": "408cc29e3f19be5d4af7f1fd617328eedebfff934b3d243d6cac8450ca4be1bf",
+      "val_features": "15328eb59047a349b28f28c64400caa1565751958fc36dc3aa9990665a589441",
+      "sampling_plan": "a0a3ed3d3b9c34d453498cb816678b06894418e2f44876a4fd5608472908ce6c",
+      "h2t_global_epoch10_classifier": "a232ced0aee9c21850f43fdc64b320276a81fcea3117d617e9d3757bd2cb9610",
+      "stage1_best_checkpoint": "74c712e46df3063309945471c3238b5d3e9714d06102d9bd171af4377e8c1b94"
+    }
+  },
+  "interpretation_guardrail": "All intervals condition on fixed trained checkpoints; three seeds and repeated validation images are not independent image-level replicates."
+}
