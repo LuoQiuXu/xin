@@ -1,0 +1,170 @@
+CODEX 实验任务：Low-VS 供体亲和度 × 判别间隔风险通道保护
+版本日期：2026-10-19
+GitHub branch: experiment/donor-affinity-margin-protect-20261019
+目录：H2T_repro_audit/lowvs_factorial/
+
+目标：在冻结的 Clean Stage-I backbone 上，完成一个 2×2 的 Stage-II 小型机制实验。先阅读同目录 PROTOCOL.md 和 policy.py。不要把本轮扩展成完整框架，也不要重新调参。
+
+==============================
+A. 最高优先级约束
+==============================
+
+1. 禁止执行任何 Git/GitHub/版本控制操作：不 checkout、不 fetch、不 pull、不 push、不 commit、不 branch、不 merge、不创建 PR。用户自行管理 Git。
+2. 不得访问官方 CIFAR-100 TEST：不加载、不解码、不计算统计、不做评估、不做模型选择。继续复用现有 TEST guard。
+3. 不得修改、覆盖或删除任何历史实验代码、checkpoint、缓存、采样计划、Gumbel 文件、签名 CSV、旧报告或结果。
+4. 新输出只能写到 H2T_repro_audit/lowvs_factorial/results/。如果任何计划输出已存在，拒绝覆盖；不要自动 resume。
+5. 不得重新训练 Stage I，不得解冻 backbone/BN，不得增加辅助损失，不得改变原 Low-VS 的打分公式、Bottom48 候选规则、16 个整通道替换、rho/fallback、接收者标签、SGD/scheduler。
+6. 固定且仅允许 Stage-II seeds 124、125，四个新臂，每臂10 epochs，每 epoch 85 steps，共850次 optimizer.step。不得跑 seed126、额外epoch、Top-K/保护数量/分层数/超参数扫描。
+7. 不得使用验证集或 TEST 来构建原型、选择 donor、选择 mask 或调整任何策略。原型和 donor schedule 只使用 LT TRAIN 数据。
+8. 如果关键本地源文件、checkpoint、plan、Gumbel、历史签名或环境缺失，立即停止并报告缺失项；不得重新生成旧 plan 或伪造历史 hash。
+9. Codex 不要改写现有 ravs_v1、lowvs_disc_preserve、lowvs_norm_direction 或 gu_lowvs 文件。只在 lowvs_factorial/ 内新增/修复代码。只有确定会阻塞协议执行的 bug 才允许最小修复，并说明是否改变协议。
+10. 先运行 CPU policy tests，再 preflight，再 prepare，再训练。任一步失败即停，不跳过检查、不重试覆盖。
+
+==============================
+B. 先检查现有代码与数据来源
+==============================
+
+阅读：
+- H2T_repro_audit/lowvs_factorial/PROTOCOL.md
+- H2T_repro_audit/lowvs_factorial/policy.py
+- H2T_repro_audit/lowvs_factorial/test_policy.py
+- H2T_repro_audit/ravs_v1/run_ravs_v1.py
+- H2T_repro_audit/ravs_v1/run_safeguards.py
+- H2T_repro_audit/lowvs_disc_preserve/run_pilot.py
+- 本地 clean_vs_stability_runs/.../online_policy.py 和 reused_train_helpers.py
+- 本地历史 Stage-I / 数据 split / sampling_plan / gumbel_noise
+- H2T_repro_audit/lowvs_disc_preserve/results/epoch10.csv 和 historical replay/manifest
+
+必须先确认当前本地代码确实包含本分支中的 lowvs_factorial/ 文件。不得为了拿到文件而执行任何 Git 命令。
+
+复用 run_ravs_v1.py 的 load_data、fresh、warmup、evaluate、source checks 和现有 frozen-model helpers。复用原 online_masks、augment、fuse、scheduler、optimizer_for；不得复制后悄悄改变原公式。先检查各 helper 的真实返回结构，尤其是 online_masks 的 score/candidate-pool trace；不要猜 trace 字段名。
+
+==============================
+C. 实现 run_factorial.py
+==============================
+
+在本目录新建 run_factorial.py。它必须提供：
+- unit
+- preflight
+- prepare
+- train --seed {124,125} --arm {RandomDonor,HighAffinityDonor,RandomDonor+MarginProtect,HighAffinityDonor+MarginProtect}
+- report
+
+实现尽量直接，复用已有 helper；不需要新框架、不需要复杂插件化、不需要额外依赖。
+
+C1. 训练集 GAP bank / prototypes
+- 用冻结 Stage-I checkpoint 和原 eval_transform，对原 LT TRAIN 子集全部图像计算 GAP-64。
+- 可复用本地已有 balanced_clean_train_bank.npz，但只有在其 Stage-I SHA、标签、原始训练索引、shape、特征有限性全部通过验证后才可复用；否则在本实验 results/ 下重新计算。
+- 不得访问验证集或 TEST 构建 prototypes。
+- 对 head 类 ID 0..35 建立 L2-normalized TRAIN prototype。
+- 保存 train bank/prototype provenance：Stage-I checkpoint SHA、train labels/index SHA、eval transform、bank SHA、class counts、TEST_used=false。
+- 确认 backbone/BN 前后 state hash 完全相同。
+
+C2. donor plan：固定、配对、只改尾类接收者
+- 复用原 sampling_plan 的 receivers；保留原来的 receiver 数组、batch 顺序、10 epochs×N rows。
+- 只对接收标签 y[receiver] >= 71 的 draw 替换 donor；其他 receiver 的 donor 必须与原 sampling_plan 完全相同。
+- head donor classes 为 0..35，按 class count 降序切为6个 strata，每个stratum 6类。
+- 每个 tail receiver draw 使用 clean TRAIN GAP 与 head prototypes 的 cosine affinity。
+- 通过可复现 NumPy Generator 预先产生 u_stratum、u_class、u_instance。A/B 必须使用完全相同的三组随机数。
+- 先以各 stratum 的 class-count 总和为概率抽 stratum；A 在该 stratum 中按训练数量比例抽 class；B 在同一 stratum 的 top-2 affinity class 中按训练数量比例抽 class。每个类内按 u_instance 均匀选真实 TRAIN donor index。
+- C 的 donor index 必须逐项等于 A；D 的 donor index 必须逐项等于 B。A/B 每个 tail draw 的 stratum ID 必须逐项相同。
+- 每个 seed、每个 epoch都预先固定 donor plan，保存 donor index、receiver index、donor label/class、stratum、affinity、uniform variates/hash。训练中不得按当前 FC 或 validation 重新选 donor。
+- 记录 donor class count/stratum 分布，明确承认同一 stratum 内 A/B 的 class count 分布仍可能不同。不能声称 donor 频次完全相同。
+- 检查所有 donor index 属于 LT TRAIN，donor_labels == chosen_donor_class，receiver/donor 不得越界。
+
+C3. 原始 Low-VS mask 与 MarginProtect mask
+- 每个 batch 使用原 online_masks(receiver, y[donor], gumbel) 生成原始 donor-conditioned VS 分数和 Low-VS mask。
+- 对四个 arm，receiver augmentation、donor augmentation随机数、Gumbel、receiver IDs和原始在线VS分数必须成对。每个 arm 使用相同的 seed+300009 augmentation Generator 初始化，按相同batch顺序执行。
+- A/B：尾类接收者使用原 Low-VS Bottom48 → Gumbel-random 16；非尾类全部按原规则。
+- C/D：仅尾类接收者使用 margin protection；非尾类必须完全使用原 Low-VS mask。
+- 必须从现有 online_masks 的实际 trace 取得原 Bottom48 candidate pool。如果 trace 未直接暴露候选池，检查原 online_policy.py 并用完全相同的 score/rank/tie/fallback 逻辑重建；用断言验证重建候选池产生的原始16-mask与 online_masks 返回的 Low-VS mask完全一致。不得改动原 helper。
+- 对每个 tail receiver，使用 policy.channel_margin_delta：
+  q_d=(W[y,d]-W[j*,d])*(GAP(donor)_d-GAP(receiver)_d)，j* 为当前 unfused receiver logits 的最强非真实类别。
+- 在原 Bottom48 候选中保护 q_d 最小的16个通道，从剩余32个中用同一批原始 Gumbel 值选择16个。不要从所有64个非保护通道选；不得改变 Bottom48。
+- 每个融合样本必须恰好替换16个完整8×8 feature maps。被选通道与 donor 逐位相等，未选通道与 receiver 逐位相等，label仍为 receiver label。
+- q_d是固定当前竞争类别下的即时 margin 变化贡献，不得描述为语义重要性或泛化效用。
+
+C4. 训练一致性与防护
+- 每个 arm/seed 都从 base.fresh(seed) 得到完全相同的初始 FC；使用原 optimizer_for 和 scheduler。
+- backbone所有参数、BN affine、running stats、num_batches_tracked都必须冻结并逐位不变。
+- 只有100-way linear classifier可以更新，且更新后参数有限。
+- 每组10 epochs×85 batch=850 optimizer.step；batch_size=128，最后一个batch允许按原数据集长度为95。
+- 训练过程中保存每batch签名：receiver IDs/labels、donor IDs/labels、两组增强像素、冻结特征、原始VS scores hash、Gumbel hash、原始LowVS mask hash、新实际 mask hash、q/geometry summary。
+- 由于 A/B 有意改变 tail donor index，不能要求四臂 donor hash 完全相同；正确要求是 receiver/augment random stream/Gumbel相同，A与C donor完全一致，B与D donor完全一致；A/B donor只允许在 tail receiver draws不同，非tail donor index逐项一致。
+- 官方 TEST guard事件必须为0；验证只用现有 TRAIN holdout feature maps。
+- 训练失败后写 FAILED_STOP.json 和日志，停止，不覆盖输出、不自动重跑。
+
+C5. 在线几何诊断
+在每个 batch optimizer.step 之前，对 tail receiver draws记录：
+- clean receiver margin与最强竞争类别ID；
+- fused与clean的固定 j* margin差、fused动态 margin差；
+- fused CE - clean CE；
+- clean margin > 0 但 fused margin <= 0 的比例；
+- 16个被选通道的 q_d 之和；
+- 保护集 q_d 均值/分位数、选中集 q_d 均值/分位数；
+- donor affinity、stratum、donor class count。
+几何统计只解释即时行为，不得当作最终收益或因果证明。
+
+==============================
+D. 输出与分析
+==============================
+
+全部只写到 H2T_repro_audit/lowvs_factorial/results/，已存在就停止。至少生成：
+- preflight.json
+- train_bank_provenance.json
+- donor_plan_seed124.npz / donor_plan_seed125.npz
+- donor_plan_summary.csv
+- 每个seed/arm下的 config.json、epochs.csv、batch_signatures.csv、geometry_diagnostics.csv、final_fc.pth、validation_epoch10.npz、summary.json
+- epoch10.csv
+- paired.csv
+- per_class.csv
+- group_confusion.csv
+- factorial_effects.csv
+- scientific_summary.json
+- LOWVS_FACTORIAL_RESULTS.md
+- LOWVS_FACTORIAL_SCIENTIFIC_REPORT.md（中文）
+- 每条命令的console日志、environment/source hashes、TEST guard结果
+
+Report必须：
+1. 主终点仅epoch10，逐seed报告Overall/Head/OfficialMedium/Tail/Many/Medium/Few/Macro/validation CE。
+2. 计算 B-A、C-A、D-B、D-A 的paired wins/losses/net correct、Tail net correct、每类净变化和组间错分转移。
+3. Tail交互项 I = D - B - C + A，分别计算每个seed，不做p-value。
+4. 对比历史 E=LowVS-Full，仅作上下文，不重训E；清楚说明A与E的donor protocol不同，不把E-A视为单因素因果对比。
+5. 展示 donor class count/stratum/affinity分布，防止把类频次变化误称为兼容性效果。
+6. 说明验证集只有1980张TRAIN图像、class0缺失、每类20张、历史重复使用；不宣称独立测试泛化。
+7. 检查收益是否来自真实tail正确分类，而不是Tail预测转移到其他错误类别。
+8. 结论必须按 PROTOCOL.md 的预设门槛，不根据结果更改阈值。
+9. 不追加任何实验，不扫描超参数，不做新的Stage-I，不跑官方TEST。
+
+==============================
+E. 必须先运行的顺序
+==============================
+
+从 repository root 执行。Python 路径沿用本地历史实验使用的解释器；不要猜新环境。
+
+python H2T_repro_audit/lowvs_factorial/run_factorial.py unit
+python H2T_repro_audit/lowvs_factorial/run_factorial.py preflight
+python H2T_repro_audit/lowvs_factorial/run_factorial.py prepare
+
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 124 --arm RandomDonor
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 124 --arm HighAffinityDonor
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 124 --arm RandomDonor+MarginProtect
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 124 --arm HighAffinityDonor+MarginProtect
+
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 125 --arm RandomDonor
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 125 --arm HighAffinityDonor
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 125 --arm RandomDonor+MarginProtect
+python H2T_repro_audit/lowvs_factorial/run_factorial.py train --seed 125 --arm HighAffinityDonor+MarginProtect
+
+python H2T_repro_audit/lowvs_factorial/run_factorial.py report
+
+每一步必须等待上一条命令完整成功。不能并行跑四个训练臂。不要将所有命令包装成无检查的批处理。
+
+==============================
+F. 停止原则
+==============================
+
+- 不满足预检、源哈希、配对或冻结断言：立即停并报告，不得“修到能跑”为止。
+- 只允许修复本实验目录内明确的实现 bug；先写出失败证据和最小修复说明。
+- 如果政策实现需要改变原 Low-VS score、Bottom48、fallback、16通道或训练配置才能通过检查，停止并报告，不改变协议。
+- 训练完成后只分析结果；不再自动创建第五个新训练组或新种子。
