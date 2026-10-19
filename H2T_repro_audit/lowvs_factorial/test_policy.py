@@ -103,8 +103,9 @@ def test_protection_preserves_bottom48_and_replacement_count():
     assert not torch.any(protected & ~candidates)
     for i in range(b):
         cand = torch.where(candidates[i])[0]
-        expected = cand[torch.argsort(q[i, cand], stable=True)[:16]]
-        assert torch.equal(torch.where(protected[i])[0], expected)
+        expected = torch.zeros(64, dtype=torch.bool)
+        expected[cand[torch.argsort(q[i, cand], stable=True)[:16]]] = True
+        assert torch.equal(protected[i], expected)
     print("PASS: protected mask is paired, fixed-size, and remains inside Bottom48")
 
 
