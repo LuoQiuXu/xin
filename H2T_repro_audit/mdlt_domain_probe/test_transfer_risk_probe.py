@@ -21,7 +21,7 @@ class TransferRiskProbeTests(unittest.TestCase):
         np.testing.assert_allclose(average_ranks(np.array([4.0, 2.0, 2.0, 9.0])), [3.0, 1.5, 1.5, 4.0])
         self.assertAlmostEqual(binary_auc(np.array([0, 0, 1, 1]), np.array([0.1, 0.2, 0.8, 0.9])), 1.0)
         self.assertAlmostEqual(binary_auc(np.array([0, 0, 1, 1]), np.array([0.8, 0.9, 0.1, 0.2])), 0.0)
-        self.assertAlmostEqual(binary_auc(np.array([0, 1]), np.array([1.0, 1.0])), 0.5)
+        self.assertIsNone(binary_auc(np.array([0, 1]), np.array([1.0, 1.0])))
         self.assertIsNone(binary_auc(np.array([1, 1]), np.array([0.1, 0.9])))
         self.assertIsNone(binary_auc(np.array([0, 1]), np.array([1.0, 1.0])))
 
