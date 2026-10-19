@@ -1,0 +1,189 @@
+H2T NEXT-STAGE TASK FOR CODEX
+Title: Minimal real-scenario audit before proposing another H2T modification
+Repository: LuoQiuXu/xin
+Required branch: experiment/h2t-real-scenario-audit-20261019
+Branch parent: experiment/donor-affinity-margin-protect-20261019
+Priority: scientific signal over engineering completeness; do not overbuild.
+
+============================================================
+0. RESEARCH QUESTION AND SCOPE
+============================================================
+
+We have run many mechanism probes (donor selection, channel scoring, Low-VS/Uniform, margin-related diagnostics), but we still have not established a concrete deployment scenario in which H2T has a measurable disadvantage. Do NOT assume that label noise, prior shift, or OOD is the problem. This task is a small, falsifiable SCREENING audit to identify whether an already-existing model shows a credible weakness under a clearly defined scenario.
+
+Primary screen: test-time class-prior shift (no training).
+Secondary screen: OOD rejection only if a valid local OOD dataset and compatible model inference path already exist.
+Do NOT implement a new H2T algorithm or train any model in this task. The goal is to decide what deserves the next controlled training experiment.
+
+This is an exploratory screen, not a paper claim. Do not call a reweighted evaluation a real-world deployment result. Explicitly distinguish:
+(1) measured performance on held-out images;
+(2) mathematically reweighted expected accuracy under a specified hypothetical target prior;
+(3) actual evaluation on a real shifted/OOD dataset, if available.
+
+============================================================
+1. GIT AND SAFETY RULES
+============================================================
+
+1. Fetch origin and checkout exactly:
+   experiment/h2t-real-scenario-audit-20261019
+2. Verify the active branch before edits. Never edit main or the parent branch.
+3. Do not reset, rebase, force-push, or rewrite history.
+4. Do not edit original H2T algorithm files, official reproduction files, existing reports, old checkpoints, or historical result directories.
+5. Add new audit code only under:
+   H2T_repro_audit/real_scenario_audit/
+6. Never overwrite an existing artifact. Use a new timestamped run directory if local outputs already exist.
+7. Do not commit datasets, model checkpoints, large feature arrays, or large binary artifacts. Commit code, protocol, compact CSV/JSON summaries, small plots, and the final report only.
+8. No official test labels/predictions may be used to tune a method, threshold, or choose a new experiment. Prefer the existing locked TRAIN-held-out validation predictions. If only an official-test artifact is available for a particular comparison, mark it explicitly as POST-HOC/EXPLORATORY and do not use it for any selection.
+9. Do not download a dataset without first checking whether it is already available locally. Do not fabricate OOD examples or treat corruptions/noise augmentations as a real OOD dataset.
+10. Keep the implementation small and inspectable. Avoid a generic framework, unnecessary abstractions, config systems, or refactoring unrelated code.
+
+============================================================
+2. PRE-FLIGHT: DISCOVER REAL ARTIFACTS, DO NOT GUESS PATHS
+============================================================
+
+Read these tracked reports first:
+- CLEAN_VS_STAGE2_RESULTS.md
+- CLEAN_VS_MULTI_SEED_STABILITY_REPORT.md
+- H2T_DONOR_STAGE2_RESULTS.md
+- H2T_DONOR_PERTURBATION_AUDIT.md
+- H2T_VARIATION_SHIFT_AUDIT.md
+- H2T_SMART_GUIDED_CHANNEL_RESULTS.md
+
+Use these reports to identify exact model/checkpoint provenance, evaluation split, class definitions, and existing per-sample prediction/logit artifacts. Search only the known project/reproduction directories first, including:
+- H2T_repro_audit/clean_vs_runs/
+- H2T_repro_audit/clean_vs_stability_runs/
+- H2T_repro_audit/stage2_runs/
+- H2T_repro_audit/lowvs_factorial/
+- the local Windows experiment directories referenced in the reports, if available.
+
+Produce a compact artifact inventory with:
+- relative/absolute path;
+- artifact type (per-sample logits, predicted labels, true labels, per-class summary, checkpoint, OOD dataset);
+- model/method and seed;
+- split and class coverage;
+- SHA256 for input files actually used;
+- whether the artifact is validation-only or post-hoc official-test data.
+
+Do not infer that a file exists merely because an old report mentions a similarly named file. Verify each exact path, shape, class count, label range, finite values, and checkpoint/model provenance. If logits or per-sample predictions are unavailable, do not silently substitute aggregate metrics for paired predictions; document the limitation and use the best supported lower-cost analysis.
+
+============================================================
+3. SCREEN B: TEST-TIME CLASS-PRIOR SHIFT (REQUIRED; NO TRAINING)
+============================================================
+
+Research question:
+Does the relative ranking/gain of the available H2T variants versus a matched baseline depend strongly on the evaluation class prior? This is a prior-sensitivity screen, not a test-time adaptation experiment.
+
+Use the best-supported matched comparison among the existing frozen models. Prefer in this order:
+A. cRT vs Original-H2T, if both have predictions from the same checkpoint backbone, split, and protocol;
+B. Uniform-PerSample vs Low-VS, if A cannot be constructed fairly;
+C. another matched pair only if its provenance is clearly documented.
+Do not combine results from different backbones/seeds and call them paired. If multiple seeds have matching predictions, report per-seed results first and summarize the paired differences.
+
+Use existing TRAIN-held-out validation predictions as the primary source. Some historical validation splits cover classes 1..99 only and omit class 0. If so:
+- explicitly report the missing class;
+- renormalize all target priors over the observed classes only;
+- label all resulting values “99-class partial prior audit”;
+- do not claim full CIFAR-100 expected accuracy.
+Do not use official-test predictions to select a method or tune anything.
+
+Compute class-wise top-1 accuracy from per-sample predictions, if available. Evaluate expected top-1 accuracy under these fixed priors:
+1. Uniform prior over observed classes.
+2. Forward long-tail prior: the same geometric class-frequency schedule as CIFAR-100-LT IF=100, restricted and renormalized over observed classes.
+3. Reverse long-tail prior: reverse the class-frequency schedule, then restrict and renormalize over observed classes.
+4. Optional IF=10 forward prior only if it can be added with trivial code; do not let this delay the main audit.
+
+For each model and prior, report:
+- expected top-1 accuracy = sum_c p_target(c) * per_class_accuracy(c);
+- Macro accuracy (uniform class weighting);
+- paired method delta in percentage points under each prior;
+- which classes drive the delta (compact per-class CSV);
+- whether the sign of the method delta changes across priors.
+
+If paired per-sample predictions are available, calculate a deterministic paired bootstrap 95% interval for the method difference by resampling images WITHIN each observed class and recomputing the prior-weighted difference. Use a fixed, documented bootstrap seed and at least 2,000 replicates. Do not treat epochs as independent samples. If only per-class aggregate accuracy is available, skip the bootstrap and state why.
+
+Use the training class-count schedule only to define the specified counterfactual prior; never use test labels to estimate or tune a target prior. Clearly state that this reweighting assumes class-conditional accuracy remains fixed and changes only p(y). It does not simulate covariate shift, retrain the model, or demonstrate adaptation.
+
+Interpretation rule:
+- A sign reversal or a large, reproducible reduction of the candidate's advantage under a predeclared prior is a reason to investigate prior sensitivity further, not proof of universal failure.
+- If no reversal appears, report that the tested prior shifts did not reveal a ranking reversal. Do not invent a failure.
+
+============================================================
+4. SCREEN C: OOD REJECTION (OPTIONAL, ONLY IF VALID DATA EXISTS)
+============================================================
+
+Run this only if a legitimate OOD image dataset is already available locally and the existing frozen models can be evaluated with the correct CIFAR-100 preprocessing. Prefer SVHN if it is already cached; otherwise use one already-available, clearly described OOD dataset. Do not download or synthesize a dataset for this task. If none exists, emit status “SKIPPED_NO_LOCAL_OOD_DATA” and explain what is needed for a future run.
+
+Use the same held-out ID validation images as the ID score source. Run inference only; no training or threshold tuning on OOD data.
+
+For each matched model, compute:
+- MSP (maximum softmax probability);
+- Energy score, with the exact formula and temperature documented;
+- AUROC (higher is better);
+- AUPR-Out (higher is better);
+- FPR95 (lower is better; threshold chosen to retain 95% ID TPR using ID validation scores only);
+- fraction of OOD images whose argmax is in the predeclared tail-class set, reported as a diagnostic rather than an OOD metric.
+
+Use the same ID/OOD examples and transforms across compared models. Validate tensor shape, class dimension, finite logits, and score direction before computing metrics. Report class overlap/domain caveats. CIFAR-10 should not automatically be called a clean OOD set because some semantics overlap CIFAR-100.
+
+This OOD screen is secondary: H2T is a closed-set long-tailed classifier, so weaker OOD rejection alone does not establish a defect in its intended setting. Do not broaden the paper claim based only on this audit.
+
+============================================================
+5. IMPLEMENTATION EXPECTATIONS
+============================================================
+
+Create a small, readable implementation under H2T_repro_audit/real_scenario_audit/, e.g.:
+- audit_prior_shift.py
+- audit_ood.py (only if valid local OOD data exists; otherwise a clear skip status is enough)
+- tests/test_prior_shift.py
+- PROTOCOL.md
+- results/REAL_SCENARIO_AUDIT_REPORT.md
+- results/prior_shift_metrics.csv
+- results/prior_shift_summary.json
+- results/per_class_deltas.csv
+- results/ood_metrics.csv and a small plot only if OOD audit ran.
+
+You may adjust filenames if there is a strong reason, but do not create a large framework.
+
+Tests must cover:
+- target-prior weights are finite, nonnegative, sum to 1 over observed classes, and correctly handle a missing class;
+- expected accuracy equals a hand-calculated toy example;
+- paired bootstrap is deterministic under a fixed seed and preserves pairing;
+- invalid/mismatched labels, shapes, class IDs, or NaN/Inf fail loudly;
+- missing OOD data produces a clear skip rather than a fake result.
+
+Unit-test toy arrays are for software correctness only and must never appear as experiment results.
+
+============================================================
+6. EXECUTION AND REPORTING
+============================================================
+
+1. Run the lightweight unit tests.
+2. Run the prior-shift audit on the verified existing artifacts.
+3. Run the OOD screen only if section 4's requirements are met.
+4. Do not train Stage I or Stage II. Do not run a noise experiment in this branch yet.
+5. Keep the run fast. No hyperparameter search, no model selection, no new data split, no new backbone, no expensive visualization suite.
+6. Produce one concise report with:
+   - exact inputs and hashes;
+   - models/methods and pairing status;
+   - split and class coverage;
+   - metrics table under each target prior;
+   - uncertainty intervals where valid;
+   - OOD result or explicit skip reason;
+   - limitations and a GO / NO-GO / INCONCLUSIVE recommendation for the next controlled experiment.
+7. State explicitly what the audit cannot prove. A prior-reweighted score is not an observed deployment outcome. An OOD result is not a long-tail closed-set result.
+8. Include exact reproduction commands and software versions.
+9. Check git diff and confirm no historical file/checkpoint was changed. Run tests and a small smoke test before committing.
+10. Commit and push ONLY to experiment/h2t-real-scenario-audit-20261019. Do not push to main or the parent branch. Commit source, tests, protocol, and compact outputs only; do not commit model weights, datasets, or large raw arrays.
+
+============================================================
+7. DECISION AFTER THIS SCREEN
+============================================================
+
+Do not automatically propose a new algorithm after seeing the results.
+
+- If a prior-shift ranking reversal is credible, the next experiment should use a predeclared target-prior protocol and compare the frozen H2T/cRT variants without tuning on the same evaluation split.
+- If OOD rejection differs but prior-shift does not, treat OOD as an adjacent application question and decide whether it fits the research scope before proceeding.
+- If neither screen finds a credible weakness, do not manufacture one. Then consider a separate, explicitly labeled mechanism pilot for label-noise robustness; first isolate label-identity noise from changes in class counts, and only make a real-world claim after validating on a genuine noisy-label long-tail dataset such as a correctly constructed CIFAR-100N-LT split.
+- If required artifacts are missing, stop at the inventory/report stage and explain exactly what is missing. Do not silently substitute a different checkpoint or dataset.
+
+The desired output is a small, trustworthy experiment that narrows the scientific question, not a polished framework.
