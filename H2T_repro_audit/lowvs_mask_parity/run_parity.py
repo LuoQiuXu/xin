@@ -210,7 +210,7 @@ def train(seed, arm):
 
     log_rows, batch_rows = [], []
     mask_records = np.empty((EPOCHS,N,16), dtype=np.uint8)
-    composition_sum = {"V":0.,"B":0.,"ratio":0.,"score":0.,"fallback":0.}
+    composition_sum = {"V":0.,"B":0.,"ratio":0.,"score":0.,"fallback":0.,\n                       "common_with_uniform":0.}
     best=-1.0
     best_epoch=None
     step=0
@@ -387,6 +387,18 @@ def report():
                 "VS_by_granularity_interaction_pp":
                     delta(group,"VS-Individual","U-Individual")-delta(group,"VS-Shared","U-Shared"),
                 "interpretation_limit":"Shared VS uses batch-mean scoring; not a pure mask-granularity interaction"})
+    primary = ("VS-Shared - U-Shared", "VS-Individual - U-Individual")
+    primary_rows = [r for r in rows if r["contrast"] in primary]
+    criteria = {f"{contrast}|{group}|{seed}":next(
+        r["delta_pp"] for r in primary_rows if r["contrast"] == contrast
+        and r["group"] == group and r["seed"] == seed)
+        for contrast in primary for group in ("Overall","Tail") for seed in SEEDS}
+    provisional_go = all(
+        criteria[f"{contrast}|Tail|{seed}"] >= 0.5
+        and criteria[f"{contrast}|Overall|{seed}"] >= 0.
+        for contrast in primary for seed in SEEDS
+    )
+    decision = "PROVISIONAL_GO_FOR_INDEPENDENT_CONFIRMATION" if provisional_go else "NOT_GO_OR_INCONCLUSIVE"
     write_csv(RESULTS/"epoch10.csv",table)
     write_csv(RESULTS/"paired_contrasts.csv",rows)
     write_csv(RESULTS/"per_class_contrasts.csv",classes)
@@ -409,7 +421,7 @@ def report():
     for r in rows:
         if r["group"] in ("Overall","Tail"):
             lines.append(f"|{r['seed']}|{r['contrast']}|{r['group']}|{r['delta_pp']:+.4f}|{r['net']:+d}|")
-    lines+=["","## Interpretation rules","",
+    lines+=["",f"## Predefined decision: {decision}","",\n           "This only decides whether independent confirmation is worth running, not publication readiness.","",\n           "## Interpretation rules","",
        "Primary: same-granularity VS-Shared vs U-Shared and VS-Individual vs U-Individual.",
        "Secondary: VS-Individual vs U-Shared is a **confounded** replacement comparison.",
        "Only fixed epoch10 is confirmatory *within this exploratory screen*. Best validation",
@@ -431,7 +443,7 @@ def report():
     report_path=RESULTS/"LOWVS_MASK_PARITY_REPORT.md"
     with report_path.open("x",encoding="utf-8") as handle:handle.write("\n".join(lines))
     print("\n".join(lines[:24]))
-    print("Report:", report_path)
+    print("Report:", report_path,"Decision:",decision)
 
 
 def main():
