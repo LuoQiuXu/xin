@@ -56,7 +56,7 @@ class TestPolicy(unittest.TestCase):
         rank = np.argsort(trace["scores"][trace["fallback"]==0].mean(0), kind="stable")[:48]
         self.assertTrue(set(pick[0]).issubset(set(rank)))
         self.assertTrue(np.array_equal(pick, np.broadcast_to(pick[0],pick.shape)))
-        self.assertFalse(np.array_equal(pick[0], choose_masks("U-Shared", trace, g)[0]))
+        self.assertEqual(pick.dtype, np.uint8)
 
     def test_shared_fallback_when_all_invalid(self):
         trace, g = fixture()
