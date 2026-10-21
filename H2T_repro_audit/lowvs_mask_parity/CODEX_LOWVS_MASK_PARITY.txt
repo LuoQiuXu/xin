@@ -1,0 +1,140 @@
+【Codex 执行指令：Low-VS × Mask Granularity 严格配对补实验】
+仓库：LuoQiuXu/xin
+唯一允许写入分支：experiment/lowvs-mask-parity-20261021
+已有代码目录：H2T_repro_audit/lowvs_mask_parity/
+重要：代码已经提交，先审查、测试和运行，禁止重新设计另一个方案。
+日期：2026-10-21
+
+======== 一、实验动机，不要跑偏 ========
+
+此前 Low-VS 相对 Uniform-PerSample 在 IF100、Clean Stage I 的固定 epoch10 有小幅改善，但 2026-10-15 的 BatchShared 额外对照和旧实验不在同一数值环境，历史报告记录输入特征/VS评分哈希不一致。我们不能认定 Low-VS 已严格优于原始 H2T 的 batch-shared 随机通道选择。
+
+本次唯一问题：
+在 Stage I、BN、BS 接收者、IS 供体、输入增强、分类器初始参数、SGD、训练预算及 MASK GRANULARITY 分别对齐时，Low-VS 是否优于相同粒度的随机掩码？
+
+四个必须从头在同一数值环境重训的臂：
+  U-Shared, VS-Shared, U-Individual, VS-Individual
+Stage II seeds = 124,125；每臂 10 epochs × 85 batches = 850 SGD steps；共 8 个新训练臂。
+
+禁止复用旧版不同环境的 Uniform/LowVS 模型作为本次的新臂，禁止混合旧 2026-10-15 结果的准确率生成所谓严格配对表。
+
+阅读全文：
+- H2T_repro_audit/lowvs_mask_parity/PROTOCOL.md
+- H2T_repro_audit/lowvs_mask_parity/mask_policy.py
+- H2T_repro_audit/lowvs_mask_parity/test_mask_policy.py
+- H2T_repro_audit/lowvs_mask_parity/run_parity.py
+历史参照：
+- CLEAN_VS_MULTI_SEED_STABILITY_REPORT.md
+- H2T_repro_audit/mask_granularity_iteration/results/MASK_GRANULARITY_RESULTS.md
+- H2T_BN_AUDIT.md
+- DATASET_PROTOCOL_AUDIT.md
+
+======== 二、分支与历史保护 ========
+
+1. 先 git fetch origin，checkout experiment/lowvs-mask-parity-20261021，并确认分支。
+2. 只在本分支工作；不修改 main、旧实验分支、H2T 官方核心代码、原始报告或任何封存数据。
+3. 历史 Stage I 和老实验目录只读；若要修 bug，只允许改本次目录，并将科学假设、掩码定义与修补原因记录到本次目录中。
+4. 禁止 force push、reset、rebase、删除旧 checkpoints。
+5. 只 commit 小型源码、协议、必要日志与 compact CSV/JSON/MD。严禁 commit 模型权重、原始图像/特征缓存、大型 npz。
+6. 已有本次 results 若不完整不得覆盖；先诊断错误并清楚说明。不要默默重跑或用新种子替代。
+
+======== 三、优先执行 CPU 单元测试，再做真实数据 preflight ========
+
+在项目目录执行（PowerShell；根据本机实际 Python 环境调整）：
+
+  $py = 'D:\app\minicondaaa\envs\xiaoju\python.exe'
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py unit
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py preflight
+
+已知旧 Clean 实验位于：
+  H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/
+
+脚本复用历史已审计模块：
+  common.py、stability_models.py、online_policy.py、
+  reused_train_helpers.py、reused_vs_math.py
+以及旧的 Clean Stage I epoch184 checkpoint、LT TRAIN、validation feature maps、
+class_feature_statistics.npz、seed124/125 的 sampling_plan 和 Gumbel keys。
+
+这些大文件可能只在本地，没有同步到 GitHub；必须逐一核对存在性、维度和 SHA。没有真实资产就如实 STOP，禁止用随机数组“补齐”或换一个无审计的 checkpoint。
+
+若本机没有指定路径中的 Python，但另一个 Python 环境能完整通过依赖、CUDA 与数值测试，可统一改为一个有效环境运行全部 8 臂；环境选择必须事先固定，且第一臂以后不得切换。不能用旧环境的结果顶替。
+
+======== 四、关键技术规则 ========
+
+- Backbone=Clean ResNet-32，Stage I seed42 epoch184，冻结 backbone/BN。
+- 只更新 6500 参数 100 类分类头，CE/原 cosine schedule。
+- 同一 BS receiver、IS donor、同一图像增强，rho=0.25，64 通道替换16。
+- 完整空间通道 [8,8] 直接复制；接收标签保持不变。
+- U-Shared：一个 batch 共用第一条锁定 Gumbel64 得到的随机16/64掩码。
+- VS-Shared：同一 batch 的有效接收者/供体评分按通道取平均；Bottom48 候选池，使用和 U-Shared 完全相同的第一条 Gumbel 在池内选16。无有效评分时回退 U-Shared。
+- U-Individual：每样本自己的 Gumbel 随机16。
+- VS-Individual：保持旧在线 Low-VS 数学、Bottom48/16、少样本供体回退 Uniform。
+- 不能将 U-Shared 称为 “原作者 RNG 逐位复现”：它是原始随机 mask 的分布/共享语义对照。batch-level VS 是本次新增的预定义聚合规则，不能假称原 H2T 自带此模块。
+- 所有 8 臂必须运行在同一 Python/PyTorch/CUDA 数值环境。
+- 每个 seed 的 U-Shared 必须先于其他三臂执行，保存新的 850 行 batch signatures。
+- 其余三臂每个 batch 的 13 个关键字段与该 seed 的 U-Shared 严格逐位匹配。字段涉及索引/标签、增强图像、特征、Gumbel、GAP、VS评分、CPU/CUDA RNG 和原2个在线掩码。
+- 任一哈希不一致，立即停止该 seed，不得像历史跨环境对照那样豁免。根因确定前，不继续实验。
+- 验证集限 1980 张 TRAIN 留出集（ID1..99、class0 缺失、100-way logits），不打开官方 TEST。
+- 每臂保存 epoch10 logits/labels/predictions、模型训练 epoch 指标、实际 mask、分类头权重，以及必要配对记录。
+- 模型和 BN 每 epoch 确认完全冻结；保存分类头并独立加载复核最后和最佳指标。
+- 如果检测任何训练不公平、官方 TEST 被调用、真实样本路径不匹配、历史 SHA 改变，STOP。
+
+允许修复 run_parity.py 中确定的纯工程 bug，但必须运行复核并记录：BUGFIXES.md，注明修复前后代码差异、为什么不改变科学协议；例如输入类型、测试缺失处理、导入、CUDA 数值复现等。任何修改 scoring/BOTTOM48/16、共享规则、rho、loss、训练时长、eval 数据、seed 都不属于工程修复，不可自行修改。
+
+======== 五、执行顺序 ========
+
+确认 unit 和 preflight 均通过后，严格按以下顺序逐臂执行，每条返回成功才启动下一条。
+
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 124 --arm U-Shared
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 124 --arm VS-Shared
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 124 --arm U-Individual
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 124 --arm VS-Individual
+
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 125 --arm U-Shared
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 125 --arm VS-Shared
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 125 --arm U-Individual
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 125 --arm VS-Individual
+
+全部完成后才执行：
+  & $py H2T_repro_audit/lowvs_mask_parity/run_parity.py report
+
+整个过程不需要重训 Stage I，不需要引入额外新模型/损失或进行参数搜索。
+如出现运行错误不要自动执行后续命令，立即记录并 STOP。
+
+======== 六、报告必须回答的问题 ========
+
+主比较（固定第10epoch；各 seed 单独报告）：
+  1. VS-Shared − U-Shared：在原始批共享掩码形式下 Low-VS 是否有效？
+  2. VS-Individual − U-Individual：旧的 Low-VS 正向信号在本次环境重训后是否存在？
+
+辅比较：
+  3. U-Individual − U-Shared：随机掩码粒度效应。
+  4. VS-Individual − VS-Shared：注意包含 VS 批聚合定义变化，不可称纯粒度效应。
+  5. VS-Individual − U-Shared：多因素混杂，不能称通道评分的独立收益。
+
+逐项报告 Overall、Head、OfficialMedium、Tail、Few、逐图 paired wins/losses/net 和 per-class delta。
+保存是否与训练中输入的所有 13 个配对字段相符、每组更改实际掩码数、chosen B/V/ratio 统计；
+各实验 arm 的首末 epoch 曲线、best epoch（仅诊断）、实际耗时和显存（若可得到）。
+
+预先冻结 GO 门槛：对两个主比较，seed124和125都要求 Tail +0.5 pp 或更多，
+且 Overall 非负；仅当两组主比较的全部要求都成立，才给“值得独立确认”
+的探索性 GO。否则根据方向与 Head/Overall 代价报告 NO-GO 或 INCONCLUSIVE。
+门槛即使通过，结果仍只属于旧99类开发集，不可称已证明方法优于原 H2T。
+不能拿测试集挑 seed、选 epoch 或改阈值。
+
+最终生成：
+  H2T_repro_audit/lowvs_mask_parity/results/LOWVS_MASK_PARITY_REPORT.md
+  H2T_repro_audit/lowvs_mask_parity/results/epoch10.csv
+  H2T_repro_audit/lowvs_mask_parity/results/paired_contrasts.csv
+  H2T_repro_audit/lowvs_mask_parity/results/per_class_contrasts.csv
+  H2T_repro_audit/lowvs_mask_parity/results/interactions.csv
+
+请在报告结尾逐条说明：1) 哪些比较严格配对；2) 有多少样本净得失；
+3) 原 H2T 是否真被严格代表；4) 掩码粒度是否混杂；5) 为什么99类重复dev不能作盲测；
+6) 本次实验对“Low-VS有效”的支持力度；7)下一步 GO / NO-GO / INCONCLUSIVE。
+
+完成后只把必要小型代码+报告提交并 push 到当前分支；旧分支与所有旧文件字节不变。
+请在最后向用户回报 git commit SHA、执行Python/torch/CUDA版本、运行命令、
+核验结果、8臂指标总表、发现的限制与GitHub报告路径。
+
+本任务结束后 STOP，不自行设计下一版方法、IF200扩展、追加其他seed或运行官方TEST。
