@@ -1,0 +1,12 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 125 --arm VS-Shared START 2026-10-21T18:19:02+08:00
+VS-Shared seed=125 epoch=1: Overall=46.5152, Head=60.0000, Tail=26.0345
+VS-Shared seed=125 epoch=2: Overall=46.4141, Head=59.7143, Tail=26.2069
+VS-Shared seed=125 epoch=3: Overall=46.8182, Head=60.5714, Tail=27.0690
+VS-Shared seed=125 epoch=4: Overall=47.0202, Head=60.1429, Tail=27.4138
+VS-Shared seed=125 epoch=5: Overall=47.0707, Head=60.8571, Tail=25.8621
+VS-Shared seed=125 epoch=6: Overall=46.7677, Head=60.7143, Tail=26.0345
+VS-Shared seed=125 epoch=7: Overall=46.7172, Head=60.8571, Tail=26.2069
+VS-Shared seed=125 epoch=8: Overall=47.0202, Head=60.7143, Tail=26.0345
+VS-Shared seed=125 epoch=9: Overall=46.9697, Head=60.5714, Tail=26.7241
+VS-Shared seed=125 epoch=10: Overall=46.9697, Head=60.5714, Tail=26.7241
+COMPLETE 125 VS-Shared 10 epochs / 850 updates

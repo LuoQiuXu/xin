@@ -1,0 +1,4 @@
+# Full per-batch evidence stays local; publish compact verification tables.
+/results/**/batch_signatures.csv
+/results/source_snapshot/
+/results/matplotlib_cache/

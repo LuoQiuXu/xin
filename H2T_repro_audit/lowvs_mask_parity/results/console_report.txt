@@ -1,0 +1,26 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe H2T_repro_audit/lowvs_mask_parity/run_parity.py report START 2026-10-21T18:22:47+08:00
+# Low-VS same-environment 2x2 scientific report
+
+This report is mechanically generated from **eight newly trained arms**; no historical
+accuracy is reused as a contemporary arm. All outcomes are on the repeatedly used
+**TRAIN-held-out 99-class development split (1980 images, class 0 absent)**,
+not on the official TEST set. Results are exploratory, NOT statistically independent
+confirmation of a new method.
+
+## Fixed epoch 10, percent (%)
+
+| Seed | Arm | Overall | Head | Medium-ID | Tail | Few |
+|---|---|---:|---:|---:|---:|---:|
+|124|U-Shared|47.3232|60.2857|51.1429|27.0690|27.6667|
+|124|VS-Shared|47.1717|61.4286|49.8571|26.7241|27.1667|
+|124|U-Individual|47.0707|60.1429|50.7143|26.8966|27.5000|
+|124|VS-Individual|47.3232|59.8571|51.0000|27.7586|28.3333|
+|125|U-Shared|46.9697|59.8571|50.7143|26.8966|27.5000|
+|125|VS-Shared|46.9697|60.5714|50.1429|26.7241|27.1667|
+|125|U-Individual|46.8687|60.1429|50.1429|26.8966|27.5000|
+|125|VS-Individual|47.1717|59.5714|50.7143|27.9310|28.5000|
+
+## Paired comparisons: positive delta means first method wins
+
+| Seed | Comparison | Group | delta pp | net correct |
+Report: D:\xiangmuxunlian\xin\H2T_repro_audit\lowvs_mask_parity\results\LOWVS_MASK_PARITY_REPORT.md Decision: NO_GO_FOR_PREREGISTERED_SCREEN

@@ -45,6 +45,7 @@ from stability_models import frozen_models, check_sources, plan_dir, PAIR_KEYS
 from reused_train_helpers import augment, fuse, tensor_hash, scheduler, optimizer_for
 from online_policy import online_masks, selected_statistics
 from mask_policy import ARMS, choose_masks
+import audit_support as audit
 
 _test_events = []
 
@@ -54,7 +55,7 @@ def install_test_guard():
     def audit(event, args):
         if event == "open" and args and isinstance(args[0], (str, bytes, os.PathLike)):
             p = str(Path(os.fsdecode(args[0])).resolve()).casefold()
-            if p == forbidden:
+            if p == forbidden or (Path(p).name == "test" and Path(p).parent.name == "cifar-100-python"):
                 _test_events.append("Official CIFAR-100 test file access")
                 raise RuntimeError("Official TEST data access is prohibited")
     sys.addaudithook(audit)
@@ -128,6 +129,10 @@ def preflight():
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         raise RuntimeError("CPU tests did not pass")
+    unit_record=json.loads((RESULTS/'unit.json').read_text(encoding='utf-8'))
+    assert unit_record['status']=='PASS' and unit_record['source_hashes']==audit.source_hashes(sys.modules[__name__])
+    if not torch.cuda.is_available():raise RuntimeError('Required CUDA environment missing; STOP')
+    evidence={};history=audit.historical_manifest(sys.modules[__name__])
     for seed in SEEDS:
         inputs, digests = input_manifest(seed)
         labels = np.load(inputs["train_labels"], allow_pickle=False)
@@ -149,8 +154,15 @@ def preflight():
             raise ValueError("Invalid recipient raw indices")
         if np.min(plan["donors"]) < 0 or np.max(plan["donors"]) >= N:
             raise ValueError("Invalid donor raw indices")
-        print(f"seed={seed}: preflight PASS; 10 x {N} paired draws; 99-class TRAIN holdout; hashes={digests}")
-    print("Preflight complete: no new training and no official TEST access.")
+        real=audit.preflight_seed(sys.modules[__name__],seed,inputs)
+        evidence[str(seed)]={**real,'input_sha256':digests}
+        print(f"seed={seed}: real-data CUDA preflight PASS; fresh replay 13/13 fields exact; zero updates",flush=True)
+    assert evidence['124']['environment']==evidence['125']['environment']
+    audit.verify_history(sys.modules[__name__],history)
+    dump(RESULTS/'preflight.json',{'status':'PASS','seeds':evidence,'source_hashes':audit.source_hashes(sys.modules[__name__]),
+         'historical_sha256':history,'environment':evidence['124']['environment'],'TEST_events':_test_events,
+         'backward_calls':0,'optimizer_updates':0,'time':audit.stamp()})
+    print("Preflight complete: no new training and no official TEST access.",flush=True)
 
 
 def signature(epoch, batch, rec, don, labels, ri, di, receiver, donor, g, trace, aug):
@@ -172,6 +184,11 @@ def signature(epoch, batch, rec, don, labels, ri, di, receiver, donor, g, trace,
 def train(seed, arm):
     if seed not in SEEDS or arm not in ARMS:
         raise ValueError("Unexpected seed or arm")
+    pre=audit.check_preflight(sys.modules[__name__],seed)
+    order=[(se,a) for se in SEEDS for a in ARMS]
+    for prior_seed,prior_arm in order[:order.index((seed,arm))]:
+        prior=json.loads((run_dir(prior_seed,prior_arm)/'summary.json').read_text(encoding='utf-8'))
+        assert prior['status']=='complete' and prior['updates']==850
     inputs, input_sha = input_manifest(seed)
     folder = run_dir(seed, arm)
     baseline = run_dir(seed, "U-Shared") / "batch_signatures.csv"
@@ -185,6 +202,16 @@ def train(seed, arm):
 
     cfg, transform, bb, cls, CE, methods, stage1, q = frozen_models(seed)
     bb_init, fc_init = state_hash(bb), state_hash(cls)
+    env=audit.environment()
+    assert env==pre['environment'],'Numerical environment changed; STOP'
+    expected=pre['seeds'][str(seed)]
+    assert bb_init==expected['initial']['backbone'] and fc_init==expected['initial']['classifier']
+    fc_snapshot={k:v.detach().cpu().clone() for k,v in cls.state_dict().items()}
+    bn_init=audit.bn_hash(sys.modules[__name__],bb)
+    dump(folder/'config.json',{'seed':seed,'arm':arm,'epochs':10,'batch_size':128,'updates':850,
+         'rho':.25,'replace_channels':16,'candidate_channels':48,'environment':env,
+         'source_hashes':audit.source_hashes(sys.modules[__name__]),'inputs':input_sha,
+         'effective_yaml':cfg.dump(),'initial_backbone_hash':bb_init,'initial_classifier_hash':fc_init})
     if reference is not None:
         saved = json.loads((run_dir(seed, "U-Shared") / "summary.json").read_text(encoding="utf-8"))
         if bb_init != saved["initial_backbone_hash"] or fc_init != saved["initial_classifier_hash"]:
@@ -216,7 +243,11 @@ def train(seed, arm):
     best_epoch=None
     step=0
     start=time.perf_counter()
+    samegran_overlap=0; samegran_identical=0
+    fallback_reason_counts=np.zeros(4,dtype=np.int64);shared_no_eligible_batches=0
+    torch.cuda.reset_peak_memory_stats()
     for epoch in range(EPOCHS):
+        epoch_started=time.perf_counter(); train_loss_sum=0.
         cls.train()
         schedule(opt, epoch, cfg)
         for batch, lower in enumerate(range(0,N,BATCH)):
@@ -231,14 +262,28 @@ def train(seed, arm):
                 raise RuntimeError("Backbone unexpectedly requires gradient")
             g=gumbel[epoch,lower:upper]
             trace=online_masks(receiver,labels[don],g)
+            fallback_reason_counts += np.bincount(trace['fallback'],minlength=4)
+            shared_no_eligible_batches += int(not np.any(trace['fallback']==0))
             sig=signature(epoch,batch,rec,don,labels,ri,di,receiver,donor,g,trace,augment_rng)
             if reference is not None:
                 previous=reference[step]
                 wrong=[k for k in PAIR_KEYS if str(sig[k]) != str(previous[k])]
                 if wrong:
+                    dump(folder/'PAIRING_FAILURE.json',{'seed':seed,'arm':arm,'epoch':epoch+1,'batch':batch,
+                         'failed_fields':wrong,'actual':sig,'expected':previous})
                     raise RuntimeError(f"STRICT pairing mismatch seed={seed}, {arm}, epoch={epoch+1}, "
                                        f"batch={batch}, fields={wrong}; do NOT waive this gate")
+            if step==0:
+                mismatch=[k for k in PAIR_KEYS if str(sig[k])!=str(expected['signature'][k])]
+                if mismatch:
+                    dump(folder/'PREFLIGHT_TO_TRAIN_FAILURE.json',{'fields':mismatch,'actual':sig,'expected':expected['signature']})
+                    raise RuntimeError('First batch differs from real-data preflight: '+str(mismatch))
             chosen=choose_masks(arm,trace,g)
+            uniform=choose_masks('U-Shared' if arm.endswith('Shared') else 'U-Individual',trace,g)
+            current_bool=np.zeros((len(chosen),64),dtype=bool);np.put_along_axis(current_bool,chosen,True,axis=1)
+            uniform_bool=np.zeros_like(current_bool);np.put_along_axis(uniform_bool,uniform,True,axis=1)
+            samegran_overlap += int((current_bool&uniform_bool).sum())
+            samegran_identical += int((current_bool==uniform_bool).all(1).sum())
             mask_records[epoch,lower:upper]=chosen
             with torch.no_grad():
                 mixed,mask=fuse(receiver,donor,chosen)
@@ -250,19 +295,26 @@ def train(seed, arm):
                 composition_sum[k] += float(np.asarray(selected[k]).sum())
             logits=cls(mixed)
             loss=criterion(logits,target,extra_info=None)
-            if not torch.isfinite(loss):
+            if not torch.isfinite(loss) or not torch.isfinite(logits).all():
                 raise RuntimeError("Nonfinite classifier loss")
             opt.zero_grad()
             loss.backward()
             if any(p.grad is None or not torch.isfinite(p.grad).all() for p in cls.parameters()):
                 raise RuntimeError("Invalid classifier gradients")
             opt.step()
+            assert all(torch.isfinite(p).all() for p in cls.parameters())
+            assert all(p.grad is None and not p.requires_grad for p in bb.parameters())
+            assert np.array_equal(target.cpu().numpy(),labels[rec])
+            train_loss_sum += float(loss.detach())*len(rec)
             sig.update({"selected_mask_sha256":array_hash(chosen),
                         "learning_rate":float(opt.param_groups[0]["lr"]),
                         "loss":float(loss.detach())})
             batch_rows.append(sig)
             step+=1
+        torch.cuda.synchronize()
+        train_seconds=time.perf_counter()-epoch_started
         check_frozen(bb,snapshot)
+        assert audit.bn_hash(sys.modules[__name__],bb)==bn_init
         val,logits,pred=evaluate(cls,val_labels,feature_maps=val_maps)
         if val["Overall"] > best:
             best=val["Overall"];best_epoch=epoch+1
@@ -276,7 +328,10 @@ def train(seed, arm):
             with (folder/"validation_epoch10.npz").open("xb") as fh:
                 np.savez_compressed(fh,labels=val_labels, predictions=pred, logits=logits)
         log_rows.append({"epoch":epoch+1,**{k:val[k] for k in METRICS},
-                         "train_lr":float(opt.param_groups[0]["lr"])})
+                         "train_lr":float(opt.param_groups[0]["lr"]),"updates":step,
+                         "train_CE":train_loss_sum/N,"training_seconds":train_seconds,
+                         "peak_allocated_mib":torch.cuda.max_memory_allocated()/1024**2,
+                         "peak_reserved_mib":torch.cuda.max_memory_reserved()/1024**2})
         print(f"{arm} seed={seed} epoch={epoch+1}: Overall={val['Overall']:.4f}, "
               f"Head={val['Head']:.4f}, Tail={val['Tail']:.4f}",flush=True)
     if step != 850 or _test_events:
@@ -292,11 +347,16 @@ def train(seed, arm):
     for label in ("best","final"):
         c=torch.load(folder/f"{label}_fc.pth",map_location="cpu",weights_only=False)
         cls.load_state_dict(c["classifier"],strict=True)
-        score,_,_=evaluate(cls,val_labels,feature_maps=val_maps)
+        score,reloaded_logits,reloaded_pred=evaluate(cls,val_labels,feature_maps=val_maps)
         expected = log_rows[c["epoch"]-1]
         if any(score[k] != expected[k] for k in METRICS):
             raise RuntimeError(f"{label} checkpoint evaluation mismatch")
-        reloads[label]={"epoch":c["epoch"],"sha256":sha(folder/f"{label}_fc.pth")}
+        if label=='final':
+            assert np.array_equal(reloaded_logits,logits) and np.array_equal(reloaded_pred,pred),'Final logits reload mismatch'
+        reloads[label]={"epoch":c["epoch"],"sha256":sha(folder/f"{label}_fc.pth"),"metrics":{k:score[k] for k in METRICS}}
+    changes={k:float((v.detach().cpu()-fc_snapshot[k]).abs().max()) for k,v in cls.state_dict().items()}
+    assert all(v>0 for v in changes.values())
+    audit.verify_history(sys.modules[__name__],pre['historical_sha256'])
     write_csv(folder/"epochs.csv",log_rows)
     write_csv(folder/"batch_signatures.csv",batch_rows)
     with (folder/"actual_masks.npz").open("xb") as fh:
@@ -312,6 +372,18 @@ def train(seed, arm):
                        "original_official_rng_exact":False},
              "selected_stats_mean":{k:v/(N*EPOCHS) for k,v in composition_sum.items()},
              "checkpoints":reloads,"runtime_seconds":time.perf_counter()-start,
+             "environment":env,"source_hashes":audit.source_hashes(sys.modules[__name__]),
+             "classifier_parameters":sum(p.numel() for p in cls.parameters()),"classifier_max_abs_changes":changes,
+             "backbone_state_entries":len(snapshot),"backbone_parameter_tensors":len(list(bb.parameters())),
+             "BN_before_hash":bn_init,"BN_after_hash":audit.bn_hash(sys.modules[__name__],bb),
+             "BN_counter_values":sorted({int(v) for k,v in snapshot.items() if k.endswith('num_batches_tracked')}),
+             "final_backbone_hash":state_hash(bb),"final_classifier_hash":state_hash(cls),
+             "fallback_reason_counts":fallback_reason_counts.tolist(),"shared_no_eligible_batches":shared_no_eligible_batches,
+             "same_granularity_uniform_mean_overlap":samegran_overlap/(N*EPOCHS),
+             "same_granularity_uniform_identical_draws":samegran_identical,
+             "same_granularity_uniform_changed_draws":N*EPOCHS-samegran_identical,
+             "peak_allocated_mib":torch.cuda.max_memory_allocated()/1024**2,
+             "peak_reserved_mib":torch.cuda.max_memory_reserved()/1024**2,
              "test_access_events":_test_events}
     dump(folder/"summary.json",summary)
     dump(folder/"status.json",{"state":"complete","seed":seed,"arm":arm,"updates":850},replace=True)
@@ -324,10 +396,14 @@ def _group_mask(y, group):
     if group=="Head":return y < 36
     if group=="OfficialMedium":return (y >= 36)&(y < 71)
     if group=="Tail":return y >= 71
+    if group=="Few":
+        counts=np.bincount(np.load(OLD/'train_labels.npy',allow_pickle=False),minlength=100)
+        return counts[y]<20
     raise ValueError(group)
 
 
 def report():
+    pre=audit.check_preflight(sys.modules[__name__])
     results={}
     table=[]
     masks={}
@@ -339,6 +415,7 @@ def report():
             summary=json.loads((folder/"summary.json").read_text(encoding="utf-8"))
             if summary["status"]!="complete" or summary["updates"]!=850 or not summary["backbone_bn_bitwise_frozen"]:
                 raise RuntimeError(f"Invalid run: {folder}")
+            assert summary['source_hashes']==pre['source_hashes'] and summary['environment']==pre['environment']
             rows=read_csv(folder/"batch_signatures.csv")
             if len(rows)!=850: raise RuntimeError("Short batch signatures")
             if arm=="U-Shared":baseline=rows
@@ -350,6 +427,11 @@ def report():
                 raise RuntimeError("Unexpected evaluation split")
             if not np.isfinite(b["logits"]).all() or b["logits"].shape!=(1980,100):
                 raise RuntimeError("Invalid frozen evaluation logits")
+            assert np.array_equal(p,b['logits'].argmax(1))
+            assert np.bincount(y,minlength=100).tolist()==[0]+[20]*99
+            from common import metrics as recalculate_metrics
+            recalculated=recalculate_metrics(p,y)
+            assert all(abs(recalculated[k]-summary['epoch10'][k])<1e-9 for k in METRICS if k!='validation_CE')
             if arm=="U-Shared":baseline_y=y
             elif not np.array_equal(y,baseline_y):raise RuntimeError("Changed validation labels/order")
             results[(seed,arm)]=(y,p,summary)
@@ -362,7 +444,7 @@ def report():
     for seed in SEEDS:
         for improved,baseline in contrasts:
             y,pb,_=results[(seed,baseline)];_,pa,_=results[(seed,improved)]
-            for group in ("Overall","Head","OfficialMedium","Tail"):
+            for group in ("Overall","Head","OfficialMedium","Tail","Few"):
                 mask=_group_mask(y,group)
                 gained=int(np.sum((pb[mask]!=y[mask])&(pa[mask]==y[mask])))
                 lost=int(np.sum((pb[mask]==y[mask])&(pa[mask]!=y[mask])))
@@ -376,7 +458,8 @@ def report():
                 lost=int(np.sum((pb[mask]==y[mask])&(pa[mask]!=y[mask])))
                 classes.append({"seed":seed,"contrast":f"{improved} - {baseline}",
                                 "class_id":class_id,"images":int(mask.sum()),
-                                "gained":gained,"lost":lost,"net":gained-lost})
+                                "gained":gained,"lost":lost,"net":gained-lost,
+                                "delta_pp":100*(gained-lost)/int(mask.sum())})
     interaction=[]
     for seed in SEEDS:
         def delta(group,a,b):
@@ -399,7 +482,7 @@ def report():
         and criteria[f"{contrast}|Overall|{seed}"] >= 0.
         for contrast in primary for seed in SEEDS
     )
-    decision = "PROVISIONAL_GO_FOR_INDEPENDENT_CONFIRMATION" if provisional_go else "NOT_GO_OR_INCONCLUSIVE"
+    decision = "PROVISIONAL_GO_FOR_INDEPENDENT_CONFIRMATION" if provisional_go else "NO_GO_FOR_PREREGISTERED_SCREEN"
     write_csv(RESULTS/"epoch10.csv",table)
     write_csv(RESULTS/"paired_contrasts.csv",rows)
     write_csv(RESULTS/"per_class_contrasts.csv",classes)
@@ -443,10 +526,12 @@ def report():
        "`interactions.csv`, and each run's `batch_signatures.csv`,",
        "`actual_masks.npz`, `summary.json`, and saved classification head.",
        ""]
+    lines=audit.report_evidence(sys.modules[__name__],lines,results,rows,interaction,criteria,decision)
     report_path=RESULTS/"LOWVS_MASK_PARITY_REPORT.md"
     with report_path.open("x",encoding="utf-8") as handle:handle.write("\n".join(lines))
     print("\n".join(lines[:24]))
     print("Report:", report_path,"Decision:",decision)
+    dump(RESULTS/'STOP_COMPLETED.json',{'status':'complete_and_stopped','updates':6800,'new_arms':8,'decision':decision,'time':audit.stamp()})
 
 
 def main():
@@ -455,27 +540,38 @@ def main():
     parser.add_argument("--seed",type=int,choices=SEEDS)
     parser.add_argument("--arm",choices=ARMS)
     args=parser.parse_args()
-    if args.action=="train" and (args.seed is None or args.arm is None):
-        parser.error("train needs --seed and --arm")
+    if args.action=="train" and (args.seed is None or args.arm is None):parser.error("train needs --seed and --arm")
     RESULTS.mkdir(parents=True,exist_ok=True)
-    install_test_guard()
-    try:
-        if args.action=="unit":
-            import unittest
-            r=unittest.TextTestRunner(verbosity=2).run(
-                unittest.defaultTestLoader.discover(str(HERE),pattern="test_mask_policy.py"))
-            if not r.wasSuccessful():raise RuntimeError("Unit tests failed")
-        elif args.action=="preflight":preflight()
-        elif args.action=="train":train(args.seed,args.arm)
-        elif args.action=="report":report()
-        if _test_events:raise RuntimeError(f"Official TEST events: {_test_events}")
-    except BaseException:
-        # A failure stops the current invocation. Never retry under a new model or
-        # silently override a mismatched pairing contract.
-        print("FAILED - STOP; no next arm should be run until this is explained.",file=sys.stderr)
-        traceback.print_exc()
-        raise
+    if (RESULTS/'FAILED_STOP.json').exists():raise RuntimeError('Existing failure marker: STOP; no overwrite or silent retry')
+    if (RESULTS/'STOP_COMPLETED.json').exists():raise RuntimeError('Completed experiment: refuse rerun')
+    install_test_guard();audit.write_guard(sys.modules[__name__])
+    tag=f'train_seed{args.seed}_{args.arm}' if args.action=='train' else args.action
+    log_path=RESULTS/f'console_{tag}.txt'
+    if log_path.exists() or (RESULTS/f'status_{tag}.json').exists():raise FileExistsError('Command output exists; STOP')
+    with log_path.open('x',encoding='utf-8',buffering=1) as log:
+        out,err=sys.stdout,sys.stderr
+        sys.stdout,sys.stderr=audit.Tee(out,log),audit.Tee(err,log)
+        started=time.perf_counter()
+        try:
+            print('COMMAND',sys.executable,' '.join(sys.argv),'START',audit.stamp(),flush=True)
+            if args.action=='unit':
+                import unittest
+                r=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.discover(str(HERE),pattern='test_mask_policy.py'))
+                if not r.wasSuccessful():raise RuntimeError('Unit tests failed')
+                dump(RESULTS/'unit.json',{'status':'PASS','tests':r.testsRun,'source_hashes':audit.source_hashes(sys.modules[__name__]),'software':audit.software()})
+            elif args.action=='preflight':preflight()
+            elif args.action=='train':train(args.seed,args.arm)
+            else:report()
+            if _test_events or audit.WRITES:raise RuntimeError('Official TEST or historical write event')
+            dump(RESULTS/f'status_{tag}.json',{'status':'complete','time':audit.stamp(),'seconds':time.perf_counter()-started,
+                 'command':sys.argv,'source_hashes':audit.source_hashes(sys.modules[__name__]),'TEST_events':_test_events,'historical_write_events':audit.WRITES})
+        except BaseException:
+            text=traceback.format_exc();print(text,file=sys.stderr,flush=True)
+            if not (RESULTS/'FAILED_STOP.json').exists():
+                dump(RESULTS/'FAILED_STOP.json',{'status':'FAILED_STOP','command':sys.argv,'traceback':text,'time':audit.stamp(),
+                     'TEST_events':_test_events,'historical_write_events':audit.WRITES,'partial_outputs_preserved':True})
+            raise
+        finally:sys.stdout,sys.stderr=out,err
 
 
-if __name__=="__main__":
-    main()
+if __name__=='__main__':main()

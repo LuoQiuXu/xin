@@ -1,0 +1,164 @@
+{
+  "status": "complete",
+  "seed": 125,
+  "arm": "VS-Shared",
+  "epoch10": {
+    "epoch": 10,
+    "Overall": 46.96969696969697,
+    "Head": 60.57142857142857,
+    "OfficialMedium": 50.142857142857146,
+    "Tail": 26.724137931034484,
+    "Many": 61.470588235294116,
+    "Medium": 49.857142857142854,
+    "Few": 27.166666666666668,
+    "Macro": 46.96969696969697,
+    "validation_CE": 2.161899589769768,
+    "train_lr": 0.0004894348372981928,
+    "updates": 850,
+    "train_CE": 1.1398921952969008,
+    "training_seconds": 5.217468300019391,
+    "peak_allocated_mib": 123.9775390625,
+    "peak_reserved_mib": 160.0
+  },
+  "best_epoch": 5,
+  "best_Overall": 47.070707070707066,
+  "updates": 850,
+  "epochs": 10,
+  "input_sha256": {
+    "stage1": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+    "statistics": "e81a4897a965d642f832bd6429e0e5a7d136725daaa069d9ded96f87ab64aef9",
+    "source_lock": "954664d2508e36db01700f18bf469a53315b80cadc0d9150b9b3dec57b7ee24a",
+    "train_labels": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9",
+    "train_images": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64",
+    "validation_labels": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e",
+    "validation_maps": "a52852cd37f3daeb2116073253fb3e7cc5e798e0f4dd315849fb337064e34485",
+    "split": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1",
+    "config": "8b21fd1f3a6c959c39e268d6a4e957162f13996aa6486b65260f6c49ea78a886",
+    "plan": "68644617eb3f0e4a3e40cd48f938823c8893cc109241ad5c45277a6e50cf8fa4",
+    "noise": "f850740bb72db61994031bfba6020c09c86e7e96c8faaca7624774bea6ead96b"
+  },
+  "initial_backbone_hash": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "initial_classifier_hash": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+  "backbone_bn_bitwise_frozen": true,
+  "paired_batch_count": 850,
+  "baseline_control_fields": [
+    "epoch",
+    "batch",
+    "size",
+    "indices_sha256",
+    "images_sha256",
+    "features_sha256",
+    "augmentation_state_after_sha256",
+    "ambient_cpu_rng_sha256",
+    "ambient_cuda_rng_sha256",
+    "gumbel_sha256",
+    "online_gap_sha256",
+    "online_scores_sha256",
+    "all_two_masks_sha256"
+  ],
+  "policy": {
+    "shared_rule": "batch-mean eligible VS scores, bottom 48, uniform 16",
+    "uniform_shared_rng": "first receiver's Gumbel64; broadcast to batch",
+    "original_official_rng_exact": false
+  },
+  "selected_stats_mean": {
+    "V": 3.6160430859869135,
+    "B": 10.297420902281676,
+    "ratio": 0.29333382104864275,
+    "score": 0.517991465874461,
+    "fallback": 0.02811837374389232,
+    "common_with_uniform": 4.066783442426478
+  },
+  "checkpoints": {
+    "best": {
+      "epoch": 5,
+      "sha256": "4478cdd179c8239d39f6daac8fbd4a3f48085eb280e59643b7e48d196adf4bfb",
+      "metrics": {
+        "Overall": 47.070707070707066,
+        "Head": 60.857142857142854,
+        "OfficialMedium": 50.857142857142854,
+        "Tail": 25.862068965517242,
+        "Many": 61.61764705882353,
+        "Medium": 50.714285714285715,
+        "Few": 26.333333333333332,
+        "Macro": 47.07070707070707,
+        "validation_CE": 2.1699831336435644
+      }
+    },
+    "final": {
+      "epoch": 10,
+      "sha256": "78d6ef04723f7b94ef1438055a45126d078d95a2017e5d59d6b7316c633e0237",
+      "metrics": {
+        "Overall": 46.96969696969697,
+        "Head": 60.57142857142857,
+        "OfficialMedium": 50.142857142857146,
+        "Tail": 26.724137931034484,
+        "Many": 61.470588235294116,
+        "Medium": 49.857142857142854,
+        "Few": 27.166666666666668,
+        "Macro": 46.96969696969697,
+        "validation_CE": 2.161899589769768
+      }
+    }
+  },
+  "runtime_seconds": 52.853838300099596,
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "CUDA": "13.2",
+    "cudnn": 92400,
+    "device": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "device_total_mib": 8150.5625,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": false,
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "deterministic_algorithms": false,
+    "torch_num_threads": 24,
+    "default_dtype": "torch.float32",
+    "CUBLAS_WORKSPACE_CONFIG": null
+  },
+  "source_hashes": {
+    "H2T_repro_audit/lowvs_mask_parity/run_parity.py": "383e15dcd44cce0489836ae5ef87b10c61dbe7ffee3df3dcd6aab0d87d5d5910",
+    "H2T_repro_audit/lowvs_mask_parity/mask_policy.py": "2bfeaec984668c672de156eab5b713a68b72ec5360cf1601c5dcede657143c36",
+    "H2T_repro_audit/lowvs_mask_parity/test_mask_policy.py": "3797451ffee9e8d0dfea1b19034001d9351bf79b7c61c02e22df8ee50202ebac",
+    "H2T_repro_audit/lowvs_mask_parity/audit_support.py": "9310bf108d550d472b9f70b146b5ce928faf2d0284ca966620b9576e4d2612b3",
+    "H2T_repro_audit/lowvs_mask_parity/PROTOCOL.md": "b16a73013dc456e045a1f30553c5cf0cfbf2f2a9ff9c8a6f3b7996a0c32d27df",
+    "H2T_repro_audit/lowvs_mask_parity/CODEX_LOWVS_MASK_PARITY.txt": "c0db942b60fb50eeab2463842db72a10fa9f8850fe1fee329ead5d5cff39996f",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/common.py": "88360fccca5ee3dd4e04345948b3e8becdc94a5cea7d76ec988b2d971559515f",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/stability_models.py": "dbfe26b1e0455c03170d8b09b49335dfafd60d40236f11b6d7a74ee820893d7f",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/online_policy.py": "5c2334b9f5c8573472f8abebd98f5830a9e15f337af5ddfcd2b35c252cbe4137",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/reused_train_helpers.py": "9e5aada8732341e9f5d027647ba214c72ad3bccde0b3a11a098c517f755ed520",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/reused_vs_math.py": "636fdebdb31c991993cd6332a742efc15bdb981bbd1af0b3e1e5cef5b3e2ee61"
+  },
+  "classifier_parameters": 6500,
+  "classifier_max_abs_changes": {
+    "module.fc.weight": 0.3986079692840576,
+    "module.fc.bias": 0.1349569410085678
+  },
+  "backbone_state_entries": 186,
+  "backbone_parameter_tensors": 93,
+  "BN_before_hash": "017f79ae853f3223d04784ed1297798b0dd6679218b8bcc8bd33fd23d84d3a10",
+  "BN_after_hash": "017f79ae853f3223d04784ed1297798b0dd6679218b8bcc8bd33fd23d84d3a10",
+  "BN_counter_values": [
+    15640
+  ],
+  "final_backbone_hash": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "final_classifier_hash": "51d0947f6e3853055b83a1c1121ecc6a192816308ae09250952bc038a38726be",
+  "fallback_reason_counts": [
+    105420,
+    3050,
+    0,
+    0
+  ],
+  "shared_no_eligible_batches": 0,
+  "same_granularity_uniform_mean_overlap": 11.988540610306996,
+  "same_granularity_uniform_identical_draws": 384,
+  "same_granularity_uniform_changed_draws": 108086,
+  "peak_allocated_mib": 123.9775390625,
+  "peak_reserved_mib": 160.0,
+  "test_access_events": []
+}

@@ -1,0 +1,12 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe H2T_repro_audit/lowvs_mask_parity/run_parity.py train --seed 124 --arm U-Individual START 2026-10-21T18:15:20+08:00
+U-Individual seed=124 epoch=1: Overall=46.7172, Head=59.7143, Tail=26.7241
+U-Individual seed=124 epoch=2: Overall=46.2121, Head=59.7143, Tail=26.0345
+U-Individual seed=124 epoch=3: Overall=46.8182, Head=60.2857, Tail=26.3793
+U-Individual seed=124 epoch=4: Overall=47.1212, Head=60.5714, Tail=27.5862
+U-Individual seed=124 epoch=5: Overall=47.0707, Head=61.1429, Tail=26.3793
+U-Individual seed=124 epoch=6: Overall=46.7172, Head=60.4286, Tail=26.7241
+U-Individual seed=124 epoch=7: Overall=47.1212, Head=60.5714, Tail=26.7241
+U-Individual seed=124 epoch=8: Overall=46.7677, Head=59.7143, Tail=26.5517
+U-Individual seed=124 epoch=9: Overall=46.9697, Head=60.0000, Tail=26.8966
+U-Individual seed=124 epoch=10: Overall=47.0707, Head=60.1429, Tail=26.8966
+COMPLETE 124 U-Individual 10 epochs / 850 updates

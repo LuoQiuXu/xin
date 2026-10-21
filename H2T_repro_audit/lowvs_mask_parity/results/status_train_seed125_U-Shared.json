@@ -1,0 +1,28 @@
+{
+  "status": "complete",
+  "time": "2026-10-21T18:18:37+08:00",
+  "seconds": 53.84931710001547,
+  "command": [
+    "H2T_repro_audit/lowvs_mask_parity/run_parity.py",
+    "train",
+    "--seed",
+    "125",
+    "--arm",
+    "U-Shared"
+  ],
+  "source_hashes": {
+    "H2T_repro_audit/lowvs_mask_parity/run_parity.py": "383e15dcd44cce0489836ae5ef87b10c61dbe7ffee3df3dcd6aab0d87d5d5910",
+    "H2T_repro_audit/lowvs_mask_parity/mask_policy.py": "2bfeaec984668c672de156eab5b713a68b72ec5360cf1601c5dcede657143c36",
+    "H2T_repro_audit/lowvs_mask_parity/test_mask_policy.py": "3797451ffee9e8d0dfea1b19034001d9351bf79b7c61c02e22df8ee50202ebac",
+    "H2T_repro_audit/lowvs_mask_parity/audit_support.py": "9310bf108d550d472b9f70b146b5ce928faf2d0284ca966620b9576e4d2612b3",
+    "H2T_repro_audit/lowvs_mask_parity/PROTOCOL.md": "b16a73013dc456e045a1f30553c5cf0cfbf2f2a9ff9c8a6f3b7996a0c32d27df",
+    "H2T_repro_audit/lowvs_mask_parity/CODEX_LOWVS_MASK_PARITY.txt": "c0db942b60fb50eeab2463842db72a10fa9f8850fe1fee329ead5d5cff39996f",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/common.py": "88360fccca5ee3dd4e04345948b3e8becdc94a5cea7d76ec988b2d971559515f",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/stability_models.py": "dbfe26b1e0455c03170d8b09b49335dfafd60d40236f11b6d7a74ee820893d7f",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/online_policy.py": "5c2334b9f5c8573472f8abebd98f5830a9e15f337af5ddfcd2b35c252cbe4137",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/reused_train_helpers.py": "9e5aada8732341e9f5d027647ba214c72ad3bccde0b3a11a098c517f755ed520",
+    "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/reused_vs_math.py": "636fdebdb31c991993cd6332a742efc15bdb981bbd1af0b3e1e5cef5b3e2ee61"
+  },
+  "TEST_events": [],
+  "historical_write_events": []
+}

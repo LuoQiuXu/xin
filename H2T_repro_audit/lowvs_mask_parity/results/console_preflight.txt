@@ -1,0 +1,16 @@
+COMMAND D:\app\minicondaaa\envs\xiaoju\python.exe H2T_repro_audit/lowvs_mask_parity/run_parity.py preflight START 2026-10-21T18:11:44+08:00
+test_all_arms_shapes_and_distinct_channels (test_mask_policy.TestPolicy.test_all_arms_shapes_and_distinct_channels) ... ok
+test_does_not_modify_inputs (test_mask_policy.TestPolicy.test_does_not_modify_inputs) ... ok
+test_individual_replays_reviewed_policy (test_mask_policy.TestPolicy.test_individual_replays_reviewed_policy) ... ok
+test_invalid_inputs_fail_loudly (test_mask_policy.TestPolicy.test_invalid_inputs_fail_loudly) ... ok
+test_shared_fallback_when_all_invalid (test_mask_policy.TestPolicy.test_shared_fallback_when_all_invalid) ... ok
+test_shared_vs_pool_and_shared_noise (test_mask_policy.TestPolicy.test_shared_vs_pool_and_shared_noise) ... ok
+test_uniform_shared_equals_first_uniform_draw (test_mask_policy.TestPolicy.test_uniform_shared_equals_first_uniform_draw) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.006s
+
+OK
+seed=124: real-data CUDA preflight PASS; fresh replay 13/13 fields exact; zero updates
+seed=125: real-data CUDA preflight PASS; fresh replay 13/13 fields exact; zero updates
+Preflight complete: no new training and no official TEST access.

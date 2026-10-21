@@ -1,0 +1,5 @@
+seed,group,VS_by_granularity_interaction_pp,interpretation_limit
+124,Overall,0.4040404040404041,Shared VS uses batch-mean scoring; not a pure mask-granularity interaction
+124,Tail,1.206896551724138,Shared VS uses batch-mean scoring; not a pure mask-granularity interaction
+125,Overall,0.30303030303030304,Shared VS uses batch-mean scoring; not a pure mask-granularity interaction
+125,Tail,1.206896551724138,Shared VS uses batch-mean scoring; not a pure mask-granularity interaction
