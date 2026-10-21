@@ -210,7 +210,8 @@ def train(seed, arm):
 
     log_rows, batch_rows = [], []
     mask_records = np.empty((EPOCHS,N,16), dtype=np.uint8)
-    composition_sum = {"V":0.,"B":0.,"ratio":0.,"score":0.,"fallback":0.,\n                       "common_with_uniform":0.}
+    composition_sum = {"V":0.,"B":0.,"ratio":0.,"score":0.,"fallback":0.,
+                       "common_with_uniform":0.}
     best=-1.0
     best_epoch=None
     step=0
@@ -421,7 +422,9 @@ def report():
     for r in rows:
         if r["group"] in ("Overall","Tail"):
             lines.append(f"|{r['seed']}|{r['contrast']}|{r['group']}|{r['delta_pp']:+.4f}|{r['net']:+d}|")
-    lines+=["",f"## Predefined decision: {decision}","",\n           "This only decides whether independent confirmation is worth running, not publication readiness.","",\n           "## Interpretation rules","",
+    lines+=["",f"## Predefined decision: {decision}","",
+           "This only decides whether independent confirmation is worth running, not publication readiness.","",
+           "## Interpretation rules","",
        "Primary: same-granularity VS-Shared vs U-Shared and VS-Individual vs U-Individual.",
        "Secondary: VS-Individual vs U-Shared is a **confounded** replacement comparison.",
        "Only fixed epoch10 is confirmatory *within this exploratory screen*. Best validation",
