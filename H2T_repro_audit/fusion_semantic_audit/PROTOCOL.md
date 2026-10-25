@@ -30,6 +30,10 @@ Before calculating results, replay the historical augmentation RNG through epoch
 
 Any mismatch stops the run. Do not weaken the hash gate, replace the historical masks, or use the deterministic eval-feature bank as a substitute for the exact augmented features. The eval-feature bank is used only for TRAIN-only NCM prototypes.
 
+On a mismatch, persist the expected and observed digests, the exact hashed feature-array metadata and finiteness counts, and the current inference settings to a fresh `diagnostics/replay_mismatch_*/replay_mismatch.json` before raising. Existing results and diagnostic records are never overwritten. A diagnostic-write failure must also stop the run. This adds evidence capture only; it does not alter inference settings, the comparison order, or exact hash equality.
+
+The previous failed process did not retain its actual feature digest or tensors. A static diagnosis must mark these observations unavailable rather than substitute a newly computed value. Code changes also invalidate the old preflight's audit-source digest; do not update that historical manifest or rerun the audit without separate authorization.
+
 ## Primary quantities
 
 For each fixed evaluator:
@@ -57,7 +61,7 @@ Compute per-class semantic-risk summaries from the exact epoch-10 TRAIN draws, t
 
 ## Outputs
 
-The script writes only to this directory's results folder:
+Scientific results and manifests are written to this directory's results folder. Mismatch evidence is written separately to a fresh diagnostics folder as specified above:
 - preflight.json
 - replay_verification.csv
 - group_summary.csv

@@ -1,0 +1,19 @@
+test_average_ranks_handles_ties (__main__.FusionSemanticAuditUnitTests.test_average_ranks_handles_ties) ... ok
+test_channel_mask_replaces_only_selected_coordinates (__main__.FusionSemanticAuditUnitTests.test_channel_mask_replaces_only_selected_coordinates) ... ok
+test_margin_and_competitor (__main__.FusionSemanticAuditUnitTests.test_margin_and_competitor) ... ok
+test_pair_excluded_ncm_scores_are_finite (__main__.FusionSemanticAuditUnitTests.test_pair_excluded_ncm_scores_are_finite) ... ok
+test_spearman_is_rank_correlation (__main__.FusionSemanticAuditUnitTests.test_spearman_is_rank_correlation) ... ok
+test_diagnostic_io_failure_still_stops_replay (__main__.ReplayMismatchDiagnosticTests.test_diagnostic_io_failure_still_stops_replay) ... ok
+test_first_mismatch_order_is_unchanged (__main__.ReplayMismatchDiagnosticTests.test_first_mismatch_order_is_unchanged) ... ok
+test_hash_matches_locked_historical_function (__main__.ReplayMismatchDiagnosticTests.test_hash_matches_locked_historical_function) ... ok
+test_matching_signatures_do_not_create_diagnostics (__main__.ReplayMismatchDiagnosticTests.test_matching_signatures_do_not_create_diagnostics) ... ok
+test_mismatch_is_persisted_before_exception (__main__.ReplayMismatchDiagnosticTests.test_mismatch_is_persisted_before_exception) ... ok
+test_near_equal_values_still_fail_exact_gate (__main__.ReplayMismatchDiagnosticTests.test_near_equal_values_still_fail_exact_gate) ... ok
+test_nonfinite_features_are_recorded_without_invalid_json (__main__.ReplayMismatchDiagnosticTests.test_nonfinite_features_are_recorded_without_invalid_json) ... ok
+test_repeated_failures_never_overwrite_existing_diagnostic (__main__.ReplayMismatchDiagnosticTests.test_repeated_failures_never_overwrite_existing_diagnostic) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.043s
+
+OK
+unit_exit_status=0; elapsed_seconds=2.821

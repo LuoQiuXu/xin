@@ -12,8 +12,10 @@ import csv
 import hashlib
 import json
 import math
+import os
 import sys
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +33,7 @@ FACTORIAL = AUDIT_ROOT / "lowvs_factorial"
 NORM = AUDIT_ROOT / "lowvs_norm_direction"
 DISC = AUDIT_ROOT / "lowvs_disc_preserve"
 RESULTS = HERE / "results"
+DIAGNOSTICS = HERE / "diagnostics"
 
 SEEDS = (124, 125)
 N = 10847
@@ -124,6 +127,149 @@ def array_hash(*arrays: np.ndarray) -> str:
         digest.update(str(array.dtype).encode())
         digest.update(array.tobytes())
     return digest.hexdigest()
+
+
+def array_diagnostic(array: np.ndarray) -> dict[str, Any]:
+    """Describe the exact hash input without casting or changing its bytes."""
+    array = np.asarray(array)
+    finite = np.isfinite(array)
+    return {
+        "shape": list(array.shape),
+        "dtype": str(array.dtype),
+        "dtype_str": array.dtype.str,
+        "strides_bytes": list(array.strides),
+        "c_contiguous": bool(array.flags.c_contiguous),
+        "elements": int(array.size),
+        "all_finite": bool(finite.all()),
+        "nonfinite_elements": int(array.size - np.count_nonzero(finite)),
+        "single_array_sha256": array_hash(array),
+    }
+
+
+def replay_runtime_diagnostic(backbone: torch.nn.Module | None) -> dict[str, Any]:
+    """Read numerical settings at failure time; never change them."""
+    cuda_available = torch.cuda.is_available()
+    info: dict[str, Any] = {
+        "python": sys.executable,
+        "torch": torch.__version__,
+        "numpy": np.__version__,
+        "cuda": torch.version.cuda,
+        "cudnn": torch.backends.cudnn.version(),
+        "GPU": torch.cuda.get_device_name(0) if cuda_available else None,
+        "cudnn_benchmark": torch.backends.cudnn.benchmark,
+        "cudnn_deterministic": torch.backends.cudnn.deterministic,
+        "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+        "matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+        "float32_matmul_precision": torch.get_float32_matmul_precision(),
+        "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+        "grad_enabled_at_diagnostic_capture": torch.is_grad_enabled(),
+        "feature_forward_context_in_source": "torch.no_grad()",
+        "relevant_environment": {
+            name: os.environ.get(name)
+            for name in ("CUBLAS_WORKSPACE_CONFIG", "NVIDIA_TF32_OVERRIDE",
+                         "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE")
+        },
+    }
+    if backbone is not None:
+        info["backbone_training"] = backbone.training
+        info["trainable_backbone_parameters"] = sum(
+            parameter.numel() for parameter in backbone.parameters() if parameter.requires_grad
+        )
+        info["batchnorm_training"] = {
+            name: module.training for name, module in backbone.named_modules()
+            if isinstance(module, torch.nn.modules.batchnorm._BatchNorm)
+        }
+    return info
+
+
+def persist_replay_mismatch(
+    *, seed: int, epoch: int, batch: int, field: str,
+    expected: dict[str, str], observed: dict[str, str],
+    checked_rows: list[dict[str, Any]], feature_arrays: dict[str, np.ndarray],
+    feature_tensors: dict[str, torch.Tensor],
+    backbone: torch.nn.Module | None, checkpoint_sha256: str | None,
+) -> Path:
+    """Persist failure evidence separately, without touching sealed results."""
+    payload: dict[str, Any] = {
+        "status": "EXACT_REPLAY_MISMATCH",
+        "seed": seed, "epoch": epoch, "batch": batch, "field": field,
+        "expected_sha256": expected[field], "observed_sha256": observed[field],
+        "features_sha256": {
+            "expected": expected["features_sha256"],
+            "observed": observed["features_sha256"],
+        },
+        "checkpoint_sha256": checkpoint_sha256,
+        "historical_signatures": str(
+            NORM / "results" / f"seed{seed}" / "LowVS-Full" / "batch_signatures.csv"
+        ),
+        "checks_through_first_mismatch": checked_rows,
+        "expected_hashes": dict(expected), "observed_hashes": dict(observed),
+        "hash_contract": "receiver then donor; str(shape), str(dtype), numpy.tobytes(order='C'); no casting or tolerance",
+        "feature_arrays": {}, "feature_tensors": {},
+        "historical_feature_value_comparison": None,
+        "historical_feature_value_comparison_note": "No historical augmented feature values supplied; no numerical difference is inferred from hashes.",
+        "exact_replay_passed": False,
+    }
+    for name, array in feature_arrays.items():
+        try:
+            payload["feature_arrays"][name] = array_diagnostic(array)
+        except Exception as error:
+            payload["feature_arrays"][name] = {"diagnostic_error": repr(error)}
+    for name, tensor in feature_tensors.items():
+        payload["feature_tensors"][name] = {
+            "shape": list(tensor.shape), "dtype": str(tensor.dtype),
+            "device": str(tensor.device), "stride": list(tensor.stride()),
+            "requires_grad": tensor.requires_grad, "contiguous": tensor.is_contiguous(),
+        }
+    try:
+        payload["runtime"] = replay_runtime_diagnostic(backbone)
+    except Exception as error:
+        payload["runtime"] = {"diagnostic_error": repr(error)}
+    DIAGNOSTICS.mkdir(parents=True, exist_ok=True)
+    folder = DIAGNOSTICS / f"replay_mismatch_s{seed}_e{epoch}_b{batch}_{uuid.uuid4().hex}"
+    folder.mkdir()  # Permission errors must stop immediately, without tempfile's Windows retries.
+    path = folder / "replay_mismatch.json"
+    with path.open("x", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2, allow_nan=False)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return path
+
+
+def verify_replay_signatures(
+    *, seed: int, epoch: int, batch: int,
+    expected: dict[str, str], observed: dict[str, str],
+    feature_arrays: dict[str, np.ndarray], feature_tensors: dict[str, torch.Tensor],
+    backbone: torch.nn.Module | None = None, checkpoint_sha256: str | None = None,
+) -> list[dict[str, Any]]:
+    """Keep the original ordered, exact-equality gate; save evidence before raising."""
+    checked_rows: list[dict[str, Any]] = []
+    for field in REPLAY_FIELDS:
+        matched = expected[field] == observed[field]
+        checked_rows.append({
+            "seed": seed, "epoch": epoch, "batch": batch, "field": field,
+            "match": matched, "expected_sha256": expected[field],
+            "observed_sha256": observed[field],
+        })
+        if not matched:
+            message = f"Exact replay mismatch: seed={seed}, epoch={epoch}, batch={batch}, field={field}."
+            try:
+                path = persist_replay_mismatch(
+                    seed=seed, epoch=epoch, batch=batch, field=field,
+                    expected=expected, observed=observed, checked_rows=checked_rows,
+                    feature_arrays=feature_arrays, feature_tensors=feature_tensors,
+                    backbone=backbone, checkpoint_sha256=checkpoint_sha256,
+                )
+            except Exception as error:
+                raise RuntimeError(
+                    f"{message} Diagnostic persistence failed; strict replay remains stopped. "
+                    "Do not relax the hash check."
+                ) from error
+            raise RuntimeError(
+                f"{message} Diagnostics persisted: {path}. Stop; do not relax the hash check."
+            )
+    return checked_rows
 
 
 def normalize_rows(values: np.ndarray, eps: float = 1e-12) -> np.ndarray:
@@ -584,22 +730,13 @@ def replay_epoch10_features(data: dict[str, Any]) -> tuple[dict[int, dict[str, n
                     "uniform_mask_sha256": common.array_hash(masks["Uniform-PerSample"][epoch, start:stop]),
                     "lowvs_mask_sha256": common.array_hash(masks["Low-VS"][epoch, start:stop]),
                 }
-                for field in REPLAY_FIELDS:
-                    matched = expected[field] == observed[field]
-                    replay_rows.append({
-                        "seed": seed,
-                        "epoch": PRIMARY_EPOCH,
-                        "batch": batch,
-                        "field": field,
-                        "match": matched,
-                        "expected_sha256": expected[field],
-                        "observed_sha256": observed[field],
-                    })
-                    if not matched:
-                        raise RuntimeError(
-                            f"Exact replay mismatch: seed={seed}, epoch={PRIMARY_EPOCH}, "
-                            f"batch={batch}, field={field}. Stop; do not relax the hash check."
-                        )
+                replay_rows.extend(verify_replay_signatures(
+                    seed=seed, epoch=PRIMARY_EPOCH, batch=batch,
+                    expected=expected, observed=observed,
+                    feature_arrays={"receiver": receiver_np, "donor": donor_np},
+                    feature_tensors={"receiver": receiver_map, "donor": donor_map},
+                    backbone=backbone, checkpoint_sha256=data["checkpoint_sha256"],
+                ))
                 receiver_gap[start:stop] = F.avg_pool2d(receiver_map, 8).view(-1, FEATURE_DIM).detach().cpu().numpy()
                 donor_gap[start:stop] = F.avg_pool2d(donor_map, 8).view(-1, FEATURE_DIM).detach().cpu().numpy()
 

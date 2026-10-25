@@ -1,7 +1,7 @@
 任务：执行 H2T 融合特征语义一致性审计。先完整阅读：
 H2T_repro_audit/fusion_semantic_audit/PROTOCOL.md
 
-重要：当前研究分支必须保持为 experiment/donor-affinity-margin-protect-20261019。不要切换分支，不要执行任何 git/version-control 命令，不要提交或推送。代码已由用户放在该分支；若本地工作目录尚未同步到这些新文件，停止并告知用户先同步当前分支。
+重要：当前研究分支必须保持为 experiment/fusion-semantic-audit-20261025。不要切换分支，不要执行任何 git/version-control 命令，不要提交或推送。代码已由用户放在该分支；若本地工作目录尚未同步到这些新文件，停止并告知用户先同步当前分支。
 
 科学目标：
 在固定 epoch 10、相同历史 receiver/donor pairs 下，比较 Uniform-PerSample 与 Low-VS 的实际 16/64 通道替换特征。用锁定 Stage-I CE head 和 TRAIN-only leave-pair-out NCM 两个固定 evaluator，统计尾类接收者融合后 harmful/beneficial prediction flips、target-margin change、donor-label takeover，并将 per-class 风险与已有 LowVS-CleanCE / LowVS-TopCompetitor 验证集类别变化做描述性关联。
@@ -23,7 +23,9 @@ python -B H2T_repro_audit/fusion_semantic_audit/audit_fusion_semantics.py run
 - 脚本会验证锁定 Stage-I checkpoint、TRAIN feature-bank provenance、source lock、split/raw IDs、保存的 channel masks、已有 validation_epoch10.npz 与 batch signatures。
 - Run 阶段会严格重放历史增强 RNG，并对 seed124/125 的 epoch-10 共 85 个 batch 分别验证 receiver/donor indices、augmented images、feature maps、Gumbel 与两种 mask 的 SHA256。
 - 如果任何哈希不一致、缺少历史输入或 CUDA 不可用，立即停止。不要删掉或放宽哈希检查，不要用 eval-transform feature bank 代替真实增强特征，不要猜测/重建缺失 masks，不要改旧源文件。
-- 脚本只应在 H2T_repro_audit/fusion_semantic_audit/results/ 写入新产物。若目标文件已存在，不要覆盖或删除；报告冲突并停止。
+- 常规审计结果只写入 H2T_repro_audit/fusion_semantic_audit/results/；失败证据按下一条写入独立 diagnostics/。若目标文件已存在，不要覆盖或删除；报告冲突并停止。
+- 重放哈希不一致时，先在本目录 diagnostics/replay_mismatch_*/replay_mismatch.json 持久化预期/实际哈希、特征 shape/dtype/有限性与运行配置，再严格停止；诊断文件与旧结果分离，每次使用独立目录，不得用数值容差替代哈希门禁。
+- 代码修改后不得沿用或改写旧 preflight 的源码哈希；已有 results/ 保留。本次诊断修复仅允许单元测试和静态检查，不因此获得重跑 preflight/run 的授权。
 - 不读官方 CIFAR-100 TEST 图像/标签，不执行官方测试集完整性打开，不使用测试集选 checkpoint。
 - 不运行额外训练、也不根据结果追加新实验。
 

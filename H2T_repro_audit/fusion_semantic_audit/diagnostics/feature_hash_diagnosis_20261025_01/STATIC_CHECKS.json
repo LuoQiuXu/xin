@@ -1,0 +1,14 @@
+{
+  "python_sources_compile": true,
+  "existing_functions_unchanged_except_gate_call": 33,
+  "unexpected_changed_functions": [],
+  "replay_inference_and_rng_ast_unchanged_except_diagnostic_gate_call": true,
+  "existing_constants_unchanged": true,
+  "protected_files_checked": 93,
+  "changed_protected_files": [],
+  "diagnostic_source_sha256": "33a2cc705844f5f44e95aa956f8a01ad77f5e465add85636cdfafc0288a8514d",
+  "original_preflight_audit_source_sha256": "cd95df8894109748edcddf9d7d6f2fd31301e9a55b51a6e28daa4ff3fcefe3ae",
+  "full_audit_or_preflight_executed": false,
+  "model_inference_performed": false,
+  "all_passed": true
+}

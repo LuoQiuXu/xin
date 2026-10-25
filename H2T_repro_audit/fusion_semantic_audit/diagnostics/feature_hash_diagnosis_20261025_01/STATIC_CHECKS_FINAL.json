@@ -1,0 +1,33 @@
+{
+  "all_passed": true,
+  "python_sources_compile": true,
+  "unexpected_changed_existing_functions": [],
+  "replay_inference_and_rng_ast_unchanged_except_diagnostic_gate_call": true,
+  "array_hash_function_ast_unchanged": true,
+  "protected_files_checked": 93,
+  "changed_protected_files": [],
+  "historical_ravs_sources": {
+    "run_ravs_v1.py": {
+      "historical_manifest_sha256": "f0ae4dac9b4aca524805088052c733966a514951e98a4168febc95fb6303a191",
+      "current_sha256": "f0ae4dac9b4aca524805088052c733966a514951e98a4168febc95fb6303a191",
+      "match": true
+    },
+    "run_safeguards.py": {
+      "historical_manifest_sha256": "13d541a239a7dcd3ebc571e418943437cfbe65a510e10940261f6fe3f069da5e",
+      "current_sha256": "13d541a239a7dcd3ebc571e418943437cfbe65a510e10940261f6fe3f069da5e",
+      "match": true
+    }
+  },
+  "current_source_sha256": "36329c85df2a41ea900cbb84c4843115d4081d054eb676cc0eaa0faf704b01f3",
+  "unit_tests": {
+    "count": 13,
+    "exit_status": 0
+  },
+  "original_preflight_untouched": true,
+  "full_audit_rerun": false,
+  "preflight_rerun": false,
+  "model_inference": false,
+  "training": false,
+  "official_TEST_access": false,
+  "commit_or_push": false
+}
