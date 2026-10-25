@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\fusion_semantic_audit\audit_fusion_semantics.py", line 1183, in <module>
+    main()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\fusion_semantic_audit\audit_fusion_semantics.py", line 1179, in main
+    run_audit()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\fusion_semantic_audit\audit_fusion_semantics.py", line 1130, in run_audit
+    gap_by_seed, replay_rows, device_name = replay_epoch10_features(data)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\fusion_semantic_audit\audit_fusion_semantics.py", line 599, in replay_epoch10_features
+    raise RuntimeError(
+RuntimeError: Exact replay mismatch: seed=124, epoch=10, batch=0, field=features_sha256. Stop; do not relax the hash check.
+run_exit_status=1; elapsed_seconds=31.921

@@ -1,0 +1,77 @@
+{
+  "status": "STOPPED_ON_EXACT_REPLAY_MISMATCH",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "current_branch_read_from_HEAD": "experiment/fusion-semantic-audit-20261025",
+  "task_file_branch_name": "experiment/donor-affinity-margin-protect-20261019",
+  "branch_handling": "Preserved current branch as explicitly requested in this chat. No Git commands or version-control mutations performed.",
+  "commands": [
+    {
+      "action": "unit",
+      "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B H2T_repro_audit/fusion_semantic_audit/test_fusion_semantic_audit.py",
+      "exit_status": 0,
+      "elapsed_seconds": 8.676,
+      "output": "test_average_ranks_handles_ties (__main__.FusionSemanticAuditUnitTests.test_average_ranks_handles_ties) ... ok\r\ntest_channel_mask_replaces_only_selected_coordinates (__main__.FusionSemanticAuditUnitTests.test_channel_mask_replaces_only_selected_coordinates) ... ok\r\ntest_margin_and_competitor (__main__.FusionSemanticAuditUnitTests.test_margin_and_competitor) ... ok\r\ntest_pair_excluded_ncm_scores_are_finite (__main__.FusionSemanticAuditUnitTests.test_pair_excluded_ncm_scores_are_finite) ... ok\r\ntest_spearman_is_rank_correlation (__main__.FusionSemanticAuditUnitTests.test_spearman_is_rank_correlation) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 5 tests in 0.021s\r\n\r\nOK\r\nunit_exit_status=0; elapsed_seconds=8.676\r\n"
+    },
+    {
+      "action": "preflight",
+      "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B H2T_repro_audit/fusion_semantic_audit/audit_fusion_semantics.py preflight",
+      "exit_status": 0,
+      "elapsed_seconds": 7.549,
+      "output": "PREFLIGHT PASS: source/data locks and required artifacts verified; no training or official TEST access.\r\npreflight_exit_status=0; elapsed_seconds=7.549\r\n"
+    },
+    {
+      "action": "run",
+      "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B H2T_repro_audit/fusion_semantic_audit/audit_fusion_semantics.py run",
+      "exit_status": 1,
+      "elapsed_seconds": 31.921
+    }
+  ],
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "torch_version": "2.14.1+cu132",
+    "torch_cuda_version": "13.2",
+    "cuda_available": true,
+    "device": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "device_count": 1
+  },
+  "first_mismatch": {
+    "seed": 124,
+    "epoch": 10,
+    "batch": 0,
+    "field": "features_sha256",
+    "observed_sha256": null,
+    "observed_hash_note": "The original script did not print or persist the observed value. No replay was repeated to recover it.",
+    "expected_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5"
+  },
+  "exact_replay_fields_passed_before_failure": [
+    "indices_sha256",
+    "images_sha256"
+  ],
+  "run_output": "Traceback (most recent call last):\r\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\fusion_semantic_audit\\audit_fusion_semantics.py\", line 1183, in <module>\r\n    main()\r\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\fusion_semantic_audit\\audit_fusion_semantics.py\", line 1179, in main\r\n    run_audit()\r\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\fusion_semantic_audit\\audit_fusion_semantics.py\", line 1130, in run_audit\r\n    gap_by_seed, replay_rows, device_name = replay_epoch10_features(data)\r\n                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\fusion_semantic_audit\\audit_fusion_semantics.py\", line 599, in replay_epoch10_features\r\n    raise RuntimeError(\r\nRuntimeError: Exact replay mismatch: seed=124, epoch=10, batch=0, field=features_sha256. Stop; do not relax the hash check.\r\nrun_exit_status=1; elapsed_seconds=31.921\r\n",
+  "model_training_performed": false,
+  "optimizer_steps": 0,
+  "official_CIFAR100_TEST_used": false,
+  "scientific_results_computed": false,
+  "additional_experiments_or_retries": 0,
+  "audit_source_modified": false,
+  "git_commands_executed": false,
+  "expected_outputs_not_generated": [
+    "run_manifest.json",
+    "FUSION_SEMANTIC_AUDIT_REPORT.md",
+    "replay_verification.csv",
+    "group_summary.csv",
+    "class_summary.csv",
+    "mask_contrast.csv",
+    "tail_draws_epoch10.csv",
+    "validation_class_deltas.csv",
+    "class_level_association.csv"
+  ],
+  "post_run_integrity_verification": {
+    "preflight_manifest_entries_checked": 30,
+    "historical_source_lock_entries_checked": 69,
+    "all_matched": true,
+    "mismatches": []
+  },
+  "recorded_at_Asia_Shanghai": "2026-10-25T21:18:40+08:00"
+}
