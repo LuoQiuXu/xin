@@ -99,5 +99,20 @@ class TargetSemanticsPolicyTests(unittest.TestCase):
             soft_target_cross_entropy(logits, targets)
 
 
+    def test_endpoint_crossing_alpha_is_one(self) -> None:
+        clean = torch.tensor([[2.0, 1.0, 0.0]], dtype=torch.float32)
+        fused = torch.tensor([[1.0, 2.0, 0.0]], dtype=torch.float32)
+        competitor, alpha = first_crossed_competitor(clean, fused, torch.tensor([0]))
+        self.assertEqual(int(competitor.item()), 1)
+        self.assertAlmostEqual(float(alpha.item()), 1.0, places=6)
+
+    def test_equal_crossing_times_choose_smallest_class_id(self) -> None:
+        clean = torch.tensor([[2.0, 1.0, 1.0]], dtype=torch.float32)
+        fused = torch.tensor([[1.0, 2.0, 2.0]], dtype=torch.float32)
+        competitor, alpha = first_crossed_competitor(clean, fused, torch.tensor([0]))
+        self.assertEqual(int(competitor.item()), 1)
+        self.assertAlmostEqual(float(alpha.item()), 0.5, places=6)
+
+
 if __name__ == "__main__":
     unittest.main()
