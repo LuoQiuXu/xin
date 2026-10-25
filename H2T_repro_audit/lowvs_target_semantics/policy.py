@@ -14,6 +14,7 @@ import torch.nn.functional as F
 TargetMode = Literal["hard", "donor_mix", "first_crossed_competitor"]
 
 
+@torch.no_grad()
 def first_crossed_competitor(
     clean_reference_logits: torch.Tensor,
     fused_reference_logits: torch.Tensor,
