@@ -1,0 +1,38 @@
+任务：执行 H2T 融合特征语义一致性审计。先完整阅读：
+H2T_repro_audit/fusion_semantic_audit/PROTOCOL.md
+
+重要：当前研究分支必须保持为 experiment/donor-affinity-margin-protect-20261019。不要切换分支，不要执行任何 git/version-control 命令，不要提交或推送。代码已由用户放在该分支；若本地工作目录尚未同步到这些新文件，停止并告知用户先同步当前分支。
+
+科学目标：
+在固定 epoch 10、相同历史 receiver/donor pairs 下，比较 Uniform-PerSample 与 Low-VS 的实际 16/64 通道替换特征。用锁定 Stage-I CE head 和 TRAIN-only leave-pair-out NCM 两个固定 evaluator，统计尾类接收者融合后 harmful/beneficial prediction flips、target-margin change、donor-label takeover，并将 per-class 风险与已有 LowVS-CleanCE / LowVS-TopCompetitor 验证集类别变化做描述性关联。
+
+这不是训练任务。严禁新增 optimizer/backward、重新训练分类器或 Stage-I、调参、扫描 seed、重跑旧实验、访问官方 CIFAR-100 TEST。
+
+请按以下顺序执行，命令必须逐条成功后再继续。使用当前已经激活的 xiaoju Python 环境；如果当前环境不是实验环境，先报告环境问题，不要安装/升级包。
+
+1. 在仓库根目录执行单元测试：
+python -B H2T_repro_audit/fusion_semantic_audit/test_fusion_semantic_audit.py
+
+2. 执行静态预检：
+python -B H2T_repro_audit/fusion_semantic_audit/audit_fusion_semantics.py preflight
+
+3. 只有前两步均通过，且 CUDA 可用时，执行：
+python -B H2T_repro_audit/fusion_semantic_audit/audit_fusion_semantics.py run
+
+关键完整性要求：
+- 脚本会验证锁定 Stage-I checkpoint、TRAIN feature-bank provenance、source lock、split/raw IDs、保存的 channel masks、已有 validation_epoch10.npz 与 batch signatures。
+- Run 阶段会严格重放历史增强 RNG，并对 seed124/125 的 epoch-10 共 85 个 batch 分别验证 receiver/donor indices、augmented images、feature maps、Gumbel 与两种 mask 的 SHA256。
+- 如果任何哈希不一致、缺少历史输入或 CUDA 不可用，立即停止。不要删掉或放宽哈希检查，不要用 eval-transform feature bank 代替真实增强特征，不要猜测/重建缺失 masks，不要改旧源文件。
+- 脚本只应在 H2T_repro_audit/fusion_semantic_audit/results/ 写入新产物。若目标文件已存在，不要覆盖或删除；报告冲突并停止。
+- 不读官方 CIFAR-100 TEST 图像/标签，不执行官方测试集完整性打开，不使用测试集选 checkpoint。
+- 不运行额外训练、也不根据结果追加新实验。
+
+运行结束后请只汇报可核查事实：
+1. 每条命令的 exit status；
+2. exact replay 的 batch/field hash 是否全部通过；若失败，给出第一个 mismatch 的 seed/epoch/batch/field；
+3. 实际运行设备与耗时；
+4. results 目录文件清单；
+5. preflight.json、run_manifest.json 与 FUSION_SEMANTIC_AUDIT_REPORT.md 的路径；
+6. 是否发生任何模型训练、官方 TEST 访问、旧文件修改或版本控制操作（预期全部为否）。
+
+不要替我作最终科学结论，不要因为某个 evaluator 的结果更好就自动选择方法。完成后保留全部产物，等待我进一步分析。
