@@ -101,7 +101,7 @@ class TargetSemanticsPolicyTests(unittest.TestCase):
 
     def test_endpoint_crossing_alpha_is_one(self) -> None:
         clean = torch.tensor([[2.0, 1.0, 0.0]], dtype=torch.float32)
-        fused = torch.tensor([[1.0, 2.0, 0.0]], dtype=torch.float32)
+        fused = torch.tensor([[2.0, 2.0, 0.0]], dtype=torch.float32)
         competitor, alpha = first_crossed_competitor(clean, fused, torch.tensor([0]))
         self.assertEqual(int(competitor.item()), 1)
         self.assertAlmostEqual(float(alpha.item()), 1.0, places=6)
