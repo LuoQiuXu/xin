@@ -1,0 +1,160 @@
+Codex 任务：Low-VS Target Semantics 三臂小型实验
+日期：2026-10-25
+目标分支：experiment/lowvs-target-semantics-20261025
+目录：H2T_repro_audit/lowvs_target_semantics/
+
+目标：完成一个严格配对的三臂实验。只改变尾类融合样本的监督目标，回答 donor-aware / first-crossed-competitor-aware target 是否比原始接收者硬标签更好。不要扩展成新框架，不做超参数扫描，不重训 Stage I。
+
+==============================
+A. 研究问题与三臂
+==============================
+
+先阅读本目录的 PROTOCOL.md、policy.py、test_policy.py。
+
+A = HardRecipient：原始 LowVS-Full 融合特征 + 接收者硬标签。
+B = DonorMixTarget：仅 y_receiver >= 71 时，target=0.75*one_hot(y_receiver)+0.25*one_hot(y_donor)。
+C = FirstCrossedCompetitor：仅 y_receiver >= 71 时，用冻结 balanced cRT reference head 找 clean-to-fused GAP 路径上的 first-crossed competitor；若 clean reference 严格判对且发生交叉，target=0.75*one_hot(y_receiver)+0.25*one_hot(first_competitor)，否则 hard target。
+
+三臂只改 target distribution。不能加 clean anchor、risk weighting、label smoothing 或额外损失。软目标 CE 每行概率和为 1，与硬标签 CE 保持相同损失尺度。
+
+==============================
+B. 最高优先级约束
+==============================
+
+1. 不执行任何 Git/GitHub/版本控制操作：不 checkout、fetch、pull、push、commit、branch、merge、PR。用户自行管理版本同步。
+2. 禁止访问官方 CIFAR-100 TEST：不加载、不解码、不计算 hash、不评估、不做模型选择。继续使用本地现有 TEST guard。
+3. 不修改、覆盖、删除历史脚本、checkpoint、缓存、采样计划、Gumbel、签名文件、报告或历史结果。
+4. 新输出只写入 H2T_repro_audit/lowvs_target_semantics/results/。如果任一预期输出已存在，立即停止；不覆盖、不 resume。
+5. 不重训 Stage I；不解冻 Backbone/BN；不改原 Low-VS 公式、Bottom48、16 通道替换、donor/receiver schedule、augment、Gumbel、fallback、optimizer、scheduler 或训练 epoch。
+6. 固定 seeds 124、125；每 seed 三臂，每臂10 epochs×85 updates=850次 optimizer.step。禁止额外 seed、epoch、donor mass 或 target mass sweep。
+7. 不得使用开发集构建 reference、prototypes、target、donor plan、mask 或调参。
+8. 如果本地关键源、采样计划、Gumbel、Clean Stage-I checkpoint 或 balanced cRT reference 无法核实，停止并报告缺失项；不得猜测路径或制造历史 hash。
+9. 只能在本实验目录新增/修复文件。发现现有 helper 需要改动才能运行时，先停并报告，不要修改历史 helper。
+10. 所有训练顺序串行；任一步失败立即停止，不自动重试。
+
+==============================
+C. 先审查来源与现有实现
+==============================
+
+从本地仓库根目录确认新目录已同步。若本地工作区缺少本目录文件，停止并让用户同步目标分支；不要自己执行 git 命令。
+
+检查并阅读：
+- H2T_repro_audit/lowvs_target_semantics/PROTOCOL.md
+- H2T_repro_audit/lowvs_target_semantics/policy.py
+- H2T_repro_audit/lowvs_target_semantics/test_policy.py
+- H2T_repro_audit/lowvs_norm_direction/run_experiment.py
+- H2T_repro_audit/lowvs_norm_direction/norm_policy.py
+- H2T_repro_audit/ravs_v1/run_ravs_v1.py
+- H2T_repro_audit/ravs_v1/run_safeguards.py
+- H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/online_policy.py
+- H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/reused_train_helpers.py
+- H2T/RISK_AWARE_SUPERVISION_REPORT.md
+- H2T/BALANCED_REFERENCE_EXPERIMENT_REPORT.md
+
+使用已经验证的 LowVS-Full donor/receiver schedule、online mask helper、数据增强和 optimizer/scheduler。不要从 lowvs_factorial 的 RandomDonor / HighAffinityDonor 计划开始，因为那组改过尾类供体策略，不能作为原始 LowVS-Full 的干净对照。
+
+Clean Stage-I checkpoint 的预期 SHA256：
+7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88
+必须核验实际 checkpoint 文件；如不匹配立即停止。
+
+Balanced cRT reference：
+- 从 H2T/RISK_AWARE_SUPERVISION_REPORT.md 和 H2T/BALANCED_REFERENCE_EXPERIMENT_REPORT.md 中追溯之前使用的 frozen balanced cRT head。
+- 必须确认它来自同一个 Clean Stage-I 特征空间，只用 CIFAR-100-LT TRAIN 训练，未使用官方 TEST 选 checkpoint。
+- 保存真实路径、checkpoint SHA、训练来源、特征/Stage-I SHA和加载方法到 reference_provenance.json。
+- 如果找不到可核实的 checkpoint，不要临时换成 Stage-I CE head，不要调用会读取官方 test features/labels 的脚本来“顺手”重训 reference；立即停止并报告缺失项。
+
+==============================
+D. 实现 run_target_semantics.py
+==============================
+
+在 H2T_repro_audit/lowvs_target_semantics/ 新建 run_target_semantics.py。优先复用历史 helper；不重写训练框架。
+
+CLI：
+- unit
+- preflight
+- prepare
+- train --seed {124,125} --arm {HardRecipient,DonorMixTarget,FirstCrossedCompetitor}
+- report
+
+D1. Unit / preflight
+- 先运行本目录 policy tests；使用原实验 Python 环境。
+- 检查数据集真实 TRAIN raw indices / 标签与原 LT 子集一致。
+- 检查 Clean Stage-I SHA、reference head 来源、缓存来源、原 LowVS-Full donor/receiver plan、Gumbel 与 helper hashes。
+- 安装官方 TEST guard 和历史文件只读保护。
+- 任何必要来源缺失、hash 不一致、输出已存在或 guard 失败，停止；不跳过检查，不自动重建历史输入。
+
+D2. 固定输入流
+- 复用原 LowVS-Full 的 receiver/donor schedule；不要使用 lowvs_factorial 的 donor-affinity plan。
+- 两个 seeds 内，三臂共享同一份 receiver IDs、donor IDs/labels、增强随机流、frozen feature maps、Gumbel、原始 online VS scores、原始 mask、fused feature maps。
+- 每臂从 base.fresh(seed) 或已核实的等价 helper 得到相同初始 FC；使用原 optimizer_for 和 scheduler。Backbone、BN affine、running stats、num_batches_tracked 全部 eval 冻结，仅 trainable 100-way linear classifier 更新。
+- 每个 seed 三臂的 input/mask signatures 必须逐 batch 完全一致。target signature 可以不同，梯度/后续 FC 状态可以不同。
+- 训练10 epochs、每epoch85 steps、batch128；实际 optimizer.step 必须精确850。
+- 不选择 best epoch；固定 epoch10 为主终点。
+
+D3. 监督目标
+- 对所有非尾类 receiver（label <71），三臂全部用 hard receiver target。
+- HardRecipient：所有样本硬标签。
+- DonorMixTarget：尾类 receiver 使用真实 donor label，target mass 固定0.25；donor 与 receiver 同类时自然退化为 hard target。
+- FirstCrossedCompetitor：用 frozen balanced cRT reference head 对 clean receiver GAP 与 fused GAP 计算 logits；调用本目录 policy.first_crossed_competitor。只对尾类 receiver应用该 target。clean reference 未严格判对或没有 crossing 时，target 回退 hard receiver label。
+- Stage-II classifier logits只由原 trainable head产生。balanced cRT reference绝不能参与Stage-II预测loss、梯度或优化器更新。
+- 用 policy.build_target_distribution + policy.soft_target_cross_entropy。所有target行和为1；不可把 CE 项相加，不能改变梯度整体尺度。
+- 日志记录每个 batch 的 tail draw 数、donor异类比例、B软目标实际激活率、C crossing率、first-crossed class计数、hard-target fallback率及 target/mask/input hashes。
+
+D4. 首次跨界数值核验
+- 用独立小型CPU测试核验 alpha=m0/(m0-m1)，并检查 reference clean strict correctness、竞争类排除、tie按class ID、endpoint crossing alpha=1、无crossing sentinel=-1。
+- 使用真实 batch 做额外断言：如果 first_crossed_competitor 返回 j，clean margin必须严格正，fused margin(j)必须<=0，alpha在[0,1]，且没有其他有效竞争类拥有更小alpha。
+- GAP(clean/fused)必须来自当前同一次增强/融合的特征张量，不得重新增强或缓存不同图像版本。
+- 如果 reference classifier不是线性GAP head，或无法证明 feature/logit path linearity，则停止，不使用本公式。
+
+==============================
+E. 输出与分析
+==============================
+
+只写 results/，任何文件存在时拒绝覆盖。至少生成：
+- preflight.json、source_manifest.json、reference_provenance.json、environment.json；
+- 每个 seed/arm：config.json、effective.yaml、epochs.csv、batch_signatures.csv、target_diagnostics.csv、final_fc.pth、validation_epoch10.npz、summary.json；
+- epoch10.csv、paired.csv、per_class.csv、paired_group_transitions.csv、target_diagnostics_summary.csv、scientific_summary.json；
+- LOWVS_TARGET_SEMANTICS_RESULTS.md；
+- LOWVS_TARGET_SEMANTICS_SCIENTIFIC_REPORT.md（中文）；
+- 每条命令的 console stdout/stderr；
+- STOP_COMPLETED.json 或 FAILED_STOP.json。
+
+报告必须逐 seed 列出 Overall/Head/OfficialMedium/Tail/Many/Medium/Few/Macro/validation CE，并报告：
+- B-A 与 C-A 的总体和 Tail paired wins/losses/net correct；
+- 每个类别的正确数变化、Tail worst-class 和主要错分去向；
+- donor target激活率、competitor crossing率、first-crossed competitor分布；
+- 三臂输入/mask签名一致性、Backbone/BN bitwise freeze、FC更新数量；
+- 明确指出开发集是历史重复使用的 TRAIN holdout（1980张，class0缺失），不能称为独立测试泛化；
+- 不给两个 seed 的重复开发集评估做显著性检验，不使用test-selected best结果作主结论。
+
+==============================
+F. 执行顺序
+==============================
+
+所有命令逐条运行；上一条成功后才执行下一条。使用原实验 Python 环境，不要猜新的解释器路径。
+
+1. python H2T_repro_audit/lowvs_target_semantics/run_target_semantics.py unit
+2. python H2T_repro_audit/lowvs_target_semantics/run_target_semantics.py preflight
+3. python H2T_repro_audit/lowvs_target_semantics/run_target_semantics.py prepare
+
+然后逐条训练：
+4. train --seed 124 --arm HardRecipient
+5. train --seed 124 --arm DonorMixTarget
+6. train --seed 124 --arm FirstCrossedCompetitor
+7. train --seed 125 --arm HardRecipient
+8. train --seed 125 --arm DonorMixTarget
+9. train --seed 125 --arm FirstCrossedCompetitor
+
+最后：
+10. python H2T_repro_audit/lowvs_target_semantics/run_target_semantics.py report
+
+每条命令必须确认 exit code 为0、状态文件为预期成功状态后再继续。不得并行跑臂，不得在失败后自动重跑。
+
+==============================
+G. 停止规则
+==============================
+
+- 任何来源/hash/输入配对/target数值/冻结状态/TEST guard检查失败：立即停。
+- 仅允许在本实验目录内修复明确的接口 bug；如果需要修改旧 helper 或改变实验数学定义，停止并报告。
+- 六组训练完成后停止，不新增 seed、target mass、epoch、类别阈值或额外 loss。
+- 若两个新 target 均未在两个 seed 上稳定提高 Tail，停止这条 target 机制，不继续堆叠机制。
