@@ -46,6 +46,7 @@ Otherwise `NO_SUPPORT_STOP`. Neither case establishes independent statistical si
 
 ```powershell
 python -m unittest discover -s H2T_repro_audit/receiver_selectivity -p "test_*.py" -v
+python H2T_repro_audit/receiver_selectivity/run_experiment.py self-test --run-id receiver_selectivity_20261026_01
 python H2T_repro_audit/receiver_selectivity/run_experiment.py preflight --run-id receiver_selectivity_20261026_01
 python H2T_repro_audit/receiver_selectivity/run_experiment.py run-all --run-id receiver_selectivity_20261026_01
 ```
