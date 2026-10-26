@@ -7,7 +7,8 @@
       "venue": "AAAI 2024",
       "primary_url": "https://ojs.aaai.org/index.php/AAAI/article/view/29262",
       "fulltext_url": "https://ojs.aaai.org/index.php/AAAI/article/download/29262/30382",
-      "role": "target original; source of actual modules and author's claimed boundary issue"
+      "role": "target original; source of actual modules and author's claimed boundary issue",
+      "fulltext_access_note": "AAAI primary PDF accessible, figure/formula must still be verified by Codex"
     },
     {
       "key": "PI_H2T",
@@ -15,7 +16,8 @@
       "venue": "IEEE TPAMI 2026 / arXiv revision",
       "primary_url": "https://arxiv.org/abs/2506.00625",
       "fulltext_url": "https://arxiv.org/pdf/2506.00625",
-      "role": "same authors' successor; PIF and H2TF; requires paper version, formula and ratio-direction check"
+      "role": "same authors' successor; PIF and H2TF; requires paper version, formula and ratio-direction check",
+      "fulltext_access_note": "Direct arXiv PDF not fetched during initial planning; obtain complete revision/full text or mark blocked"
     },
     {
       "key": "FEATRECON",
@@ -23,7 +25,8 @@
       "venue": "ICLR 2025",
       "primary_url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/adb2075b6dd31cb18dfa727240d2887e-Abstract-Conference.html",
       "fulltext_url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/adb2075b6dd31cb18dfa727240d2887e-Paper-Conference.pdf",
-      "role": "representation deformation/overlap comparator; not H2T-specific negative evidence"
+      "role": "representation deformation/overlap comparator; not H2T-specific negative evidence",
+      "fulltext_access_note": "Primary publication and reported abstract verified; Codex must open full PDF for formula-specific claims"
     },
     {
       "key": "SEL",
@@ -31,7 +34,8 @@
       "venue": "ICCV 2025",
       "primary_url": "https://openaccess.thecvf.com/content/ICCV2025/html/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.html",
       "fulltext_url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.pdf",
-      "role": "decision-region robustness comparator; features plug-in H2T combined scores; distinct protocols"
+      "role": "decision-region robustness comparator; features plug-in H2T combined scores; distinct protocols",
+      "fulltext_access_note": "Primary publication and reported abstract verified; Codex must open full PDF for formula-specific claims"
     },
     {
       "key": "DBG",
@@ -39,7 +43,8 @@
       "venue": "CVPR 2026",
       "primary_url": "https://openaccess.thecvf.com/content/CVPR2026/html/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.html",
       "fulltext_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.pdf",
-      "role": "boundary ambiguity in diffusion-based head-to-tail generative transfer; DO NOT attribute claim directly to H2T feature channel swap"
+      "role": "boundary ambiguity in diffusion-based head-to-tail generative transfer; DO NOT attribute claim directly to H2T feature channel swap",
+      "fulltext_access_note": "Primary landing page verified; direct PDF path needs independent access confirmation before using page-specific claims"
     }
   ]
 }
