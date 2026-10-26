@@ -30,7 +30,7 @@ TARGET_SYMBOLS = {
     "BalancedDatasetSampler", "EffectNumSampler",
 }
 PATTERNS: dict[str, re.Pattern[str]] = {
-    "feature_fusion": re.compile(r"(^|\.)(H2T|H2Tv2)$|fusion|donor|sample_image", re.I),
+    "feature_fusion": re.compile(r"(^|\.)(H2T|H2Tv2)(\b|\()|fusion|donor|sample_image", re.I),
     "input_mixup": re.compile(r"mixup", re.I),
     "normalization": re.compile(
         r"BatchNorm|LayerNorm|GroupNorm|InstanceNorm|SyncBatchNorm|RMSNorm|"
@@ -41,7 +41,7 @@ PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "sampling": re.compile(r"sampl|DataLoader|weighted", re.I),
     "loss": re.compile(r"loss|criterion|CrossEntropy|LDAM|BalancedSoftmax|Focal", re.I),
-    "classifier_head": re.compile(r"classifier|NormedLinear|\.Linear$|^Linear$", re.I),
+    "classifier_head": re.compile(r"classifier|NormedLinear|(^|\.)Linear(\b|\()", re.I),
     "pooling": re.compile(r"avg_pool|adaptive_avg_pool|global_pool", re.I),
     "gradient_control": re.compile(
         r"no_grad|inference_mode|requires_grad|detach|backward|zero_grad|optimizer|autocast", re.I
@@ -154,7 +154,7 @@ def call_name(node: ast.AST) -> str:
 
 
 def categories_for(name: str, source_segment: str = "") -> list[str]:
-    probe = f"{name} {source_segment}"
+    probe = f"{name} {source_segment}".strip()
     return [category for category, pattern in PATTERNS.items() if pattern.search(probe)]
 
 
