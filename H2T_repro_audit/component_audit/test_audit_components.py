@@ -37,10 +37,12 @@ alpha: null
 class StaticScannerTests(unittest.TestCase):
     def test_categories_cover_core_component_families(self):
         self.assertIn("feature_fusion", categories_for("H2T"))
-        self.assertIn("normalization", categories_for("nn.BatchNorm2d"))
+        self.assertIn("feature_fusion", categories_for("H2T", "H2T(x, y, rho=0.25)"))
+        self.assertIn("normalization", categories_for("nn.BatchNorm2d", "nn.BatchNorm2d(4)"))
         self.assertIn("attention_candidate", categories_for("nn.MultiheadAttention"))
         self.assertIn("sampling", categories_for("ClassAwareSampler"))
         self.assertIn("classifier_head", categories_for("nn.Linear"))
+        self.assertIn("classifier_head", categories_for("nn.Linear", "nn.Linear(64, 100)"))
 
     def test_ast_visitor_records_definition_call_and_no_grad(self):
         source = """
