@@ -1,0 +1,98 @@
+{
+  "checks_passed": true,
+  "component_rows": 42,
+  "CSV_columns": 16,
+  "markdown_component_columns": 15,
+  "source_references_checked": 79,
+  "config_checks": "selected scalar/list values; defaults -> YAML; CLI not executed",
+  "audit_tool_AST_files": [
+    "H2T_repro_audit/component_audit/audit_components.py",
+    "H2T_repro_audit/component_audit/test_audit_components.py",
+    "H2T_repro_audit/component_audit/verify_component_outputs.py",
+    "H2T_repro_audit/component_audit/write_component_reports.py"
+  ],
+  "scanner_source_parse_errors": [],
+  "manifest_source_files": 75,
+  "manifest_differences": [],
+  "frozen_tree_files": 269,
+  "frozen_tree_bytes": 224482146,
+  "frozen_tree_added": [],
+  "frozen_tree_deleted": [],
+  "frozen_tree_changed": [],
+  "git_checks": [
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "audit/h2t-component-map-20261026\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "9a89df6dbe9f89c80dfd8792a7e06137333d2233\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "stdout": " M H2T_repro_audit/component_audit/audit_components.py\n M H2T_repro_audit/component_audit/test_audit_components.py\n?? H2T_repro_audit/component_audit/results/\n?? H2T_repro_audit/component_audit/verify_component_outputs.py\n?? H2T_repro_audit/component_audit/write_component_reports.py\n?? H2T_repro_audit/fusion_semantic_audit/\n?? H2T_repro_audit/lowvs_mask_parity/\n?? H2T_repro_audit/mdlt_domain_probe/\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--short",
+        "--",
+        "H2T_official_clean/H2T-main/"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "HEAD",
+        "--",
+        "H2T_official_clean/H2T-main/"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "preexisting_status": "?? H2T_repro_audit/fusion_semantic_audit/\n?? H2T_repro_audit/lowvs_mask_parity/\n?? H2T_repro_audit/mdlt_domain_probe/\n",
+  "new_status_lines": [
+    " M H2T_repro_audit/component_audit/audit_components.py",
+    " M H2T_repro_audit/component_audit/test_audit_components.py",
+    "?? H2T_repro_audit/component_audit/results/",
+    "?? H2T_repro_audit/component_audit/verify_component_outputs.py",
+    "?? H2T_repro_audit/component_audit/write_component_reports.py"
+  ],
+  "runtime_evidence": "NONE; only stdlib audit execution and CPU document tools",
+  "source_hash_read_mode": "raw bytes, no checkpoint/NPZ deserialization"
+}

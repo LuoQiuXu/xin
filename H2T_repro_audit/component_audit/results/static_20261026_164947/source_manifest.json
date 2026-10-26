@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-10-26T08:49:46.235284+00:00",
+  "repository_root": "D:\\xiangmuxunlian\\xin",
+  "git_branch": "audit/h2t-component-map-20261026",
+  "git_head": "9a89df6dbe9f89c80dfd8792a7e06137333d2233",
+  "source_root": "D:\\xiangmuxunlian\\xin\\H2T_official_clean\\H2T-main",
+  "source_file_count": 75,
+  "source_files": [
+    {
+      "path": "H2T_official_clean/H2T-main/aggregate_h2t_calibration_sweep.py",
+      "bytes": 24056,
+      "sha256": "c29b5a4969f251022bc2a9526e5c10dfb12f4de9b547c8b9fa8cc59c6a91a60f"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/analyze_h2t_donor_predictability.py",
+      "bytes": 10708,
+      "sha256": "28374a5d44d90b6bb91bcc25c9ea8c94f4c7a002e3270fb4ab2ef9c89ff2c816"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_calibration.py",
+      "bytes": 34317,
+      "sha256": "84eb64810e260a64b6c19b23c545b5332656149a80f458d78c00558461a23094"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_direction_groups.py",
+      "bytes": 13505,
+      "sha256": "7619381d42499d1293268fd7765be6d8e223cb7ccb813cd8766a1402fccae8b5"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_direction_multiseed.py",
+      "bytes": 8733,
+      "sha256": "292b53f0916ff7c2353352672650ecf9949482763d363fdd01bb9ef475439bfd"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_direction_selectors.py",
+      "bytes": 8046,
+      "sha256": "fa80dea5c96024b333e71383ac4d32ee74cea5aabede6cd1cf9dc600df70ad20"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_instance_top10.py",
+      "bytes": 9471,
+      "sha256": "1a91962e3b71fac1521399dea6f6bb0042b1d0f3b63d1a5768f60de68894753b"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_real_shuffled_holdout.py",
+      "bytes": 11737,
+      "sha256": "6bfbc507057283337042d36294825696535786861e98e9f6d708201755aff314"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/audit_h2t_transfer_oracle.py",
+      "bytes": 38741,
+      "sha256": "7cc9bbbac45d8e3f35b913dc3fb1510e79142e5c08af14f8c0761668c379cbda"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb0005_stage1_ce_mixup.yaml",
+      "bytes": 650,
+      "sha256": "329fe8a20242809b3d3e9f5926676e50196abcabcbb6746f5ba06312823b3d99"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb0005_stage2_ce_H2T.yaml",
+      "bytes": 925,
+      "sha256": "6d00580f466e176e2313b4d1639867bca8ea2b0c42e7540eac8d4a0ee3350611"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+      "bytes": 665,
+      "sha256": "96b8b504a44c194ba3c06a70e4691f71c73e3192af084674ad50b329c0fe7c5b"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+      "bytes": 925,
+      "sha256": "e5fcac39017036a7ad4f58d420460eebb0c5faa70cce1fcf02eddb4bfd9794c5"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb002_stage1_ce_mixup.yaml",
+      "bytes": 661,
+      "sha256": "d36929b7501108b3d8064fd0b8a675fb1df67c588eee32173fcaca64392de8af"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb002_stage2_ce_H2T.yaml",
+      "bytes": 923,
+      "sha256": "c4ddba74e00d6f0139b96436c2604ea4690b0b13961485a33fa3a7cdb934bce0"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/datasets/cifar10.py",
+      "bytes": 8180,
+      "sha256": "74d06a6548723c91021d44f97c740a1d16801555d0e945fc5c812ba64b96b9dc"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+      "bytes": 8354,
+      "sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/datasets/imagenet.py",
+      "bytes": 7437,
+      "sha256": "38dd579a1d7da90ee22053329461bd20b4cbe1289b9b6baa08b9fcb789beae5d"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/datasets/ina2018.py",
+      "bytes": 7398,
+      "sha256": "3ad6e8f15d2d5bcb125478986ae8086198275a1971912c742876f96bf1e7a67b"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/datasets/places.py",
+      "bytes": 6697,
+      "sha256": "f64b7e35ae78d6bd64da6d33f4dc9674926ca6d54e97f6b02329d01e73ff548b"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/datasets/sampler.py",
+      "bytes": 4803,
+      "sha256": "b5acc56eee2a6f622944d65320315beb1385a5278cf81867744b9ee66b999908"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/eval-modifed.py",
+      "bytes": 13537,
+      "sha256": "ad20eee715ca39bc5b243f93a9426422752fe6c57f5155a8f2edd47f172a70ff"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/loss.py",
+      "bytes": 14002,
+      "sha256": "01f6dd3eec61f63927a1a9a7d89bdfbe92fb7ed0a3c3c406e108ea6d8f099a07"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/methods.py",
+      "bytes": 2261,
+      "sha256": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/resnet.py",
+      "bytes": 21202,
+      "sha256": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+      "bytes": 7011,
+      "sha256": "a0f43fb293de0072a81d6329bbafc0b12b00706570596710b4021846eb6163fd"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/resnet_places.py",
+      "bytes": 22046,
+      "sha256": "712eb3ba5ce4bd317f23d774ab6ec72faf46c50f3b7fcbbad6dbe70970a3f2f6"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/EAResNet.py",
+      "bytes": 12376,
+      "sha256": "4666e23b6771933cb317dc510151a1642e425a2e7d6ead494ec08f3ced399d48"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/EAResNeXt.py",
+      "bytes": 12536,
+      "sha256": "af2a8e4611e87ca4cc139c8fa6c5c139d0a1ab2c01fad333f93d5a83fc7115b3"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/ResNet.py",
+      "bytes": 8924,
+      "sha256": "6345f25ee6e5f9bc9eb42b7323220b5ce91774229493bac9f2f295a2f5d166dc"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/ResNeXt.py",
+      "bytes": 6401,
+      "sha256": "d80edad478136c5771b0a7f4cb32864e09692d05cb09d9ba4bd906a7cf607807"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/RIDEResNet.py",
+      "bytes": 8020,
+      "sha256": "548e48e0773b3a2fa4f78f6d8d9f8e3f268abdc6750365938bbd9672d08c060b"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/RIDEResNeXt.py",
+      "bytes": 8034,
+      "sha256": "65bd50df409d992e11dd6f0508e9b847b4aee32d09afdf6b0845084f2b1fba1e"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/ldam_drw_resnets/ride_resnet.py",
+      "bytes": 12792,
+      "sha256": "511a1d171a6ef51bc093dd5d269b3f6ce3eb358443ff0fbfd2a860db59328ff4"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+      "bytes": 11126,
+      "sha256": "3f11e7e6ae0dccfe6f39805f0f528d5ab32a80a59328a32d6d22a546985887e6"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/ldam_drw_resnets/ride_resnet_places.py",
+      "bytes": 11899,
+      "sha256": "26b483f18d4c3b73db54b88b467325847a997fce8cac999ee0be42b1c2ce69d3"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/loss.py",
+      "bytes": 12086,
+      "sha256": "b6b320c0d9b2ec9c9a65a013338eddf0d12cd5c30916fb417517e36af373eab5"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/metric.py",
+      "bytes": 776,
+      "sha256": "e0c729b40b20bc610245bf57b4ae583d124332c5f56d2be5f791a208c4a7fbf0"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/models/ride_model/model.py",
+      "bytes": 9617,
+      "sha256": "b7930fadfb702895eec562e3e9d1896bab51f6635cbb157280cc125fb639f29b"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_multiseed_rho_sweep/H2T_CALIBRATION_AUDIT_MULTISEED_ZH.md",
+      "bytes": 7888,
+      "sha256": "af7a4bc1ce77d7716f26a9d67e3a68c353900cc3e9c29f5df61d395d157556c6"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_rho010_seed42/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 1827,
+      "sha256": "2ecf62de2b8560b5affb475606d1fdf7302dbc93c494786df342b7d94313a44e"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_rho010_seed43/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 1827,
+      "sha256": "a7b9c7f0274331117699c60b58e919755776763aecfdb18305bc05634909188d"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_rho010_seed44/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 1827,
+      "sha256": "295d9aa732a42b03143e346cb99bbee3ee8a4abadcaf5343d22556a6d068dadc"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_rho040_seed42/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 1827,
+      "sha256": "fc4afdd8cd907f2478a54ea6facddb4fee369c7690260d1cb352926e88c8fb66"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_rho040_seed43/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 1827,
+      "sha256": "4653b964f9f0219c00a7f6d10133ba295a1e472e89d96406f9b3d80d05d9d387"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_rho040_seed44/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 1827,
+      "sha256": "fa9d4b9d180feb468e6d224b8a73a19c63abb8897e0f33610bb3b3bcf6ed89e2"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_seed42/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 3961,
+      "sha256": "5820286331ee9be2394d2165655449d45a2334f2d3014b09ebcc26c97e49922c"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_seed43/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 3961,
+      "sha256": "6f93f6eed762ec75877b1043a5f6de8946b607fe9ec3429f5d29d41e557fc015"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/calibration_audit_official_h2t_seed44/CALIBRATION_AUDIT_REPORT_ZH.md",
+      "bytes": 3961,
+      "sha256": "40e00f1412471ece165ed50f83eb9eabaf0bb71244a1807c71784044a661dc02"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_direction_group_audit/DIRECTION_GROUPS_ZH.md",
+      "bytes": 4541,
+      "sha256": "4c6bda2b902f8d7b1a23c50aa1b60c71280d9c84686849d45f92f4e97c963eb1"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_direction_multiseed/MULTISEED_COMPETITOR_AUDIT_ZH.md",
+      "bytes": 3080,
+      "sha256": "914d98f6563181430ce2d053c43a960d4578e577b8e86049e4215eb428c2ec52"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_direction_selectors_seed42/DIRECTION_SELECTORS_ZH.md",
+      "bytes": 3376,
+      "sha256": "9c1025101e32ea199ea238c42f8c51c961dc0766aa515abdcbcc81445bddc1d6"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_diversity_training_seed42/DIVERSITY_TRAINING_ZH.md",
+      "bytes": 3629,
+      "sha256": "76b38292e136e1778bda21f94145c6efc99e623b30f49fa298a5d6b5eeb50eaf"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_donor_predictability_seed42/DONOR_PREDICTABILITY_ZH.md",
+      "bytes": 3910,
+      "sha256": "1add9b32d1d34d0c58555461f4d30ea81539a06f190fb989578997beaa243874"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_donor_training_seed42/TRAINING_CLEAN_INFERENCE_ZH.md",
+      "bytes": 3441,
+      "sha256": "12a78ad4ea58aa7af522da11c84452ff12e612a850c7a747f8196c358a85b793"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_instance_top10_seed42/INSTANCE_TOP10_AUDIT_ZH.md",
+      "bytes": 3369,
+      "sha256": "9573b8d573640fab5a0edbed8892bd0d1d8c261c592e99b1bc3da9a6e7e4337e"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_module_swaps_0_vs_040/MODULE_SWAP_ZH.md",
+      "bytes": 2987,
+      "sha256": "3987720f892d02d136d1ac1ab125c76bcdfe1e2a0686ed45f2f4f7224c099e15"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_real_shuffled_holdout_seed42/REAL_SHUFFLED_HOLDOUT_ZH.md",
+      "bytes": 3236,
+      "sha256": "ce9646c8c1deafa587f2a39aee8dec1090bc49d5bed69c1cde2df8df59153cec"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_real_shuffled_holdout_smoke/REAL_SHUFFLED_HOLDOUT_ZH.md",
+      "bytes": 2137,
+      "sha256": "684de27001d443c9e6003e5e1acea4efb402306e577d4bdb2b3eab2bf50af2f5"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_transfer_oracle_seed42_rho025/H2T_TRANSFER_ORACLE_AUDIT_ZH.md",
+      "bytes": 3826,
+      "sha256": "420915ea1ef4cb42fb5da90bd164b698a9b9e9e465ad6b2b12d5acc1dd42f200"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_transfer_oracle_smoke/H2T_TRANSFER_ORACLE_AUDIT_ZH.md",
+      "bytes": 2748,
+      "sha256": "dd8da58858cca89a91741a9b5db287ff9f029ab65d709511f7248ff7cde65fcd"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/outputs/h2t_transfer_oracle_smoke_pool_expectation/H2T_TRANSFER_ORACLE_AUDIT_ZH.md",
+      "bytes": 3084,
+      "sha256": "abaa4ea1d021084e73378651b1ed291b5ad0c29b2994cd66bd439625b8ea5cf6"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/README.md",
+      "bytes": 7371,
+      "sha256": "d124d644cf8231eac50ac9c442a82f815d75881bdf3f2599df74a5e4ee94affc"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/swap_backbone_classifier.py",
+      "bytes": 10799,
+      "sha256": "98df48d63da07dd77e4f75aab6750e5b44f7096c144fca4d42bc7a17b802ecdb"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/train_h2t_diversity_pilot.py",
+      "bytes": 4950,
+      "sha256": "2f4c997b15385c11dc3e299c685356f1c20196fba8a8c932c6fd19e407d1abc4"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/train_h2t_selected_donors.py",
+      "bytes": 12291,
+      "sha256": "8ddaad45c43f55aa52de190d1968f0d79660936c4f45c12b2412b4c8c34b937d"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/train_stage1.py",
+      "bytes": 19580,
+      "sha256": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/train_stage2.py",
+      "bytes": 21091,
+      "sha256": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/utils/__init__.py",
+      "bytes": 359,
+      "sha256": "7ee7c19e09851641a41f8182330f3514c61f050021b3ccdf4a5869d2beb21977"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/utils/logger.py",
+      "bytes": 3229,
+      "sha256": "bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/utils/meter.py",
+      "bytes": 1208,
+      "sha256": "6d70adc2be7f5884da2688faac671fa57ef542584c9b3a1dbf9aa7e980aeed7e"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/utils/metric.py",
+      "bytes": 3141,
+      "sha256": "d5da5eb30abd9328f5342182f3c23b4ca44253f89fa17c3efeffe1fee8c9933e"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/utils/Unzip.py",
+      "bytes": 1878,
+      "sha256": "db6badce518b786b45695a43276e355edb9bba84b6aa8d2ee47349d281c6d4cf"
+    },
+    {
+      "path": "H2T_official_clean/H2T-main/utils/util.py",
+      "bytes": 1075,
+      "sha256": "8af78b3a38e13ceaea11a7e7b3957f5229aa97e357aaa083c7f0edd1dd35dfa9"
+    }
+  ]
+}

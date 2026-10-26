@@ -80,6 +80,14 @@ def train_step(x, y):
         self.assertIn("Stage 1 path enabled", status["mixup_data"]["status"])
         self.assertIn("Stage 2 mixup is false", status["mixup_data"]["evidence_notes"][-1])
 
+    def test_uncategorized_definition_keeps_call_ownership_context(self):
+        source = "class Plain:\n    def forward(self, x):\n        return x\n"
+        visitor = ComponentVisitor(source, "generic_fixture.py")
+        visitor.visit(ast.parse(source))
+        forward = next(symbol for symbol in visitor.symbols if symbol["name"] == "forward")
+        self.assertEqual(forward["scope"], "Plain")
+        self.assertEqual(forward["categories"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

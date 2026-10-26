@@ -1,0 +1,1332 @@
+=== PDF PAGE 1 ===
+Feature Fusion from Head to Tail for Long-Tailed Visual Recognition
+Mengke Li1,2, Zhikai Hu3, Yang Lu4, Weichao Lan3, Yiu-ming Cheung3, Hui Huang2*
+1 Guangdong Laboratory of Artificial Intelligence and Digital Economy (SZ), Shenzhen, China
+2 College of Computer Science and Software Engineering, Shenzhen University, Shenzhen, China
+3 Department of Computer Science, Hong Kong Baptist University, Hong Kong, China
+4 Fujian Key Laboratory of Sensing and Computing for Smart City, School of Informatics, Xiamen University, Xiamen, China
+limengke@gml.ac.cn, cszkhu@comp.hkbu.edu.hk, luyang@xmu.edu.cn, {cswclan, ymc}@comp.hkbu.edu.hk,
+hhzhiyan@gmail.com
+Abstract
+The imbalanced distribution of long-tailed data presents a
+considerable challenge for deep learning models, as it causes
+them to prioritize the accurate classification of head classes
+but largely disregard tail classes. The biased decision bound-
+ary caused by inadequate semantic information in tail classes
+is one of the key factors contributing to their low recog-
+nition accuracy. To rectify this issue, we propose to aug-
+ment tail classes by grafting the diverse semantic information
+from head classes, referred to as head-to-tail fusion (H2T).
+We replace a portion of feature maps from tail classes with
+those belonging to head classes. These fused features sub-
+stantially enhance the diversity of tail classes. Both theoret-
+ical analysis and practical experimentation demonstrate that
+H2T can contribute to a more optimized solution for the de-
+cision boundary. We seamlessly integrate H2T in the classi-
+fier adjustment stage, making it a plug-and-play module. Its
+simplicity and ease of implementation allow for smooth in-
+tegration with existing long-tailed recognition methods, fa-
+cilitating a further performance boost. Extensive experiments
+on various long-tailed benchmarks demonstrate the effective-
+ness of the proposed H2T. The source code is available at
+https://github.com/Keke921/H2T.
+1 Introduction
+Deep models have shown remarkable capabilities in diverse
+visual recognition tasks (Hu et al. 2019; Cheung, Li, and
+Zou 2021; Minaee et al. 2022; Lan et al. 2024), yet their
+performance heavily relies on data that is evenly distributed
+across categories. In contrast, real-world data typically fol-
+lows long-tailed distributions (Reed 2001; Liu et al. 2019;
+Zhang et al. 2023), which hinders model performance, es-
+pecially on minority classes (referred to as tail classes in
+long-tailed data). This challenge has become one of the bot-
+tlenecks limiting the advancement of deep models. In recent
+times, a plethora of methods have emerged to address the
+problem of severe class imbalance in long-tailed data from
+different aspects, such as class-balancing methods (Chawla
+et al. 2002; Huang et al. 2016; Ren et al. 2018; Cui et al.
+2019; Lin et al. 2020; Huang et al. 2020; Hong et al. 2021;
+Park et al. 2021), re-margining methods (Cao et al. 2019; Li,
+Cheung, and Lu 2022; Li, Cheung, and Hu 2022), data aug-
+mentation (Kim, Jeong, and Shin 2020; Wang et al. 2021a;
+*Corresponding author.
+Training set
+Training set
+Test set
+Test set
+(a) Existing methods
+(b) H2T
+Head/tail
+sample
+Class
+centroid
+Fused
+head/tail
+sample
+Class
+boundary
+Figure 1: Comparison between decision boundaries pro-
+duced by (a) existing methods and (b) proposed H2T.
+Li et al. 2021; Park et al. 2022), and ensembling learn-
+ing (Wang et al. 2021b; Li et al. 2022a; Jin et al. 2023).
+While these methods demonstrated the capability to yield
+robust predictions, they primarily focus on training a new
+model to acquire a relatively balanced embedding space
+and/or assembling multiple diverse networks. However, they
+overlook acquiring a more optimal classifier (determining
+the decision boundary), which is crucial for fully releasing
+the potential of the acquired backbone.
+This paper thereby aims to obtain a more effective classi-
+fier with the trained backbone. It is widely recognized that
+increasing class margins (Cao et al. 2019; Deng et al. 2019)
+and/or tightening the intra-class space (Wang et al. 2018,
+2017) for the training set can improve the generalization per-
+formance of the model (Liu et al. 2021; Hu et al. 2023).
+However, while the clear margin is effective for balanced
+data, it may still have a biased decision boundary for long-
+tailed data. Take the binary case in the embedding space of
+the obtained backbone as an example, the decision bound-
+ary is usually the midline connecting the two class centroids.
+The head class has sufficiently sampled and its embedding
+space is fully occupied (Xiao et al. 2021). On the opposite,
+the tail class suffers from a scarcity of samples, leading to
+sparsely distributed semantic regions. The bias in the tail
+centroid persists due to head squeeze even if the existence
+of a clear margin. As a result, during the inference stage, a
+considerable number of samples that differ from the train-
+arXiv:2306.06963v3  [cs.CV]  18 Dec 2023
+
+=== PDF PAGE 2 ===
+ing set emerge, causing the erosion of well-defined margins.
+Consequently, numerous tail class samples are misclassified
+as head classes, as illustrated in Figure 1(a).
+To enrich the sparse tail class semantics and calibrate the
+bias in tail classes, we propose a direct and effective solu-
+tion, named head-to-tail fusion (H2T), which grafts partial
+semantics from the head class on the tail class. In particular,
+the fusion operation in H2T involves the direct replacement
+of certain features of tail samples with those of head sam-
+ples. This is based on the assumption that predictions on tail
+classes that have rare instances are easily affected by head
+classes that appear frequently. Transferring the head seman-
+tics can effectively fill the tail semantic area and the cate-
+gory overlap, which compels the decision boundary to shift
+closer to a more optimal one, as shown in Figure 1(b). Ulti-
+mately, the generalization performance of the tail classes can
+be improved. To streamline the fusion operation, we design
+an easy-to-implement strategy that takes full use of the ob-
+tained features without retraining the backbone. Specifically,
+we randomly substitute several channels in the feature maps
+of the class-balanced data with those of the head-biased data.
+This makes the feature maps of tail classes with a high prob-
+ability of being fused with head classes. We apply H2T to
+the classifier tuning stage, and with just a few lines of code
+and a few epochs of training, remarkable performance im-
+provements can be achieved. In addition, H2T does not alter
+the structure of the backbone or increase the network pa-
+rameters. This characteristic makes it highly adaptable and
+compatible with various existing techniques, facilitating its
+seamless incorporation into diverse existing methods. The
+main contributions of this paper are summarized as follows:
+• We propose a novel H2T that borrows information from
+head classes and applies it to augment tail classes without
+additional data or network parameters, which can release
+the potential of the well-trained backbone and obtain bet-
+ter decision boundaries.
+• We devise a simple fusion strategy that partially sub-
+stitutes the feature maps of an instance-wise sampling
+branch with those of a class-balanced sampling branch.
+This approach enables H2T to be implemented with ease
+and without requiring any modifications to the original
+backbone structure.
+• Considerable performance improvement is achieved in
+both single and multi-expert models by integrating the
+H2T module into the existing structures. Extensive ex-
+periments on popular benchmarks validate the efficacy
+of the proposed method.
+2 Related Work
+This section mainly makes an overview of methods based on
+data augmentation which is the most relevant regime.
+Classical Augmentation: Classical augmentation methods
+including flip, rotate, crop, padding, and color jittering
+etc. (Szegedy et al. 2015; He et al. 2016) have been widely
+applied in deep models. On long-tailed data, these meth-
+ods can improve model robustness and prevent overfitting
+to specific input patterns to a certain extent. Recently, Au-
+toAugment (Cubuk et al. 2019), Fast AutoAugment (Lim
+et al. 2019), Population based augmentation (Ho et al. 2019)
+and Randaugment (Cubuk et al. 2020), etc. have been pro-
+posed to determine the best data augmentation strategy for a
+dataset automatically. These methods have been proven to be
+effective in increasing the classification accuracy for DNNs
+and also have demonstrated their efficacy on long-tailed data
+(Ren et al. 2020; Cui et al. 2021; Li et al. 2022b).
+MixUp Based Augmentation: MixUp (Zhang et al. 2018)
+is an effective data augmentation method that linearly com-
+bines a pair of row images and their labels. This method
+adds complexity control to the uncovered space in the data
+space through linearly interpolating discrete sample points,
+which reduces the model generalization error. Numerous
+studies (Zhang et al. 2021; Zhong et al. 2021; Li, Cheung,
+and Lu 2022) have experimentally proven that MixUp can
+significantly improve long-tailed recognition performance.
+CutMix (Yun et al. 2019), a variant of MixUp, augments
+data by cutting a patch from one input image and pasting
+it into another image within the training set. The ground
+truth labels are combined in proportion to the patch areas.
+Park et al. (Park et al. 2022) propose mixing the foreground
+patches from tail classes with the background images from
+head classes via CutMix, enabling the transfer of context-
+rich background information from head to tail.
+New Images Based Augmentation: In addition to the
+aforementioned methods, researchers have proposed al-
+ternative approaches that generate new informative sam-
+ples for tail classes. One such method is M2m (Kim,
+Jeong, and Shin 2020), which translates samples from head
+classes to tail classes using a pretrained auxiliary classifier.
+Wang et al. (Wang et al. 2021a) utilize the learned encoded
+variation information from head classes to synthesize im-
+ages for tail classes. Zada et al. (Zada, Benou, and Irani
+2022) directly exploit pure noise images as tail class sam-
+ples. Zhang et al. (Zhang et al. 2021) utilize class activa-
+tion maps (CAM) (Zhou et al. 2016) to separate image fore-
+ground and background, followed by augmenting the fore-
+ground by flipping, rotating, and scaling, etc. The new sam-
+ples are then generated by overlaying the augmented fore-
+ground on the unchanged background.
+Feature Level Augmentation: Data augmentation can also
+be performed in feature space. For example, Manifold
+MixUp (Verma et al. 2019) conducts the linear interpolation
+on the features of input images, which has been shown to
+yield better results in long-tail learning (Zhang et al. 2021;
+Zhou et al. 2020). Chu et al. (Chu et al. 2020) use CAM
+to decompose features into class-generic and class-specific
+components. Tail classes are then augmented by combin-
+ing their class-specific components with the class-generic
+components. Another promising technique is to transfer
+knowledge from head classes to tail classes. For example,
+Yin et al. (Yin et al. 2019) and Liu et al. (Liu et al. 2020) en-
+rich tail classes with the intra-class variance of head classes
+to balance the class distributions in feature space. Recently,
+meta-learning-based augmentation has been leveraged to ad-
+dress class imbalance. Liu et al. (Liu, Li, and Sun 2022) de-
+sign a meta-embedding that uses a memory bank to enrich
+tail classes. MetaSAug (Li et al. 2021) learns class-wise co-
+variance matrices by minimizing loss on a small balanced
+
+=== PDF PAGE 3 ===
+validation set and subsequently uses the learned matrices to
+semantically augment tail classes.
+3 Methodology
+3.1 Preliminaries
+We formally define the basic notations used in this paper
+before going into detail about our proposed method. We
+use {x, y} to represent one input image and its correspond-
+ing label. The total number of classes is denoted by C,
+thus, we have y ∈ { 0, 1, · · · , C − 1}. The training set
+includes N samples. Suppose that class i has ni training
+samples. Then N = P
+i ni. For simplicity, we suppose
+n0 ≥ n1 ≥ · · · ≥ nC−1. Feed x into the backbone, we
+can obtain its feature maps before the last pooling layer,
+denoted as F = [ F0, F1, · · · , Fd−1] ∈ RwF ×hF ×d, where
+wF and hF represent the width and height of the feature
+map, respectively. d is the dimension of features in embed-
+ding space. The representation after the last pooling layer is
+f ∈ Rd. The weight of the linear classifier is represented
+as W = [ w0, w1, · · · , wC−1] ∈ Rd×C, where wi represents
+the classifier weight for class i. We use the subscripts h, m
+and t to indicate head, medium and tail classes, respectively.
+zi = wT
+i f represents the predicted logit of classi, where the
+subscript i = y denotes the target logit and i ̸= y denotes
+the non-target logit.
+3.2 Motivation
+Head classes are significantly more numerous than tail
+classes in long-tailed data, resulting in a biased classifier,
+which leads to poor performance on the test set of tail
+classes. The straightforward solution involves increasing the
+importance or frequencies of tail classes (Cao et al. 2019;
+Zhou et al. 2020; Ando and Huang 2017). They can increase
+the performance of tail classes, nevertheless, they also en-
+tail an elevated risk of overfitting. To adjust the decision
+boundary and prevent overfitting, it is crucial to enhance
+the diversity of tail class samples (Zhang et al. 2023; Yang
+et al. 2022). Unfortunately, directly obtaining more samples
+is generally infeasible. We can consider enriching the tail
+class by maximizing the utilization of existing features. Typ-
+ically, the misclassified samples are unseen instances from
+the training set, and these instances tend to be interspersed
+in the vicinity of the decision boundary. This pattern pro-
+vides us an opportunity to augment the diversity within tail
+classes and populate class margins with semantically mean-
+ingful samples. This augmentation process contributes to an
+optimal decision boundary. To achieve this, we simulate the
+potential unseen samples by directly borrowing semantic in-
+formation from head classes to augment tail classes. By do-
+ing so, the rich semantic information can be transferred from
+well-represented head classes to tail classes.
+3.3 Methodology: Fusing Head Features to Tail
+We fuse the features of head classes to the tail to exploit the
+abundant closet semantic information. This operation can
+enrich the tail classes and expand their embedding space dis-
+tribution. The fusion process is formulated as:
+˜F = Mp ⊗ Ft + Mp ⊗ Fh, (1)
+Algorithm 1: H2T
+Input: Training set, fusion ration p
+Output: Trained model
+1: Initialize the model ϕ randomly
+2: for iter = 1 to E0 do
+3: Sampling batches of data (x, y) ∼ T I from the
+instance-wise sampling data
+4: Obtain the feature map F = ϕθ(x)
+5: Calculate logits z = WT f and loss L1(x, y)
+6: ϕ = ϕ − α∇ϕL1((x, y); ϕ).
+7: end for
+8: for iter = E0 + 1 to E2 do
+9: Sample batches of data (xB, yB) ∼ T B and (x, y) ∼
+T I
+10: Obtain feature maps F B = ϕθ(xB) and F I =
+ϕθ(x)
+11: Fuse feature maps by Eq. 1 to obtain ˜F
+12: Input ˜F to pooling layer to obtain ˜f, then calculate
+the logits by ˜z = WT ˜f and the loss by L2(xB, yB)
+13: Froze the parameters of representation learning ϕr,
+and finetune the classifier parameters ϕc: ϕc = ϕc −
+α∇ϕc L2((xB, yB); ϕc).
+14: end for
+where Mp is the mask stacked with multiple 1 matrices
+IM = 1wF ×hF and 0 matrices OM = 0wF ×hF . The total
+number of all the 1 and 0 matrices is d. Mp is the comple-
+ment of Mp, that is, the indices of 0 matrices in Mp corre-
+spond to the 1 matrix in Mp, and vice versa. The subscript
+p of the mask matrices represents the fusion ratio. Specially,
+the number of IM and OM is [d × p] and d − [d × p], re-
+spectively. [·] means rounding operation. ˜F is then passed
+through a pooling layer and classifier to predict the corre-
+sponding logits z = [z0, z1, · · · , zC−1]. Different loss func-
+tions, such as CE loss, MisLAS (Zhong et al. 2021), or
+GCL (Li, Cheung, and Lu 2022), to name a few, can be
+adopted. The backbone ϕ can be the single model (He et al.
+2016) as well as the multi-expert model (Wang et al. 2021b;
+Xiang, Ding, and Han 2020). We exploit the two-stage train-
+ing (Kang et al. 2020) and apply H2T in stage II.
+The selection of features to be fused poses a tedious task
+during training since visual recognition tasks often encom-
+pass a vast number of categories, and it cannot be guaran-
+teed that each minibatch contains the required categories.
+We thereby devise a simple strategy to facilitate an easy-
+to-execute fusion process. This strategy involves sampling
+two versions of data: 1) class-balanced data T B used to bal-
+ance the empirical/structural risk minimization (ERM/SRM)
+of each class, which is fed into the fused branch, and 2)
+instance-wise data T I has a high probability to obtain head
+class samples, which is fed into the fusing branch. The sam-
+pling rates pB
+i and pI
+i for class i within the sets T B and T I,
+respectively, are calculated by
+pB
+i = 1
+C , p I
+i = ni
+N . (2)
+Balanced sampling data ensures that each class is sampled
+
+=== PDF PAGE 4 ===
+Stage I: Feature extraction
+Feature
+Extractor
+Feature
+Extractor
+Stage II: Classi/f_ier adjustment
+W W’
+hF
+wF
+d
+Figure 2: Framework of head-to-tail fusion (H2T).
+with equal probability 1
+C . The fewer the number of samples,
+the higher the probability of being resampled multiple times.
+The instance-wise sampling branch deals with the original
+data distribution, resulting in head-biased data. Therefore,
+the head classes have a higher probability of being sampled.
+Next, we can use the feature mapsF B and F I obtained from
+T B and T I to substitute Ft and Fh in Eq. (1). By doing so,
+the features of the repeatedly sampled tail classes will be
+fused with the head class features with a higher probability.
+In contrast to the common practice of linearly combining a
+pair of inputs and their labels for augmentation, we only use
+the labels of the fused branch, namely the balance-sampled
+data, as the ground truth. By adopting this method, the se-
+mantics of head classes are utilized to enrich tail classes.
+The proposed framework is illustrated in Figure 2 and Algo-
+rithm 1. The key steps are highlighted in rose-red.
+3.4 Rationale Analysis
+Although the proposed H2T appears intuitive and straight-
+forward on the surface, it is built on a foundation of ratio-
+nale. We explore its theoretical rationality in depth in this
+section. For ease of analysis, we assume that the feature
+maps to be fused are rearranged in order without loss of gen-
+erality. Then, after the pooling layer, the feature can be writ-
+ten as f T
+i = [ ˙f T
+i , ¨f T
+i ], where ˙fi and ¨fi denote the portions
+of features that are retained and to be fused, respectively.
+wT
+i = [ ˙wT
+i , ¨wT
+i ] is the corresponding classifier weights.
+On the one hand, we expect zt > z h for tail class, so that
+wT
+t ft > w T
+h ft ⇒
+˙wT
+t ˙ft + ¨wT
+t ¨ft > ˙wT
+h ˙ft + ¨wT
+h ¨ft.
+(3)
+However, as shown in Figure 3, numerous tail class samples
+are incorrectly classified into head classes. Therefore, the
+trained model actually predicts zh > z t, namely,
+˙wT
+t ˙ft + ¨wT
+t ¨ft < ˙wT
+h ˙ft + ¨wT
+h ¨ft. (4)
+After fusing the head to the tail in stage II, the feature of
+tail class is ˜ft = [ ˙ft, ¨fh], and the corresponding logit is ˜zt.
+Our training goal is still to make the target logit larger than
+the non-target class, namely, ˜zt > ˜zh. Therefore, we have
+wT
+t ˜ft > w T
+h ˜ft ⇒
+
+˙wt
+¨wt
+T ˙ft
+¨fh
+
+>
+
+˙wh
+¨wh
+T ˙ft
+¨fh
+
+⇒
+˙wT
+t ˙ft + ¨wT
+t ¨fh > ˙wT
+h ˙ft + ¨wT
+h ¨fh.
+(5)
+111
+12 38 69 47 46 0
+677
+0 0
+461
+96
+13 9 2 1 2 0
+412
+4
+197
+350
+5 18 1 1 1 1 2
+424
+0
+100
+200
+300
+400
+500
+600
+700No. of Samples for Predicted Class
+Class 7 Class 8 Class 9
+Class 0 Class 1 Class 2 Class 3 Class 4 Class 5 Class 6 Class 7 Class 8 Class 9
+AirplaneAutomobile
+Bird Cat Deer Dog Frog Horse Ship Truck
+Predicted Label
+Head
+ Medium
+ Tail
+Test Setğ
+0
+500
+1000
+1500
+2000
+2500
+3000
+3500
+4000
+4500
+5000
+No. of Training Samples
+Training Setğ
+Figure 3: Frequency of predictive labels for tail classes sam-
+ples. A large number of tail class samples are incorrectly
+recognized as head classes.
+ft fh- ft ft
+fh fh
+1
+12
+2
+2
+1
+>
+ft fh-
+h
+h
+Figure 4: Rationale analysis of H2T. Forces 1⃝ and 2⃝ are
+generated by Eq. (9) and Eq. (7), respectively.1⃝ > 2⃝ makes
+the tail sample to “pull” closer towt and “push” further away
+from wh, leading to the adjustment of decision boundary and
+enlargement of the tail class space.
+Adding the last line in Eq. (5) to Eq. (4), we can obtain that
+¨wT
+h ( ¨ft − ¨fh) > ¨wT
+t ( ¨ft − ¨fh). (6)
+We use ¨θ∗ (∗ is h or t) to represent the angle between ¨w∗
+and ¨ft − ¨fh. Eq. (6) is further simplified to
+| ¨wh| cos ¨θh > | ¨wt| cos ¨θt. (7)
+On the other hand, similar to Eq. (3), for logits of head
+classes, we have
+˙wT
+h ˙fh + ¨wT
+h ¨fh > ˙wT
+t ˙fh + ¨wT
+t ¨fh. (8)
+Add the last line in Eq. (5) to Eq. (8), we obtain that
+| ˙wt| cos ˙θt > | ˙wh| cos ˙θh. (9)
+
+=== PDF PAGE 5 ===
+Eq. (7) forces wh to move closer to tail class samples while
+pushing wt further away from them, thus increasing the dis-
+tribution span of head classes. Conversely, Eq. (9) exerts
+an opposite force. Figure 4 geometrically interprets the ra-
+tionale of H2T. Notably, when the fusion ratio p is small,
+Eq. (9) exerts a greater force, enabling the classifier to be
+well-calibrated. As p grows, the item ¨wT
+t ¨fh > ¨wT
+h ¨fh in
+Eq. (6) progressively becomes more dominant. Under this
+case, even though Eq. (7) encourageswt to move away from
+tail class samples, which is larger than the force of Eq. (9),
+¨wT
+t ¨fh > ¨wT
+h ¨fh attracts wt towards head class samples, thus
+broadens the distribution span of tail classes. Consequently,
+the classifier increases its performance in the tail class, re-
+gardless of the value of p. We also experimentally validate
+this analysis Section 4.4.
+4 Experiments
+4.1 Datasets and Metrics
+We evaluate our proposed H2T on four widely-used bench-
+marks: CIFAR100-LT (Cao et al. 2019), ImageNet-LT (Liu
+et al. 2019), iNaturalist 2018 (Van Horn et al. 2018), and
+Places-LT (Liu et al. 2019). CIFAR100-LT is a small-
+scale dataset that is sub-sampled from the balanced ver-
+sion CIFAR100 (Krizhevsky, Hinton et al. 2009). We used
+the imbalance ratios ( ρ = nmax
+nmin
+) 200, 100, and 50 (Chu
+et al. 2020). The original versions of imageNet-2012 (Rus-
+sakovsky et al. 2015) and Places 365 (Zhou et al. 2017)
+are also balanced datasets. We use the same settings as
+Liu et al. (Liu et al. 2019) to obtain the long-tailed versions.
+iNaturalist is collected from all over the world and is natu-
+rally heavily imbalanced. The 2018 version (Van Horn et al.
+2018) is utilized in our experiment. We also report the com-
+parison results on CIFAR10-LT (Cao et al. 2019) in the Ap-
+pendix. As for the metrics, besides top-1 classification accu-
+racy, following Liu et al. (Liu et al. 2019), the accuracy on
+three partitions: head (ni > 100), medium (20 < n i ≤ 100)
+and tail (ni ≤ 20) on large-scale datasets are also compared.
+4.2 Basic Settings
+SGD with a momentum of 0.9 is adopted for all datasets.
+Stage II is trained with 10 epochs. For CIFAR100-LT,
+we refer to the settings in Cao et al. (Cao et al. 2019)
+and Zhong et al. (Zhong et al. 2021). The backbone net-
+work is ResNet-32 (He et al. 2016). Stage I trains for 200
+epochs. The initial learning rate is 0.1 and is decayed at the
+160th and 180th epochs by 0.1. The batch size is 128. For
+imageNet-LT and iNaturalist 2018, we use the commonly
+used ResNet-50. For Places-LT, we utilize the ResNet-152
+pre-trained on imageNet. We reproduce the prior methods
+that provide the hyper-parameters for a fair comparison. For
+those methods that do not provide hyperparameters or offi-
+cial codes, we directly report their results presented in the
+original paper.
+4.3 Comparisons to Existing Methods
+Compared Methods: For single model, we compare the
+proposed H2T with the following three kinds of methods:
+Table 1: Comparison results on CIFAR100-LT.
+Imbalance Ratio 200 100 50
+Single Model
+CE loss 35.99 39.55 45.40
+LDAM-DRW (Cao et al. 2019) 38.91 42.04 47.62
+DR+MU (Kang et al. 2020) 41.73 45.68 50.86
+MisLAS (Zhong et al. 2021) 43.45 46.71 52.31
+MBJ⋆ (Liu, Li, and Sun 2022) - 45.80 52.60
+GCL (Li, Cheung, and Lu 2022) 44.76 48.61 53.55
+CE+CMO⋆ (Park et al. 2022) - 43.90 48.30
+BSCE+CMO⋆ (Park et al. 2022) - 46.60 51.40
+ABL⋆ (Jin, Lang, and Lei 2023) - 46.80 52.10
+DR+H2T 43.95 47.73 52.95
+MisLAS+H2T 43.84 47.62 52.73
+GCL+H2T 45.24 48.88 53.76
+Multi-Expert Model
+BBN (Zhou et al. 2020) 37.21 42.56 47.02
+RIDE (Wang et al. 2021b) 45.84 50.37 54.99
+ACE⋆ (Cai, Wang, and Hwang 2021) - 49.40 50.70
+RIDE+CMO⋆ (Park et al. 2022) - 50.00 53.00
+ResLT (Cui et al. 2023) 44.26 48.73 53.81
+RIDE+H2T 46.64 51.38 55.54
+ResLT+H2T 46.18 49.60 54.39
+Note: The backbone is ResNet-32.⋆ denotes the results quoted
+from the corresponding papers. The best and the second-best re-
+sults are shown inunderline boldandbold, respectively.
+two-stage methods , i.e., LDAM-DRW (Cao et al. 2019),
+decoupling representation (DR) (Kang et al. 2020) 1, Mis-
+LAS (Zhang et al. 2021), and GCL (Li, Cheung, and Lu
+2022); decision boundary adjustment method , i.e., Adap-
+tive Bias Loss (ABL) (Jin, Lang, and Lei 2023); data aug-
+mentation methods , i.e., MBJ (Liu, Li, and Sun 2022),
+and CMO (Park et al. 2022). We report the results of CE
+loss and balanced softmax cross-entropy loss (BSCE) (Ren
+et al. 2020) with CMO (abbreviated as CE+CMO and
+BSCE+CMO, respectively). The results of H2T accompa-
+nied by DR (CE loss is utilized), MisLAS, and GCL are re-
+ported. For multi-expert models, we compare BBN (Zhou
+et al. 2020), RIDE (Wang et al. 2021b), ACE (Cai, Wang,
+and Hwang 2021), and ResLT (Cui et al. 2023). Both RIDE
+and ResLT use 3-expert architectures. For Places-LT, we re-
+port the results of RIDE with linear and cosine classifiers.
+Comparison Results: The results on CIFAR100-LT are
+shown in Table 1. H2T can further improve both single and
+multi-expert models. Applying H2T to the vanilla training
+of DR with CE loss (DR+H2T) enhances the performance
+by a significant margin, surpassing most recent methods.
+The biggest improvement exceeds 2%. H2T can also fur-
+ther boost the performance of two-stage SOTA methods,
+i.e., MisLAS and GCL, albeit with less significant improve-
+ments than for DR. H2T also bolsters the efficacy of multi-
+expert models. For example, RIDE and ResLT integrating
+with H2T outperform the original methods by 1.01% and
+0.87% on CIFAR100-LT withρ = 100.
+The results on large-scale datasets are summarized in Ta-
+bles 2, 3, and 4. The baseline (CE loss) achieves high ac-
+curacy on frequent classes while the performance on rare
+classes is unsatisfactory. Comparatively, all methods, except
+CMO and multi-expert models, exhibit substantial improve-
+1We reproduce DR with MixUp for a fair comparison.
+
+=== PDF PAGE 6 ===
+Table 2: Comparison results on imageNet-LT.
+Method Head Med Tail All
+Single Model
+CE loss 64.91 38.10 11.28 44.51
+LDAM-DRW (Cao et al. 2019) 58.63 48.95 30.37 49.96
+DR (Kang et al. 2020) 62.93 49.77 33.26 52.18
+MisLAS (Zhong et al. 2021) 62.53 49.82 34.74 52.29
+MBJ⋆(Liu, Li, and Sun 2022) 61.60 48.40 39.00 52.10
+GCL (Li, Cheung, and Lu 2022) 62.24 48.62 52.1254.51
+CE+CMO⋆(Park et al. 2022) 67.00 42.30 20.50 49.10
+BSCE+CMO⋆(Park et al. 2022) 62.00 49.10 36.70 52.30
+ABL⋆(Jin, Lang, and Lei 2023) 62.60 50.30 36.90 53.20
+DR+H2T 63.26 50.43 34.11 52.74
+MisLAS+H2T 62.42 51.07 35.36 52.90
+GCL+H2T 62.36 48.75 52.15 54.62
+Multi-Expert Model
+BBN (Zhou et al. 2020) - - - 48.30
+RIDE (Wang et al. 2021b) 69.59 53.06 30.09 55.72
+ACE⋆ (Cai, Wang, and Hwang 2021) - - - 54.70
+RIDE+CMO⋆(Park et al. 2022) 66.40 53.90 35.60 56.20
+ResLT (Cui et al. 2023) 59.39 50.97 41.29 52.66
+RIDE+H2T 67.55 54.95 37.08 56.92
+ResLT+H2T 62.29 52.29 35.31 53.39
+Note: The backbone is ResNet-50. Others are the same as Table 1.
+Table 3: Comparison results on iNaturalist 2018.
+Method Head Med Tail All
+Single Model
+CE loss 76.10 69.05 62.44 66.86
+LDAM-DRW (Cao et al. 2019) - - - 68.15
+DR (Kang et al. 2020) 72.88 71.15 69.24 70.49
+MisLAS (Zhong et al. 2021) 72.52 72.08 70.76 71.54
+MBJ⋆(Liu, Li, and Sun 2022) - - - 70.00
+GCL (Li, Cheung, and Lu 2022) 66.43 71.66 72.47 71.47
+CE+CMO⋆(Park et al. 2022) 76.90 69.30 66.60 68.90
+BSCE+CMO⋆(Park et al. 2022) 68.80 70.00 72.30 70.90
+ABL⋆(Jin, Lang, and Lei 2023) - - - 71.60
+DR+H2T 71.73 72.32 71.30 71.81
+MisLAS+H2T 69.68 72.49 72.15 72.05
+GCL+H2T 67.74 71.92 72.22 71.62
+Multi-Expert Model
+BBN (Zhou et al. 2020) - - - 69.70
+RIDE (Wang et al. 2021b) 76.52 74.23 70.45 72.80
+ACE (Cai, Wang, and Hwang 2021)⋆ - - - 72.90
+RIDE+ CMO⋆(Park et al. 2022) 68.70 72.60 73.10 72.80
+ResLT (Cui et al. 2023)⋆ 64.85 70.64 72.11 70.69
+RIDE+H2T 75.69 74.22 71.36 73.11
+ResLT with H2T 68.41 72.31 72.09 71.88
+Note: The backbone is ResNet-50. Others are the same as Table 1.
+ments in the medium and tail classes but at the expense of
+reduced accuracy in head classes. CMO leverages the back-
+ground of head classes to augment tail classes without re-
+ducing the number of training samples in head classes, thus
+enhancing model performance for both head and tail classes.
+However, CMO+CE shows less competitive results in im-
+proving tail class performance. ABL also adjusts the deci-
+sion boundary, but its effectiveness is not as pronounced as
+H2T. It is worth noting that all comparison methods necessi-
+tate training from scratch. H2T can outperform the compari-
+son methods on most datasets by re-fining the classifier with
+only basic CE loss and several training epochs. For example,
+on iNaturalist 2018, DR+H2T achieves 71.81%, which is the
+highest among all other comparison methods. Furthermore,
+H2T can deliver consistent performance improvements for
+both single and multi-expert models, particularly for tail and
+medium classes. Nevertheless, the accuracy improvements
+of cosine classifier (CC) are less pronounced than those of
+Table 4: Comparison results on Places-LT.
+Method Head Med Tail All
+Single Model
+CE loss 46.48 25.66 8.09 29.43
+DR (Kang et al. 2020) 41.66 37.79 32.77 37.40
+MisLAS (Zhong et al. 2021) 41.95 41.88 34.65 40.38
+MBJ⋆(Liu, Li, and Sun 2022) 39.50 38.20 35.50 38.10
+GCL (Li, Cheung, and Lu 2022) 38.64 42.59 38.44 40.30
+ABL⋆(Jin, Lang, and Lei 2023) 41.50 40.80 31.40 39.40
+DR+H2T 41.96 42.87 35.33 40.95
+MisLAS+H2T 41.40 43.04 35.95 41.03
+GCL+H2T 39.34 42.50 39.46 40.73
+Multi-Expert Model
+LFME⋆(Xiang, Ding, and Han 2020) 39.30 39.60 24.20 36.20
+RIDE (Wang et al. 2021b) (LC) 44.79 40.69 31.97 40.32
+RIDE (Wang et al. 2021b) (CC) 44.38 40.59 32.99 40.35
+ResLT⋆(Cui et al. 2023) 40.30 44.40 34.70 41.00
+RIDE+H2T (LC) 42.99 42.55 36.25 41.38
+RIDE+H2T (CC) 42.34 43.21 35.62 41.30
+Note: CC, cosine classifier. LC, linear classifier. The backbone is ResNet-152.
+Others are the same as Table 1.
+linear classifier (LC). For example, we can observe that H2T
+improves GCL using CC much less than DR and MisLAS
+that use LC. One reason is that the soft margin in GCL al-
+lowing samples to fall in the margin between classes can al-
+leviate the decision boundary bias compared with hard mar-
+gins such as LDAM (Li et al. 2023). This phenomenon also
+confirms our motivation. Table 4 further compares the im-
+provements of H2T on RIDE with LC (by 1.06%) and CC
+(0.95%). The margin on LC is more profound.
+4.4 Further Analysis
+This section visualizes the decision boundary of H2T on
+each class and investigates the effects of the sampler for
+the fusing branch and the fusion ratio p mentioned in Sec-
+tion 3.3. All experiments are performed with DR+H2T.
+Visualization of Decision Boundary: Figure 5 shows the
+t-SNE visualization of the distribution in embedding space
+and the decision boundary, which demonstrates our moti-
+vation (i.e., H2T can enrich tail classes and calibrate the
+decision boundary). For a more convenient and clearer pre-
+sentation, the experiment is conducted on CIFAR10-LT and
+we show the most easily misclassified classes shown in Fig-
+ure 3 (i.e., Class 0 and Class 8). More visualization results
+for other classes can be found in Section D in the Appendix.
+Features are extracted from class-balanced sampling data.
+We can see that the distribution of Class 8 is sparser than
+that of Class 0 by DR. H2T enriches the diversity of tail
+classes without external information, achieving a more op-
+timal decision boundary. It is worth noting that, the signifi-
+cance of a clear margin differs between balanced and imbal-
+anced datasets. In a balanced dataset, a clear margin is supe-
+rior because the classifier is unbiased for each class. How-
+ever, in the case of imbalanced training data, a clear margin
+provides the classifier more room to squeeze tail classes so
+that correctly classifies head classes. Therefore, we use H2T
+to fill the marge with semantic samples, which has multiple
+advantages: 1) prevent over-squeezing for tail classes, thus
+achieving a more reasonable decision boundary, 2) simulate
+potentially unseen samples, thus improving the generaliza-
+tion performance of the model on the test set. This is dis-
+
+=== PDF PAGE 7 ===
+DR (CE loss) on Training Set
+  0
+8
+DR (CE loss) on Test Set
+  0
+8
+DR+H2T on Training Set
+  0
+8
+DR+H2T on Test Set
+  0
+8
+Figure 5: Decision boundary comparison of Class 0 and 8
+without H2T v.s. with H2T (namely, DR and DR+H2T).
+Figure 6: Change of accuracy on different splits w.r.t.p.
+tinctly different from the perception that clear margins can
+improve performance on balanced datasets.
+The Influence of Sampler for Fusing Branch: We com-
+pare different sampling strategies for the fusing branch,
+including class-balanced sampling (CS), reverse sampling
+(RS) that is tail-biased, and instance-wise sampling (IS) that
+is head-biased. The results are shown in Table 5. DR uses
+cRT to fine-tune the classifier with the class-balanced sam-
+pling data, which enlarges the medium and tail class expands
+by pushing the decision boundary in the direction of com-
+pressing head classes. Additionally, DR uses CE loss that
+does not consider class margin. These lead to a significant
+boost in medium and tail classes while reducing the classi-
+fication accuracy on head classes. RS augments classes of
+all scales using head class samples with the lowest probabil-
+ity. CS makes all classes augmented with other classes in an
+equal probability. IS allows more features from the medium
+and tail classes to be fused with head features. All sampling
+strategies adjust the decision boundaries towards narrowing
+the head class distribution. RS has less damage to the per-
+formance of head classes while the improvement brought
+Table 5: Impact of different samplers.
+Method Head Med Tail All
+CE loss† 67.86 38.51 5.66 39.55
+DR w.o. H2T† 63.67 46.63 22.21 45.68
+BS+RS 63.56 48.60 24.07 46.87
+BS+BS 62.72 49.14 25.93 47.30
+BS+IS 62.00 50.17 27.07 47.73
+about by IS to the tail and medium classes is more promi-
+nent. As the classifier tuning stage cannot change the em-
+bedding distribution, the performance on medium and tail
+classes is further improved but with performance degrada-
+tion of head classes.
+The Impact of Fusion Ratio: Figure 6 shows the change of
+accuracy on different splits with respect top. As p increases,
+the performance of medium and tail classes improves while
+that of head classes decreases, which is consistent with Sec-
+tion 3.4.The class extension of the medium class and the tail
+class is expanded by eroding that of head classes through
+H2T fusion. Since ¨wT
+t ¨fh > ¨wT
+h ¨fh plays a disproportion-
+ate role, resulting in excessive head class samples being in-
+correctly labeled as medium and tail classes as p increases.
+If p > 0.3, the accuracy on head classes drops dramati-
+cally. Even replacing all feature maps with another class still
+yields a relatively satisfactory accuracy (43.57%), surpass-
+ing CE loss by 4.02%. p = 0 .3 obtains the best overall per-
+formance (47.73%) on CIFAR100-LT. By adjustingp based
+on specific scenarios, one can control the accuracy of classes
+with different scales, which is particularly useful when addi-
+tional accuracy requirements exist for different scale classes.
+More visualization results for the fused embedding space
+and the selection strategy of fused features can be found in
+Section E in the Appendix.
+5 Concluding Remarks
+This paper has proposed a simple but effective H2T for aug-
+menting tail classes by fusing the feature maps of head class
+samples to tail. By virtue of this fusion operation, our pro-
+posed H2T has two-fold advantages: 1) it produces rela-
+tively abundant features to augment tail classes, and 2) gen-
+erates two opposing forces that restrain each other, prevent-
+ing excessive sacrifices in head class accuracy. We have
+further designed a strategy that fuses the features of two
+branches with different sampling rates for easy implemen-
+tation. Extensive experiments have shown that the proposed
+H2T further improves upon SOTA methods.
+Despite its effectiveness, H2T has an underlying assump-
+tion that representation learning has reached its optimum
+on the available data. It only adjusts the decision bound-
+ary without altering the feature distribution. Ultimately, im-
+provements in the tail classes are always accompanied by
+sacrificing the head class performance. Our future work will
+focus on obtaining a more reasonable embedding space dis-
+tribution to overcome this limitation.
+
+=== PDF PAGE 8 ===
+Acknowledgments
+This work was supported in parts by NSFC (62306181,
+U21B2023, 62376233), DEGP Innovation Team (2022KCX
+TD025), NSFC-RGC (N HKBU214/21), RGC (12201321,
+12202622), and Shenzhen Science and Technology Program
+(KQTD20210811090044003, RCJC20200714114435012).
+References
+Ando, S.; and Huang, C. 2017. Deep Over-sampling Frame-
+work for Classifying Imbalanced Data. In ECML/PKDD,
+770–785.
+Cai, J.; Wang, Y .; and Hwang, J.-N. 2021. ACE: Ally Com-
+plementary Experts for Solving Long-Tailed Recognition in
+One-Shot. In ICCV, 112–121.
+Cao, K.; Wei, C.; Gaidon, A.; Arechiga, N.; and Ma, T. 2019.
+Learning imbalanced datasets with label-distribution-aware
+margin loss. In NeurIPS, 1567–1578.
+Chawla, N. V .; Bowyer, K. W.; Hall, L. O.; and Kegelmeyer,
+W. P. 2002. SMOTE: Synthetic Minority Over-sampling
+Technique. Journal of artificial intelligence research , 16:
+321–357.
+Cheung, Y .-M.; Li, M.; and Zou, R. 2021. Facial Struc-
+ture Guided GAN for Identity-Preserved Face Image De-
+Occlusion. In ICMR, 46–54.
+Chu, P.; Bian, X.; Liu, S.; and Ling, H. 2020. Feature
+Space Augmentation for Long-Tailed Data. In ECCV, vol-
+ume 12374, 694–710.
+Cubuk, E. D.; Zoph, B.; Man ´e, D.; Vasudevan, V .; and Le,
+Q. V . 2019. AutoAugment: Learning Augmentation Strate-
+gies From Data. In CVPR, 113–123.
+Cubuk, E. D.; Zoph, B.; Shlens, J.; and Le, Q. V . 2020. Ran-
+daugment: Practical automated data augmentation with a re-
+duced search space. In CVPRW, 3008–3017.
+Cui, J.; Liu, S.; Tian, Z.; Zhong, Z.; and Jia, J. 2023. ResLT:
+Residual Learning for Long-Tailed Recognition. IEEE
+TPAMI, 45(3): 3695–3706.
+Cui, J.; Zhong, Z.; Liu, S.; Yu, B.; and Jia, J. 2021. Paramet-
+ric contrastive learning. In CVPR, 715–724.
+Cui, Y .; Jia, M.; Lin, T.-Y .; Song, Y .; and Belongie, S. 2019.
+Class-balanced loss based on effective number of samples.
+In CVPR, 9268–9277.
+Deng, J.; Guo, J.; Xue, N.; and Zafeiriou, S. 2019. ArcFace:
+Additive Angular Margin Loss for Deep Face Recognition.
+In CVPR, 4690–4699.
+He, K.; Zhang, X.; Ren, S.; and Sun, J. 2016. Deep residual
+learning for image recognition. In CVPR, 770–778.
+Ho, D.; Liang, E.; Chen, X.; Stoica, I.; and , P. 2019. Popu-
+lation Based Augmentation: Efficient Learning of Augmen-
+tation Policy Schedules. In ICML, volume 97, 2731–2741.
+Hong, Y .; Han, S.; Choi, K.; Seo, S.; Kim, B.; and Chang,
+B. 2021. Disentangling Label Distribution for Long-Tailed
+Visual Recognition. In CVPR, 6626–6636.
+Hu, Z.; Cheung, Y .-m.; Li, M.; Lan, W.; Zhang, D.; and
+Liu, Q. 2023. Joint Semantic Preserving Sparse Hashing
+for Cross-Modal Retrieval. IEEE TCSVT, 1–15.
+Hu, Z.; Liu, X.; Wang, X.; Cheung, Y .-m.; Wang, N.; and
+Chen, Y . 2019. Triplet Fusion Network Hashing for Un-
+paired Cross-Modal Retrieval. In ICMR, 141–149.
+Huang, C.; Li, Y .; Loy, C. C.; and Tang, X. 2016. Learn-
+ing Deep Representation for Imbalanced Classification. In
+CVPR.
+Huang, C.; Li, Y .; Loy, C. C.; and Tang, X. 2020. Deep Im-
+balanced Learning for Face Recognition and Attribute Pre-
+diction. IEEE TPAMI, 42(11): 2781–2794.
+Jin, L.; Lang, D.; and Lei, N. 2023. An Optimal Trans-
+port View of Class-Imbalanced Visual Recognition. Inter-
+national Journal of Computer Vision, 1–19.
+Jin, Y .; Li, M.; Lu, Y .; Cheung, Y .-m.; and Wang, H. 2023.
+Long-Tailed Visual Recognition via Self-Heterogeneous In-
+tegration With Knowledge Excavation. In Proceedings of
+the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition (CVPR), 23695–23704.
+Kang, B.; Xie, S.; Rohrbach, M.; Yan, Z.; Gordo, A.; Feng,
+J.; and Kalantidis, Y . 2020. Decoupling representation and
+classifier for long-tailed recognition. In ICLR.
+Kim, J.; Jeong, J.; and Shin, J. 2020. M2m: Imbalanced clas-
+sification via major-to-minor translation. In CVPR, 13896–
+13905.
+Krizhevsky, A.; Hinton, G.; et al. 2009. Learning multiple
+layers of features from tiny images. Tech Report.
+Lan, W.; Cheung, Y .-M.; Jiang, J.; Hu, Z.; and Li, M. 2024.
+Compact Neural Network via Stacking Hybrid Units. IEEE
+TPAMI, 46(1): 103–116.
+Li, B.; Han, Z.; Li, H.; Fu, H.; and Zhang, C. 2022a. Trust-
+worthy Long-Tailed Classification. In CVPR, 6970–6979.
+Li, J.; Tan, Z.; Wan, J.; Lei, Z.; and Guo, G. 2022b. Nested
+Collaborative Learning for Long-Tailed Visual Recognition.
+In CVPR, 6949–6958.
+Li, M.; Cheung, Y .-m.; and Hu, Z. 2022. Key Point Sensitive
+Loss for Long-tailed Visual Recognition. IEEE TPAMI, in
+Press: 1–14.
+Li, M.; Cheung, Y .-m.; and Lu, Y . 2022. Long-Tailed Vi-
+sual Recognition via Gaussian Clouded Logit Adjustment.
+In CVPR, 6929–6938.
+Li, M.; Cheung, Y .-m.; Lu, Y .; Hu, Z.; Lan, W.; and Huang,
+H. 2023. Adjusting Logit in Gaussian Form for Long-Tailed
+Visual Recognition. arXiv preprint arXiv:2305.10648.
+Li, S.; Gong, K.; Liu, C. H.; Wang, Y .; Qiao, F.; and Cheng,
+X. 2021. MetaSAug: Meta Semantic Augmentation for
+Long-Tailed Visual Recognition. In CVPR, 5212–5221.
+Lim, S.; Kim, I.; Kim, T.; Kim, C.; and Kim, S. 2019. Fast
+AutoAugment. In NeurIPS, 6662–6672.
+Lin, T.; Goyal, P.; Girshick, R. B.; He, K.; and Doll ´ar, P.
+2020. Focal Loss for Dense Object Detection.IEEE TPAMI,
+42(2): 318–327.
+Liu, J.; Li, W.; and Sun, Y . 2022. Memory-Based Jitter: Im-
+proving Visual Recognition on Long-Tailed Data with Di-
+versity in Memory. In AAAI, 1720–1728. AAAI Press.
+Liu, J.; Sun, Y .; Han, C.; Dou, Z.; and Li, W. 2020. Deep
+Representation Learning on Long-Tailed Data: A Learnable
+Embedding Augmentation Perspective. In CVPR.
+
+=== PDF PAGE 9 ===
+Liu, X.; Hu, Z.; Ling, H.; and Cheung, Y .-M. 2021. MTFH:
+A Matrix Tri-Factorization Hashing Framework for Efficient
+Cross-Modal Retrieval. IEEE TPAMI, 43(3): 964–981.
+Liu, Z.; Miao, Z.; Zhan, X.; Wang, J.; Gong, B.; and Yu,
+S. X. 2019. Large-Scale Long-Tailed Recognition in an
+Open World. In CVPR, 2537–2546.
+Minaee, S.; Boykov, Y .; Porikli, F.; Plaza, A.; Kehtarnavaz,
+N.; and Terzopoulos, D. 2022. Image Segmentation Using
+Deep Learning: A Survey. IEEE TPAMI, 44(7): 3523–3542.
+Park, S.; Hong, Y .; Heo, B.; Yun, S.; and Choi, J. Y . 2022.
+The Majority Can Help The Minority: Context-rich Minor-
+ity Oversampling for Long-tailed Classification. In CVPR,
+6887–6896.
+Park, S.; Lim, J.; Jeon, Y .; and Choi, J. Y . 2021. Influence-
+Balanced Loss for Imbalanced Visual Classification. In
+ICCV, 735–744.
+Reed, W. J. 2001. The Pareto, Zipf and other power laws.
+Economics letters, 74(1): 15–19.
+Ren, J.; Yu, C.; sheng, s.; Ma, X.; Zhao, H.; Yi, S.; and Li,
+h. 2020. Balanced Meta-Softmax for Long-Tailed Visual
+Recognition. In NeurIPS, volume 33, 4175–4186.
+Ren, M.; Zeng, W.; Yang, B.; and Urtasun, R. 2018. Learn-
+ing to Reweight Examples for Robust Deep Learning. In
+ICML, volume 80, 4331–4340.
+Russakovsky, O.; Deng, J.; Su, H.; Krause, J.; Satheesh, S.;
+Ma, S.; Huang, Z.; Karpathy, A.; Khosla, A.; Bernstein, M.;
+Berg, A. C.; and Fei-Fei, L. 2015. ImageNet Large Scale
+Visual Recognition Challenge. IJCV, 115(3): 211–252.
+Szegedy, C.; Liu, W.; Jia, Y .; Sermanet, P.; Reed, S. E.;
+Anguelov, D.; Erhan, D.; Vanhoucke, V .; and Rabinovich,
+A. 2015. Going deeper with convolutions. In CVPR, 1–9.
+Van Horn, G.; Mac Aodha, O.; Song, Y .; Cui, Y .; Sun,
+C.; Shepard, A.; Adam, H.; Perona, P.; and Belongie, S. J.
+2018. The INaturalist Species Classification and Detection
+Dataset. In CVPR, 8769–8778.
+Verma, V .; Lamb, A.; Beckham, C.; Najafi, A.; Mitliagkas,
+I.; Lopez-Paz, D.; and Bengio, Y . 2019. Manifold mixup:
+Better representations by interpolating hidden states. In
+ICML, 6438–6447.
+Wang, F.; Xiang, X.; Cheng, J.; and Yuille, A. L. 2017.
+NormFace: L2 Hypersphere Embedding for Face Verifica-
+tion. In ACM MM, 1041–1049.
+Wang, H.; Wang, Y .; Zhou, Z.; Ji, X.; Gong, D.; Zhou, J.; Li,
+Z.; and Liu, W. 2018. Cosface: Large margin cosine loss for
+deep face recognition. In CVPR, 5265–5274.
+Wang, J.; Lukasiewicz, T.; Hu, X.; Cai, J.; and Zhenghua, X.
+2021a. RSG: A Simple but Effective Module for Learning
+Imbalanced Datasets. In CVPR, 3784–3793.
+Wang, X.; Lian, L.; Miao, Z.; Liu, Z.; and Yu, S. X. 2021b.
+Long-tailed Recognition by Routing Diverse Distribution-
+Aware Experts. In ICLR.
+Xiang, L.; Ding, G.; and Han, J. 2020. Learning From Mul-
+tiple Experts: Self-paced Knowledge Distillation for Long-
+Tailed Classification. In ECCV, 247–263.
+Xiao, L.; Zhang, X.; Jing, L.; Huang, C.; and Song, M. 2021.
+Does head label help for long-tailed multi-label text classifi-
+cation. AAAI, 35(16): 14103–14111.
+Yang, L.; Jiang, H.; Song, Q.; and Guo, J. 2022. A survey
+on long-tailed visual recognition. IJCV, 130(7): 1837–1872.
+Yin, X.; Yu, X.; Sohn, K.; Liu, X.; and Chandraker, M. 2019.
+Feature transfer learning for face recognition with under-
+represented data. In CVPR, 5704–5713.
+Yun, S.; Han, D.; Oh, S. J.; Chun, S.; Choe, J.; and Yoo, Y .
+2019. Cutmix: Regularization strategy to train strong classi-
+fiers with localizable features. In ICCV, 6023–6032.
+Zada, S.; Benou, I.; and Irani, M. 2022. Pure Noise to the
+Rescue of Insufficient Data: Improving Imbalanced Classi-
+fication by Training on Random Noise Images. In ICML,
+volume 162, 25817–25833.
+Zhang, H.; Cisse, M.; Dauphin, Y . N.; and Lopez-Paz, D.
+2018. mixup: Beyond empirical risk minimization. ICLR.
+Zhang, Y .; Kang, B.; Hooi, B.; Yan, S.; and Feng, J. 2023.
+Deep Long-Tailed Learning: A Survey. IEEE TPAMI, 1–20.
+Zhang, Y .; Wei, X.-S.; Zhou, B.; and Wu, J. 2021. Bag of
+Tricks for Long-Tailed Visual Recognition with Deep Con-
+volutional Neural Networks. In AAAI, 3447–3455.
+Zhong, Z.; Cui, J.; Liu, S.; and Jia, J. 2021. Improving
+Calibration for Long-Tailed Recognition. In CVPR, 16489–
+16498.
+Zhou, B.; Cui, Q.; Wei, X.-S.; and Chen, Z.-M. 2020. BBN:
+Bilateral-Branch Network with Cumulative Learning for
+Long-Tailed Visual Recognition. In CVPR, 9719–9728.
+Zhou, B.; Khosla, A.; Lapedriza, `A.; Oliva, A.; and Torralba,
+A. 2016. Learning Deep Features for Discriminative Local-
+ization. In CVPR, 2921–2929.
+Zhou, B.; Lapedriza, A.; Khosla, A.; Oliva, A.; and Torralba,
+A. 2017. Places: A 10 million image database for scene
+recognition. IEEE TPAMI, 40(6): 1452–1464.
+
+=== PDF PAGE 10 ===
+Appendix: Feature Fusion from Head to Tail for Long-Tailed Visual
+Recognition
+A Key Execution Code
+H2T is easy to implement and can be seamlessly integrated
+with various other methods. Below, we outline the key codes
+of the algorithm:
+Listing 1: PyTorch implementation of H2T
+1 def H2T(x1, x2, rho = 0.3):
+2 if type (x1).__name__ == ’Tensor’:
+3 fea_num = x1.shape[1]
+4 index = torch.randperm(fea_num).
+cuda()
+5 slt_num = int(rho*fea_num)
+6 index = index[:slt_num]
+7 x1[:,index,:,:] = x2[:,index
+,:,:]
+8 else:
+9 for i in range (len(x1)):
+10 fea_num = x1[i].shape[1]
+11 index = torch.randperm(
+fea_num).cuda()
+12 slt_num = int(rho*fea_num)
+13 index = index[:slt_num]
+14 x1[i][:,index,:,:] = x2[i
+][:,index,:,:]
+15 return x1
+B Comparison Results on CIFAR-10-LT
+In Section 4.3 of the main paper, we show the results on
+most of the benchmark datasets except CIRAT10-LT. Ta-
+ble 6 presents the supplementary results on CIFAR10-LT
+w.r.t Top-1 classification accuracy (%). The improvement of
+applying H2T to the vanilla training of DR with CE loss
+(DR+H2T) is more clear. The biggest improvement exceeds
+5% on CIFAR10-LT with ρ = 200 . The improvement in
+GCL+H2T is less compared with other methods because
+GCL uses the distance in cosine form. This result is con-
+sistent with the experimental results on Places-LT (refer to
+Table 4 of the main paper), namely the H2T improves RIDE
+with cosine classifier less than with linear classifier.
+C Selection of fused features
+The selected fused features are essential. We conduct an ex-
+periment to show the effect of the selection strategy of fused
+features. The dataset is CIRAR100-LT and the imbalance
+ratio is 100. Table 7 shows the Top-1 classification accu-
+racy (%) of different selections. Two approaches are vali-
+dated: sequential selection and random selection. Sequential
+selection refers to replacing a certain proportion of feature
+maps directly in accordance with the original order of fea-
+ture maps. We select the first 30%, meddle 30%, and the
+last 30% of the feature maps to be replaced. Random se-
+lection refers to randomly selecting a certain proportion of
+Table 6: Comparison results on CIFAR10-LT.
+Imbalance Ratio 200 100 50
+Single Model
+CE loss 67.24 70.70 74.81
+LDAM-DRW (Cao et al. 2019) 73.52 77.03 81.03
+DR+MU (Kang et al. 2020) 73.06 79.15 84.21
+MisLAS (Zhong et al. 2021) 77.17 82.12 85.55
+MBJ⋆ (Liu, Li, and Sun 2022) - 81.00 86.60
+GCL (Li, Cheung, and Lu 2022) 78.56 82.06 85.36
+DR+H2T 78.59
+(↑5.53)
+82.87
+(↑2.14)
+86.35
+(↑3.72)
+MisLAS+H2T 78.05
+(↑0.88)
+83.23
+(↑1.11)
+86.72
+(↑1.17)
+GCL+H2T 79.42
+(↑0.86)
+82.40
+(↑0.34)
+85.41
+(↑0.05)
+Multi-Expert Model
+BBN (Zhou et al. 2020) 73.47 79.82 81.18
+ACE⋆ (Cai, Wang, and Hwang 2021) - 81.20 84.30
+ResLT (Cui et al. 2023) 75.29 80.58 84.07
+ResLT+H2T 77.25
+(↑1.96)
+81.77
+(↑1.19)
+84.99
+(↑0.92)
+Note: The backbone is ResNet-32.⋆ represents the results quoted
+from the corresponding papers. The best and the second-best re-
+sults are shown inunderline boldandbold, respectively. The text in
+blue indicates the performance improvement compared to the original
+method w.o. H2T.
+Table 7: Selection of fused features
+First 30% Middle 30% Last 30% Random 30 %1
+47.22 47.23 47.41 47.73
+Random 30%2 Random %303 Random 30%4 Random 30%5
+47.75 47.80 47.71 47.66
+feature maps to replace. In the experiment, the fused ratio
+is 30% and we verified 5 random seeds (Random 30% 1 to
+Random 30% 5). We can observe that random selection gen-
+erally outperforms sequential selection. Different fused fea-
+tures may introduce variations, underscoring the need for a
+thoughtful selection strategy. This aspect remains a topic for
+our future work.
+D Visualization Results of decision
+Boundaries
+This section offers additional visualization comparisons per-
+taining to the decision boundary, serving as a supplemen-
+tary analysis to Figure 5 presented in Section 4.4 of the
+main paper. CIFAR10-LT, with an imbalance ratio of 100, is
+employed for the purpose of facilitating easy visualization.
+Classes 0-3 are head classes and Classes 6-9 are tail classes.
+Figure 7 shows the tSNE of embedding space and the deci-
+sion boundaries. We can see that H2T changes the embed-
+ding space of head and tail classes more. Figures 8-10 fur-
+ther visualize the decision boundary between head and each
+tail class. Compared with DR, H2T fills the margin between
+classes and adjusts the decision boundary to a more reason-
+able position in the obtained embedding space. For example,
+
+=== PDF PAGE 11 ===
+DR (CE loss) on Training Set
+  0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+DR (CE loss) on Test Set
+  0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+DR+H2T on Training Set
+  0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+DR+H2T on Test Set
+  0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Figure 7: Decision boundary Comparison w.o. and w. H2T
+(all classes).
+DR (CE loss) on Training Set
+  0
+6
+DR (CE loss) on Test Set
+  0
+6
+DR+H2T on Training Set
+  0
+6
+DR+H2T on Test Set
+  0
+6
+Figure 8: Decision boundary Comparison w.o. and w. H2T
+(Class 0 and 6).
+DR (CE loss) on Test Set
+  0
+7
+DR (CE loss) on Test Set
+  0
+7
+DR+H2T on Training Set
+  0
+7
+DR+H2T on Test Set
+  0
+7
+Figure 9: Decision boundary Comparison w.o. and w. H2T
+(Class 0 and 7).
+DR (CE loss) on Training Set
+  0
+9
+DR (CE loss) on Test Set
+  0
+9
+DR+H2T on Training Set
+  0
+9
+DR+H2T on Test Set
+  0
+9
+Figure 10: Decision boundary Comparison w.o. and w. H2T
+(Class 0 and 9).
+
+=== PDF PAGE 12 ===
+as shown in 9, H2T not only expands the tail class (Class
+7) space but also rectifies the head class space (Class 0).
+While this decision boundary enhances the classification ef-
+fect, it remains suboptimal. This presents an intriguing prob-
+lem worth exploring in future research.
+E Visualization Results w.r.t. p
+This section includes visualization results for fusion ra-
+tio p mentioned in Section 3.3 of the main paper. We use
+CIFAR10-LT for easy visualization. Figure 11 shows that
+as the value of p increases, the interior of each category
+becomes saturated first, and after p surpasses 0.4, the sam-
+ples within each category gradually become more dispersed.
+These findings suggest that the selection of an appropriate
+fusion ratio is crucial in balancing the preservation of the in-
+terior samples while ensuring that the model is able to cap-
+ture the tail samples effectively. By gaining a deeper under-
+standing of the relationship between the fusion ratio and the
+distribution of sample points, we can optimize the perfor-
+mance of the model and ensure its suitability for a range of
+applications.
+(Figure 11 is located on the next page.)
+F Comparison with Existing Methods
+• Clarify H2T. H2T constructs virtual tail features to simu-
+late potential sample variations by grafting part of head fea-
+tures into the tail, enabling tail samples to populate the class
+boundary, as depicted in Fig. 1. It enhances generalization
+by explicitly introducing perturbations.
+• Comparison with influence-balanced loss (IB) (Park et al.
+2021). Reducing decision boundary bias is a common goal
+in long-tail learning. Different from H2T, IB implicitly ad-
+dresses this issue from an optimization perspective. The gra-
+dients in stage II of IB isλk ·(∇Lk/∥∇Lk∥). Essentially, IB
+directly specifies the gradient descent step size to promote a
+more substantial gradient descent for tail classes to finetune
+the classifier.
+• Comparison with CMO (Park et al. 2022) . CMO allows
+the transformation of discrete sample values into continu-
+ous ones by mixup inputs and labels using CutMix. No new
+samples are created essentially. H2T constructs new virtual
+tail features where labels are not involved in fusion, which
+can simulate samples that are absent from the training set.
+• Comparison with head-to-tail network (HTTN) (Xiao et al.
+2021). HTTN indirectly utilizes head samples to transfer
+the prototypes. It computes the attention ( αzj) between tail
+and head prototypes, then uses αzj and the relationship
+(Wtransf er) between head prototypes and head classifier to
+identify tail classifier. In H2T, tail classesdirectly employ a
+portion of head features to simulate unseen tail samples and
+thus populate the class boundary.
+G Additional Rational Analysis
+The addition of the inequality obtained from correctly clas-
+sified tail samples to Eq. 4 does not eliminate the com-
+mon terms on both sides of the inequality, and consequently,
+it does not lead to a meaningful result. We consider the
+inequality relationship obtained by correctly classified tail
+samples and fused head samples:
+˙wT
+t ˙ft + ¨wT
+t ¨ft > ˙wT
+h ˙ft + ¨wT
+h ¨ft → for correct tail
+˙wT
+h ˙fh + ¨wT
+h ¨ft > ˙wT
+t ˙fh + ¨wT
+t ¨ft → for fused head
+Then, we can derive Eq. 9, which encourages wt to be in
+closer proximity to tail samples, as depicted in Figure 4.
+
+=== PDF PAGE 13 ===
+Figure 11: Visualization of feature distribution w.r.t.p.

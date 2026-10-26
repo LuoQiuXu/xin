@@ -1,0 +1,138 @@
+=== PDF PAGE 1 ===
+Feature Fusion from Head to Tail for Long-Tailed
+Visual Recognition
+Mengke Li, Zhikai Hu, Yang Lu, Weichao Lan, Yiu-ming Cheung, Hui Huang*
+Reported by Mengke Li
+
+
+=== PDF PAGE 2 ===
+AAAI-24
+2
+Introduction
+The head class has sufficiently
+sampled and its embedding space is
+fully occupied.
+The tail class suffers from a scarcity
+of samples, leading to sparsely
+distributed semantic regions.
+The class boundary is biased.
+
+=== PDF PAGE 3 ===
+AAAI-24
+3
+Method
+• Two-stage training scheme (Kang et al. 2020) .
+• The second stage involves dual-branch sampling: (1) fused branch -- class-balanced data ;
+(2) fusing branch -- instance-wise data.
+• Fuse the features of the two branches. Only use the labels of the fused branch as ground
+truth.
+Kang, B.; Xie, S.; Rohrbach, M.; Yan, Z.; Gordo, A.; Feng, J.; and Kalantidis, Y. 2020. Decoupling representation and classifier for long-tailed recognition. In ICLR.
+
+=== PDF PAGE 4 ===
+AAAI-24
+4
+Rationale
+𝑤𝑡
+𝑇𝑓𝑡< 𝑤ℎ
+𝑇𝑓𝑡 ⇒
+ሶ𝑤𝑡
+𝑇 ሶ𝑓𝑡 + ሷ𝑤𝑡
+𝑇 ሷ𝑓𝑡< ሶ𝑤ℎ
+𝑇 ሶ𝑓𝑡 + ሷ𝑤ℎ
+𝑇 ሷ𝑓𝑡
+𝑤𝑡
+𝑇 ሚ𝑓𝑡> 𝑤ℎ
+𝑇 ሚ𝑓 ⇒
+ሶ𝑤𝑡
+𝑇 ሶ𝑓𝑡 + ሷ𝑤𝑡
+𝑇 ሷ𝑓𝑡> ሶ𝑤ℎ
+𝑇 ሶ𝑓𝑡 + ሷ𝑤ℎ
+𝑇 ሷ𝑓ℎ
+Before H2T
+After H2T
+• 𝑤𝑡
+𝑇 = [ ሶ𝑤𝑡
+𝑇, ሷ𝑤𝑡
+𝑇], 𝑓𝑡
+𝑇 = [ ሶ𝑓𝑡
+𝑇, ሷ𝑓𝑡
+𝑇]
+𝑤ℎ
+𝑇 ሚ𝑓ℎ> 𝑤ℎ
+𝑇 ሚ𝑓 ⇒
+ሶ𝑤ℎ
+𝑇 ሶ𝑓ℎ + ሷ𝑤𝑡
+𝑇 ሷ𝑓𝑡> ሶ𝑤𝑡
+𝑇 ሶ𝑓ℎ + ሷ𝑤𝑡
+𝑇 ሷ𝑓ℎ
+Force ①: ሷ𝑤ℎ
+𝑇 cos ሷ𝜃ℎ > ሷ𝑤𝑡
+𝑇 cos ሷ𝜃𝑡
+• ሷ𝜃∗ (* is h or t) represent the angle between
+ሷ𝑤∗ and ሷ𝑓𝑡 − ሷ𝑓ℎ
+Force ② : ሶ𝑤𝑡
+𝑇 cos ሶ𝜃𝑡 > ሷ𝑤ℎ
+𝑇 cos ሶ𝜃ℎ
+For tail
+For head
+
+=== PDF PAGE 5 ===
+AAAI-24
+5
+Rationale
+Forces ①>② makes the tail sample to “pull” closer to and “push” further away from 𝑤ℎ,
+leading to the adjustment of decision boundary and enlargement of the tail class space.
+
+
+=== PDF PAGE 6 ===
+AAAI-24
+6
+Experiments
+Comparison results on CIFAR100-LT
+
+=== PDF PAGE 7 ===
+AAAI-24
+7
+Experiments
+Comparison results on imageNet-LT and iNaturalist 2018
+
+
+=== PDF PAGE 8 ===
+AAAI-24
+8
+Experiments
+Comparison results on Places-LT. CC, cosine classifier. LC, linear classifier.
+
+
+=== PDF PAGE 9 ===
+AAAI-24
+9
+Experiments
+Decision boundary comparison
+
+=== PDF PAGE 10 ===
+AAAI-24
+10
+Experiments
+Change of accuracy (%) on different splits w.r.t. fusing ratio p.
+
+
+=== PDF PAGE 11 ===
+AAAI-24
+11
+Conclusion
+Pros:
+Simple but effective:
+• A plug-and-play module;
+• H2T produces abundant features to augment tail classes;
+• H2T generates two opposing forces that restrain each other, preventing
+excessive sacrifices in head class accuracy.
+Cons:
+Sacrifice head class performance:
+• H2T  only adjusts the decision boundary without altering the feature
+distribution.
+
+=== PDF PAGE 12 ===
+Thanks
+12
+AAAI 2024

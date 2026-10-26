@@ -1,0 +1,23 @@
+{
+  "component_rows": 42,
+  "CSV_columns": [
+    "component_id",
+    "component_name",
+    "category",
+    "definition_path",
+    "definition_line",
+    "callsite_path",
+    "callsite_line",
+    "selected_stage1_status",
+    "selected_stage2_status",
+    "paper_evidence",
+    "code_evidence",
+    "removal_effect",
+    "evidence_class",
+    "existing_ablation",
+    "confounders",
+    "unresolved_question"
+  ],
+  "all_paths_and_lines_valid": true,
+  "runtime_evidence": "NONE: no training modules imported, no GPU/model/data/checkpoint execution"
+}

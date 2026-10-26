@@ -1,0 +1,555 @@
+[
+  {
+    "component_id": "C01",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/methods.py",
+    "line": 31,
+    "source_text": "def H2T(x1, x2, rho = 0.3):          "
+  },
+  {
+    "component_id": "C01",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 370,
+    "source_text": "                        feat = H2T(feat1, feat2, rho =config.H2T)                        "
+  },
+  {
+    "component_id": "C02",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/methods.py",
+    "line": 34,
+    "source_text": "        index = torch.randperm(fea_num).cuda()"
+  },
+  {
+    "component_id": "C02",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 370,
+    "source_text": "                        feat = H2T(feat1, feat2, rho =config.H2T)                        "
+  },
+  {
+    "component_id": "C03",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/methods.py",
+    "line": 35,
+    "source_text": "        slt_num = int(rho*fea_num)"
+  },
+  {
+    "component_id": "C03",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 370,
+    "source_text": "                        feat = H2T(feat1, feat2, rho =config.H2T)                        "
+  },
+  {
+    "component_id": "C04",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 100,
+    "source_text": "            meta['sample_image'] = sample_img"
+  },
+  {
+    "component_id": "C04",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 378,
+    "source_text": "            loss = criterion(output, target, extra_info=extra_info)"
+  },
+  {
+    "component_id": "C05",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 103,
+    "source_text": "        if self.config.sampler.type == \"weighted sampler\" and self.train:"
+  },
+  {
+    "component_id": "C05",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 321,
+    "source_text": "    for i, (images, target, meta) in enumerate(train_loader):"
+  },
+  {
+    "component_id": "C06",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 93,
+    "source_text": "            elif self.config.sampler.dual_sample.type == \"long-tailed\":"
+  },
+  {
+    "component_id": "C06",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 326,
+    "source_text": "            images2 = meta['sample_image']"
+  },
+  {
+    "component_id": "C07",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 74,
+    "source_text": "    def __getitem__(self, index):"
+  },
+  {
+    "component_id": "C07",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 325,
+    "source_text": "        if config.H2T>0:"
+  },
+  {
+    "component_id": "C08",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/sampler.py",
+    "line": 130,
+    "source_text": "class ClassAwareSampler(torch.utils.data.sampler.Sampler):"
+  },
+  {
+    "component_id": "C08",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 204,
+    "source_text": "        balance_sampler = ClassAwareSampler(train_dataset)"
+  },
+  {
+    "component_id": "C09",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/sampler.py",
+    "line": 6,
+    "source_text": "class BalancedDatasetSampler(torch.utils.data.sampler.Sampler):"
+  },
+  {
+    "component_id": "C10",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/sampler.py",
+    "line": 47,
+    "source_text": "class EffectNumSampler(torch.utils.data.sampler.Sampler):"
+  },
+  {
+    "component_id": "C11",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 43,
+    "source_text": "    def sample_class_index_by_weight(self):"
+  },
+  {
+    "component_id": "C11",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 86,
+    "source_text": "                sample_class = self.sample_class_index_by_weight()"
+  },
+  {
+    "component_id": "C12",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 27,
+    "source_text": "    def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):"
+  },
+  {
+    "component_id": "C12",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 190,
+    "source_text": "        train_dataset = IMBALANCECIFAR100(config, root=root, imb_type=imb_type, "
+  },
+  {
+    "component_id": "C13",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 175,
+    "source_text": "        train_transform = transforms.Compose(["
+  },
+  {
+    "component_id": "C13",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 122,
+    "source_text": "            img = self.transform(img)"
+  },
+  {
+    "component_id": "C14",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 179,
+    "source_text": "        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),"
+  },
+  {
+    "component_id": "C14",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/datasets/cifar100.py",
+    "line": 122,
+    "source_text": "            img = self.transform(img)"
+  },
+  {
+    "component_id": "C15",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/methods.py",
+    "line": 8,
+    "source_text": "def mixup_data(x, y, alpha=1.0, use_cuda=True):"
+  },
+  {
+    "component_id": "C15",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage1.py",
+    "line": 321,
+    "source_text": "            images, targets_a, targets_b, lam = mixup_data(images, target, alpha=config.alpha)"
+  },
+  {
+    "component_id": "C16",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 360,
+    "source_text": "            with torch.no_grad():"
+  },
+  {
+    "component_id": "C16",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 241,
+    "source_text": "    optimizer = torch.optim.SGD([{\"params\": classifier.parameters()}],"
+  },
+  {
+    "component_id": "C17",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 64,
+    "source_text": "        self.bn1 = nn.BatchNorm2d(planes)"
+  },
+  {
+    "component_id": "C17",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 313,
+    "source_text": "        if config.shift_bn:"
+  },
+  {
+    "component_id": "C18",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 64,
+    "source_text": "        self.bn1 = nn.BatchNorm2d(planes)"
+  },
+  {
+    "component_id": "C18",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 241,
+    "source_text": "    optimizer = torch.optim.SGD([{\"params\": classifier.parameters()}],"
+  },
+  {
+    "component_id": "C19",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 155,
+    "source_text": "class Classifier(nn.Module):"
+  },
+  {
+    "component_id": "C19",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 117,
+    "source_text": "        classifier = getattr(resnet_cifar, 'Classifier')(feat_in=64, num_classes=config.num_classes)"
+  },
+  {
+    "component_id": "C20",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 161,
+    "source_text": "    def forward(self, x):"
+  },
+  {
+    "component_id": "C20",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 373,
+    "source_text": "            output = classifier(feat)"
+  },
+  {
+    "component_id": "C21",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/loss.py",
+    "line": 8,
+    "source_text": "class CrossEntropyLoss(nn.Module):"
+  },
+  {
+    "component_id": "C21",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 239,
+    "source_text": "    criterion = eval(config.loss.type)(config=config, cls_num_list=cls_num_list).to('cuda')  #cls_num_list=cls_num_list,"
+  },
+  {
+    "component_id": "C22",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/loss.py",
+    "line": 9,
+    "source_text": "    def __init__(self, config, cls_num_list=None, reweight_CE=False):"
+  },
+  {
+    "component_id": "C22",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 239,
+    "source_text": "    criterion = eval(config.loss.type)(config=config, cls_num_list=cls_num_list).to('cuda')  #cls_num_list=cls_num_list,"
+  },
+  {
+    "component_id": "C23",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/train_stage1.py",
+    "line": 231,
+    "source_text": "        optimizer = torch.optim.SGD([{\"params\": model.parameters()},"
+  },
+  {
+    "component_id": "C23",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 241,
+    "source_text": "    optimizer = torch.optim.SGD([{\"params\": classifier.parameters()}],"
+  },
+  {
+    "component_id": "C24",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/train_stage1.py",
+    "line": 457,
+    "source_text": "def adjust_learning_rate(optimizer, epoch, config):"
+  },
+  {
+    "component_id": "C24",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage1.py",
+    "line": 245,
+    "source_text": "        adjust_learning_rate(optimizer, epoch, config)"
+  },
+  {
+    "component_id": "C25",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 487,
+    "source_text": "def adjust_learning_rate(optimizer, epoch, config):"
+  },
+  {
+    "component_id": "C25",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 251,
+    "source_text": "        adjust_learning_rate(optimizer, epoch, config)"
+  },
+  {
+    "component_id": "C26",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 184,
+    "source_text": "    # optionally resume from a checkpoint"
+  },
+  {
+    "component_id": "C26",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 201,
+    "source_text": "            model.load_state_dict(checkpoint['state_dict_model'])"
+  },
+  {
+    "component_id": "C27",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/methods.py",
+    "line": 70,
+    "source_text": "class LearnableWeightScaling(nn.Module):"
+  },
+  {
+    "component_id": "C28",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 37,
+    "source_text": "class NormedLinear(nn.Module):"
+  },
+  {
+    "component_id": "C28",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 102,
+    "source_text": "            self.linear = NormedLinear(64, num_classes)"
+  },
+  {
+    "component_id": "C29",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/loss.py",
+    "line": 33,
+    "source_text": "class LabelAwareSmoothing(nn.Module):"
+  },
+  {
+    "component_id": "C30",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/loss.py",
+    "line": 69,
+    "source_text": "class LDAMLoss(nn.Module):"
+  },
+  {
+    "component_id": "C30",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 239,
+    "source_text": "    criterion = eval(config.loss.type)(config=config, cls_num_list=cls_num_list).to('cuda')  #cls_num_list=cls_num_list,"
+  },
+  {
+    "component_id": "C31",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/loss.py",
+    "line": 137,
+    "source_text": "class RIDELoss(nn.Module):"
+  },
+  {
+    "component_id": "C31",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 239,
+    "source_text": "    criterion = eval(config.loss.type)(config=config, cls_num_list=cls_num_list).to('cuda')  #cls_num_list=cls_num_list,"
+  },
+  {
+    "component_id": "C32",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/loss.py",
+    "line": 265,
+    "source_text": "class ResLoss(nn.Module):"
+  },
+  {
+    "component_id": "C32",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+    "line": 245,
+    "source_text": "      def forward(self, x):"
+  },
+  {
+    "component_id": "C33",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/methods.py",
+    "line": 50,
+    "source_text": "class H2Tv2(nn.Module):"
+  },
+  {
+    "component_id": "C34",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+    "line": 99,
+    "source_text": "class ResNet_s(nn.Module):"
+  },
+  {
+    "component_id": "C34",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/model.py",
+    "line": 71,
+    "source_text": "            self.backbone = ride_resnet_cifar.ResNet_s(ride_resnet_cifar.BasicBlock, [5, 5, 5], num_classes=num_classes, reduce_dimension=reduce_dimension, layer2_output_dim=layer2_output_dim, layer3_output_dim=layer3_output_dim, use_norm=use_norm, num_experts=num_experts, **kwargs)"
+  },
+  {
+    "component_id": "C35",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/EAResNet.py",
+    "line": 241,
+    "source_text": "    def pred_expert_help(self, input_part, i):"
+  },
+  {
+    "component_id": "C35",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/model.py",
+    "line": 63,
+    "source_text": "        self.backbone = EAResNet.ResNet(EAResNet.BasicBlock, [1, 1, 1, 1], dropout=None, num_classes=num_classes, reduce_dimension=reduce_dimension, layer3_output_dim=layer3_output_dim, layer4_output_dim=layer4_output_dim, num_experts=num_experts, **kwargs)"
+  },
+  {
+    "component_id": "C36",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/RIDEResNet.py",
+    "line": 147,
+    "source_text": "        self.use_dropout = True if dropout else False"
+  },
+  {
+    "component_id": "C36",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/fb_resnets/RIDEResNet.py",
+    "line": 210,
+    "source_text": "            x = self.dropout(x)"
+  },
+  {
+    "component_id": "C37",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 126,
+    "source_text": "class ResNet_fe(nn.Module):"
+  },
+  {
+    "component_id": "C37",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 116,
+    "source_text": "        model = getattr(resnet_cifar, config.backbone)()"
+  },
+  {
+    "component_id": "C38",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 58,
+    "source_text": "class BasicBlock(nn.Module):"
+  },
+  {
+    "component_id": "C38",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/resnet_cifar.py",
+    "line": 143,
+    "source_text": "            layers.append(block(self.in_planes, planes, stride))"
+  },
+  {
+    "component_id": "C39",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/resnet.py",
+    "line": 218,
+    "source_text": "class ResNet_FE(nn.Module):"
+  },
+  {
+    "component_id": "C39",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage1.py",
+    "line": 118,
+    "source_text": "        model = getattr(resnet, config.backbone)()"
+  },
+  {
+    "component_id": "C40",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/loss.py",
+    "line": 249,
+    "source_text": "class RIDELossWithDistill(nn.Module):"
+  },
+  {
+    "component_id": "C40",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/models/ride_model/loss.py",
+    "line": 252,
+    "source_text": "        self.ride_loss = RIDELoss(cls_num_list=cls_num_list, **kwargs)"
+  },
+  {
+    "component_id": "C41",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/utils/util.py",
+    "line": 15,
+    "source_text": "def SetRandomSeed(seed):"
+  },
+  {
+    "component_id": "C41",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 72,
+    "source_text": "    if config.deterministic:"
+  },
+  {
+    "component_id": "C42",
+    "kind": "definition",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 401,
+    "source_text": "def validate(val_loader, model, classifier, criterion, config, logger, block=None):  #, lws_model"
+  },
+  {
+    "component_id": "C42",
+    "kind": "callsite",
+    "path": "H2T_official_clean/H2T-main/train_stage2.py",
+    "line": 262,
+    "source_text": "        acc1, ece = validate(val_loader, model, classifier, criterion, config, logger, block) #, lws_model"
+  }
+]

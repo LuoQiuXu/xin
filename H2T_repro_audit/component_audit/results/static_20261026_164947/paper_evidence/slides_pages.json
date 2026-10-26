@@ -1,0 +1,50 @@
+[
+  {
+    "page": 1,
+    "text": "Feature Fusion from Head to Tail for Long-Tailed \nVisual Recognition\nMengke Li, Zhikai Hu, Yang Lu, Weichao Lan, Yiu-ming Cheung, Hui Huang*\nReported by Mengke Li\n"
+  },
+  {
+    "page": 2,
+    "text": "AAAI-24\n2\nIntroduction\nThe head class has sufficiently \nsampled and its embedding space is \nfully occupied.\nThe tail class suffers from a scarcity \nof samples, leading to sparsely \ndistributed semantic regions. \nThe class boundary is biased."
+  },
+  {
+    "page": 3,
+    "text": "AAAI-24\n3\nMethod\n• Two-stage training scheme (Kang et al. 2020) .\n• The second stage involves dual-branch sampling: (1) fused branch -- class-balanced data ; \n(2) fusing branch -- instance-wise data.\n• Fuse the features of the two branches. Only use the labels of the fused branch as ground \ntruth. \nKang, B.; Xie, S.; Rohrbach, M.; Yan, Z.; Gordo, A.; Feng, J.; and Kalantidis, Y. 2020. Decoupling representation and classifier for long-tailed recognition. In ICLR."
+  },
+  {
+    "page": 4,
+    "text": "AAAI-24\n4\nRationale \n𝑤𝑡\n𝑇𝑓𝑡< 𝑤ℎ\n𝑇𝑓𝑡 ⇒\nሶ𝑤𝑡\n𝑇 ሶ𝑓𝑡 + ሷ𝑤𝑡\n𝑇 ሷ𝑓𝑡< ሶ𝑤ℎ\n𝑇 ሶ𝑓𝑡 + ሷ𝑤ℎ\n𝑇 ሷ𝑓𝑡\n𝑤𝑡\n𝑇 ሚ𝑓𝑡> 𝑤ℎ\n𝑇 ሚ𝑓 ⇒\nሶ𝑤𝑡\n𝑇 ሶ𝑓𝑡 + ሷ𝑤𝑡\n𝑇 ሷ𝑓𝑡> ሶ𝑤ℎ\n𝑇 ሶ𝑓𝑡 + ሷ𝑤ℎ\n𝑇 ሷ𝑓ℎ\nBefore H2T\nAfter H2T\n• 𝑤𝑡\n𝑇 = [ ሶ𝑤𝑡\n𝑇, ሷ𝑤𝑡\n𝑇], 𝑓𝑡\n𝑇 = [ ሶ𝑓𝑡\n𝑇, ሷ𝑓𝑡\n𝑇]\n𝑤ℎ\n𝑇 ሚ𝑓ℎ> 𝑤ℎ\n𝑇 ሚ𝑓 ⇒\nሶ𝑤ℎ\n𝑇 ሶ𝑓ℎ + ሷ𝑤𝑡\n𝑇 ሷ𝑓𝑡> ሶ𝑤𝑡\n𝑇 ሶ𝑓ℎ + ሷ𝑤𝑡\n𝑇 ሷ𝑓ℎ\nForce ①: ሷ𝑤ℎ\n𝑇 cos ሷ𝜃ℎ > ሷ𝑤𝑡\n𝑇 cos ሷ𝜃𝑡\n• ሷ𝜃∗ (* is h or t) represent the angle between \nሷ𝑤∗ and ሷ𝑓𝑡 − ሷ𝑓ℎ\nForce ② : ሶ𝑤𝑡\n𝑇 cos ሶ𝜃𝑡 > ሷ𝑤ℎ\n𝑇 cos ሶ𝜃ℎ\nFor tail\nFor head"
+  },
+  {
+    "page": 5,
+    "text": "AAAI-24\n5\nRationale \nForces ①>② makes the tail sample to “pull” closer to and “push” further away from 𝑤ℎ, \nleading to the adjustment of decision boundary and enlargement of the tail class space. \n"
+  },
+  {
+    "page": 6,
+    "text": "AAAI-24\n6\nExperiments \nComparison results on CIFAR100-LT "
+  },
+  {
+    "page": 7,
+    "text": "AAAI-24\n7\nExperiments \nComparison results on imageNet-LT and iNaturalist 2018\n"
+  },
+  {
+    "page": 8,
+    "text": "AAAI-24\n8\nExperiments \nComparison results on Places-LT. CC, cosine classifier. LC, linear classifier.\n"
+  },
+  {
+    "page": 9,
+    "text": "AAAI-24\n9\nExperiments \nDecision boundary comparison"
+  },
+  {
+    "page": 10,
+    "text": "AAAI-24\n10\nExperiments \nChange of accuracy (%) on different splits w.r.t. fusing ratio p.\n"
+  },
+  {
+    "page": 11,
+    "text": "AAAI-24\n11\nConclusion \nPros:\nSimple but effective:\n• A plug-and-play module; \n• H2T produces abundant features to augment tail classes;\n• H2T generates two opposing forces that restrain each other, preventing \nexcessive sacrifices in head class accuracy.\nCons:\nSacrifice head class performance:\n• H2T  only adjusts the decision boundary without altering the feature \ndistribution. "
+  },
+  {
+    "page": 12,
+    "text": "Thanks\n12\nAAAI 2024"
+  }
+]

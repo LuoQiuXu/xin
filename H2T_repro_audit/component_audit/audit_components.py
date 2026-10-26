@@ -176,8 +176,9 @@ class ComponentVisitor(ast.NodeVisitor):
         return ".".join(self.scope) or "<module>"
 
     def _record_symbol(self, node: ast.AST, kind: str, name: str) -> None:
-        if not is_relevant_symbol(name):
-            return
+        # Preserve every definition as call-ownership context. Generic names
+        # such as forward/train_step need not contain component keywords;
+        # an empty category list does not make them active method components.
         self.symbols.append({
             "kind": kind,
             "name": name,
