@@ -348,6 +348,33 @@ def analyze(out: Path) -> None:
     print(f"ANALYSIS COMPLETE: {decision}; Tail pp={tail_delta}; Overall pp={overall_delta}")
 
 
+def self_test() -> None:
+    """No dataset/GPU: verify the concrete hard-replacement path and win/loss counting."""
+    x = torch.arange(7*64*8*8, dtype=torch.float32).reshape(7,64,8,8)
+    donor = x + 1_000_000.
+    selected = np.arange(0,64,4,dtype=np.int64)  # 16 channels
+    labels = np.array([0,35,36,70,71,95,99])
+    for arm in ARMS:
+        active = choose_active(labels,arm,124,0,0)
+        z = apply_original_mask(x, donor, selected, active)
+        expected = x.clone()
+        for i,on in enumerate(active):
+            if on:
+                expected[i, selected] = donor[i, selected]
+        assert torch.equal(z,expected), f"hard-channel replacement bug in {arm}"
+    # 99 classes, 20 examples per class; exactly one changed correction in tail class71.
+    yy = np.repeat(np.arange(1,100,dtype=np.int64),20)
+    a = yy.copy()
+    b = yy.copy()
+    b[np.flatnonzero(yy==71)[0]] = 0
+    stats,rows=compare(a,b,yy)
+    assert stats["tail_wins"] == 1 and stats["tail_losses"] == 0
+    assert abs(stats["Tail_delta_pp"] - 100/580)<1e-12
+    assert abs(stats["Overall_delta_pp"] - 100/1980)<1e-12
+    assert next(x for x in rows if x["class"]==71)["delta_pp"] == 5.
+    print("SELF TEST PASS: complete-channel fusion flags and paired result arithmetic")
+
+
 def run_all(run_id: str) -> Path:
     if not run_id or not all(c.isalnum() or c in "-_" for c in run_id):
         raise ValueError("run-id must contain only alnum, underscore and hyphen")
@@ -367,11 +394,13 @@ def run_all(run_id: str) -> Path:
 
 def main() -> None:
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("preflight","run-all","analyze"))
+    parser.add_argument("command", choices=("self-test","preflight","run-all","analyze"))
     parser.add_argument("--run-id", required=True)
     a=parser.parse_args()
     out=HERE/"results"/a.run_id
-    if a.command=="preflight":
+    if a.command=="self-test":
+        self_test()
+    elif a.command=="preflight":
         print(json.dumps(preflight(out),ensure_ascii=False,indent=2))
     elif a.command=="run-all":
         print("RESULT DIR",run_all(a.run_id))
