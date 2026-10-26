@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "papers": [
+    {
+      "key": "H2T",
+      "title": "Feature Fusion from Head to Tail for Long-Tailed Visual Recognition",
+      "venue": "AAAI 2024",
+      "primary_url": "https://ojs.aaai.org/index.php/AAAI/article/view/29262",
+      "fulltext_url": "https://ojs.aaai.org/index.php/AAAI/article/download/29262/30382",
+      "role": "target original; source of actual modules and author's claimed boundary issue"
+    },
+    {
+      "key": "PI_H2T",
+      "title": "PI-H2T: Enhancing Long-Tailed Visual Recognition With Permutation-Invariant and Head-to-Tail Feature Fusion",
+      "venue": "IEEE TPAMI 2026 / arXiv revision",
+      "primary_url": "https://arxiv.org/abs/2506.00625",
+      "fulltext_url": "https://arxiv.org/pdf/2506.00625",
+      "role": "same authors' successor; PIF and H2TF; requires paper version, formula and ratio-direction check"
+    },
+    {
+      "key": "FEATRECON",
+      "title": "Geometry of Long-Tailed Representation Learning: Rebalancing Features for Skewed Distributions",
+      "venue": "ICLR 2025",
+      "primary_url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/adb2075b6dd31cb18dfa727240d2887e-Abstract-Conference.html",
+      "fulltext_url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/adb2075b6dd31cb18dfa727240d2887e-Paper-Conference.pdf",
+      "role": "representation deformation/overlap comparator; not H2T-specific negative evidence"
+    },
+    {
+      "key": "SEL",
+      "title": "Supervised Exploratory Learning for Long-Tailed Visual Recognition",
+      "venue": "ICCV 2025",
+      "primary_url": "https://openaccess.thecvf.com/content/ICCV2025/html/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.html",
+      "fulltext_url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.pdf",
+      "role": "decision-region robustness comparator; features plug-in H2T combined scores; distinct protocols"
+    },
+    {
+      "key": "DBG",
+      "title": "Decision Boundary-aware Generation for Long-tailed Learning",
+      "venue": "CVPR 2026",
+      "primary_url": "https://openaccess.thecvf.com/content/CVPR2026/html/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.html",
+      "fulltext_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.pdf",
+      "role": "boundary ambiguity in diffusion-based head-to-tail generative transfer; DO NOT attribute claim directly to H2T feature channel swap"
+    }
+  ]
+}
