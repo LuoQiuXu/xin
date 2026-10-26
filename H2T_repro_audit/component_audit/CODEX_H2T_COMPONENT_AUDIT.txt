@@ -1,0 +1,145 @@
+TASK: Complete the original H2T non-backbone component audit. This is a static code-and-paper audit, not a method-improvement or training task.
+
+REPOSITORY
+- Repository: LuoQiuXu/xin
+- Intended branch: audit/h2t-component-map-20261026
+- Frozen original source of truth: H2T_official_clean/H2T-main/
+- Do not substitute H2T_repro_audit/official/, experimental H2T variants, or PI-H2T for the clean original implementation.
+- Do not modify any file under H2T_official_clean/H2T-main/.
+
+FIRST: SAFE GIT CHECK
+1. Confirm repository root and current branch.
+2. If the current branch is not audit/h2t-component-map-20261026, inspect git status first. If the working tree is dirty, STOP and report it; do not stash, reset, discard, or overwrite anything. If it is clean, fetch the remote branch and check it out. Do not create or switch to any other branch.
+3. Record git branch, HEAD SHA, and git status in VALIDATION_REPORT.md.
+4. Never overwrite an existing results directory. Use a new timestamped directory for this run.
+
+GOAL
+For every non-backbone component in the original H2T implementation, establish:
+(a) where it is defined;
+(b) where it is actually called;
+(c) whether the selected CIFAR-100-LT IF=100 Stage 1 / Stage 2 path enables it;
+(d) what the paper says it is intended to do;
+(e) what problem it is supposed to solve;
+(f) what code behavior is likely to change if it is removed/replaced;
+(g) whether the removal effect is already supported by a paper/repository ablation or is only a hypothesis.
+
+Do not treat a module definition as proof of use. Do not treat a YAML value as runtime proof if config defaults, command-line overrides, or control flow may change it. Do not invent paper sections, equations, page numbers, or ablation results.
+
+STEP 1 — RUN UNIT TESTS
+From repository root:
+python -m unittest discover -s H2T_repro_audit/component_audit -p "test_*.py" -v
+
+If a test fails, diagnose and fix only the new component_audit files. Do not change frozen H2T source files. Re-run tests and record the exact result.
+
+STEP 2 — RUN THE STATIC INVENTORY
+From repository root:
+python H2T_repro_audit/component_audit/audit_components.py
+
+The script should create a new timestamped folder under H2T_repro_audit/component_audit/results/. If the default path or expected source files are missing, do not silently point the script at a different implementation. Diagnose the repository layout and report the discrepancy.
+
+Expected generated artifacts:
+- source_manifest.json
+- static_inventory.json
+- STATIC_COMPONENT_MAP.md
+
+Inspect these outputs. The scanner is a locator, not the final scientific conclusion. Correct any bug in the scanner only if you can reproduce it and add a unit test.
+
+STEP 3 — MANUALLY TRACE THE ACTIVE PATH
+Read the relevant source code, following calls rather than relying only on keyword search. At minimum inspect:
+- H2T_official_clean/H2T-main/README.md
+- H2T_official_clean/H2T-main/methods.py
+- H2T_official_clean/H2T-main/train_stage1.py
+- H2T_official_clean/H2T-main/train_stage2.py
+- H2T_official_clean/H2T-main/datasets/cifar100.py
+- H2T_official_clean/H2T-main/datasets/sampler.py
+- H2T_official_clean/H2T-main/models/resnet_cifar.py
+- H2T_official_clean/H2T-main/models/resnet.py
+- H2T_official_clean/H2T-main/models/resnet_places.py
+- H2T_official_clean/H2T-main/loss.py
+- H2T_official_clean/H2T-main/config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml
+- H2T_official_clean/H2T-main/config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml
+- the config-loader implementation imported by train_stage1.py/train_stage2.py (follow the actual import and determine defaults/CLI overrides).
+
+Also inspect all model/loss files for attention-like modules and optional components, including alternative RIDE-related implementations. Clearly separate:
+1. component used by the selected CIFAR-100-LT configuration;
+2. component defined in the source but not shown to be active on this path;
+3. architecture implementation details;
+4. H2T-specific method components.
+
+Follow the actual loader variable passed to Stage 2 training. Determine whether class-aware/balanced loaders are constructed but not used, whether resampling happens inside dataset __getitem__, and how receiver/donor images are selected. Do not infer sampler behavior from class names alone.
+
+Inspect exact control flow around:
+- H2T channel selection and tensor replacement;
+- H2Tv2 or any alternative fusion implementation;
+- Stage 1 MixUp and Stage 2 MixUp configuration;
+- sampler / dual_sample / sample_image / sample_label;
+- model.train(), model.eval(), torch.no_grad(), parameter gradients, and optimizer parameter groups in Stage 2;
+- shift_bn and BatchNorm running-statistic behavior;
+- classifier selection, NormedLinear, LearnableWeightScaling, pooling;
+- active loss construction and loss dispatch;
+- image augmentation, optimizer, and scheduler;
+- any attention, feature recalibration, normalization, or trick components that exist in code but may be inactive.
+
+STEP 4 — VERIFY THE PAPER EVIDENCE
+Use the original H2T paper linked from the official README (arXiv:2306.06963) and local slides/poster if available. If the paper cannot be retrieved in the current environment, say so explicitly and limit claims to accessible evidence. For each paper claim, cite the section/equation/figure/table/page only when you can verify it. Do not use a later PI-H2T paper as evidence for the original H2T design.
+
+STEP 5 — WRITE THE SCIENTIFIC AUDIT REPORT
+Create the following files inside the new timestamped results directory:
+1. COMPONENT_AUDIT_REPORT.md
+2. COMPONENT_EVIDENCE_MATRIX.csv
+3. VALIDATION_REPORT.md
+
+COMPONENT_AUDIT_REPORT.md must include:
+- Executive summary: what is genuinely H2T-specific vs inherited infrastructure.
+- A method/data/training-flow diagram in Mermaid or concise text, grounded in the traced code.
+- A table with one row per component and these fields:
+  component; category; definition location; call location; inputs/outputs; paper-stated purpose; code-level mechanism; problem addressed; Stage 1 status; Stage 2 status; expected effect of removal/replacement; evidence class; existing ablation/result; confounders; open question.
+- Dedicated sections for fusion, sampling/receiver-donor construction, normalization/BN, classifier/loss, data augmentation and training tricks, optional/inactive components, and architecture-only details.
+- A “what we know vs what remains untested” section.
+- A prioritized list of unresolved mechanism questions, but do not propose or run a new training experiment yet.
+
+COMPONENT_EVIDENCE_MATRIX.csv must have one row per component and columns:
+component_id, component_name, category, definition_path, definition_line, callsite_path, callsite_line, selected_stage1_status, selected_stage2_status, paper_evidence, code_evidence, removal_effect, evidence_class, existing_ablation, confounders, unresolved_question.
+
+For removal_effect, use exactly one of:
+- ALREADY_TESTED — provide the existing evidence/result;
+- CODE_DERIVED_EXPECTATION — reasoned prediction, not experimentally verified;
+- UNKNOWN — insufficient evidence.
+
+VALIDATION_REPORT.md must record:
+- branch and HEAD SHA;
+- commands run and exit codes;
+- unit-test summary;
+- output directory;
+- source file count and hashes/manifest path;
+- whether the frozen source changed;
+- syntax/AST parse warnings and scanner limitations;
+- paper accessibility and evidence limitations;
+- confirmation that no training/GPU experiment was run.
+
+SCIENTIFIC QUALITY RULES
+- Separate paper evidence, code evidence, config evidence, runtime evidence, and ablation evidence.
+- Cite repository-relative paths and exact line numbers for code claims.
+- For a module that is defined but not used by the selected config, say “defined, not shown active on this path”; do not call it an active H2T component.
+- If no attention module is present in the active backbone, say so, but still report attention-like modules found in alternative code paths. A keyword scan alone is insufficient to conclude absence.
+- Distinguish “feature fusion” from input MixUp. They operate at different points and should not be conflated.
+- Distinguish freezing backbone gradients from putting the backbone in eval mode: no_grad() and model.eval() are different controls; BN running stats may still update when the model is in train mode.
+- If the code contains an apparent bug or paper/code mismatch, record it with exact evidence; do not silently fix the original source.
+- A predicted removal effect is not an empirical result.
+- Avoid broad claims such as “removing this will lower accuracy” unless an existing controlled ablation supports it.
+
+STEP 6 — FINAL INTEGRITY CHECK
+1. Run git diff --check.
+2. Confirm git status and diff for H2T_official_clean/H2T-main/ are empty.
+3. Confirm the new audit files and result artifacts are the only changes.
+4. Do not commit or push unless the user explicitly asks in a later message.
+5. Do not launch Stage 1 / Stage 2 training, do not use the GPU, and do not modify any model/training behavior.
+
+DELIVERY
+When finished, provide a concise summary with:
+- exact result directory;
+- files created;
+- tests and validation outcomes;
+- 3–7 strongest verified observations;
+- unresolved questions and any blockers.
+Do not make a final research recommendation until the evidence report is complete.
