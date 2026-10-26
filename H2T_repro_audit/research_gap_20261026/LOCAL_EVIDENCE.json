@@ -13,7 +13,7 @@
     {
       "id": "H2T_SELECT",
       "source": "H2T_repro_audit/component_audit/results/static_20261026_164947/COMPONENT_AUDIT_REPORT.md",
-      "anchor": "论文 Table 7在30%替换下报告固定首/中/末与随机选择",
+      "anchor": "Table 7在30%替换下报告固定首/中/末",
       "observation": "原论文对随机与固定通道选择做过比较。",
       "boundary": "已有消融不能直接证明 H2T 最优性或单独的尾类失效条件。",
       "type": "published_ablation"
