@@ -1,0 +1,324 @@
+[
+  {
+    "field": "PIF channel mean",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 173,
+    "source_line": "            out_mean = out.mean(dim = 1, keepdims=True)"
+  },
+  {
+    "field": "PIF channel mean",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 172,
+    "source_line": "        residual = feature - feature.mean(dim=1, keepdim=True)"
+  },
+  {
+    "field": "PIF residual equation",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 144,
+    "source_line": "            self.conv1d = nn.Sequential( "
+  },
+  {
+    "field": "PIF residual equation",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 167,
+    "source_line": "        self.fuse = nn.Conv1d(2, 1, kernel_size=1, bias=False)"
+  },
+  {
+    "field": "PIF parameterization/bias",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 145,
+    "source_line": "                nn.Conv1d(2, 4, kernel_size=1),"
+  },
+  {
+    "field": "PIF parameterization/bias",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 167,
+    "source_line": "        self.fuse = nn.Conv1d(2, 1, kernel_size=1, bias=False)"
+  },
+  {
+    "field": "PIF concat order",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 174,
+    "source_line": "            out_hat = torch.stack((out, out - out_mean),dim=2)"
+  },
+  {
+    "field": "PIF concat order",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 173,
+    "source_line": "        pair = torch.stack((residual, feature), dim=2)"
+  },
+  {
+    "field": "PIF tensor dimensions",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 172,
+    "source_line": "            [bs,dim,w,h] = out.shape"
+  },
+  {
+    "field": "PIF tensor dimensions",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 175,
+    "source_line": "        return self.fuse(pair.reshape(b*c, 2, h*w)).reshape(b, c, h, w)"
+  },
+  {
+    "field": "PIF active return",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 180,
+    "source_line": "            return out_hat"
+  },
+  {
+    "field": "PIF active return",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 184,
+    "source_line": "        return self.pif(super().forward(x))"
+  },
+  {
+    "field": "PIF initialization",
+    "kind": "historical_code",
+    "path": "H2T/models/resnet_cifar.py",
+    "line": 150,
+    "source_line": "        self.apply(_weights_init)"
+  },
+  {
+    "field": "PIF initialization",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 165,
+    "source_line": "    def __init__(self):"
+  },
+  {
+    "field": "H2TF location",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 533,
+    "source_line": "            recipient_vector = pooled(backbone(images))"
+  },
+  {
+    "field": "H2TF location",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 29,
+    "source_line": "    recipient, donor = pool(recipient_map), pool(donor_map)"
+  },
+  {
+    "field": "H2TF receiver/donor polarity",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 608,
+    "source_line": "            # Eq. (7) written in donor-mass form: f~= (1-lambda) f_B+lambda f_I."
+  },
+  {
+    "field": "H2TF receiver/donor polarity",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 38,
+    "source_line": "        fused = r[:, None] * recipient + (1-r[:, None]) * donor"
+  },
+  {
+    "field": "Ratio cosine/theoretical bounds",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 292,
+    "source_line": "    cosine = F.cosine_similarity("
+  },
+  {
+    "field": "Ratio cosine/theoretical bounds",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 19,
+    "source_line": "    cosine = F.cosine_similarity(features, weight[labels], dim=1).clamp(-1, 1)"
+  },
+  {
+    "field": "Ratio clipping",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 298,
+    "source_line": "    recipient_mass = torch.clamp((1.0 - cosine) / 2.0, min=0.0, max=1.0)"
+  },
+  {
+    "field": "Ratio clipping",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 22,
+    "source_line": "        ratio = (distance / 2).clamp(0, 1)"
+  },
+  {
+    "field": "Ratio reference classifier",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 750,
+    "source_line": "    pi_weight = classifier_state[\"fc.weight\"].to(device).detach().clone()"
+  },
+  {
+    "field": "Ratio reference classifier",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 37,
+    "source_line": "        features, r = h2tf(recipient_map, donor_map, labels, classifier.module.fc.weight, mode,"
+  },
+  {
+    "field": "Ratio gradient/detach",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 532,
+    "source_line": "        with torch.no_grad():"
+  },
+  {
+    "field": "Ratio gradient/detach",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 25,
+    "source_line": "    return ratio.detach() if ratio_detach else ratio"
+  },
+  {
+    "field": "Supervision labels/loss",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 627,
+    "source_line": "        loss = F.cross_entropy(logits, target)"
+  },
+  {
+    "field": "Supervision labels/loss",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 40,
+    "source_line": "        loss = criterion(classifier(features), labels)"
+  },
+  {
+    "field": "BS/IS sampling",
+    "kind": "historical_code",
+    "path": "H2T/train_boundary_h2t_stage2.py",
+    "line": 176,
+    "source_line": "def dataset_config(num_donor_candidates: int = 1) -> SimpleNamespace:"
+  },
+  {
+    "field": "BS/IS sampling",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 99,
+    "source_line": "            values = train_stage2(dataset.train_instance, model, classifier, criterion, optimizer, config, args.ratio_mode)"
+  },
+  {
+    "field": "CNN backbone and head",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 240,
+    "source_line": "    uses_projection_shortcut = any("
+  },
+  {
+    "field": "CNN backbone and head",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/models/resnet_cifar.py",
+    "line": 178,
+    "source_line": "class ResNetPIF(ResNet_fe):"
+  },
+  {
+    "field": "Stage I optimizer/MixUp",
+    "kind": "historical_code",
+    "path": "H2T/config/cifar100/cifar100_imb001_stage1_ce_mixup_pif.yaml",
+    "line": 37,
+    "source_line": "lr: 0.1"
+  },
+  {
+    "field": "Stage I optimizer/MixUp",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 89,
+    "source_line": "    params = [{'params': classifier.parameters()}] if stage2 else [{'params': model.parameters()}, {'params': classifier.parameters()}]"
+  },
+  {
+    "field": "Stage II optimizer/schedule",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 753,
+    "source_line": "    optimizer = torch.optim.SGD("
+  },
+  {
+    "field": "Stage II optimizer/schedule",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 97,
+    "source_line": "        (lr_stage2 if stage2 else lr_stage1)(optimizer, epoch, config)"
+  },
+  {
+    "field": "Backbone gradient freeze",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 264,
+    "source_line": "    backbone.requires_grad_(False)"
+  },
+  {
+    "field": "Backbone gradient freeze",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 42,
+    "source_line": "def freeze_extractor(model):"
+  },
+  {
+    "field": "BN running buffers",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 477,
+    "source_line": "    if args.no_shift_bn:"
+  },
+  {
+    "field": "BN running buffers",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/pi_h2t.py",
+    "line": 44,
+    "source_line": "    model.eval()  # Freeze BN running statistics as requested, not just gradients."
+  },
+  {
+    "field": "Checkpoint lineage/selection",
+    "kind": "historical_code",
+    "path": "H2T/outputs/pi_h2t_ratio_only_pif_stage1seed123_seed42/experiment.json",
+    "line": 2,
+    "source_line": "  \"checkpoint\": \"D:\\\\xiangmuxunlian\\\\\\u65b0\\\\H2T\\\\saved\\\\cifar100_imb001_stage1_ce_mixup_pif_202608082320\\\\ckps\\\\model_best.pth.tar\","
+  },
+  {
+    "field": "Checkpoint lineage/selection",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 16,
+    "source_line": "def load_stage1(path, model, classifier):"
+  },
+  {
+    "field": "Inference no H2TF",
+    "kind": "historical_code",
+    "path": "H2T/train_pi_h2t_ratio_only_stage2.py",
+    "line": 430,
+    "source_line": "def evaluate("
+  },
+  {
+    "field": "Inference no H2TF",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/train_pi_h2t.py",
+    "line": 104,
+    "source_line": "        accuracy, ece = validate(dataset.eval, model, classifier, criterion, config, logger)"
+  },
+  {
+    "field": "Accuracy/evaluation protocol",
+    "kind": "historical_code",
+    "path": "H2T/outputs/pi_h2t_ratio_only_pif_stage1seed123_seed42/summary.csv",
+    "line": 2,
+    "source_line": "pi_recipient_only,last,10,0.3481999933719635,0.2633333206176758,0.4440000355243683,0.3379310071468353,0.06702314003872038,0.23033379352267486,0.7696662094666242,0.7696662094666242,0.047352331071043474,0.782803527955992,0.771901964307665,0.7508384662735799,0.3602424158064838,0.0,5054,0.0,-10497553.703125,-9339508.48046875,537099,215936"
+  },
+  {
+    "field": "Accuracy/evaluation protocol",
+    "kind": "review_code",
+    "path": "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md",
+    "line": 1,
+    "source_line": "# PI-H2T 实现审核包：尚未启动正式实验"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "key": "H2T",
+    "url": "https://ojs.aaai.org/index.php/AAAI/article/download/29262/30382",
+    "status": "FULL_PDF_TEXT_OPENED",
+    "final_url": "https://ojs.aaai.org/index.php/AAAI/article/download/29262/30382",
+    "sha256": "38ec38129c3dfa7d9d42d10dc1e9018ffd25bdca01ea5772c74c57f2234ccc0a",
+    "bytes": 3810786,
+    "pages": 9,
+    "local_pdf": "paper_cache\\H2T.pdf"
+  },
+  {
+    "key": "PI_H2T",
+    "url": "https://arxiv.org/pdf/2506.00625v2",
+    "status": "FULL_PDF_TEXT_OPENED",
+    "final_url": "https://arxiv.org/pdf/2506.00625v2",
+    "sha256": "b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8",
+    "bytes": 12559590,
+    "pages": 17,
+    "local_pdf": "paper_cache\\PI_H2T.pdf"
+  },
+  {
+    "key": "FEATRECON",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/adb2075b6dd31cb18dfa727240d2887e-Paper-Conference.pdf",
+    "status": "FULL_PDF_TEXT_OPENED",
+    "final_url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/adb2075b6dd31cb18dfa727240d2887e-Paper-Conference.pdf",
+    "sha256": "2452227af12940e9c3b115c381e669493ec8252865b1d2a0c71e4247fed22783",
+    "bytes": 2161681,
+    "pages": 33,
+    "local_pdf": "paper_cache\\FEATRECON.pdf"
+  },
+  {
+    "key": "SEL",
+    "url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.pdf",
+    "status": "FULL_PDF_TEXT_OPENED",
+    "final_url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.pdf",
+    "sha256": "60cde7cf1aee220b51965ddd68720c7a70f6dc16b1421810585147a0220aa688",
+    "bytes": 2934923,
+    "pages": 11,
+    "local_pdf": "paper_cache\\SEL.pdf"
+  },
+  {
+    "key": "DBG",
+    "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.pdf",
+    "status": "FULL_PDF_TEXT_OPENED",
+    "final_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.pdf",
+    "sha256": "e5e2503be6d9745f7d199d86e25b43c1d99566ba1f0350a9a1a7833333cf04ad",
+    "bytes": 4903284,
+    "pages": 10,
+    "local_pdf": "paper_cache\\DBG.pdf"
+  },
+  {
+    "key": "H2T_ARXIV_V3",
+    "url": "https://arxiv.org/pdf/2306.06963v3",
+    "status": "FULL_PDF_TEXT_OPENED",
+    "final_url": "https://arxiv.org/pdf/2306.06963v3",
+    "sha256": "74a71f43104b3d4e19be54ceb75a85d7e0eb4e64e478e4ffca021ca4bfeb9153",
+    "bytes": 5368004,
+    "pages": 13,
+    "local_pdf": "paper_cache\\H2T_ARXIV_V3.pdf"
+  }
+]

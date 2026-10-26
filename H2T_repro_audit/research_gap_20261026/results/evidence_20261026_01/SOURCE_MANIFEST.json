@@ -1,0 +1,13 @@
+{
+  "ledger_sha256": "0c52e7cb6bd5925473b225b64c1d89f30dd9c993f2cdbe17050846877329139a",
+  "sources": {
+    "H2T_repro_audit/component_audit/results/static_20261026_164947/COMPONENT_AUDIT_REPORT.md": "13d597aedde78aa5c9f72d5419305df757ec71924d2a2591120da2fc3b568185",
+    "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9",
+    "H2T/PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md": "1eaaf016c2cc11f52ef37787ad08ecc54ae7a1a0baec10f8308bbb21c86d5567",
+    "H2T/PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md": "8ef92a099cfe68a89acdfe5b27e179c557effa7705754457e14d8e0651ef2ac3",
+    "H2T/PI_H2T_RATIO_ONLY_CE_MULTISEED_REPORT.md": "2b552b22d22dbe15e917524ab56a74ea626d8f46443632d3404595eb79cdbda8",
+    "H2T/PI_H2T_CENTER_VS_BOUNDARY_R_SEED42_REPORT.md": "a85ac2fd98ae198b764516240f5cafbe29905c19b6015eba5541292587e09aa9"
+  },
+  "count": 10,
+  "scope": "textual anchors only; not causal or paper verification"
+}

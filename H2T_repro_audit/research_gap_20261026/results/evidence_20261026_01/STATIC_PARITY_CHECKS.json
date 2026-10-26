@@ -1,0 +1,61 @@
+{
+  "historical_PIF_layers": [
+    {
+      "line": 145,
+      "input": 2,
+      "output": 4,
+      "kernel": 1,
+      "bias": true,
+      "parameters": 12
+    },
+    {
+      "line": 146,
+      "input": 4,
+      "output": 2,
+      "kernel": 1,
+      "bias": true,
+      "parameters": 10
+    },
+    {
+      "line": 147,
+      "input": 2,
+      "output": 1,
+      "kernel": 1,
+      "bias": true,
+      "parameters": 3
+    }
+  ],
+  "historical_PIF_parameter_count": 25,
+  "review_PIF_layers": [
+    {
+      "line": 167,
+      "input": 2,
+      "output": 1,
+      "kernel": 1,
+      "bias": false,
+      "parameters": 2
+    }
+  ],
+  "review_PIF_parameter_count": 2,
+  "ratio_boundary_arithmetic": [
+    {
+      "cosine": -1,
+      "recipient_r": 1.0,
+      "donor_lambda": 0.0
+    },
+    {
+      "cosine": 0,
+      "recipient_r": 0.5,
+      "donor_lambda": 0.5
+    },
+    {
+      "cosine": 1,
+      "recipient_r": 0.0,
+      "donor_lambda": 1.0
+    }
+  ],
+  "paper_ratio_direction": "Eq7 r=recipient; Eq8 + footnote2 implies r=(1-cos)/2",
+  "affine_chain_identity": "A=W3*W2*W1; c=W3*W2*b1+W3*b2+b3; output=A0*F+A1*(F-mean)+c",
+  "conclusion": "parameterization differs; absence of nonlinearities permits affine function-class reduction; not evidence that this caused accuracy collapse",
+  "scope": "AST and scalar algebra only; no torch import, real tensors, checkpoint deserialization or model forward"
+}

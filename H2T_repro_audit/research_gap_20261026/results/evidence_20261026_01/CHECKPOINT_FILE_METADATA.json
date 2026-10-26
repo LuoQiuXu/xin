@@ -1,0 +1,16 @@
+[
+  {
+    "candidate_current_path": "H2T\\saved\\cifar100_imb001_stage1_ce_mixup_pif_202608082320\\ckps\\model_best.pth.tar",
+    "exists": true,
+    "bytes": 1954461,
+    "sha256": "a1b1630bec4ac46eadb6b1e519af82ed24165dbcf72ba00a9acbc14d77bed8f8",
+    "qualification": "Raw hash only. Historical absolute path used 新; byte identity to that original artifact unverified without prior hash. Not deserialized."
+  },
+  {
+    "candidate_current_path": "H2T\\saved\\cifar100_imb001_stage1_ce_mixup_pif_off_matched_202608092042\\ckps\\model_best.pth.tar",
+    "exists": true,
+    "bytes": 1954525,
+    "sha256": "967ba06f6287328fc64a2f40ee98017d3efa3279af3c61b971bbadc54e9d672d",
+    "qualification": "Raw hash only. Historical absolute path used 新; byte identity to that original artifact unverified without prior hash. Not deserialized."
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "branch": "research/h2t-pih2t-gap-20261026",
+  "audit_base_HEAD": "de2198a85117a46972d294fb4ae09951b3dbb018",
+  "unit_tests": {
+    "passed": 5,
+    "initial_environment_error": true,
+    "source_tests_changed": false
+  },
+  "local_anchors": 10,
+  "reviewed_sources_hashed": 44,
+  "parity_fields": 23,
+  "source_references": 46,
+  "paper_PDFs": 6,
+  "paper_pages": 93,
+  "visually_checked_pages": 11,
+  "history_rows": 18,
+  "CE_gate": true,
+  "PIF_gate": false,
+  "tracked_text_hashes_unchanged": 1493,
+  "historical_asset_metadata_unchanged": 264,
+  "historical_asset_content_hash_check": "not claimed; metadata+no-write scope only",
+  "git_diff_check": "PASS",
+  "tracked_changes": [],
+  "conflicts": [],
+  "status_before_commit": [
+    "?? H2T_repro_audit/fusion_semantic_audit/",
+    "?? H2T_repro_audit/lowvs_mask_parity/",
+    "?? H2T_repro_audit/mdlt_domain_probe/",
+    "?? H2T_repro_audit/research_gap_20261026/results/"
+  ],
+  "decision": "STOP_AND_REPAIR_PARITY",
+  "collapse_status": "REPRODUCTION_UNRESOLVED",
+  "GPU_experiment": false,
+  "model_forward": false,
+  "checkpoint_deserialized": false,
+  "official_TEST_accessed": false,
+  "new_files_scope": "H2T_repro_audit\\research_gap_20261026\\results\\evidence_20261026_01",
+  "publication_byte_count_before_validation_files": 217351
+}
