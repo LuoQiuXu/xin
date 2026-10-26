@@ -1,0 +1,76 @@
+任务名称：H2T 原始随机特征融合的接收者选择性失效测试（IF200）
+任务类型：高质量科学迭代 / 已编写受控实验代码的复核与运行；不是新模块开发。
+仓库：LuoQiuXu/xin
+本次唯一工作分支：experiment/h2t-receiver-selectivity-20261026
+参考分支：audit/h2t-component-map-20261026
+执行入口：H2T_repro_audit/receiver_selectivity/run_experiment.py
+阅读：H2T_repro_audit/receiver_selectivity/README.md
+
+【一、科学问题：禁止偏题】
+原始 H2T 在 Stage II 不区分接收类别，随机用供体完整特征通道替换部分接收通道。
+已经观测到：IF200 固定BN实验里，H2T整体及Tail均有增益，但尾类72/77/79/87在两个StageII seeds表现出各自少量净损伤（同一重复使用的TRAIN开发集，每类仅20张）。这是探索性局部受损迹象，不是已经证明的系统失效。
+本轮唯一要检验：
+“对尾类接收者直接执行随机通道替换是否必要？如果取消尾类接收者上的融合，在相同融合次数预算下，与随机跳过融合相比，能否更好地保留Tail分类性能？”
+不设计新的供体方法、通道打分、分类损失、语义重建或参数扫描。
+不利用历史受损类别72/77/79/87挑选治疗组；它们只作为事后描述列出。
+
+【二、实验设计（固定，不得临时改）】
+源协议：CIFAR-100-LT IF200 (.005), ResNet-32；9502真实LT TRAIN；原TRAIN的1980张开发验证（只有class1..99，每类20张，缺class0）；固定Stage I seed42 epoch200；BN/Backbone完全eval冻结；StageII CE、SGD原IF200配置，10 epochs、每个seed750次分类头更新；StageII seeds=124,125；每组固定第10轮报告。保持train/val隔离；不得访问CIFAR100官方TEST。
+每个seed四组：
+A DR-NoFusion — 不执行H2T融合；
+B Original-BatchShared — 所有接收者执行作者式batch共享的16/64完整通道硬替换；
+C TailOff — 仅关闭y>=71的尾类接收者融合，其他接收者保持原始H2T融合；
+D RandomOffMatched — 每一真实minibatch随机关闭与C相同数量的融合，随机位置不依据类别，保持原H2T供体与通道掩码。
+唯一关键因果比较：C - D（相同每batch实际融合数；只改变被关闭融合的接收者身份）。
+辅助对照：B - A体现整体H2T效果；C - B、D - B说明代价和结构变化。
+不要把B-C差异全部归因于Tail，它同时改变总融合强度；不能单凭C>B说尾类直接融合有害，必须审查C-D。
+B是batch-shared H2T-like对照，固定BN，不是作者shift_bn=True的完整官方重现。
+使用同样真实接收者序列、IS供体、图像增强、随机掩码、模型初始权重和分类器优化预算。不要额外创建不同数据集或修改训练/验证划分。
+不要拿已知72/77/79/87作为筛选依据，不训练只关闭这4个类别的“oracle”模型。
+
+【三、预注册决策标准】
+主终点：固定epoch10的Tail Top-1(pp)，C-D。
+要称为“值得后续独立验证的条件性信号”，必须同时满足：
+1) seed124与125的C-D Tail均严格>0；
+2) 两seed Tail差的算术平均>=+0.5个百分点；
+3) 两seed C-D Overall均>=-0.25个百分点。
+只要一个条件不满足 → NO_SUPPORT_STOP：不对当前假设继续扫参数或追加训练。
+全部通过 → CONDITIONAL_SIGNAL_ONLY，绝不能直接宣称已找到失效原因或泛化有效。
+辅助指标：Head、Medium、Few、WorstClass、各类逐图wins/losses/net、每个seed的Tail win/loss、历史四类的描述性变化。每类只20张，不做伪显著性声明。
+两个StageII种子共享相同StageI以及同一开发验证集，不是独立跨数据集泛化；验证集长期用于研究开发，属于探索性研究。
+不得基于best epoch替换epoch10，不择优重跑，不额外添加seed。
+
+【四、Codex执行流程】
+0. 检查Git当前分支和工作区。
+   必须在 experiment/h2t-receiver-selectivity-20261026 上；若有未提交改动，先报告，严禁stash/reset/覆盖。不要切到别的分支，不要覆盖历史目录。
+1. 读完整README、run_experiment.py、policy.py、test_policy.py和if200_stress/run_if200.py的相关接口；确认所有import正常、重用的Stage I checkpoint/缓存存在。请特别注意两个不同policy.py的模块导入隔离。
+2. 先执行：
+   python -m unittest discover -s H2T_repro_audit/receiver_selectivity -p "test_*.py" -v
+   python H2T_repro_audit/receiver_selectivity/run_experiment.py preflight --run-id receiver_selectivity_20261026_01
+   记录命令/退出码。若preflight提示缺少历史源文件，不允许自动重训StageI或从未知来源填充；停止并报告具体缺失。
+3. 在确保结果目录 receiver_selectivity_20261026_01 不存在（避免覆盖）的前提下，执行：
+   python H2T_repro_audit/receiver_selectivity/run_experiment.py run-all --run-id receiver_selectivity_20261026_01
+   原则上依次完成每seed 4臂，共8组StageII，每组10epoch×75步，固定StageI不更新。
+4. 对同一个seed，DR为paired signatures参考；其余三组每batch原图、特征、供体、掩码哈希必须和DR一致（唯一被比较的差异是active flags）。验证TailOff与RandomOffMatched每batch的fused receiver数严格相等，两个模型均只更新6500个FC参数；BB/BN状态不变。
+5. 运行结束应生成：protocol.json、epoch10_summary.csv、per_class_pairing.csv、analysis.json、SCIENTIFIC_REPORT.md，以及每seed/每arm的 train_epochs.csv、paired_batches.csv、validation_epoch10.npz、final_fc.pth、summary.json。
+   抽查每个seed 4组日志和checkpoint，验证npz 1980×100 logits的 argmax 和 summary 指标一致。
+6. 如果paired签名失败、源哈希不一致、GPU OOM、源文件缺失或其他真实性保护失败 → 立即停止，不放宽哈希、不替换旧checkpoint、不默默改动训练。把失败现场写到本轮新目录中的 FAILURE_REPORT.md；不要编造完成结果。只允许为真实代码错误做最小修复并添加对应测试，修复前后diff和错误保留。
+7. 请提供一份独立的 SCIENTIFIC_REVIEW.md（中文），至少回答：
+   - C-D是否符合预注册信号标准；每seed真实net图片数是多少？
+   - C-D的Tail与Overall权衡如何？是否只是牺牲Head换来的？
+   - B-A是否在新配对重跑中仍有Overall/Tail收益？与历史IF200仅描述比较，不能当成额外独立seed。
+   - C-B和D-B是否方向相近？对“少融合一点”这个混杂解释意味着什么？
+   - 原4个局部受损类别的改善/恶化只是探索性描述还是稳定跨种子发现？
+   - 什么结论本轮仍无法支持？下一步应该停止还是单独独立验证？
+   提供CSV和代码证据，但不要发明新的改进策略；不进行超参搜索。
+8. 使用git diff --check检查；确保历史 H2T_official_clean/、if200_stress/results/ 与所有老分支历史产物保持原样。只写本轮receiver_selectivity/results新目录。
+9. 请在执行完成后把可审查的小体积结果（报告、CSV、JSON、日志摘要）提交并推送到当前实验分支；巨大checkpoint和npz如超出GitHub限制不要上传，保持本地并在报告中记录SHA256、文件大小、路径和可复核验证命令。不得修改任何其他分支，不创建PR，不合并。
+10. 最终告诉我GitHub分支、最新commit SHA、结果目录、完成的8组列表、预注册结论和异常。仅在产物推送完成后，才说“结果已上传”。
+
+【五、工作方式】
+少做工程完美主义：不搭统一训练平台，不改原工程结构，不增加无关功能，不多跑不相关模型，不搜新指标。
+多做科学迭代：直接检验原始机制的一个开关，严格对照输入、融合次数、训练预算及最终结果；允许结果否定假设。
+不能将“尾类某几张图出现loss”直接表述为H2T方法系统失效；也不能将即时margin为负简单等同为有害训练。
+如实验不支持预期，请如实报告并停在结论上，禁止自行再变更方向。
+
+开始执行。
