@@ -46,6 +46,7 @@ B是batch-shared H2T-like对照，固定BN，不是作者shift_bn=True的完整�
 1. 读完整README、run_experiment.py、policy.py、test_policy.py和if200_stress/run_if200.py的相关接口；确认所有import正常、重用的Stage I checkpoint/缓存存在。请特别注意两个不同policy.py的模块导入隔离。
 2. 先执行：
    python -m unittest discover -s H2T_repro_audit/receiver_selectivity -p "test_*.py" -v
+   python H2T_repro_audit/receiver_selectivity/run_experiment.py self-test --run-id receiver_selectivity_20261026_01
    python H2T_repro_audit/receiver_selectivity/run_experiment.py preflight --run-id receiver_selectivity_20261026_01
    记录命令/退出码。若preflight提示缺少历史源文件，不允许自动重训StageI或从未知来源填充；停止并报告具体缺失。
 3. 在确保结果目录 receiver_selectivity_20261026_01 不存在（避免覆盖）的前提下，执行：
