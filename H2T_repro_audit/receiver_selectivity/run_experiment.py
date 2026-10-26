@@ -89,7 +89,8 @@ def preflight(out: Path) -> dict:
     maps = np.load(old.RESULTS / "validation_maps.npy", mmap_mode="r", allow_pickle=False)
     assert maps.shape == (1980, 64, 8, 8)
     assert np.bincount(vy, minlength=100)[0] == 0
-    input_hash = {str(p.relative_to(ROOT)): sha(p) for p in required_files()}
+    provenance_sources = required_files() + [IF200/"run_if200.py", IF200/"policy.py", HERE/"policy.py", HERE/"run_experiment.py"]
+    input_hash = {str(p.relative_to(ROOT)): sha(p) for p in provenance_sources}
     return {
         "source_hashes": input_hash,
         "stage1_sha": sha(old.RESULTS / "stage1/stage1_fixed_epoch200.pth"),
@@ -224,6 +225,14 @@ def train_arm(seed: int, arm: str, out: Path, pre: dict) -> None:
         "stage1_sha": pre["stage1_sha"], "epoch": 10}, run/"final_fc.pth")
     np.savez_compressed(run / "validation_epoch10.npz", labels=vy, logits=val_logits,
                         predictions=val_preds)
+    # Independent reload sanity check of the completed classifier artifact.
+    saved = torch.load(run/"final_fc.pth", map_location="cpu", weights_only=False)
+    assert saved["seed"] == seed and saved["arm"] == arm and saved["epoch"] == 10
+    fc.load_state_dict(saved["classifier"], strict=True)
+    replay_metrics, replay_logits, replay_preds = old.vals(fc, vy, maps=maps)
+    assert np.array_equal(replay_preds, val_preds)
+    assert np.array_equal(replay_logits, val_logits)
+    assert all(abs(replay_metrics[k] - metrics[k]) < 1e-10 for k in metrics)
     dump_json(run / "summary.json", {
         "seed":seed,"arm":arm,"epoch":10,"total_steps":steps,"final":metrics,
         "batch_pairing": "PASS" if arm != ARMS[0] else "reference",
@@ -345,8 +354,9 @@ def run_all(run_id: str) -> Path:
     out = HERE / "results" / run_id
     if out.exists():
         raise FileExistsError(f"Refuse overwrite of old run: {out}")
-    out.mkdir(parents=True)
+    # Missing historical inputs must not leave a misleadingly started run dir.
     pre=preflight(out)
+    out.mkdir(parents=True)
     dump_json(out/"protocol.json",pre)
     for seed in SEEDS:
         for arm in ARMS:
