@@ -307,7 +307,11 @@ def analyze(out: Path) -> None:
     tail_delta = [p["Tail_delta_pp"] for p in primary]
     overall_delta = [p["Overall_delta_pp"] for p in primary]
     # Preregistered exploratory check, NOT a significance or publication claim.
-    passes = all(x > 0 for x in tail_delta) and              sum(tail_delta)/len(tail_delta) >= PRIMARY_TAIL_THRESHOLD_PP and              all(x >= PRIMARY_OVERALL_FLOOR_PP for x in overall_delta)
+    passes = (
+        all(x > 0 for x in tail_delta)
+        and sum(tail_delta)/len(tail_delta) >= PRIMARY_TAIL_THRESHOLD_PP
+        and all(x >= PRIMARY_OVERALL_FLOOR_PP for x in overall_delta)
+    )
     decision = "CONDITIONAL_SIGNAL_ONLY" if passes else "NO_SUPPORT_STOP"
     dump_json(out/"analysis.json", {
         "contrasts":all_results,"primary_tail_delta_pp":tail_delta,
@@ -353,6 +357,7 @@ def self_test() -> None:
     x = torch.arange(7*64*8*8, dtype=torch.float32).reshape(7,64,8,8)
     donor = x + 1_000_000.
     selected = np.arange(0,64,4,dtype=np.int64)  # 16 channels
+    selected_tensor = torch.as_tensor(selected,dtype=torch.long)
     labels = np.array([0,35,36,70,71,95,99])
     for arm in ARMS:
         active = choose_active(labels,arm,124,0,0)
@@ -360,7 +365,7 @@ def self_test() -> None:
         expected = x.clone()
         for i,on in enumerate(active):
             if on:
-                expected[i, selected] = donor[i, selected]
+                expected[i, selected_tensor] = donor[i, selected_tensor]
         assert torch.equal(z,expected), f"hard-channel replacement bug in {arm}"
     # 99 classes, 20 examples per class; exactly one changed correction in tail class71.
     yy = np.repeat(np.arange(1,100,dtype=np.int64),20)
