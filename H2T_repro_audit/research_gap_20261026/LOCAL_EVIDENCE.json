@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "study": "H2T and PI-H2T evidence-first mechanism gap audit",
+  "claims": [
+    {
+      "id": "H2T_METHOD",
+      "source": "H2T_repro_audit/component_audit/results/static_20261026_164947/COMPONENT_AUDIT_REPORT.md",
+      "anchor": "真正直接界定 H2T 的组件是：两种采样边际形成的接收者/供体",
+      "observation": "代码证据显示接收者类别均衡、供体原始长尾、随机整通道替换、接收者硬标签、Stage II 调分类器。",
+      "boundary": "仅为特定 CIFAR 配置的已审计调用链，不推广为全部宿主/模型实现。",
+      "type": "code_audit"
+    },
+    {
+      "id": "H2T_SELECT",
+      "source": "H2T_repro_audit/component_audit/results/static_20261026_164947/COMPONENT_AUDIT_REPORT.md",
+      "anchor": "论文 Table 7在30%替换下报告固定首/中/末与随机选择",
+      "observation": "原论文对随机与固定通道选择做过比较。",
+      "boundary": "已有消融不能直接证明 H2T 最优性或单独的尾类失效条件。",
+      "type": "published_ablation"
+    },
+    {
+      "id": "PI_IMPLEMENTATION",
+      "source": "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md",
+      "anchor": "这是按论文公式和用户任务说明实现的复现候选",
+      "observation": "PI-H2T 本地实现曾明确标记为论文复现候选，不是已验证的完整官方实现。",
+      "boundary": "不能把本地退化直接称为作者官方 PI-H2T 失效。",
+      "type": "implementation_provenance"
+    },
+    {
+      "id": "PI_PIF_CONFIG",
+      "source": "H2T/PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md",
+      "anchor": "公开 H2T 仓库的主训练代码是 AAAI-24 H2T，而非一个完整、可直接运行的 PI-H2T 端到端发布版",
+      "observation": "已有 PIF 实验启用了按论文定义修复的 PIF 分支，并记录了与上游发布状态差异。",
+      "boundary": "要核实准确论文版本/公式、初始化及训练协议才能分析 PI-H2T 机制漏洞。",
+      "type": "implementation_provenance"
+    },
+    {
+      "id": "PI_STAGE2_NOSHUFFLE",
+      "source": "H2T/PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md",
+      "anchor": "| T2：no fusion | update | 0 | 45.69 | 65.22 | 47.80 | 18.90 | 45.85 |",
+      "observation": "本地同 PIF Stage-I、Stage-II BN-update/no-fusion 控制：Last Overall 45.69%。",
+      "boundary": "seed42、本地 protocol；这不是论文官方性能。",
+      "type": "historical_experiment"
+    },
+    {
+      "id": "PI_STAGE2_NATIVE",
+      "source": "H2T/PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md",
+      "anchor": "| T3：Native PI-H2T | update | 0.7697 | 34.82 | 26.33 | 44.40 | 33.79 | 40.99 |",
+      "observation": "本地同源 checkpoint 的 native-ratio H2TF：Last Overall 34.82%，donor mass≈0.7697。",
+      "boundary": "不等于 PI-H2T 正式作者程序；不能直接推导公式错误或已证实的论文缺陷。",
+      "type": "historical_experiment"
+    },
+    {
+      "id": "PI_STAGE2_MATCHED",
+      "source": "H2T/PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md",
+      "anchor": "| T4：matched scale | update | 0.7133 | 37.26 | 30.86 | 46.71 | 33.79 | 42.18 |",
+      "observation": "按既有预注册尺度匹配后 Last Overall 37.26%，较 native +2.44pp 但低于 no fusion。",
+      "boundary": "匹配全局均值不等于固定逐样本比例对应，不能据此直接确定失效原因。",
+      "type": "historical_experiment"
+    },
+    {
+      "id": "PI_RATIO_CE",
+      "source": "H2T/PI_H2T_RATIO_ONLY_CE_MULTISEED_REPORT.md",
+      "anchor": "三 seed 的平均结果为 `B = 41.12 ± 0.16`",
+      "observation": "未加入 PIF 的 CE setting 中，pair-conditioned B 优于 PI recipient-only A 及 shuffled C。",
+      "boundary": "这是非 PIF checkpoint 的具体配置，不等于完整 PI-H2T 效果。",
+      "type": "historical_experiment"
+    },
+    {
+      "id": "PI_RATIO_PIF",
+      "source": "H2T/PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md",
+      "anchor": "但关键的 correspondence 阴性对照 `B > C` **没有复现**",
+      "observation": "完整 PIF setting 中 pair-conditioned 优于 shuffled 的证据没有稳定复现。",
+      "boundary": "不能宣称正确配对已在 PI-H2T 全流程中证明有效。",
+      "type": "historical_experiment"
+    },
+    {
+      "id": "PI_BOUNDARY_REJECT",
+      "source": "H2T/PI_H2T_CENTER_VS_BOUNDARY_R_SEED42_REPORT.md",
+      "anchor": "目前 **不能声称 boundary-r 优于原 PI-H2T center-r**",
+      "observation": "已测试的分类边界 margin 重分配方案未在预先规定的对照下成立。",
+      "boundary": "不能将此负结果描述为边界几何不重要，或继续在同一开发集上调参找正。",
+      "type": "historical_experiment"
+    }
+  ]
+}
