@@ -1,0 +1,68 @@
+CODEX TASK — H2T / PI-H2T paper-to-code mechanism gap study
+Repository: LuoQiuXu/xin
+ONLY branch: research/h2t-pih2t-gap-20261026
+Root: H2T_repro_audit/research_gap_20261026/
+Read README.md, PAPER_SOURCE_REGISTRY.json and LOCAL_EVIDENCE.json first.
+
+MISSION
+We have stopped inventing H2T weaknesses by random ablations. Identify whether H2T or its successor PI-H2T has a scientifically meaningful, still-unsolved limitation. Verify what authors said, what code did, what historical experiments established, and what remains untested. ONE candidate question maximum. Do not build an enhanced module, change losses, or run GPU training in this iteration.
+
+GIT SAFETY
+1. Check branch and git status before all actions. If dirty, stop and report; do not discard, reset, stash or overwrite.
+2. Work only on research/h2t-pih2t-gap-20261026. Do not switch to prior TailOff or donor-affinity branches. Do not modify frozen H2T_official_clean/, existing H2T/, PI_H2T_review/, or any H2T_repro_audit historic experiment/result.
+3. Review source lineage; the independently rebuilt PI-H2T code is NOT automatically official author code. Cite exact paths and upstream provenance.
+4. Use a fresh results folder: H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01. If it exists, stop and choose a distinctly named NEW folder, never overwrite.
+
+STEP 1 — AUTOMATED SOURCE CHECK (NO GPU)
+Run in repository root:
+python -m unittest discover -s H2T_repro_audit/research_gap_20261026 -p "test_*.py" -v
+python H2T_repro_audit/research_gap_20261026/verify_evidence.py --output H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01
+Record exit codes, paths and file hashes. Any missing anchor is a BLOCKER to fix by reconciling the original source, not a reason to silently edit source evidence or hardcode success.
+
+STEP 2 — PAPER DEEP READING (NOT ABSTRACTS)
+Read complete primary papers from PAPER_SOURCE_REGISTRY.json:
+A H2T AAAI 2024;
+B PI-H2T TPAMI 2026, recording exact arXiv/PDF version;
+C FeatRecon ICLR 2025;
+D SEL ICCV 2025;
+E DBG CVPR 2026.
+For each: identify motivating failure mode, claimed solution and its assumptions, exact major formula(s), input/output, stage, backbone/dataset/protocol and ablations, stated limitations. Record full page/section/equation/table references only after opening the actual paper PDF. Never invent page numbers. If inaccessible, mark UNVERIFIED and explain. Do not treat DBG's diffusion-based transfer side effects as direct causal evidence against the original H2T channel replacement.
+Build AUTHOR_MECHANISM_CROSSWALK.md with paper evidence and clearly separate author claims from our interpretations. Explicitly note original H2T operates in Stage II while PIF and H2TF are separate mechanisms in PI-H2T.
+
+STEP 3 — EXACT PAPER VS CODE PARITY (HIGHEST PRIORITY)
+Read local files:
+H2T_repro_audit/component_audit/results/static_20261026_164947/COMPONENT_AUDIT_REPORT.md
+PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md
+PI_H2T_review/H2T-main/review/upstream_provenance.json
+H2T/PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md
+H2T/PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md
+H2T/PI_H2T_RATIO_ONLY_CE_MULTISEED_REPORT.md
+H2T/PI_H2T_CENTER_VS_BOUNDARY_R_SEED42_REPORT.md
+Then trace actual implementing source files, not just summaries.
+Produce PI_PAPER_CODE_PARITY.md:
+- Stage I architecture, exact PIF equation, tensor dimension, initialization, active return path.
+- Stage II H2TF equation, receiver-vs-donor weights, ratio notation r vs lambda, clipping/detach/reference classifier, label usage.
+- training setting, head, backbone, BN/buffers, sampling, optimizer, checkpoint choice, data set and testing protocol.
+- status for every relevant field: MATCH / MISMATCH / UNVERIFIED; attach paper page/equation and code path:line.
+- distinguish original author H2T, archived upstream snapshots and local reimplementations. A changed implementation or mismatched protocol is not a published-method failure.
+If the exact PI ratio or PIF parity cannot be confirmed, mark the existing Stage-II collapse as REPRODUCTION_UNRESOLVED.
+
+STEP 4 — REINTERPRET PRIOR RESULTS
+Produce PRIOR_EXPERIMENT_EVIDENCE.md using the actual historical reports. Accurately tabulate:
+PIF native H2TF: T2 45.69 no fusion vs T3 34.82 native vs T4 37.26 matched scale (the SAME report's local seed/protocol);
+CE representation ratio A/B/C multi-seed;
+PIF representation ratio A/B/C multi-seed (B-vs-shuffled-C gate FAILED);
+boundary-r negative study.
+For each report: what was controlled, what was not, any author-code mismatch, number of seeds, data use, key numerical contrasts, and what the result CANNOT prove. No pooling of incompatible protocols. Do not turn historical failure signals into statistical significance.
+
+STEP 5 — SCIENTIFIC DECISION (ONE QUESTION OR NONE)
+Create ONE_QUESTION_DECISION.md with explicit gates:
+G1 author-paper mechanism verified; G2 code parity established or missing parity precisely isolated; G3 existing experiment exhibits repeatable, relevant problem not explained by implementation mismatch; G4 PI-H2T / FeatRecon / SEL / DBG have not already addressed it; G5 a single-factor intervention can falsify it at reasonable 8GB GPU cost.
+If any gate fails, outcome = STOP_AND_REPAIR_PARITY or NO_DEFENSIBLE_GAP. Do not propose another unrelated speculative vulnerability.
+If all gates pass, state one precise research question; write NEXT_EXPERIMENT_PREREG.md with smallest required arms, controlled variables, primary and secondary metrics, exact protocol, acceptance/rejection thresholds, and stopping rule. Do NOT execute it yet.
+Do not use the previously rejected TailOff or MarginProtect as default next hypotheses.
+
+STEP 6 — VERIFY & DELIVER
+Write EXECUTION_REPORT.md with branch/HEAD, test exits, source files reviewed, paper versions actually opened, anything unresolved, file hashes, whether official TEST was touched (should not be), and confirmation NO GPU experiment was run.
+Save all reports in the new results folder alongside auto-generated EVIDENCE_INDEX.csv and SOURCE_MANIFEST.json. Run git diff --check, ensure no historical file changed, and publish small reports/CSV/JSON by commit+push to this same branch. No PR/merge.
+Final response: link latest commit+result dir; state GO / STOP_AND_REPAIR_PARITY / NO_DEFENSIBLE_GAP; describe the ONE strongest source-grounded gap (if any), its exact evidence and uncertainty. Do not claim journal-level novelty or an empirical improvement without actual independent confirmation.
