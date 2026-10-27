@@ -235,7 +235,29 @@ def run() -> None:
 def report() -> None:
     args,_,history,_=checks()
     target=output_path()
+    stored=read(target/"preregistered_protocol.json")
+    pinned=prereg()
+    if stored!=pinned:
+        raise RuntimeError("Current source/preregistered protocol drift")
     result=read(target/"result.json")
+    frozen_summary=history["h2tf"]["summary"]
+    for field,expected in (
+        ("source_stage1_sha256",EXPECTED_STAGE1_SHA),
+        ("initial_classifier_hash",frozen_summary["stage2_initial_classifier_hash"]),
+        ("final_bn_buffers_hash",frozen_summary["final_bn_buffers_hash"])):
+        if result.get(field)!=expected:
+            raise RuntimeError(f"Invalid new source/FC/BN provenance: {field}")
+    if sha(target/"classifier_current_W_epoch10.pth")!=result["classifier_checkpoint_sha256"]:
+        raise RuntimeError("New FC checkpoint SHA drift")
+    if sha(target/"test_epoch10.npz")!=result["test_logits_sha256"]:
+        raise RuntimeError("New TEST NPZ SHA drift")
+    with (target/"epochs.csv").open(encoding="utf-8-sig") as f:
+        epoch_rows=list(csv.DictReader(f))
+    if len(epoch_rows)!=EXPECTED_EPOCHS:
+        raise RuntimeError("Incomplete current-W training history")
+    for idx,entry in enumerate(epoch_rows):
+        if entry["input_stream_sha256"]!=history["h2tf"]["history"][idx]["input_stream_sha256"]:
+            raise RuntimeError(f"Replayed paired stream mismatch epoch {idx+1}")
     with np.load(target/"test_epoch10.npz",allow_pickle=False) as z:
         labels=z["labels"].copy();pred=z["pred"].copy();logits=z["logits"].copy()
     if not np.array_equal(pred,logits.argmax(axis=1)):
