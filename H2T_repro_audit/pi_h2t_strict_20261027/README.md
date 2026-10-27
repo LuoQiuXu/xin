@@ -19,6 +19,7 @@
 - Stage I: CIFAR100-LT IF100 **original per-class deterministic index selection seed0**, ResNet32+PIF+CE+MixUp(alpha1), 200 epochs, batch128, SGD .1, momentum .9, weight decay 2e-4, 5-epoch linear warmup, step decay milestones 160/180, fixed seed123.
 - Stage II: one StageI fixed **epoch200** checkpoint, independent `no_fusion` and `h2tf` classifier-only runs, seed42, 10 epochs, initial SGD .02, wd5e-4, cosine decay, batch128; BS receiver / long-tail IS donor; PIF and ResNet gradients frozen.
 - For a **matched-BN-traffic control**, both StageII arms forward both receiver and donor images, even when fusion is disabled. This is a deliberate fair-control deviation from the author's simpler no-fusion path and must be disclosed.
+- CuDNN benchmark is disabled and deterministic mode enabled for paired reproducibility (local protocol choice, not verified to match author's exact backend flags).
 - Default `--bn-mode update` is inherited from H2T StageII `shift_bn=True`; `--w-reference frozen_stage1`, PIF Conv1d PyTorch default initializer and `detach=True` are **locally declared protocol choices NOT confirmed as PI author's exact choices**. Do NOT tune these after accuracy inspection.
 - Official CIFAR100 TEST is used only to **report** protocol results, never to choose a checkpoint or hyperparameters. Therefore checkpoint `fixed epoch200`, not the paper's possibly TEST-selected best. This also prevents presenting reused TEST data as independent final validation.
 
