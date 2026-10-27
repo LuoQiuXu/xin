@@ -1,3 +1,5 @@
+> **PAUSED — 作者协议优先，禁止运行此目录的 W-reference 训练。** 该分支的 `current W` 代码只是未获作者实现支持的研究性分叉，不是严格 PI-H2T 复现。严格复现任务已改为 [CODEX_PI_H2T_AUTHOR_FIRST_AUDIT.txt](CODEX_PI_H2T_AUTHOR_FIRST_AUDIT.txt)。保留旧代码仅供审计溯源，不依据其结果判断论文方法。
+
 # PI-H2T reference-W paper-parity experiment (one Stage II arm)
 
 **Research status: exploratory replication diagnostic, NOT a verified author PI-H2T reproduction, NOT a novel method.**
