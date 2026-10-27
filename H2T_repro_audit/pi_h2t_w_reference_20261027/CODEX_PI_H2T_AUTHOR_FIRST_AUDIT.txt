@@ -1,0 +1,43 @@
+CODEX 新任务：PI-H2T 严格复现必须“作者证据优先”，停止无依据试错
+GitHub：LuoQiuXu/xin
+保持分支：repro/pi-h2t-reference-w-parity-20261027
+本轮唯一工作路径：H2T_repro_audit/pi_h2t_w_reference_20261027/
+先阅读：AUTHOR_SOURCE_STATUS.md
+重要：旧 CODEX_PI_H2T_REFERENCE_W_PARITY.txt 标记 PAUSED，禁止执行其中的GPU run。
+
+【任务性质】
+只执行官方来源和协议锁定审计（NO GPU TRAINING）。我们要的是严格复现作者 PI-H2T，不能用本地冻结/动态W、比例缩放等探索选项逐个调到论文准确率，也不能将作者AAA I H2T公开代码当作已验证的完整PI-H2T代码。
+
+【第一步：作者源码来源核实】
+1. 只读检查作者PI-H2T论文最终版、arXiv 2506.00625 v2等全部可得官方论文/补充材料；记录确切版本、URL、公式页码、表格和原始代码链接。
+2. 对论文/出版页面给出的每一个代码URL逐个核实是否可访问；通过GitHub API检查仓库owner/name、default branch、所有公开branch、tag、release、最新commit SHA、README和文件树，禁止只根据“论文写 code available”推断代码完整可用。
+3. 已核实 Keke921/H2T README 明确写“AAAI 2024 H2T sample code”，目前公开main而未发现PI-H2T专用实现。重新独立检查后如仍然如此，明确标“PI-H2T ORIGINAL IMPLEMENTATION NOT VERIFIED”；不要把原始H2T的models/methods改称作者PI-H2T。
+4. 如果发现新的可靠PI作者实现，记录确切commit、许可证、运行指令、config、依赖及checkpoint URL；不改动或合并作者目录。如访问失败，不要猜作者没有实现，准确写“未找到可验证的公开实现”。
+
+【第二步：严谨的作者论文 → 作者代码 → 本地代码矩阵】
+创建 OFFICIAL_PARITY_MATRIX.md，每个字段列：
+字段名称｜PI论文页/表/公式｜PI作者代码path:line/commit（若确有）｜原始AAAI H2T代码path:line（如仅继承）｜当前本地重建path:line｜MATCH/MISMATCH/UNVERIFIED｜后果/阻断等级。
+必须覆盖PIF 2参数(含bias与初始化)、StageI sampling/MixUp/optimizer/LR/epochs/seed、PIF模型与BN、StageI checkpoint selection、StageII BS/IS、ratio符号/权重r、W到底指什么、detach、StageII BN buffers与训练/推理mode、head、StageII scheduler总步数、dataset construction、评估Last/Best。
+证据不足不要填MATCH；不要靠准确率是否靠近论文决定数学式或超参正确性。
+特别注意区分：作者PI-H2T方法、原始作者H2T代码、本地独立重建 三种来源。
+明确区分原文已定义、代码已证实、依然歧义。对于可由论文明确推导的字段可确认；无法确认的W/BN/初始化等一律留UNVERIFIED，不擅自给出另一个猜测实现。
+
+【第三步：复现结论与实际下一步】
+读取已完成结果：
+H2T_repro_audit/pi_h2t_strict_20261027/runs/pih2t_if100_seed123_42_v1/SCIENTIFIC_RESULTS.md
+H2T_repro_audit/pi_h2t_strict_20261027/runs/pih2t_if100_seed123_42_v1/PARITY_RUN_REPORT.md
+以及历史H2T component audit和原始上游训练config。
+作者报告StageI 42.19、StageII Last49.04及Best49.22（需按论文实际版本核实），本地StageI 39.91、StageII H2TF36.50。明确这些数值不构成相同协议比较，不能据此认定论文失效。
+只有两种允许的最终建议：
+A）如有完整且可核实的PI-H2T作者训练源码和对应CIFAR100配置：拟订忠实执行此官方代码的单次复现清单，默认尽量原样保留配置，标出8GB显存可执行性；无视旧current-W/frozen-W猜测；
+B）如缺少关键作者实现/配置：输出 BLOCKED_BY_MISSING_OFFICIAL_PI_H2T_CODE_OR_PROTOCOL，罗列精确缺口，给一封简短、礼貌的作者询问信英文邮件草案，包含所需源代码commit、CIFAR config、checkpoint、W/BN/初始化等问题；不要再训练或试错。作为另外一个明确的已公开基线，可以建议先按官方原始H2T代码严格复现，但不要把它称作PI-H2T。
+若存在论文中某字段明确规定但本地不同，可做代码差异核实，不用GPU先修补猜测模块。
+
+【第四步：交付与安全】
+在本目录新增 AUTHOR_SOURCE_AUDIT.md、OFFICIAL_PARITY_MATRIX.md、NEXT_ACTION_GATE.md、作者联系邮件草稿（如确有需要），并记录URL、GitHub commit、精确源码行号/论文页码、无法确认的事实和验证命令。
+本轮禁止调用 run_current_w.py run，禁止GPU训练、禁止新的W/BN/r组合扫描、禁止更新旧原始H2T或历史训练程序、禁止覆盖旧结果。
+保留所有历史未跟踪数据（fusion_semantic_audit、lowvs_mask_parity、mdlt_domain_probe等）；若git工作区有历史目录，只允许只读，不执行git clean或reset硬清。
+只提交本目录新增的小体积txt/md/json证据文件，不采用git add -A，不覆盖历史结果；commit和push到同一分支。
+最终报告：是否找到官方PI-H2T实现、来源commit、缺失字段、GO_OFFICIAL_REPRODUCTION 或 BLOCKED、下一步唯一应做的事。没有可靠证据就明确停下，不得给出“先试试current W”之类建议。
+
+任务终点是得到严格复现所需的真实作者依据，而不是获得更高准确率。
