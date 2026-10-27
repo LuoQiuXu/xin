@@ -1,0 +1,27 @@
+{
+  "run_id": "pih2t_if100_seed123_42_v1",
+  "client_date": "2026-10-27",
+  "all_gates_pass": true,
+  "unit_tests_passed": 14,
+  "syntax_exit_code": 0,
+  "preflight_exit_code": 0,
+  "smoke_exit_code": 0,
+  "new_model_TEST_accuracy_seen": false,
+  "formal_training_started": false,
+  "bn_mode": "update",
+  "w_reference": "frozen_stage1",
+  "stage1_seed": 123,
+  "stage2_seed": 42,
+  "budgets": [
+    200,
+    10,
+    10
+  ],
+  "source_hashes": {
+    "paper_components.py": "d6408ad9c1aa91435128e393c9aeb28714d2adea34fffffb1cbaaf86043f8e19",
+    "run_reproduction.py": "8a042e7e1dce50e411f00c24c116ddcc4ba7835dbd7ab6961f10c56a2c53bbdd",
+    "PARITY_LOCK.md": "a44e7a04cf13e0b12cffdf66e3c603292381c1d5e35a313997aa9cf0aaeef31c"
+  },
+  "smoke_sha256": "36b41e39ea211438d14e758bb667cbfd73bdeb4491725310b03f71ecb2454060",
+  "data_sha256": "80511bff2773017e10b79cfe0b8abc76ec6a29688ab003274b1839b44e3c199e"
+}

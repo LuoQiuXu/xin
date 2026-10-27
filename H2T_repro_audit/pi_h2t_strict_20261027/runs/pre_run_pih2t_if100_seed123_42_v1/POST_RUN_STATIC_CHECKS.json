@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "syntax_method": "AST parse all five current Python files without execution or bytecode output",
+  "syntax_files": [
+    "paper_components.py",
+    "run_reproduction.py",
+    "test_paper_components.py",
+    "test_run_reproduction.py",
+    "finalize_results.py"
+  ],
+  "git_diff_check_exit_code": 0,
+  "unmerged_files": 0,
+  "tracked_changes_only_in_study": true,
+  "pre_TEST_training_sources_unchanged": true,
+  "checks": {
+    "diff_check": "",
+    "conflicts": "",
+    "tracked_changes": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py\nH2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py\nH2T_repro_audit/pi_h2t_strict_20261027/test_paper_components.py"
+  }
+}

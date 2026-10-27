@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "epoch": 10,
+  "classifier_all_tensors_finite": true,
+  "TEST_logits_finite": true,
+  "backbone_parameters_unchanged": true,
+  "ratios_finite": true,
+  "no_fusion_actual_donor_mass_zero": true,
+  "checkpoint_sha256": "2e98fc0e74d8eca0022c9432751b65a70da77eb3f94e050201b3e51384f0561d",
+  "metrics": {
+    "Overall": 45.53,
+    "Many": 67.08333333333333,
+    "Medium": 46.34285714285714,
+    "Few": 17.79310344827586
+  }
+}

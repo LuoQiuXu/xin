@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "epoch": 10,
+  "classifier_all_tensors_finite": true,
+  "TEST_logits_finite": true,
+  "backbone_parameters_unchanged": true,
+  "ratios_finite": true,
+  "H2TF_donor_mass_exactly_one_minus_r": true,
+  "paired_full_ratios_and_labels_equal": true,
+  "checkpoint_sha256": "d03fd69d9acf52c9475c947fcc2a908ca974bc86d903f6f2d6837fac2d081804",
+  "metrics": {
+    "Overall": 36.5,
+    "Many": 29.86111111111111,
+    "Medium": 43.285714285714285,
+    "Few": 36.55172413793103
+  }
+}

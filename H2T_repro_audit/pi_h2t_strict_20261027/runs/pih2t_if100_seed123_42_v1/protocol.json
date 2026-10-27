@@ -1,0 +1,41 @@
+{
+  "status": "PAPER_ALIGNED_INDEPENDENT_RECONSTRUCTION_NOT_AUTHOR_VERIFIED",
+  "paper": "PI-H2T v2, Eq(3),(6),(7),(8); independent reconstruction",
+  "official_author_repo": "Keke921/H2T publicly shows original H2T; no complete PI-H2T verified",
+  "dataset": "CIFAR-100-LT IF=100, exp, original H2T selection seed=0",
+  "model": "original ResNet-32 CIFAR feature extractor + 2-weight unbiased Conv1d PIF",
+  "loss": "CE both stages; StageI alpha=1 MixUp; StageII receiver hard labels",
+  "stage1_epochs": 200,
+  "stage2_epochs": 10,
+  "batch_size": 128,
+  "data_root": "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100",
+  "stage1_seed": 123,
+  "stage2_seed": 42,
+  "run_id": "pih2t_if100_seed123_42_v1",
+  "stage1_lr": "SGD .1, momentum .9, weight decay .0002; warmup5, >160 x.1, >180 x.01",
+  "stage2_lr": "SGD .1 x .2 initial=.02, momentum .9, weight decay .0005; cosine",
+  "w_reference": "frozen_stage1",
+  "bn_running_buffers": "update",
+  "ratio_detach": true,
+  "pif_initialization": "torch.nn.Conv1d default (author init unknown)",
+  "cudnn": "benchmark=False, deterministic=True (reconstruction reproducibility choice)",
+  "checkpoint_selection": "fixed final epoch200 (not TEST-selected best)",
+  "evaluation": "official CIFAR100 TEST for paper-comparison ONLY; no tuning or model selection",
+  "unverified_author_details": [
+    "PIF initializer",
+    "ratio W-reference/current-vs-frozen",
+    "ratio gradient detach",
+    "StageII BN behavior",
+    "paper best-checkpoint selection"
+  ],
+  "source_hashes": {
+    "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py": "d6408ad9c1aa91435128e393c9aeb28714d2adea34fffffb1cbaaf86043f8e19",
+    "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py": "8a042e7e1dce50e411f00c24c116ddcc4ba7835dbd7ab6961f10c56a2c53bbdd",
+    "H2T_official_clean/H2T-main/models/resnet_cifar.py": "a0f43fb293de0072a81d6329bbafc0b12b00706570596710b4021846eb6163fd",
+    "H2T_official_clean/H2T-main/datasets/cifar100.py": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "H2T_official_clean/H2T-main/utils/logger.py": "bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88",
+    "H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md": "a44e7a04cf13e0b12cffdf66e3c603292381c1d5e35a313997aa9cf0aaeef31c"
+  }
+}

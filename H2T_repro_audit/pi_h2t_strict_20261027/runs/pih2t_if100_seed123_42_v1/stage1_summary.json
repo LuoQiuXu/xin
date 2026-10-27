@@ -1,0 +1,18 @@
+{
+  "epoch": 200,
+  "official_test_diagnostic": {
+    "Overall": 39.91,
+    "Many": 67.91666666666667,
+    "Medium": 38.25714285714286,
+    "Few": 7.137931034482759
+  },
+  "pif_coefficients_initial_residual_feature": [
+    0.2613041400909424,
+    0.616179883480072
+  ],
+  "pif_coefficients_final_residual_feature": [
+    3.2602970600128174,
+    0.1977022886276245
+  ],
+  "checkpoint_file_sha256": "64f53e45a1b7f73f494f9c88374607e714b58dc6eb55118fa31154c4389f93ef"
+}

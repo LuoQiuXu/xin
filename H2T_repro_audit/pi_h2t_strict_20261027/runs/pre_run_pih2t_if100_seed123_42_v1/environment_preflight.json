@@ -1,0 +1,23 @@
+{
+  "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+  "executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "torch": "2.14.1+cu132",
+  "torchvision": "0.29.1+cu132",
+  "cuda_build": "13.2",
+  "cudnn": 92400,
+  "cuda_available": true,
+  "cudnn_deterministic": false,
+  "cudnn_benchmark": false,
+  "cudnn_allow_tf32": true,
+  "cuda_matmul_allow_tf32": false,
+  "float32_matmul_precision": "highest",
+  "deterministic_algorithms": false,
+  "AMP": false,
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "total_memory_bytes": 8546484224,
+  "compute_capability": [
+    12,
+    0
+  ]
+}

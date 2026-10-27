@@ -37,7 +37,7 @@ class FormulaTests(unittest.TestCase):
         p=PIExtractor(Dummy())
         x=torch.randn(2,64,3,3)
         with torch.no_grad():
-            p.pif.fuse.weight.copy_(torch.tensor([[[0.]],[[1.]]]))
+            p.pif.fuse.weight.copy_(torch.tensor([[[0.],[1.]]]))
         self.assertTrue(torch.allclose(p(x),x*2,atol=1e-6))
 
     def test_ratio_limits_and_polarity(self):
@@ -81,6 +81,11 @@ class FormulaTests(unittest.TestCase):
         self.assertEqual(p["Medium"],100.)
         self.assertEqual(p["Few"],100.)
         self.assertAlmostEqual(p["Overall"],100.*5/6)
+
+    def test_nonbinary_accuracy_uses_integer_counts(self):
+        labels=torch.tensor([0,1,2])
+        predictions=torch.tensor([0,0,0])
+        self.assertAlmostEqual(group_stats(predictions,labels)["Overall"],100/3,places=12)
 
     def test_mismatched_shapes_raise(self):
         with self.assertRaises(ValueError):

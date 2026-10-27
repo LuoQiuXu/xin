@@ -1,0 +1,52 @@
+{
+  "stage1": {
+    "real_CIFAR": true,
+    "MixUp": true,
+    "logits_shape": [
+      128,
+      100
+    ],
+    "PIF_gradient_abs_sum": 4.725448131561279,
+    "finite_loss": 5.8466315269470215,
+    "peak_cuda_allocated_mb": 375.03076171875
+  },
+  "stage2": {
+    "real_CIFAR": true,
+    "feature_shape": [
+      128,
+      64
+    ],
+    "ratio_shape": [
+      128
+    ],
+    "ratio_min": 0.3601652681827545,
+    "ratio_max": 0.6160855293273926,
+    "donor_mass_mean": 0.4994885325431824,
+    "backbone_gradients_absent": true,
+    "head_gradient_finite": true,
+    "peak_cuda_allocated_mb": 375.03076171875
+  },
+  "environment": {
+    "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "cuda_available": true,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "cudnn_allow_tf32": true,
+    "cuda_matmul_allow_tf32": false,
+    "float32_matmul_precision": "highest",
+    "deterministic_algorithms": false,
+    "AMP": false,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "total_memory_bytes": 8546484224,
+    "compute_capability": [
+      12,
+      0
+    ]
+  }
+}

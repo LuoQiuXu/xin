@@ -1,0 +1,23 @@
+{
+  "arm": "no_fusion",
+  "epoch": 10,
+  "metrics": {
+    "Overall": 45.53,
+    "Many": 67.08333333333333,
+    "Medium": 46.34285714285714,
+    "Few": 17.79310344827586
+  },
+  "source_stage1_sha256": "64f53e45a1b7f73f494f9c88374607e714b58dc6eb55118fa31154c4389f93ef",
+  "stage2_initial_classifier_hash": "a980f7acb73dcec0cc0ce7558f76f5f1b359c15ed77fdfd033dbc12cd67f8ace",
+  "stage2_final_classifier_sha256": "2e98fc0e74d8eca0022c9432751b65a70da77eb3f94e050201b3e51384f0561d",
+  "final_bn_buffers_hash": "a8ee3bf674212287d3bc50c31ff04e95d3983c08c538ed810e22bebae95f0fe7",
+  "initial_backbone_parameters_hash": "b8890fe9756d29a43617215600cdcb9cce6cfa7726f8690566586c661918d067",
+  "final_backbone_parameters_hash": "b8890fe9756d29a43617215600cdcb9cce6cfa7726f8690566586c661918d067",
+  "pif_coefficients": [
+    3.2602970600128174,
+    0.1977022886276245
+  ],
+  "paired_bn_traffic": true,
+  "official_test_evaluated": true,
+  "label": "paper-aligned independent reconstruction, unresolved author protocol"
+}

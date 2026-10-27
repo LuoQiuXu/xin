@@ -93,5 +93,7 @@ def group_stats(pred: torch.Tensor, y: torch.Tensor) -> dict:
     if pred.shape!=y.shape or y.ndim!=1: raise ValueError("expected [N] predictions/labels")
     masks={"Overall":torch.ones_like(y,dtype=torch.bool),
            "Many":y<36,"Medium":(y>=36)&(y<71),"Few":y>=71}
-    return {name:(100.*float((pred[m]==y[m]).float().mean()) if bool(m.any()) else None)
+    # Compute percentages from integer counts; a float32 mean unnecessarily
+    # rounds exact ratios such as 5/6 before conversion to Python float.
+    return {name:(100.*int((pred[m]==y[m]).sum())/int(m.sum()) if bool(m.any()) else None)
             for name,m in masks.items()}

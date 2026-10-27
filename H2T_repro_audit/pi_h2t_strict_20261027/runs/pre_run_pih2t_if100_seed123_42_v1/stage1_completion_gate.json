@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "epochs": 200,
+  "checkpoint_sha256": "64f53e45a1b7f73f494f9c88374607e714b58dc6eb55118fa31154c4389f93ef",
+  "checkpoint_bytes": 1952815,
+  "checkpoint_all_tensors_finite": true,
+  "TEST_logits_finite": true,
+  "PIF_parameter_count": 2,
+  "execution_source_hashes_match": true,
+  "metrics": {
+    "Overall": 39.91,
+    "Many": 67.91666666666667,
+    "Medium": 38.25714285714286,
+    "Few": 7.137931034482759
+  }
+}

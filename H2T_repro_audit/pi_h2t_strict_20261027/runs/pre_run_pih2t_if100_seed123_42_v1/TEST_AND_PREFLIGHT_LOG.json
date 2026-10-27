@@ -1,0 +1,54 @@
+{
+  "client_date": "2026-10-27",
+  "scope": "before formal training; no newly trained TEST accuracy available",
+  "entries": [
+    {
+      "key": "strict_initial_tests_done",
+      "chunk_id": "2d813a",
+      "wall_time_seconds": 0.0000105,
+      "exit_code": 1,
+      "original_token_count": 557,
+      "output": "test_frozen_ratio_stop_grad_compatible (test_paper_components.FormulaTests.test_frozen_ratio_stop_grad_compatible) ... ok\r\ntest_group_boundaries (test_paper_components.FormulaTests.test_group_boundaries) ... FAIL\r\ntest_mismatched_shapes_raise (test_paper_components.FormulaTests.test_mismatched_shapes_raise) ... ok\r\ntest_pif_attaches_after_extractor (test_paper_components.FormulaTests.test_pif_attaches_after_extractor) ... ERROR\r\ntest_pif_formula_and_channel_permutation (test_paper_components.FormulaTests.test_pif_formula_and_channel_permutation) ... ok\r\ntest_pif_gradients (test_paper_components.FormulaTests.test_pif_gradients) ... ok\r\ntest_pif_is_two_weight_no_bias (test_paper_components.FormulaTests.test_pif_is_two_weight_no_bias) ... ok\r\ntest_pool_and_classifier (test_paper_components.FormulaTests.test_pool_and_classifier) ... ok\r\ntest_ratio_limits_and_polarity (test_paper_components.FormulaTests.test_ratio_limits_and_polarity) ... ok\r\n\r\n======================================================================\r\nERROR: test_pif_attaches_after_extractor (test_paper_components.FormulaTests.test_pif_attaches_after_extractor)\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\pi_h2t_strict_20261027\\test_paper_components.py\", line 40, in test_pif_attaches_after_extractor\r\n    p.pif.fuse.weight.copy_(torch.tensor([[[0.]],[[1.]]]))\r\nRuntimeError: output with shape [1, 2, 1] doesn't match the broadcast shape [2, 2, 1]\r\n\r\n======================================================================\r\nFAIL: test_group_boundaries (test_paper_components.FormulaTests.test_group_boundaries)\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\pi_h2t_strict_20261027\\test_paper_components.py\", line 83, in test_group_boundaries\r\n    self.assertAlmostEqual(p[\"Overall\"],100.*5/6)\r\nAssertionError: 83.33333134651184 != 83.33333333333333 within 7 places (1.9868214877760693e-06 difference)\r\n\r\n----------------------------------------------------------------------\r\nRan 9 tests in 0.325s\r\n\r\nFAILED (failures=1, errors=1)\r\n"
+    },
+    {
+      "key": "strict_fixed_tests",
+      "chunk_id": "ca1a43",
+      "wall_time_seconds": 8.9009722,
+      "exit_code": 0,
+      "original_token_count": 426,
+      "output": "test_frozen_ratio_stop_grad_compatible (test_paper_components.FormulaTests.test_frozen_ratio_stop_grad_compatible) ... ok\r\ntest_group_boundaries (test_paper_components.FormulaTests.test_group_boundaries) ... ok\r\ntest_mismatched_shapes_raise (test_paper_components.FormulaTests.test_mismatched_shapes_raise) ... ok\r\ntest_nonbinary_accuracy_uses_integer_counts (test_paper_components.FormulaTests.test_nonbinary_accuracy_uses_integer_counts) ... ok\r\ntest_pif_attaches_after_extractor (test_paper_components.FormulaTests.test_pif_attaches_after_extractor) ... ok\r\ntest_pif_formula_and_channel_permutation (test_paper_components.FormulaTests.test_pif_formula_and_channel_permutation) ... ok\r\ntest_pif_gradients (test_paper_components.FormulaTests.test_pif_gradients) ... ok\r\ntest_pif_is_two_weight_no_bias (test_paper_components.FormulaTests.test_pif_is_two_weight_no_bias) ... ok\r\ntest_pool_and_classifier (test_paper_components.FormulaTests.test_pool_and_classifier) ... ok\r\ntest_ratio_limits_and_polarity (test_paper_components.FormulaTests.test_ratio_limits_and_polarity) ... ok\r\ntest_checkpoint_requires_completed_summary (test_run_reproduction.ProtocolTests.test_checkpoint_requires_completed_summary) ... ok\r\ntest_checkpoint_sha_checked_before_deserialization (test_run_reproduction.ProtocolTests.test_checkpoint_sha_checked_before_deserialization) ... ok\r\ntest_stage1_lr_exact_original_boundaries (test_run_reproduction.ProtocolTests.test_stage1_lr_exact_original_boundaries) ... ok\r\ntest_stage2_lr_horizon_is_locked (test_run_reproduction.ProtocolTests.test_stage2_lr_horizon_is_locked) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 14 tests in 0.078s\r\n\r\nOK\r\n"
+    },
+    {
+      "key": "strict_compile_baseline_0",
+      "chunk_id": "508176",
+      "wall_time_seconds": 0.3310595,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "key": "strict_preflight",
+      "chunk_id": "3ed7ef",
+      "wall_time_seconds": 9.3980465,
+      "exit_code": 0,
+      "original_token_count": 686,
+      "output": "{\r\n  \"status\": \"PAPER_ALIGNED_INDEPENDENT_RECONSTRUCTION_NOT_AUTHOR_VERIFIED\",\r\n  \"paper\": \"PI-H2T v2, Eq(3),(6),(7),(8); independent reconstruction\",\r\n  \"official_author_repo\": \"Keke921/H2T publicly shows original H2T; no complete PI-H2T verified\",\r\n  \"dataset\": \"CIFAR-100-LT IF=100, exp, original H2T selection seed=0\",\r\n  \"model\": \"original ResNet-32 CIFAR feature extractor + 2-weight unbiased Conv1d PIF\",\r\n  \"loss\": \"CE both stages; StageI alpha=1 MixUp; StageII receiver hard labels\",\r\n  \"stage1_epochs\": 200,\r\n  \"stage2_epochs\": 10,\r\n  \"batch_size\": 128,\r\n  \"data_root\": \"D:\\\\xiangmuxunlian\\\\xin\\\\H2T\\\\data\\\\cifar100\",\r\n  \"stage1_seed\": 123,\r\n  \"stage2_seed\": 42,\r\n  \"run_id\": \"pih2t_if100_seed123_42_v1\",\r\n  \"stage1_lr\": \"SGD .1, momentum .9, weight decay .0002; warmup5, >160 x.1, >180 x.01\",\r\n  \"stage2_lr\": \"SGD .1 x .2 initial=.02, momentum .9, weight decay .0005; cosine\",\r\n  \"w_reference\": \"frozen_stage1\",\r\n  \"bn_running_buffers\": \"update\",\r\n  \"ratio_detach\": true,\r\n  \"pif_initialization\": \"torch.nn.Conv1d default (author init unknown)\",\r\n  \"cudnn\": \"benchmark=False, deterministic=True (reconstruction reproducibility choice)\",\r\n  \"checkpoint_selection\": \"fixed final epoch200 (not TEST-selected best)\",\r\n  \"evaluation\": \"official CIFAR100 TEST for paper-comparison ONLY; no tuning or model selection\",\r\n  \"unverified_author_details\": [\r\n    \"PIF initializer\",\r\n    \"ratio W-reference/current-vs-frozen\",\r\n    \"ratio gradient detach\",\r\n    \"StageII BN behavior\",\r\n    \"paper best-checkpoint selection\"\r\n  ],\r\n  \"source_hashes\": {\r\n    \"H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py\": \"d6408ad9c1aa91435128e393c9aeb28714d2adea34fffffb1cbaaf86043f8e19\",\r\n    \"H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py\": \"8a042e7e1dce50e411f00c24c116ddcc4ba7835dbd7ab6961f10c56a2c53bbdd\",\r\n    \"H2T_official_clean/H2T-main/models/resnet_cifar.py\": \"a0f43fb293de0072a81d6329bbafc0b12b00706570596710b4021846eb6163fd\",\r\n    \"H2T_official_clean/H2T-main/datasets/cifar100.py\": \"7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d\",\r\n    \"H2T_official_clean/H2T-main/train_stage1.py\": \"f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1\",\r\n    \"H2T_official_clean/H2T-main/train_stage2.py\": \"c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614\",\r\n    \"H2T_official_clean/H2T-main/utils/logger.py\": \"bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88\",\r\n    \"H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md\": \"a44e7a04cf13e0b12cffdf66e3c603292381c1d5e35a313997aa9cf0aaeef31c\"\r\n  }\r\n}\r\nPREFLIGHT PASS {'train': 10847, 'test': 10000, 'lt_sha256': 'e81d10803e261af2ad81ed93676c3e8a615f35ef968220f7213a169147ada37e', 'gpu': 'NVIDIA GeForce RTX 5070 Laptop GPU'}\r\n"
+    },
+    {
+      "key": "strict_smoke_done",
+      "chunk_id": "a1b341",
+      "wall_time_seconds": 0.0000059,
+      "exit_code": 0,
+      "original_token_count": 149,
+      "output": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\pi_h2t_strict_20261027\\run_reproduction.py:316: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.\r\nConsider using tensor.detach() first. (Triggered internally at C:\\actions-runner\\_work\\pytorch\\pytorch\\torch\\csrc\\autograd\\generated\\python_variable_methods.cpp:821.)\r\n  \"PIF_gradient_abs_sum\":pif_grad,\"finite_loss\":float(loss),\r\nSMOKE StageI shape/gradient PASS (128, 100)\r\nSMOKE StageII shape/grad/ratio PASS {'maps': (128, 64), 'mean_donor_mass': 0.4994885325431824, 'peak_cuda_allocated_mb': 375.0}\r\n"
+    },
+    {
+      "key": "strict_parity_source_1",
+      "chunk_id": "729db0",
+      "wall_time_seconds": 0.9955659,
+      "exit_code": 0,
+      "original_token_count": 15,
+      "output": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8\trefs/heads/main\n"
+    }
+  ]
+}
