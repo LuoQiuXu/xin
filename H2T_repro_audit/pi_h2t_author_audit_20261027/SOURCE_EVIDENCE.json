@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "purpose": "paper and AUTHOR code provenance gate; never accuracy-selected reconstruction",
+  "checked_on": "2026-10-27",
+  "upstream": {
+    "repo": "Keke921/H2T",
+    "checked_head": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8",
+    "branch_count_observed": 1,
+    "branch_names_observed": [
+      "main"
+    ],
+    "tree_size_observed": 58,
+    "complete_tree_observed": true,
+    "repo_readme_describes": "AAAI 2024 Feature Fusion from Head to Tail",
+    "interpretation": "A PI-H2T paper links this upstream repo but this checked branch does not establish runnable PI-H2T PIF/H2TF training.",
+    "limitation": "This snapshot does not prove no other PI code or supplementary materials exist; recheck before making an availability statement."
+  },
+  "paper": {
+    "title": "PI-H2T: Enhancing Long-Tailed Visual Recognition with Permutation-Invariant and Head-to-Tail Feature Fusion",
+    "arxiv": "https://arxiv.org/abs/2506.00625",
+    "claimed_code_url": "https://github.com/Keke921/H2T",
+    "reported_CIFAR100_LT_IF100_CE": {
+      "stage1_pif": 42.19,
+      "stage2_last": 49.04,
+      "stage2_best": 49.22
+    },
+    "note": "Figures reported in existing PDF audit, not independently rerun; PDF version and tables need actual Codex primary-text check."
+  },
+  "fields": [
+    {
+      "id": "PIF_FORM",
+      "claim": "PIF channel mean, residual and single 2-to-1 Conv1d bias-free",
+      "status": "PAPER_FORM_LOCAL_CANDIDATE",
+      "paper_pointer": "PI-H2T arXiv v2 pp4-5 Eq3,6",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "PIF residual equation",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Confirm the actual author PIF branch, init and return path; local formula match is not upstream code proof."
+    },
+    {
+      "id": "PIF_INIT",
+      "claim": "PIF initialization",
+      "status": "UNVERIFIED_AUTHOR_PI",
+      "paper_pointer": "PI-H2T v2 Method / Algorithm1",
+      "path": "H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md",
+      "anchor": "PIF初值",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "What initializer and convolution bias did authors use in the reported 42.19% StageI run?"
+    },
+    {
+      "id": "FUSION_FORM",
+      "claim": "H2TF receiver/donor mix at StageII and r=(1-cos)/2",
+      "status": "PAPER_FORM_LOCAL_CANDIDATE",
+      "paper_pointer": "PI-H2T v2 Eq7-8, normalization note",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "Ratio cosine/theoretical bounds",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Validate exact implementation and normalization in author's PI code; no formula inversions from TEST feedback."
+    },
+    {
+      "id": "W_REFERENCE",
+      "claim": "Classifier weight source in H2TF ratio",
+      "status": "UNVERIFIED_AUTHOR_PI",
+      "paper_pointer": "PI-H2T v2 Eq8 and Algorithm1",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "Ratio reference classifier",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Frozen StageI head or live StageII head? Resolve from author source or ask author. No experimental selection."
+    },
+    {
+      "id": "R_GRADIENT",
+      "claim": "Stop-gradient / detach for ratio",
+      "status": "UNVERIFIED_AUTHOR_PI",
+      "paper_pointer": "PI-H2T v2 Algorithm1",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "Ratio gradient/detach",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Verify if Eq8 ratio participates in optimizer graph."
+    },
+    {
+      "id": "BN_STAGE2",
+      "claim": "StageII BN buffers update policy",
+      "status": "UNVERIFIED_AUTHOR_PI",
+      "paper_pointer": "PI-H2T v2 Experimental details",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "BN running buffers",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Does backbone eval/train mode update BN running means/variances while conv weights frozen?"
+    },
+    {
+      "id": "MODEL_ARCH",
+      "claim": "Exact CIFAR ResNet32 and classifier implementation",
+      "status": "INHERITED_ORIGINAL_H2T_NOT_PI_VERIFIED",
+      "paper_pointer": "PI-H2T v2 CIFAR experiments",
+      "path": "H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md",
+      "anchor": "骨干/头",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Are shortcut option and classifier bias identical to authors' PI model?"
+    },
+    {
+      "id": "STAGE1_OPT",
+      "claim": "StageI augmentation, optimizer/schedule/seed",
+      "status": "INHERITED_ORIGINAL_H2T_NOT_PI_VERIFIED",
+      "paper_pointer": "PI-H2T v2 experimental settings and supplement",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "Stage I optimizer/MixUp",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Verify exact warmup, weight decay, LR boundaries, seeds and MixUp path."
+    },
+    {
+      "id": "STAGE2_OPT",
+      "claim": "StageII optimizer, cosine, sampling and final/best selection",
+      "status": "UNVERIFIED_AUTHOR_PI",
+      "paper_pointer": "PI-H2T v2 experimental settings",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md",
+      "anchor": "Stage II optimizer/schedule",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Confirm exact StageII LR and schedule, whether best/last is paper value, and source of stage1 checkpoint."
+    },
+    {
+      "id": "CKPT_SELECTION",
+      "claim": "StageI and II checkpoint selection",
+      "status": "LOCAL_PROTOCOL_VARIANT",
+      "paper_pointer": "PI-H2T v2 Fig9 and tables",
+      "path": "H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md",
+      "anchor": "fixed epoch200",
+      "author_pi_code": "NOT_VERIFIED",
+      "question": "Authors' StageI model_best vs last provenance? Our last-epoch fixed checkpoint must be separately labeled."
+    },
+    {
+      "id": "AUTHOR_CODE",
+      "claim": "Official PI-H2T implementation availability",
+      "status": "NOT_LOCATED_IN_CHECKED_AUTHOR_REPO",
+      "paper_pointer": "PI-H2T TPAMI 2026 code availability points to https://github.com/Keke921/H2T",
+      "path": "H2T_official_clean/H2T-main/README.md",
+      "anchor": "This repo contains the sample code for our AAAI 2024",
+      "author_pi_code": "NOT_LOCATED",
+      "question": "Inspect all public refs/releases, paper supplementary material, and contact authors; cannot infer nonexistence globally."
+    }
+  ]
+}
