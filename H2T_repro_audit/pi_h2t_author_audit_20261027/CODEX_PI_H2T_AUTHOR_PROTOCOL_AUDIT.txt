@@ -1,0 +1,74 @@
+CODEX 任务：PI-H2T 作者代码来源与严格复现协议核查（只读科学迭代）
+唯一 GitHub 仓库：LuoQiuXu/xin
+唯一任务分支：audit/pi-h2t-author-source-gate-20261027
+唯一新增目录：H2T_repro_audit/pi_h2t_author_audit_20261027/
+入口：README.md、SOURCE_EVIDENCE.json、run_source_gate.py、test_source_gate.py
+
+【先说清这轮不是训练】
+本轮 STOP 所有 PI-H2T GPU 训练、随机试错和改进模块开发！
+尤其不要运行此前从未启动的 repro/pi-h2t-reference-w-parity-20261027 分支 / CODEX_PI_H2T_REFERENCE_W_PARITY.txt。
+当前历史本地重建的成绩：PIF StageI 39.91%、StageII H2TF Last 36.50%、配对no_fusion45.53%；
+前轮从作者 PI-H2T arXiv2506.00625v2 审计的论文成绩：PIF StageI42.19%、StageII Last49.04%（Best49.22%）。
+不能因为本地 −12.54pp 就说原作者方法失效，也不能按TEST准确率反复调整融合公式。
+我们现在真正要回答：作者到底提供了哪些 PI-H2T 训练实现，真实复现协议是否已足够明确？
+
+【0．分支、历史资产和作者来源】
+先执行 git branch --show-current、git status --short、git rev-parse HEAD。
+必须处在 audit/pi-h2t-author-source-gate-20261027，且未发生未授权的 tracked 改动。
+已知历史未跟踪目录 fusion_semantic_audit、lowvs_mask_parity、mdlt_domain_probe 保留不动。不得 git clean、reset --hard、git add -A 或修改旧历史。
+绝对不修改 H2T_official_clean/、H2T/、PI_H2T_review/、pi_h2t_strict_20261027/，也不改原来的checkpoint、输入数据和已保存结果。
+先阅读本轮 README.md 和 SOURCE_EVIDENCE.json；所有新报告只在本轮新 results 子目录。
+
+【1．第一手来源：官方论文和作者仓库】
+（1）获取并核对 PI-H2T 的正式期刊来源 DOI 10.1109/TPAMI.2026.3711911、arXiv https://arxiv.org/abs/2506.00625 的实际版本与补充材料。记录访问日期、PDF标题、版本、SHA256、页数；仔细核查 Code Availability Statement / 源码链接及作者给出的实验协议、补充表格、附录算法、公式与图表。无法访问正式全文，明确标记不能验证；不得捏造页码。
+（2）读取作者明确给出的 https://github.com/Keke921/H2T 的全部可访问公共分支、tag、release、仓库README及有关提交历史。当前初查：public main=e0c849235d9655fca31cd9fa8a5f38f92a77c7e8，完整树58项，README明确称AAAI 2024 H2T，代码核心 methods.py:H2T。这不等于已经找到 PI-H2T 作者训练代码。
+（3）逐文件检查可能相关的PIF、H2TF、StageI、StageII、ratio、config实现（不仅通过文件名搜索，还看代码函数与实际调用）。对于声称官方PI-H2T来源的代码，每条必须有 exact repo URL + commit/ref + path:line + 调用链。明确区分原始 H2T 公共实现、真实PI实现、我们自己上传的重建实现、和论文概述。不得把仓库README提到了某个概念当成该方法可运行的证据。
+（4）如官方库没有完整PI-H2T实现，核对论文中是否指向其他仓库、supplement、发布页/作者公告。公开证据不足可以结论“所核查公开来源未找到完整版本”，不能断言“作者从未发布”。
+（5）若找到新的官方PI实现，不立即训练；先做源码身份核验、作者链接确认和配置核对，严禁直接取第三方代码冒充作者原版。
+
+【2．最小自动来源审计（不训练）】
+从仓库根目录使用现有Python，执行：
+python -m unittest discover -s H2T_repro_audit/pi_h2t_author_audit_20261027 -p "test_*.py" -v
+python -m py_compile H2T_repro_audit/pi_h2t_author_audit_20261027/run_source_gate.py H2T_repro_audit/pi_h2t_author_audit_20261027/test_source_gate.py
+python H2T_repro_audit/pi_h2t_author_audit_20261027/run_source_gate.py --output H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01
+输出目录必须是全新路径。如果已经存在则新建 source_gate_02 等（不要覆盖旧产物）。
+任何旧本地引用未找到，必须回到源文件核对，不得为通过测试硬编码、降低验证门槛或把旧报告当作者原始实现。
+这个工具只校验本地原文锚点及SHA，不验证论文PDF或GitHub远端的真实性；真实核对必须另行记录。
+
+【3．三方科学协议矩阵（核心任务）】
+以前一轮科研审计作线索，不作为作者原始证据：
+H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md
+H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/AUTHOR_MECHANISM_CROSSWALK.md
+H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md
+H2T_repro_audit/pi_h2t_strict_20261027/runs/pih2t_if100_seed123_42_v1/PARITY_RUN_REPORT.md
+
+输出 PI_PAPER_PROTOCOL_MATRIX.md，至少包含：
+PIF均值维度、拼接和Conv1d参数、初始化、插入位置/是否active；
+H2TF应用点、Eq7/8、r的归一化、W在何阶段更新、是否detach；
+StageI CIFAR100-LT真实划分/seed/数据增强、MixUp、骨干Option-A/B、head bias；
+StageI优化器、wd、学习率调度、batch、200epochs、checkpoint选择；
+StageII BS/IS双采样、损失、BN train/eval及running buffers、优化器/10epochs、best/last；
+评价数据与Many/Medium/Few定义。
+每行必须有“论文页码/公式/原文”列、“作者已证实代码URL@commit+path:line”列、“本地重建文件:line”列、“MATCH/PARTIAL/MISMATCH/UNVERIFIED”列和“允许哪种下一步”列。
+作者没明确说的保持UNVERIFIED，不能根据本地哪组准确率更高、作者Figure9均值更接近等选择所谓正确配置。
+特别复核 PI期刊版 与 arXiv v2是否内容一致，不能把不同版本的公式和实验数字混用。
+
+【4．科学门禁与结果】
+必须形成：
+AUTHOR_REPO_INVENTORY.md
+PI_PAPER_PROTOCOL_MATRIX.md
+STRICT_REPRODUCTION_DECISION.md
+EXECUTION_REPORT.md
+三种合法最终决策之一：
+AUTHOR_PI_CODE_VERIFIED：找到可信的完整PI作者训练实现，并列出程序+config+checkpoint来源；下一轮才按作者配置训练。
+PAPER_RECONSTRUCTION_WITH_EXPLICIT_GAPS：没有完整PI作者代码，但论文足以恢复主要部分；列出未确认关键项，不宣称“官方严格复现”。
+BLOCKED_NEEDS_AUTHOR_CONFIRMATION：关键实现无法唯一确定；写 AUTHOR_CLARIFICATION_DRAFT.md（简洁列3-5个必要问题，可包括StageII W、BN、PIF init、checkpoint），不发送邮件。
+不要根据当前本地复现结果倒推作者协议。完成审计后不启动任何200ep/10ep训练。
+
+【5．提交规则】
+检查测试退出码与原始文件哈希。只提交本轮目录内的小文件/报告/JSON/CSV，不提交PDF原文/大模型/数据集，不改历史训练代码、不动其他分支。
+显式 git add 指定文件，git diff --check，commit、push 到 audit/pi-h2t-author-source-gate-20261027（同一分支，无新分支/PR/合并）。
+最终答复：新提交SHA、报告URL、作者PI代码查找结论（带可核证依据）、至少5个关键协议字段的验证状态、最终科学门禁结果、明确“本轮无GPU训练”。
+如果来源不可访问、测试失败或证据不够，报告BLOCKED和真实原由，不得用推测填补。
+
+此轮追求高质量科学核查而非工程复杂度：作者材料→协议证据→决策，拒绝精度驱动的试错。
