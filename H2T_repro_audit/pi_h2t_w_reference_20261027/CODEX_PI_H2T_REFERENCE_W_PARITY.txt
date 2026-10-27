@@ -1,3 +1,9 @@
+【重要：已暂停 / DO NOT EXECUTE TRAINING】
+此文件是先前提出的探索性 W-reference 分叉，不属于严格复现 PI-H2T 的作者协议。2026-10-27 经重新核查，Keke921/H2T 公开仓库仅确认原始 AAAI H2T 实现，PI-H2T 的 current/frozen W 并无已确认的作者实现依据。
+请勿执行本文件中的 run_current_w.py run，也不要将其称作“作者严格复现”。新的唯一有效 Codex 任务见同目录 CODEX_PI_H2T_AUTHOR_FIRST_AUDIT.txt；先核对论文/补充材料/真实作者源代码，确认证据不足时只报告 BLOCKED，不做猜测性训练。
+
+--- 以下为已暂停的历史指令，仅供溯源 ---
+
 CODEX 执行任务：PI-H2T 严格复现差距的最小协议核查——Stage II W-reference
 GitHub 仓库：LuoQiuXu/xin
 必须使用的唯一新分支：repro/pi-h2t-reference-w-parity-20261027
