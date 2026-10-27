@@ -363,7 +363,14 @@ def report(args):
         p=run/"stage2"/arm/"summary.json"
         if not p.is_file():raise FileNotFoundError(p)
         records[arm]=json.loads(p.read_text(encoding="utf-8"))
-    a=records["no_fusion"]["metrics"];b=records["h2tf"]["metrics"]
+    left=records["no_fusion"];right=records["h2tf"]
+    if left["source_stage1_sha256"] != right["source_stage1_sha256"]:
+        raise RuntimeError("StageII arms used different StageI checkpoints")
+    if left["stage2_initial_classifier_hash"] != right["stage2_initial_classifier_hash"]:
+        raise RuntimeError("StageII arms started from different classifier weights")
+    if left["final_bn_buffers_hash"] != right["final_bn_buffers_hash"]:
+        raise RuntimeError("BN running buffers differ: matched-input StageII comparison is invalid")
+    a=left["metrics"];b=right["metrics"]
     comparison={k:round(b[k]-a[k],5) for k in GROUP.keys()|{"Overall"}}
     # Paired per-image changes, not just headline accuracy. Never select a new
     # tuning target from these official-TEST observations.
