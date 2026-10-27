@@ -208,6 +208,7 @@ def stage1(args):
     seeding(args.stage1_seed)
     device=torch.device("cuda:0")
     net,head=make_models(device)
+    pif_initial=net.pif.fuse.weight.detach().cpu().reshape(-1).tolist()
     # Dataset ctor resets NumPy seed to zero as in frozen H2T.
     loader,test,counts,lt_hash=build_loader(args,1)
     run.mkdir(parents=True,exist_ok=False)
@@ -248,6 +249,8 @@ def stage1(args):
     save_rows(run/"stage1_epochs.csv",record)
     metrics,_,_=evaluate(net,head,test,device)
     dump(run/"stage1_summary.json",{"epoch":200,"official_test_diagnostic":metrics,
+                                    "pif_coefficients_initial_residual_feature":pif_initial,
+                                    "pif_coefficients_final_residual_feature":net.pif.fuse.weight.detach().cpu().reshape(-1).tolist(),
                                     "checkpoint_file_sha256":hashfile(checkpoint)})
     print("StageI FINAL epoch200",metrics,flush=True)
 
