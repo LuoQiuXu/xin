@@ -1,0 +1,7 @@
+# Keep large data local; publish only small reports and indices.
+*.pth
+*.pth.tar
+*.npz
+*.npy
+*.log
+*.tmp
