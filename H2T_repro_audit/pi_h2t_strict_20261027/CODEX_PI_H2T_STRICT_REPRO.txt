@@ -40,11 +40,12 @@ From repository root run:
 python -m unittest discover -s H2T_repro_audit/pi_h2t_strict_20261027 -p "test_*.py" -v
 python -m py_compile H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py
 python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py preflight --run-id pih2t_if100_seed123_42_v1 --data-root <EXISTING_CIFAR100_ROOT>
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py smoke --run-id pih2t_if100_seed123_42_v1 --data-root <EXISTING_CIFAR100_ROOT>
 
 Use literal existing CIFAR100 cache root, including cifar-100-python/train and test. If missing, only with explicit user-approved download use --download. Verify CUDA on RTX5070 8GB and compatible installed pytorch/torchvision. If OOM, stop and report; do not silently lower batch size or enable AMP as those alter protocol.
 
 CRITICAL CODE REVIEW before long run: inspect optimizer LR epoch boundaries (StageI default 5-epoch warmup and milestones160/180, NOT cosine), original CIFAR sample generation, correct device/mode, optimizer parameter groups, dataset counts class0=500 class99=5, paired StageII BN input traffic, PIF gradient and H2TF ratio direction. Inspect checkpoint source/hash checks.
-If errors: fix ONLY this study directory, add regression tests and write REPAIR_LOG.md (reason, before/after, test, parity effect). Never modify original H2T code to make new runner work.
+The smoke command must run a REAL original CIFAR100-LT minibatch through StageI PIF gradients and StageII frozen-backbone H2TF; confirm both pass before long training. If errors: fix ONLY this study directory, add regression tests and write REPAIR_LOG.md (reason, before/after, test, parity effect). Never modify original H2T code to make new runner work.
 
 PHASE C — ACTUAL TRAINING, ONLY IF A AND B PASS
 Do not train if formula, data split or tests fail. Unknown author-specific config may remain UNVERIFIED; if so, you MAY run the transparently named INDEPENDENT RECONSTRUCTION using the pre-locked default choices, but must never claim official parity.
