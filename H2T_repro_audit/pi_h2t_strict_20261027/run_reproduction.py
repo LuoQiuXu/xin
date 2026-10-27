@@ -63,6 +63,8 @@ def seeding(seed: int) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.benchmark=False
+    torch.backends.cudnn.deterministic=True
 
 
 def cosine_lr(lr: float, epoch: int, total: int) -> float:
@@ -122,6 +124,7 @@ def check_plan(args) -> dict:
         "bn_running_buffers":args.bn_mode,
         "ratio_detach":True,
         "pif_initialization":"torch.nn.Conv1d default (author init unknown)",
+        "cudnn":"benchmark=False, deterministic=True (reconstruction reproducibility choice)",
         "checkpoint_selection":"fixed final epoch200 (not TEST-selected best)",
         "evaluation":"official CIFAR100 TEST for paper-comparison ONLY; no tuning or model selection",
         "unverified_author_details":["PIF initializer","ratio W-reference/current-vs-frozen",
