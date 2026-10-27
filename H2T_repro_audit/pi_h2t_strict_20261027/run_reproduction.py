@@ -200,6 +200,49 @@ def preflight(args):
     print("PREFLIGHT PASS: original CIFAR files present, CUDA detected; unresolved author details remain explicitly labelled")
 
 
+def smoke(args):
+    """Real CIFAR one-minibatch shape/gradient/8GB memory check; no checkpoint."""
+    preflight(args)
+    seeding(args.stage1_seed)
+    device=torch.device("cuda:0")
+    net,head=make_models(device)
+    stage1_loader,_,_,_=build_loader(args,1)
+    images,y,_=next(iter(stage1_loader))
+    images=images.to(device);y=y.to(device)
+    net.train();head.train()
+    logits=head(net(images))
+    assert logits.shape==(len(y),100)
+    F.cross_entropy(logits,y).backward()
+    if any(x.grad is None for x in net.pif.parameters()):
+        raise RuntimeError("StageI PIF did not receive gradients")
+    print("SMOKE StageI shape/gradient PASS",tuple(logits.shape),flush=True)
+    del net,head,logits,images,y
+    torch.cuda.empty_cache()
+
+    seeding(args.stage2_seed)
+    net,head=make_models(device)
+    stage2_loader,_,_,_=build_loader(args,2)
+    images,y,meta=next(iter(stage2_loader))
+    net.requires_grad_(False)
+    net.train() if args.bn_mode=="update" else net.eval()
+    images=images.to(device);donor=meta["sample_image"].to(device);y=y.to(device)
+    with torch.no_grad():
+        a=pool_feature(net(images));b=pool_feature(net(donor))
+        r=receiver_ratio(a,y,head.fc.weight.detach())
+        mixed=h2tf(a,b,r)
+    assert mixed.shape==(len(y),64) and r.shape==(len(y),)
+    head.train()
+    loss=F.cross_entropy(classify_vector(head,mixed),y)
+    loss.backward()
+    if head.fc.weight.grad is None:
+        raise RuntimeError("StageII head did not receive gradients")
+    if any(p.grad is not None for p in net.parameters()):
+        raise RuntimeError("StageII backbone unexpectedly received gradients")
+    print("SMOKE StageII shape/grad/ratio PASS",
+          {"maps":tuple(a.shape),"mean_donor_mass":float((1-r).mean()),
+           "peak_cuda_allocated_mb":round(torch.cuda.max_memory_allocated()/2**20,1)},flush=True)
+
+
 def stage1(args):
     run=paths_for(args)
     if run.exists(): raise FileExistsError(f"Refuse overwrite: {run}")
@@ -402,7 +445,7 @@ def report(args):
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("command",choices=("preflight","stage1","stage2","report"))
+    ap.add_argument("command",choices=("preflight","smoke","stage1","stage2","report"))
     ap.add_argument("--run-id",required=True)
     ap.add_argument("--data-root",default="H2T/data/cifar100")
     ap.add_argument("--download",action="store_true",
@@ -414,6 +457,7 @@ def main():
     ap.add_argument("--w-reference",choices=ALLOWED_W,default="frozen_stage1")
     args=ap.parse_args()
     if args.command=="preflight":preflight(args)
+    elif args.command=="smoke":smoke(args)
     elif args.command=="stage1":stage1(args)
     elif args.command=="stage2":stage2(args)
     elif args.command=="report":report(args)
