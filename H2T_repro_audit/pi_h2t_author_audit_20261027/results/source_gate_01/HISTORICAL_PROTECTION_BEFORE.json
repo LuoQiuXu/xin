@@ -1,0 +1,27 @@
+{
+  "tracked_small_file_count": 1644,
+  "tracked_small_raw_sha256_aggregate": "e93eb9611ccef3ab23641cf09a6d3b902b2b1ad66bdc85843d07fef1680fce4c",
+  "tracked_large_metadata_count": 26,
+  "tracked_large_metadata_aggregate": "f63b1234272eec7ec7042a523b2874a980c136193f40d00bdb8df95391eb65af",
+  "protected_metadata_file_count": 2221,
+  "protected_metadata_aggregate": "d95d33e0fc2983cee65a843fa142f0d604f6821486a05e314610d26290649470",
+  "protected_roots": [
+    "H2T_official_clean",
+    "H2T",
+    "PI_H2T_review",
+    "H2T_repro_audit/pi_h2t_strict_20261027",
+    "H2T_repro_audit/fusion_semantic_audit",
+    "H2T_repro_audit/lowvs_mask_parity",
+    "H2T_repro_audit/mdlt_domain_probe"
+  ],
+  "key_raw_file_sha256": {
+    "H2T_official_clean/H2T-main/models/resnet_cifar.py": "a0f43fb293de0072a81d6329bbafc0b12b00706570596710b4021846eb6163fd",
+    "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py": "d6408ad9c1aa91435128e393c9aeb28714d2adea34fffffb1cbaaf86043f8e19",
+    "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py": "8a042e7e1dce50e411f00c24c116ddcc4ba7835dbd7ab6961f10c56a2c53bbdd",
+    "H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md": "a44e7a04cf13e0b12cffdf66e3c603292381c1d5e35a313997aa9cf0aaeef31c"
+  },
+  "hash_policy": "All tracked non-study files <=5 MB raw SHA256; larger tracked files and all seven protected roots size/mtime metadata. No checkpoint deserialization/data interpretation."
+}

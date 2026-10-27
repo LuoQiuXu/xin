@@ -1,0 +1,192 @@
+[
+  {
+    "name": "crossref",
+    "url": "https://api.crossref.org/works/10.1109/TPAMI.2026.3711911",
+    "accessed_utc": "2026-10-27T15:29:46.390281+00:00",
+    "status": 200,
+    "final_url": "https://api.crossref.org/works/10.1109/TPAMI.2026.3711911",
+    "content_type": "application/json",
+    "bytes": 13581,
+    "sha256": "d4971420834fe6fde80f572e38a1683f34a3f91d734f8c1e973dea0ae22b8292",
+    "local_path": "H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/crossref.json",
+    "metadata": {
+      "title": [
+        "PI-H2T: Enhancing Long-Tailed Visual Recognition With Permutation-Invariant and Head-to-Tail Feature Fusion"
+      ],
+      "published": {
+        "date-parts": [
+          [
+            2026,
+            11
+          ]
+        ]
+      },
+      "created": {
+        "date-parts": [
+          [
+            2026,
+            7,
+            9
+          ]
+        ],
+        "date-time": "2026-07-09T19:43:27Z",
+        "timestamp": 1783626207000
+      },
+      "resource": {
+        "primary": {
+          "URL": "https://ieeexplore.ieee.org/document/11601054/"
+        }
+      },
+      "relation": {},
+      "page": "13910-13924",
+      "volume": "48",
+      "issue": "11",
+      "link": [
+        {
+          "URL": "http://xplorestaging.ieee.org/ielx8/34/11723300/11601054.pdf?arnumber=11601054",
+          "content-type": "unspecified",
+          "content-version": "vor",
+          "intended-application": "similarity-checking"
+        }
+      ]
+    }
+  },
+  {
+    "name": "journal_page",
+    "url": "https://ieeexplore.ieee.org/document/11601054/",
+    "accessed_utc": "2026-10-27T15:29:46.390281+00:00",
+    "status": 202,
+    "final_url": "https://ieeexplore.ieee.org/document/11601054/",
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "local_path": "H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/journal_page.html"
+  },
+  {
+    "name": "journal_pdf",
+    "url": "https://ieeexplore.ieee.org/ielx8/34/11723300/11601054.pdf",
+    "accessed_utc": "2026-10-27T15:29:46.391311+00:00",
+    "error_type": "HTTPError",
+    "error": "HTTP Error 418: Unknown Code",
+    "http_status": 418
+  },
+  {
+    "name": "arxiv_v2_source",
+    "url": "https://arxiv.org/src/2506.00625v2",
+    "accessed_utc": "2026-10-27T15:29:46.391311+00:00",
+    "status": 200,
+    "final_url": "https://arxiv.org/src/2506.00625v2",
+    "content_type": "application/gzip",
+    "bytes": 13139106,
+    "sha256": "13e7667687020a5e54c03dbb0994cd53c4a5edcd7c515ea28b88ab7c22780eff",
+    "local_path": "H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_source.tgz",
+    "archive_members": [
+      "00README.json",
+      "fig",
+      "fig/3FusionRatio.pdf",
+      "fig/CE-mark.png",
+      "fig/CE_PIF-mark.png",
+      "fig/H2Tv2-structure-small.pdf",
+      "fig/ablation",
+      "fig/ablation/PIF-0.3-mark.pdf",
+      "fig/ablation/PIF-0.3-mark.png",
+      "fig/ablation/PIF-0.4-mark.png",
+      "fig/ablation/PIF-0.5-mark.png",
+      "fig/ablation/PIF-0.6-mark.pdf",
+      "fig/ablation/PIF-0.6-mark.png",
+      "fig/ablation/PIF-0.7-mark.png",
+      "fig/ablation/PIF-0.8-mark.pdf",
+      "fig/ablation/PIF-0.8-mark.png",
+      "fig/ablation/PIF-0.9-mark.png",
+      "fig/ablation/PIF-1.0-bal-mark.pdf",
+      "fig/ablation/PIF-1.0-bal-mark.png",
+      "fig/ablation/PIF-1.0-mark.pdf",
+      "fig/ablation/PIF-1.0-mark.png",
+      "fig/ablation/PIF-p-mark.pdf",
+      "fig/ablation/PIF-p-mark.png",
+      "fig/ablation/PIF-tsne-mini.tex",
+      "fig/ablation/PIF-tsne.tex",
+      "fig/ablation/fusion_ratio_his.tex",
+      "fig/ablation/hist_epoch_best-cifar10.pdf",
+      "fig/ablation/hist_epoch_best-cifar100.pdf",
+      "fig/ablation/hist_epoch_last-cifar10.pdf",
+      "fig/ablation/hist_epoch_last-cifar100.pdf",
+      "fig/ablation/line_avg_r-cifar10.pdf",
+      "fig/ablation/line_avg_r-cifar100.pdf",
+      "fig/ablation/margin_distribution_comparison.pdf",
+      "fig/boundary",
+      "fig/boundary/Ablation",
+      "fig/boundary/Ablation/PI-H2T_test-mark.png",
+      "fig/boundary/Ablation/PI-H2T_train-mark.png",
+      "fig/boundary/Ablation/PIF_DR_test2-mark.png",
+      "fig/boundary/Ablation/PIF_DR_train2-mark.png",
+      "fig/boundary/Ablation/PIF_st1_test-mark.png",
+      "fig/boundary/Ablation/PIF_st1_train-mark.png",
+      "fig/boundary/CE",
+      "fig/boundary/CE/CE-09-Test-mark.png",
+      "fig/boundary/CE/CE-09-Train-mark.png",
+      "fig/boundary/H2Tv1",
+      "fig/boundary/H2Tv1/H2T-09-Test-mark.png",
+      "fig/boundary/H2Tv1/H2T-09-Train-mark.png",
+      "fig/boundary/class09-2.tex",
+      "fig/boundary.pdf",
+      "fig/rationale3.pdf",
+      "H2T_main.tex",
+      "H2T_ref.bib",
+      "IEEEbib.bst",
+      "IEEEtran.cls",
+      "photo",
+      "photo/photo_HuiHuang.jpg",
+      "photo/photo_Mengke_Li.png",
+      "photo/photo_Weichao_Lan.jpg",
+      "photo/photo_YMCheung.png",
+      "photo/photo_Yang_Lu.jpg",
+      "photo/photo_Zhikai_Hu.png",
+      "Sec",
+      "Sec/1_Intro.tex",
+      "Sec/2_RW.tex",
+      "Sec/3_Method.tex",
+      "Sec/4_Experiment.tex",
+      "Sec/5_Conclusion.tex",
+      "tab",
+      "tab/PI-abl.tex",
+      "tab/PI-baselines.tex",
+      "tab/algorithm.tex",
+      "tab/cifar-bal.tex",
+      "tab/cifar.tex",
+      "tab/cifar10-LT.tex",
+      "tab/comp_w_h2t.tex",
+      "tab/img.tex",
+      "tab/inat.tex",
+      "tab/pla.tex",
+      "tab/sym_tab.tex"
+    ],
+    "tex_urls": {
+      "fig/ablation/PIF-tsne-mini.tex": [],
+      "fig/ablation/PIF-tsne.tex": [],
+      "fig/ablation/fusion_ratio_his.tex": [],
+      "fig/boundary/class09-2.tex": [],
+      "H2T_main.tex": [
+        "https://github.com/Keke921/H2T",
+        "https://www.comp.hkbu.edu.hk/~ymc"
+      ],
+      "Sec/1_Intro.tex": [],
+      "Sec/2_RW.tex": [],
+      "Sec/3_Method.tex": [],
+      "Sec/4_Experiment.tex": [],
+      "Sec/5_Conclusion.tex": [],
+      "tab/PI-abl.tex": [],
+      "tab/PI-baselines.tex": [],
+      "tab/algorithm.tex": [],
+      "tab/cifar-bal.tex": [],
+      "tab/cifar.tex": [],
+      "tab/cifar10-LT.tex": [],
+      "tab/comp_w_h2t.tex": [],
+      "tab/img.tex": [],
+      "tab/inat.tex": [],
+      "tab/pla.tex": [],
+      "tab/sym_tab.tex": []
+    },
+    "executable_training_files": []
+  }
+]

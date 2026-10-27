@@ -1,0 +1,1183 @@
+[
+  {
+    "id": "PIF_MEAN",
+    "field": "PIF均值维度",
+    "paper_pointer": "PDF p4 Eq4–5：沿通道求均值；不是空间平均。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 163,
+        "end": 163
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 24,
+        "end": 24
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "作者片段确有dim=1；本地一致。完整PI路径未成立，不能升级为官方实现通过。",
+    "allowed_next_step": "可锁定通道均值这一数学条款；总训练门禁仍关闭。"
+  },
+  {
+    "id": "PIF_CONCAT",
+    "field": "PIF拼接与残差",
+    "paper_pointer": "p4 Eq3/6：[F−mean,F]，a(F−mean)+bF。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 164,
+        "end": 166
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 24,
+        "end": 28
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "公开片段用[F,F−mean]，顺序不同但可交换有效系数，单独不证明公式无法表示；实际参数化和输出路径另行不匹配。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "PIF_PARAMS",
+    "field": "Conv1d层数、参数和bias",
+    "paper_pointer": "p5 §3.3：单层2→1、k=1、无bias时2参数；含bias可3参数；p12 Table10报告+2。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 138,
+        "end": 145
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 18,
+        "end": 18
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "MISMATCH",
+    "evidence_and_limit": "公开片段是2→4→2→1三层、默认bias，共18权重+7偏置=25；不是文中+2参数实现。无非线性可合成仿射映射，但训练参数化、初始化、正则化未证明等价。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "PIF_INIT",
+    "field": "PIF初始化",
+    "paper_pointer": "p4–5 §3.3及p16 Algorithm1 line1只有随机初始化，没有a/b分布或初值。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 32,
+        "end": 35
+      },
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 139,
+        "end": 145
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 15,
+        "end": 18
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 365,
+        "end": 366
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "公开_weights_init只覆盖Conv2d/Linear；三层Conv1d保持Torch默认，但不能推出作者论文两参数PIF的初值。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "PIF_ACTIVE",
+    "field": "PIF输出是否生效/可构造",
+    "paper_pointer": "p4 Eq3/6及p5后续pooling说明要求输出F_fuse；p16 Algorithm1 line5却写F，保留文稿歧义。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 128,
+        "end": 145
+      },
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 161,
+        "end": 168
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 38,
+        "end": 39
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 171,
+        "end": 174
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "MISMATCH",
+    "evidence_and_limit": "公开Conv2d含非法feature_tuning参数，CPU构造实测TypeError；feature_tuning还未定义；out_hat被计算后仍return out。未修上游/历史源。原论文伪代码歧义不能为失活路径提供严格复现证明。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "PIF_INSERTION",
+    "field": "PIF位置与形状",
+    "paper_pointer": "p4–5 Eq3/6在最后pooling之前；CIFAR具体维度需来自架构。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 156,
+        "end": 168
+      },
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 176,
+        "end": 180
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 31,
+        "end": 45
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 169,
+        "end": 175
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "本地在[B,64,8,8]上活动PIF，再GAP至[B,64]。作者片段放置位置候选相符，但输出未接入，不能称完整PI模型。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "H2TF_POINT",
+    "field": "H2TF应用点",
+    "paper_pointer": "p2扩展说明、p16 Algorithm1 lines12–14：先pool，再向量融合；p5 Eq7后再pool措辞存在歧义。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 368,
+        "end": 373
+      },
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 176,
+        "end": 179
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 491,
+        "end": 503
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "MISMATCH",
+    "evidence_and_limit": "公开活动入口先对4D图调用H2T再送Classifier池化，属于原AAAI通道替换；不是论文向量H2TF路径。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "H2TF_EQ7",
+    "field": "接收者/供体权重和融合式",
+    "paper_pointer": "p5 Eq7及footnote1：r*f_receiver+(1−r)*f_donor；只保留接收者标签。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "methods.py",
+        "line": 31,
+        "end": 47
+      },
+      {
+        "path": "methods.py",
+        "line": 57,
+        "end": 67
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 368,
+        "end": 378
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 71,
+        "end": 81
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "MISMATCH",
+    "evidence_and_limit": "H2Tv2有向量线性混合片段，但41文件调用图未发现调用；活动H2T是随机整通道替换。片段存在不等于可运行PI两阶段。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "RATIO_NORM",
+    "field": "r的距离和归一化",
+    "paper_pointer": "p5 Eq8/footnote2：cosine distance；按理论边界线性min-max，非batch min/max。由标准cosine distance=1−cos推得r=(1−cos)/2。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "methods.py",
+        "line": 57,
+        "end": 66
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 66,
+        "end": 68
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "推导不是作者逐字给出的代码。H2Tv2的原始dis变换可化为p=.2+.8/(1+dis)；若dis就是论文距离则不同，但没有调用方，不能擅自认定dis语义。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "W_TRAIN",
+    "field": "分类头W在StageII是否更新",
+    "paper_pointer": "p6 Remark2及p16 Algorithm1 line15：固定表示参数，更新分类器参数。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 239,
+        "end": 244
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 388,
+        "end": 391
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 462,
+        "end": 473
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 502,
+        "end": 506
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "公开原H2T与本地都只优化head，支持架构级分阶段规则；不等于ratio引用同一份W。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "W_REFERENCE",
+    "field": "Eq8 reference W来源",
+    "paper_pointer": "p4 Table1、p5 Eq8、p6 Fig3、p16 Algorithm1：没有显式StageI clone或Eq8调用位置。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "methods.py",
+        "line": 57,
+        "end": 66
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 368,
+        "end": 378
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 463,
+        "end": 463
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 491,
+        "end": 496
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "分类头更新这一事实不能唯一确定r使用冻结StageI W还是当前StageII W。Algorithm1没有展开展示r计算；本地选择冻结W是锁定假设。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "RATIO_DETACH",
+    "field": "比例是否detach/参与梯度",
+    "paper_pointer": "p5 Eq8及p16算法未规定stop-gradient。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "methods.py",
+        "line": 57,
+        "end": 67
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 360,
+        "end": 378
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 491,
+        "end": 503
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "H2Tv2片段内部没有detach，但未集成；原H2T no_grad不证明PI ratio梯度语义。本地r位于no_grad。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "CIFAR_SPLIT",
+    "field": "CIFAR100-LT划分/IF",
+    "paper_pointer": "p7 §4.1：原CIFAR100指数子采样，IF=100之一。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "datasets/cifar100.py",
+        "line": 27,
+        "end": 33
+      },
+      {
+        "path": "datasets/cifar100.py",
+        "line": 142,
+        "end": 158
+      },
+      {
+        "path": "datasets/cifar100.py",
+        "line": 190,
+        "end": 194
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 151,
+        "end": 165
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "公开原H2T使用TRAIN产生LT、TEST作eval；本地继承相同类计数/构造器。本轮不读取CIFAR原始数据。作者PI索引清单未定位。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "SPLIT_SEED",
+    "field": "类内子采样seed",
+    "paper_pointer": "p7 §4.1没有逐类索引或selection seed。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "datasets/cifar100.py",
+        "line": 14,
+        "end": 20
+      },
+      {
+        "path": "datasets/cifar100.py",
+        "line": 149,
+        "end": 154
+      },
+      {
+        "path": "datasets/cifar100.py",
+        "line": 190,
+        "end": 192
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 158,
+        "end": 159
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "原H2T构造器seed0，重置NumPy并类内shuffle；本地一致，但没有PI作者索引或哈希佐证。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S1_SEED",
+    "field": "StageI训练seed/随机流",
+    "paper_pointer": "p7 §4.2、p16算法没有具体训练seed或设备RNG。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage1.py",
+        "line": 70,
+        "end": 71
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+        "line": 27,
+        "end": 27
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 363,
+        "end": 368
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 614,
+        "end": 614
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "原H2T deterministic=True时seed123；本地123属继承/重建。PIF新增初始化和CUDA randperm改变随机流，不宣称逐位作者重放。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "AUGMENT",
+    "field": "裁剪、翻转和归一化",
+    "paper_pointer": "p7 CNN设置只明确MixUp，未枚举裁剪、padding、Normalize数值；不能套用MHSA的AutoAugment/Cutout。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "datasets/cifar100.py",
+        "line": 175,
+        "end": 194
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 45,
+        "end": 46
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 140,
+        "end": 148
+      }
+    ],
+    "paper_vs_local_status": "PARTIAL",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "公开H2T为crop32/pad4、flip及指定mean/std；本地继承。作者PI的全部增强参数仍未唯一确认。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "MIXUP",
+    "field": "StageI MixUp及alpha",
+    "paper_pointer": "p7 §4.2明确MixUp；alpha、精确抽样RNG未在正文给出。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "methods.py",
+        "line": 8,
+        "end": 28
+      },
+      {
+        "path": "train_stage1.py",
+        "line": 320,
+        "end": 335
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+        "line": 44,
+        "end": 45
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 383,
+        "end": 389
+      }
+    ],
+    "paper_vs_local_status": "PARTIAL",
+    "status": "PARTIAL",
+    "evidence_and_limit": "策略相符；本地alpha1沿用原配置。作者CPU randperm再cuda，本地CUDA randperm，分布相同不代表同随机序列。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "BACKBONE",
+    "field": "ResNet32/Option-A或B",
+    "paper_pointer": "p7 §4.2指定ResNet32；未给shortcut option。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 61,
+        "end": 79
+      },
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 186,
+        "end": 187
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 35,
+        "end": 37
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 169,
+        "end": 174
+      }
+    ],
+    "paper_vs_local_status": "PARTIAL",
+    "status": "PARTIAL",
+    "evidence_and_limit": "本地从冻结档案构造[5,5,5]/Option-A；公开骨干候选也Option-A但当前构造失效。不能从模型名确认全部作者PI细节。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "HEAD_BIAS",
+    "field": "线性分类头及bias",
+    "paper_pointer": "p4 Table1写W^T f，未给实验classifier bias开关。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "models/resnet_cifar.py",
+        "line": 170,
+        "end": 179
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 172,
+        "end": 172
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "公开Classifier为带bias nn.Linear，Kaiming初始化weight；本地继承。理论记号省略bias不能直接当作实验必须无bias。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S1_SGD",
+    "field": "StageI optimizer/epoch/batch",
+    "paper_pointer": "p7 §4.2：SGD momentum.9，初始lr.1，ResNet32，200轮，batch128。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage1.py",
+        "line": 231,
+        "end": 234
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+        "line": 39,
+        "end": 45
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 39,
+        "end": 42
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 375,
+        "end": 381
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "这些明确的大项能核实；作者完整PI配置与模型来源尚未核实。",
+    "allowed_next_step": "将这些论文明确值列入待核协议；不能越过总门禁启动训练。"
+  },
+  {
+    "id": "S1_WD",
+    "field": "StageI weight decay/参数组",
+    "paper_pointer": "p7没有给出CIFAR CNN完整weight_decay及特殊参数组策略。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+        "line": 41,
+        "end": 41
+      },
+      {
+        "path": "train_stage1.py",
+        "line": 231,
+        "end": 234
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 375,
+        "end": 376
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "本地2e-4对net+head应用，继承公开H2T；PIF参数的作者weight_decay是否相同未验证。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S1_LR",
+    "field": "StageI milestone与边界",
+    "paper_pointer": "p7 §4.2：160/180轮各降0.1；没有说明一基边界与调用时点。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "utils/logger.py",
+        "line": 77,
+        "end": 80
+      },
+      {
+        "path": "train_stage1.py",
+        "line": 457,
+        "end": 475
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 76,
+        "end": 86
+      }
+    ],
+    "paper_vs_local_status": "PARTIAL",
+    "status": "PARTIAL",
+    "evidence_and_limit": "公开H2T代码epoch+1后>160/>180，本地161/181生效。论文大项相符，边界不能说已由PI源码确认。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S1_WARMUP",
+    "field": "五轮warmup",
+    "paper_pointer": "p7 §4.2及AppendixB未写warmup细节。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage1.py",
+        "line": 463,
+        "end": 472
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 76,
+        "end": 86
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "原H2T5轮线性warmup被本地继承，尚无PI作者配置证实。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S1_CKPT",
+    "field": "StageI checkpoint选择/加载",
+    "paper_pointer": "p10 Table6报告42.19；p16算法没有best/last选择。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage1.py",
+        "line": 250,
+        "end": 282
+      },
+      {
+        "path": "train_stage1.py",
+        "line": 450,
+        "end": 454
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 184,
+        "end": 208
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 400,
+        "end": 418
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "公开原H2T每轮eval并保存current/model_best；StageII只读resume路径。没有将PI42.19与具体文件/epoch/SHA绑定。本地fixed epoch200是预锁定选择。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "BS_IS",
+    "field": "StageII BS接收者/IS供体",
+    "paper_pointer": "p5 Eq9：BS=1/C，IS=n_i/N；并非仅头到仅尾。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "datasets/cifar100.py",
+        "line": 83,
+        "end": 113
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "line": 14,
+        "end": 20
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 151,
+        "end": 162
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "公开dataset保留原index作donor，再均匀抽类/类内样本作receiver；本地继承。作者PI迭代随机流未验证。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_LOSS",
+    "field": "StageII标签和损失",
+    "paper_pointer": "p5 §3.4 Eq7 footnote1及p10 Table6：CE版本仅接收者hard label。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "loss.py",
+        "line": 8,
+        "end": 29
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 368,
+        "end": 378
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "line": 58,
+        "end": 58
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 502,
+        "end": 506
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "本地不混合donor标签；原H2T所选CE也如此。作者PI全入口未找到，不能由接口相同认定同一次实验。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_FREEZE",
+    "field": "骨干/PIF参数冻结",
+    "paper_pointer": "p6、p16 Algorithm1 line15：仅分类器参数更新；推理保留StageI PIF。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 241,
+        "end": 244
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 360,
+        "end": 378
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 462,
+        "end": 473
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 491,
+        "end": 506
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "参数冻结和BN buffers冻结是不同事项；本地前者可证实，后者由mode决定。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_BN",
+    "field": "BN mode/affine/running buffers/流量",
+    "paper_pointer": "p6 frozen示意及p16算法未明确BN train/eval、running_mean/var更新或双分支顺序。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 305,
+        "end": 317
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "line": 49,
+        "end": 49
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 476,
+        "end": 498
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "公开H2T shift_bn=True，两个forward在no_grad仍会更新BN；本地采用update并让no_fusion也forward donor是matched BN控制，不是作者未改动DR入口。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_SGD",
+    "field": "StageII optimizer/10轮预算",
+    "paper_pointer": "p7 §4.2明确CNN SGD momentum.9、StageII10轮；未列所有超参数。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 239,
+        "end": 251
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "line": 53,
+        "end": 58
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 473,
+        "end": 479
+      }
+    ],
+    "paper_vs_local_status": "MATCH",
+    "status": "PARTIAL",
+    "evidence_and_limit": "10轮/.9和分类器SGD大项一致；不能恢复未公开的PI完整配方。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_LR_WD",
+    "field": "StageII lr/cosine/wd",
+    "paper_pointer": "p7 CNN段没有明确StageII .02/cosine/wd；旁边MHSA的.01/cosine不可移植。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 487,
+        "end": 497
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "line": 50,
+        "end": 57
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 473,
+        "end": 479
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "原H2T .1×.2=.02、cosine、wd5e-4被本地继承；不是PI作者已确认的训练配置。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_SEED",
+    "field": "StageII seed和backend",
+    "paper_pointer": "p7、p16没有指定StageII seed、cuDNN/TF32/PyTorch环境。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 72,
+        "end": 73
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "line": 37,
+        "end": 37
+      },
+      {
+        "path": "utils/util.py",
+        "line": 15,
+        "end": 23
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 63,
+        "end": 69
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 615,
+        "end": 618
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "公开StageII配置deterministic=False，若人为True则入口seed123；本地seed42/deterministic=True是重建控制，不可称作者相同seed轨迹。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "S2_BEST_LAST",
+    "field": "StageII best/last",
+    "paper_pointer": "p12 Fig9(c/d)确认CIFAR100IF100 best49.22、last49.04；文字称best在epoch6。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "train_stage2.py",
+        "line": 259,
+        "end": 288
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 480,
+        "end": 484
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 473,
+        "end": 479
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 533,
+        "end": 547
+      }
+    ],
+    "paper_vs_local_status": "PARTIAL",
+    "status": "PARTIAL",
+    "evidence_and_limit": "作者论文数字标签可核实；对应checkpoint未提供可核实SHA。本地只报告fixed epoch10，与论文last分别对比，不能用best挑配置。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "CIFAR_EVAL",
+    "field": "官方TEST与选择数据",
+    "paper_pointer": "p7 §4.1只给top1及CIFAR100来源；未给PI具体eval索引或checkpoint选择集文件。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "datasets/cifar100.py",
+        "line": 190,
+        "end": 213
+      },
+      {
+        "path": "train_stage1.py",
+        "line": 252,
+        "end": 261
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 163,
+        "end": 165
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 228,
+        "end": 242
+      }
+    ],
+    "paper_vs_local_status": "PARTIAL",
+    "status": "PARTIAL",
+    "evidence_and_limit": "公开H2T train=False官方TEST作每轮eval；本地三个固定终点的历史结果已存在。本轮只读报告/源文件，不读取CIFAR原始TEST或重算预测。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "GROUPS",
+    "field": "Many/Medium/Few定义",
+    "paper_pointer": "p7 §4.1把n>100、20<n<=100、n<=20用于large-scale datasets；未明确CIFAR分组索引。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+        "line": 15,
+        "end": 23
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 467,
+        "end": 470
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py",
+        "line": 91,
+        "end": 99
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "本地[0,36)/[36,71)/[71,100)来自公开原H2T配置；不能说论文明确给了同样CIFAR分组，也不能把大规模阈值静默套用。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "SOFTWARE",
+    "field": "作者软件/硬件数值配置",
+    "paper_pointer": "p7基本设置未给可复查完整torch/CUDA/GPU/backend版本；公开树未包含锁定依赖环境。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "utils/util.py",
+        "line": 15,
+        "end": 23
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 178,
+        "end": 202
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "本地保存了真实环境，但它不能反证作者环境；没有按准确率修改TF32或RNG。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  },
+  {
+    "id": "AUTHOR_CKPT",
+    "field": "作者PI模型来源与SHA",
+    "paper_pointer": "p10 Table6、p12 Fig9给论文指标，非文件身份。",
+    "paper_version": "arXiv:2506.00625v2, 2026-07-18; journal VoR equivalence UNVERIFIED",
+    "paper_url": "https://arxiv.org/pdf/2506.00625v2",
+    "author_public_refs": [
+      {
+        "path": "README.md",
+        "line": 92,
+        "end": 119
+      },
+      {
+        "path": "train_stage2.py",
+        "line": 184,
+        "end": 208
+      }
+    ],
+    "author_pi_implementation": "UNVERIFIED",
+    "local_refs": [
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 206,
+        "end": 215
+      },
+      {
+        "path": "H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py",
+        "line": 424,
+        "end": 443
+      }
+    ],
+    "paper_vs_local_status": "UNVERIFIED",
+    "status": "UNVERIFIED",
+    "evidence_and_limit": "README模型表标注原H2T的CE/通道替换结果，不能把Dropbox旧模型当PIF42.19/PI49.04 checkpoint。本地新checkpoint身份可核对，作者身份未证实。",
+    "allowed_next_step": "仅保留为独立重建假设；向作者核实，不进行参数组合试错。"
+  }
+]

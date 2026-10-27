@@ -1,0 +1,464 @@
+{
+  "url": "https://api.github.com/repos/Keke921/H2T/git/trees/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8?recursive=1",
+  "data": {
+    "sha": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8",
+    "url": "https://api.github.com/repos/Keke921/H2T/git/trees/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8",
+    "tree": [
+      {
+        "path": "LICENSE",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6a1569a16b7d4b81faf98fbecb2f714a1fee171e",
+        "size": 1082,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/6a1569a16b7d4b81faf98fbecb2f714a1fee171e"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "932449e911cf2d00d9ac50d48e349afa68337840",
+        "size": 7371,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/932449e911cf2d00d9ac50d48e349afa68337840"
+      },
+      {
+        "path": "config",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "36d74c390f89e4e66a5189504e4eb95198184d6c",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/36d74c390f89e4e66a5189504e4eb95198184d6c"
+      },
+      {
+        "path": "config/cifar100",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "5179d98868d9884288bee4d7670b5f7db7713d4d",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/5179d98868d9884288bee4d7670b5f7db7713d4d"
+      },
+      {
+        "path": "config/cifar100/cifar100_imb0005_stage1_ce_mixup.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a27aa31addaf41c0dacb163d071d1c6838275ba8",
+        "size": 650,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/a27aa31addaf41c0dacb163d071d1c6838275ba8"
+      },
+      {
+        "path": "config/cifar100/cifar100_imb0005_stage2_ce_H2T.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0c01fba8ed62a4d15097a5376856af4b90173750",
+        "size": 925,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/0c01fba8ed62a4d15097a5376856af4b90173750"
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6cdd05a61b08a614ce408bf20d6797f0008bf85d",
+        "size": 665,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/6cdd05a61b08a614ce408bf20d6797f0008bf85d"
+      },
+      {
+        "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7f0867f5d39aa7c0ddfd43167dd4163807fc461a",
+        "size": 925,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/7f0867f5d39aa7c0ddfd43167dd4163807fc461a"
+      },
+      {
+        "path": "config/cifar100/cifar100_imb002_stage1_ce_mixup.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "68b3a3d70c3ada8b44035ec5f687f5393b3e8ce2",
+        "size": 661,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/68b3a3d70c3ada8b44035ec5f687f5393b3e8ce2"
+      },
+      {
+        "path": "config/cifar100/cifar100_imb002_stage2_ce_H2T.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8a9055ca7ea3d30afd19ccf1e22f11186856a566",
+        "size": 923,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/8a9055ca7ea3d30afd19ccf1e22f11186856a566"
+      },
+      {
+        "path": "datasets",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "e37ca7acd2717ec41d05b985795a4ba1a7f87ca3",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/e37ca7acd2717ec41d05b985795a4ba1a7f87ca3"
+      },
+      {
+        "path": "datasets/cifar10.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2b66c5dd00f7af4350aabc2dfbdadfb14af8a920",
+        "size": 8180,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/2b66c5dd00f7af4350aabc2dfbdadfb14af8a920"
+      },
+      {
+        "path": "datasets/cifar100.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3fa26242db70f49949fff1742907bae40e9de581",
+        "size": 8354,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/3fa26242db70f49949fff1742907bae40e9de581"
+      },
+      {
+        "path": "datasets/data_txt",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "e36beb353084a80d99f0c77b8eca7a849d846260",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/e36beb353084a80d99f0c77b8eca7a849d846260"
+      },
+      {
+        "path": "datasets/data_txt/ImageNet_LT_test.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "76a2fb9749d6cd29e765cc4f8c270f2504131e2f",
+        "size": 2344500,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/76a2fb9749d6cd29e765cc4f8c270f2504131e2f"
+      },
+      {
+        "path": "datasets/data_txt/ImageNet_LT_train.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a063f095fcd475db4cf8b0658c4b73955535bbf9",
+        "size": 4658674,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/a063f095fcd475db4cf8b0658c4b73955535bbf9"
+      },
+      {
+        "path": "datasets/data_txt/Places_LT_test.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d43400ac9bc2275baa058456da40b20abb50b108",
+        "size": 1412500,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/d43400ac9bc2275baa058456da40b20abb50b108"
+      },
+      {
+        "path": "datasets/data_txt/Places_LT_train.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1d608b558c25c271da75c06f1e5e3625a4ebcb79",
+        "size": 2405174,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/1d608b558c25c271da75c06f1e5e3625a4ebcb79"
+      },
+      {
+        "path": "datasets/imagenet.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "73725040bcb736a09762a6f4c83bcd6f4e17a9a1",
+        "size": 7437,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/73725040bcb736a09762a6f4c83bcd6f4e17a9a1"
+      },
+      {
+        "path": "datasets/ina2018.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fda6a3ac44a4e05b0b50238d7bd0dd51f521d837",
+        "size": 7398,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/fda6a3ac44a4e05b0b50238d7bd0dd51f521d837"
+      },
+      {
+        "path": "datasets/places.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "670715e5ce746868e625aa2dc3f9ca596131840a",
+        "size": 6697,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/670715e5ce746868e625aa2dc3f9ca596131840a"
+      },
+      {
+        "path": "datasets/sampler.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3f35f4942671311dcf7b0e591bdfe0d1e8f68e7e",
+        "size": 4803,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/3f35f4942671311dcf7b0e591bdfe0d1e8f68e7e"
+      },
+      {
+        "path": "eval-modifed.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2b39a3532fed0c6db8f9446a12abd61c4b17b96e",
+        "size": 13537,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/2b39a3532fed0c6db8f9446a12abd61c4b17b96e"
+      },
+      {
+        "path": "loss.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7a249680fa1cd3f45c59445a7384b7cd2e2370d6",
+        "size": 14002,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/7a249680fa1cd3f45c59445a7384b7cd2e2370d6"
+      },
+      {
+        "path": "methods.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "63e4270f724484f672723a1d56940a072c01a111",
+        "size": 2261,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/63e4270f724484f672723a1d56940a072c01a111"
+      },
+      {
+        "path": "models",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "6c7dbf542af2f5ee0065a8b3553e35e8a2883ca8",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/6c7dbf542af2f5ee0065a8b3553e35e8a2883ca8"
+      },
+      {
+        "path": "models/resnet.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cdbfc9c7985213889081337de2d951d37cee79ac",
+        "size": 21202,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/cdbfc9c7985213889081337de2d951d37cee79ac"
+      },
+      {
+        "path": "models/resnet_cifar.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "df1507c76270ea01a6da57c442b1592dd02a4437",
+        "size": 7690,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/df1507c76270ea01a6da57c442b1592dd02a4437"
+      },
+      {
+        "path": "models/resnet_places.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9424324b5ef1b81c11e9ffb210ae2173b05d2d18",
+        "size": 22046,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/9424324b5ef1b81c11e9ffb210ae2173b05d2d18"
+      },
+      {
+        "path": "models/ride_model",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "431eeb6c1135aaf6c12aac997e90931b224240fe",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/431eeb6c1135aaf6c12aac997e90931b224240fe"
+      },
+      {
+        "path": "models/ride_model/fb_resnets",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "812bc4cbffd18af18e11f3e392b258a69342e51c",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/812bc4cbffd18af18e11f3e392b258a69342e51c"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/EAResNeXt.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a4afce67e06c8d82571747e3e49d203040db7a33",
+        "size": 12536,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/a4afce67e06c8d82571747e3e49d203040db7a33"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/EAResNet.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b481c7ffb9f252aa0d781b8e4487cd918ebc904d",
+        "size": 12376,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/b481c7ffb9f252aa0d781b8e4487cd918ebc904d"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/RIDEResNeXt.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6afe436b7ada4e05f0f5c7a767e9f5c7dea2d4d8",
+        "size": 8034,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/6afe436b7ada4e05f0f5c7a767e9f5c7dea2d4d8"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/RIDEResNet.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c8c44670f71d40a955d24e3b91514d7b969140d0",
+        "size": 8020,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/c8c44670f71d40a955d24e3b91514d7b969140d0"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/ResNeXt.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9218bd5644b59d76f2f48f0d069d51d3e5151814",
+        "size": 6401,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/9218bd5644b59d76f2f48f0d069d51d3e5151814"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/ResNet.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b94229b6e4e7f4893aa2dcba055be425f76935c5",
+        "size": 8924,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/b94229b6e4e7f4893aa2dcba055be425f76935c5"
+      },
+      {
+        "path": "models/ride_model/fb_resnets/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size": 0,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      {
+        "path": "models/ride_model/ldam_drw_resnets",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9aa592d40efad858a1d3b64fac035ae6d93ec27a",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/9aa592d40efad858a1d3b64fac035ae6d93ec27a"
+      },
+      {
+        "path": "models/ride_model/ldam_drw_resnets/ride_resnet.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fd13cd6d9ffd302dbc0600a89e5e359d04e97cb9",
+        "size": 12792,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/fd13cd6d9ffd302dbc0600a89e5e359d04e97cb9"
+      },
+      {
+        "path": "models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "72299a102821e22b48be9ef09fc3dfe0a28dc296",
+        "size": 11126,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/72299a102821e22b48be9ef09fc3dfe0a28dc296"
+      },
+      {
+        "path": "models/ride_model/ldam_drw_resnets/ride_resnet_places.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "812b9368f5900b48aef85caeac5f3168de06a6a0",
+        "size": 11899,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/812b9368f5900b48aef85caeac5f3168de06a6a0"
+      },
+      {
+        "path": "models/ride_model/loss.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ca5ecd70ff28dc2ff15045ebe2918ab558a42569",
+        "size": 12086,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/ca5ecd70ff28dc2ff15045ebe2918ab558a42569"
+      },
+      {
+        "path": "models/ride_model/metric.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "20bea4a28a76bde7d1721427e6f70b6d2d79dded",
+        "size": 776,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/20bea4a28a76bde7d1721427e6f70b6d2d79dded"
+      },
+      {
+        "path": "models/ride_model/model.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "edd12239eec52a05c97763fce80e6b6404c5850a",
+        "size": 9617,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/edd12239eec52a05c97763fce80e6b6404c5850a"
+      },
+      {
+        "path": "slides and poster",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "23a0f11b31bb999ae7fd38ab9465d2edc62ca469",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/23a0f11b31bb999ae7fd38ab9465d2edc62ca469"
+      },
+      {
+        "path": "slides and poster/AAAI24-H2T-slides_422.pdf",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "dfa298512f393b075b1c6cd66a8e63d633c438f5",
+        "size": 2124267,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/dfa298512f393b075b1c6cd66a8e63d633c438f5"
+      },
+      {
+        "path": "slides and poster/AAAI24-H2T-slides_422.pptx",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "77a056b1b9dfbadee60ec34dc45fda3ca8928659",
+        "size": 5733131,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/77a056b1b9dfbadee60ec34dc45fda3ca8928659"
+      },
+      {
+        "path": "slides and poster/AAAI24_H2T-poster_422.pdf",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4f589646c40c1458f8c8133756ca1dd9099bb94c",
+        "size": 4637140,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/4f589646c40c1458f8c8133756ca1dd9099bb94c"
+      },
+      {
+        "path": "train_stage1.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "48963979b7e414d0a9d89576df163a6a7ccf8f21",
+        "size": 19580,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/48963979b7e414d0a9d89576df163a6a7ccf8f21"
+      },
+      {
+        "path": "train_stage2.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ffb9bdbd5dd80a950fcc9327ba505c25db8f566e",
+        "size": 21091,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/ffb9bdbd5dd80a950fcc9327ba505c25db8f566e"
+      },
+      {
+        "path": "utils",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "8ed34266d88380b80a2d6a9bb853ffc62b847111",
+        "url": "https://api.github.com/repos/Keke921/H2T/git/trees/8ed34266d88380b80a2d6a9bb853ffc62b847111"
+      },
+      {
+        "path": "utils/Unzip.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "64144ced7b1c90d048a0ee4fd7e904173519223b",
+        "size": 1878,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/64144ced7b1c90d048a0ee4fd7e904173519223b"
+      },
+      {
+        "path": "utils/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3c39b00bcd0b6d9b9f382a5590a3cd22338ab179",
+        "size": 359,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/3c39b00bcd0b6d9b9f382a5590a3cd22338ab179"
+      },
+      {
+        "path": "utils/logger.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "da7d5b318de9f0a84bb75e646b6c8c69b8a3bf11",
+        "size": 3229,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/da7d5b318de9f0a84bb75e646b6c8c69b8a3bf11"
+      },
+      {
+        "path": "utils/meter.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "03454b4d977ef6cc2baecfd905bc5c67ad904bc1",
+        "size": 1208,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/03454b4d977ef6cc2baecfd905bc5c67ad904bc1"
+      },
+      {
+        "path": "utils/metric.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "45a152fecf874dd21b5ea357863dcfb066d2662a",
+        "size": 3141,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/45a152fecf874dd21b5ea357863dcfb066d2662a"
+      },
+      {
+        "path": "utils/util.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "75acc01457131fff6fb3dbcac693d5e01557f601",
+        "size": 1075,
+        "url": "https://api.github.com/repos/Keke921/H2T/git/blobs/75acc01457131fff6fb3dbcac693d5e01557f601"
+      }
+    ],
+    "truncated": false
+  }
+}

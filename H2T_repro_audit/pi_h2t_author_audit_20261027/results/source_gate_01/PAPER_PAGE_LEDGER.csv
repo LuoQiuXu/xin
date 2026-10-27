@@ -1,0 +1,18 @@
+﻿physical_PDF_page,full_page_text_read,visual_render_reviewed,role,version,PDF_SHA256
+1,True,False,title/authors/source-code URL; v2 identifier,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+2,True,False,extension from AAAI H2T; PIF/H2TF roles,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+3,True,False,related work; no author protocol resolution,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+4,True,True,Table1; Eq1-6; mean/residual,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+5,True,True,Eq7-9; footnotes1/2; Conv1d size/bias,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+6,True,False,Fig3; Remark1 Eq10-14; parameters frozen vs buffers unspecified,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+7,True,True,Sec4.1/4.2 dataset/CNN settings/large-scale group definition,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+8,True,False,Table2 CIFAR100 and Table3,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+9,True,False,Tables4/5; auxiliary analyses,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+10,True,True,"Table6/8 PIF StageI42.19, StageII49.22",2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+11,True,False,Table9 is CIFAR10; qualitative ratio limits,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+12,True,True,Fig9(c/d) best49.22/last49.04; Fig10; Table10+2 params,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+13,True,False,conclusion; ECE/interaction limitations; references,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+14,True,False,references including AAAI2024,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+15,True,False,references/biographies; no training code,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+16,True,True,AppendicesA-D; Algorithm1 line5 ambiguity; pooling order,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8
+17,True,False,AppendicesD/E; visualizations and balanced-data table,2506.00625v2,b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8

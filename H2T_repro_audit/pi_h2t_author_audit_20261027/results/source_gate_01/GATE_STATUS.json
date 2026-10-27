@@ -1,0 +1,13 @@
+{
+  "local_anchors_verified": 11,
+  "exact_author_pi_reproduction_cleared": false,
+  "author_code_directly_verified_by_script": false,
+  "training_allowed": false,
+  "next_action": "PRIMARY_AUTHOR_SOURCE_AND_PAPER_MANUAL_REVIEW",
+  "manifest_sha256": "9b295e5361ca418dcaaf8d7fa87f5a36178bb4a7083d455c9d69f2bdddf96ef5",
+  "evidence_sources_sha256": {
+    "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_PAPER_CODE_PARITY.md": "daf4eaae2d4c8ebd78d8e15d5839c645aa08965f2b22831a6b8830cf9ffda1c1",
+    "H2T_repro_audit/pi_h2t_strict_20261027/PARITY_LOCK.md": "a44e7a04cf13e0b12cffdf66e3c603292381c1d5e35a313997aa9cf0aaeef31c",
+    "H2T_official_clean/H2T-main/README.md": "d124d644cf8231eac50ac9c442a82f815d75881bdf3f2599df74a5e4ee94affc"
+  }
+}

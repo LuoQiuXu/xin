@@ -1,0 +1,240 @@
+{
+  "decision": "BLOCKED_NEEDS_AUTHOR_CONFIRMATION",
+  "run_directory": "H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01",
+  "audit_completed": true,
+  "GPU_training": false,
+  "matrix_rows": 36,
+  "unit_tests_passed": 9,
+  "local_anchors": 11,
+  "public_text_files_verified": 41,
+  "public_Python_AST_files": 33,
+  "paper_version": "2506.00625v2",
+  "journal_VoR_equivalence": "UNVERIFIED",
+  "artifacts": [
+    {
+      "path": ".gitignore",
+      "bytes": 15,
+      "sha256": "3577526efcfd9794f1272e109e80b60de3cca2eee79f63bb8d54bb8452d33353",
+      "publish": true
+    },
+    {
+      "path": "AUDIT_SOURCE_HASHES.json",
+      "bytes": 477,
+      "sha256": "e49a10cbec3669b1e4d2a1283495391d3fa37373281f2f326825dad16dc74696",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_CLARIFICATION_DRAFT.md",
+      "bytes": 1554,
+      "sha256": "af6b4efb5f008571786b08f3faf9da8c217997b1bd0ff28fa2c4e310d494ab05",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_COMMIT_HISTORY.json",
+      "bytes": 30507,
+      "sha256": "b8837cdb6cb0ce3cc1f4df35615cf3a79745932b9ceb70bb79b921ab0f935c13",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_REPO_INVENTORY.csv",
+      "bytes": 15859,
+      "sha256": "637ad37d029eaa350c958105beafc85aa07cbabf2d863730743c11f5ba3ac4ca",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_REPO_INVENTORY.md",
+      "bytes": 7116,
+      "sha256": "f446af66965d4621b9af91528b45171e8709c8fdd1b3522413267a49b223ffd6",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_REPOSITORY_SEARCH.json",
+      "bytes": 3674,
+      "sha256": "0ae770b5ba3255c82cd131195a257698eb5133045cc71f0c1a4f9166d08bbdb0",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_SOURCE_GATE.md",
+      "bytes": 3082,
+      "sha256": "99eae722255da5f444f3a2945b6d4c14cfc02948791f11d592ff14094d2453bb",
+      "publish": true
+    },
+    {
+      "path": "AUTHOR_TREE.json",
+      "bytes": 17812,
+      "sha256": "1cd221fa0d9f01d6562429096b1ca9e6fb68e05a654f854e56a8693a38493b12",
+      "publish": true
+    },
+    {
+      "path": "CHECK_RESULTS.json",
+      "bytes": 21729,
+      "sha256": "8e7cab109538672b52cd3731be4a5d6331f50dade80a2b09a1c70e297e7b3e65",
+      "publish": true
+    },
+    {
+      "path": "EXECUTION_REPORT.md",
+      "bytes": 5277,
+      "sha256": "d894667cab3698662fa5ae4914b41440c7f5d86837010bd8933dcdea7054195c",
+      "publish": true
+    },
+    {
+      "path": "GATE_STATUS.json",
+      "bytes": 776,
+      "sha256": "b462293744b1d89f91c02924165a27b7ac954a77e72adee275ab8a8bc2d723e2",
+      "publish": true
+    },
+    {
+      "path": "HISTORICAL_PROTECTION_AFTER.json",
+      "bytes": 1599,
+      "sha256": "139096260d70de24918207c28c3f2429fc34705fa4308db26cde7670e3221d53",
+      "publish": true
+    },
+    {
+      "path": "HISTORICAL_PROTECTION_BEFORE.json",
+      "bytes": 1788,
+      "sha256": "4b40ece7566aa65d289612f0557cb602dd4ade0dfa9b212899fccd38bafebfac",
+      "publish": true
+    },
+    {
+      "path": "LOCAL_ANCHORS.csv",
+      "bytes": 3947,
+      "sha256": "a5940d0beadb9e72b6c0a6e324d4d850a046aacdb1edd5a579e0f492705f2338",
+      "publish": true
+    },
+    {
+      "path": "PAPER_PAGE_LEDGER.csv",
+      "bytes": 2407,
+      "sha256": "f81c433b81c3ca13dcdfa6b0103adb3ec5e05eaa57a632b50acce4353b60962a",
+      "publish": true
+    },
+    {
+      "path": "PAPER_VERSION_AND_SUPPLEMENT_AUDIT.md",
+      "bytes": 3731,
+      "sha256": "848673460bce6b20c5a81e17e9bb5ecf0c4cb79fe6518ba52c79e2f4c468133c",
+      "publish": true
+    },
+    {
+      "path": "PI_PAPER_PROTOCOL_MATRIX.csv",
+      "bytes": 35643,
+      "sha256": "f5d9706d36327450e0d5656a8c228b395798f27089cd036fcb81a28cf19fac9f",
+      "publish": true
+    },
+    {
+      "path": "PI_PAPER_PROTOCOL_MATRIX.md",
+      "bytes": 37518,
+      "sha256": "8060c5b975bc02ee4aa6c84883e688b456bf26d5040c07c989b49ff72ec58147",
+      "publish": true
+    },
+    {
+      "path": "PRIMARY_ACCESS_RECEIPTS.json",
+      "bytes": 6545,
+      "sha256": "f244a85af459a3a0c2677c8bec100f5ef42a8b6a00d64b1a3ea73fce9f5871a5",
+      "publish": true
+    },
+    {
+      "path": "primary_cache/arxiv_v2_page_10.png",
+      "bytes": 468502,
+      "sha256": "9409ab62674274f6928dd2ee2bfd908b643f3cb7c31b265ca0c1fced70e9d01f",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_page_12.png",
+      "bytes": 326866,
+      "sha256": "147b29598015a5ff28bd73df6f01eced9f82d93b8db4bd30ad3d88b2743d8606",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_page_16.png",
+      "bytes": 443849,
+      "sha256": "25baeb4b0d44cd589d24dadbf59707adda8d074abe236dd3859561f4d9bd509c",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_page_4.png",
+      "bytes": 425073,
+      "sha256": "ddb77c81ad78812287456b1c7938c27c27ec0a4d0f2240f582c06cb2213d2930",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_page_5.png",
+      "bytes": 484162,
+      "sha256": "9dbd69f0d69f0616e0dc9b19ca925bf97e877df44ab9d57adcf909782e262916",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_page_7.png",
+      "bytes": 507128,
+      "sha256": "9d2ea753579f4653c0b86d500557f85b9af4383fd9c8cbf2d3a7e3ce491b0d2f",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_source.tgz",
+      "bytes": 13139106,
+      "sha256": "13e7667687020a5e54c03dbb0994cd53c4a5edcd7c515ea28b88ab7c22780eff",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/arxiv_v2_tex_sources.json",
+      "bytes": 129598,
+      "sha256": "ecc474d1f22b97ab6c75738443c62d7d1431db229f73989b739ec6fc0a068184",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/author_files.json",
+      "bytes": 321644,
+      "sha256": "01d855a4b40524bb38c7d27f779880b3b95615f46f476e94aaad46a7fdb8c5ed",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/crossref.json",
+      "bytes": 13581,
+      "sha256": "d4971420834fe6fde80f572e38a1683f34a3f91d734f8c1e973dea0ae22b8292",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/generate_reports.py",
+      "bytes": 34227,
+      "sha256": "c40da7474a3d4f3e285e8d4885a9fe7dbf11786edc1044f08e1f085d82a5b069",
+      "publish": false
+    },
+    {
+      "path": "primary_cache/journal_page.html",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "publish": false
+    },
+    {
+      "path": "PROTOCOL_MATRIX_DATA.json",
+      "bytes": 41245,
+      "sha256": "97c96f9ceba451842999e2b281109c21e219dcb2baef9144a3aba1770343a56a",
+      "publish": true
+    },
+    {
+      "path": "PUBLIC_SOURCE_STATIC_AUDIT.json",
+      "bytes": 48000,
+      "sha256": "df7eb1633f91334c9f470dec93cf2509ef800cb054407d57b6f4ae943299616a",
+      "publish": true
+    },
+    {
+      "path": "REMOTE_REFS.json",
+      "bytes": 946,
+      "sha256": "bfbd747baf0751c75b52cbbdd24df1851288224043009b323abecd4cca6e8f0a",
+      "publish": true
+    },
+    {
+      "path": "STRICT_REPRODUCTION_DECISION.json",
+      "bytes": 2111,
+      "sha256": "97383793f34f74f2503871d232ef5525910637fde4194d7e7b4c2a3590e74e17",
+      "publish": true
+    },
+    {
+      "path": "STRICT_REPRODUCTION_DECISION.md",
+      "bytes": 3574,
+      "sha256": "2f1b7a77d1aea86008205ff38bf74589d08b117205af68169636c3c4af257a2b",
+      "publish": true
+    }
+  ],
+  "self_hash_excluded": true,
+  "raw_hash_policy": "Local raw bytes; Git-normalized text blobs may differ in CRLF/LF",
+  "no_historical_code_or_data_changes": true
+}

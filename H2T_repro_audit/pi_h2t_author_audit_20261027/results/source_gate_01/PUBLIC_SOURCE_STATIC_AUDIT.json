@@ -1,0 +1,1605 @@
+{
+  "repo": "Keke921/H2T",
+  "commit": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8",
+  "source_file_count": 41,
+  "all_fetched_text_Git_blob_SHA1_verified": true,
+  "python_files_AST_checked": 33,
+  "files": [
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/LICENSE",
+      "git_blob_sha1": "6a1569a16b7d4b81faf98fbecb2f714a1fee171e",
+      "raw_utf8_sha256": "2a809a37a863df094b94d2ff0041ae66dad593e811ded4249a40cb20f5fa7385",
+      "bytes": 1082,
+      "line_count": 21,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/README.md",
+      "git_blob_sha1": "932449e911cf2d00d9ac50d48e349afa68337840",
+      "raw_utf8_sha256": "d124d644cf8231eac50ac9c442a82f815d75881bdf3f2599df74a5e4ee94affc",
+      "bytes": 7371,
+      "line_count": 128,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "config/cifar100/cifar100_imb0005_stage1_ce_mixup.yaml",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/config/cifar100/cifar100_imb0005_stage1_ce_mixup.yaml",
+      "git_blob_sha1": "a27aa31addaf41c0dacb163d071d1c6838275ba8",
+      "raw_utf8_sha256": "329fe8a20242809b3d3e9f5926676e50196abcabcbb6746f5ba06312823b3d99",
+      "bytes": 650,
+      "line_count": 49,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "config/cifar100/cifar100_imb0005_stage2_ce_H2T.yaml",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/config/cifar100/cifar100_imb0005_stage2_ce_H2T.yaml",
+      "git_blob_sha1": "0c01fba8ed62a4d15097a5376856af4b90173750",
+      "raw_utf8_sha256": "6d00580f466e176e2313b4d1639867bca8ea2b0c42e7540eac8d4a0ee3350611",
+      "bytes": 925,
+      "line_count": 59,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml",
+      "git_blob_sha1": "6cdd05a61b08a614ce408bf20d6797f0008bf85d",
+      "raw_utf8_sha256": "96b8b504a44c194ba3c06a70e4691f71c73e3192af084674ad50b329c0fe7c5b",
+      "bytes": 665,
+      "line_count": 49,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml",
+      "git_blob_sha1": "7f0867f5d39aa7c0ddfd43167dd4163807fc461a",
+      "raw_utf8_sha256": "e5fcac39017036a7ad4f58d420460eebb0c5faa70cce1fcf02eddb4bfd9794c5",
+      "bytes": 925,
+      "line_count": 60,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "config/cifar100/cifar100_imb002_stage1_ce_mixup.yaml",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/config/cifar100/cifar100_imb002_stage1_ce_mixup.yaml",
+      "git_blob_sha1": "68b3a3d70c3ada8b44035ec5f687f5393b3e8ce2",
+      "raw_utf8_sha256": "d36929b7501108b3d8064fd0b8a675fb1df67c588eee32173fcaca64392de8af",
+      "bytes": 661,
+      "line_count": 50,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "config/cifar100/cifar100_imb002_stage2_ce_H2T.yaml",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/config/cifar100/cifar100_imb002_stage2_ce_H2T.yaml",
+      "git_blob_sha1": "8a9055ca7ea3d30afd19ccf1e22f11186856a566",
+      "raw_utf8_sha256": "c4ddba74e00d6f0139b96436c2604ea4690b0b13961485a33fa3a7cdb934bce0",
+      "bytes": 923,
+      "line_count": 59,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true
+    },
+    {
+      "path": "datasets/cifar10.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/datasets/cifar10.py",
+      "git_blob_sha1": "2b66c5dd00f7af4350aabc2dfbdadfb14af8a920",
+      "raw_utf8_sha256": "74d06a6548723c91021d44f97c740a1d16801555d0e945fc5c812ba64b96b9dc",
+      "bytes": 8180,
+      "line_count": 207,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "IMBALANCECIFAR10",
+          "line": 12
+        },
+        {
+          "kind": "ClassDef",
+          "name": "CIFAR10_LT",
+          "line": 165
+        }
+      ]
+    },
+    {
+      "path": "datasets/cifar100.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/datasets/cifar100.py",
+      "git_blob_sha1": "3fa26242db70f49949fff1742907bae40e9de581",
+      "raw_utf8_sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+      "bytes": 8354,
+      "line_count": 213,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "IMBALANCECIFAR100",
+          "line": 11
+        },
+        {
+          "kind": "ClassDef",
+          "name": "CIFAR100_LT",
+          "line": 171
+        }
+      ]
+    },
+    {
+      "path": "datasets/imagenet.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/datasets/imagenet.py",
+      "git_blob_sha1": "73725040bcb736a09762a6f4c83bcd6f4e17a9a1",
+      "raw_utf8_sha256": "38dd579a1d7da90ee22053329461bd20b4cbe1289b9b6baa08b9fcb789beae5d",
+      "bytes": 7437,
+      "line_count": 192,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "LT_Dataset",
+          "line": 14
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LT_Dataset_Eval",
+          "line": 118
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ImageNet_LT",
+          "line": 147
+        }
+      ]
+    },
+    {
+      "path": "datasets/ina2018.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/datasets/ina2018.py",
+      "git_blob_sha1": "fda6a3ac44a4e05b0b50238d7bd0dd51f521d837",
+      "raw_utf8_sha256": "3ad6e8f15d2d5bcb125478986ae8086198275a1971912c742876f96bf1e7a67b",
+      "bytes": 7398,
+      "line_count": 190,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "LT_Dataset",
+          "line": 14
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LT_Dataset_Eval",
+          "line": 117
+        },
+        {
+          "kind": "ClassDef",
+          "name": "iNa2018",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "path": "datasets/places.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/datasets/places.py",
+      "git_blob_sha1": "670715e5ce746868e625aa2dc3f9ca596131840a",
+      "raw_utf8_sha256": "f64b7e35ae78d6bd64da6d33f4dc9674926ca6d54e97f6b02329d01e73ff548b",
+      "bytes": 6697,
+      "line_count": 171,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "LT_Dataset",
+          "line": 14
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LT_Dataset_Eval",
+          "line": 97
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Places_LT",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "path": "datasets/sampler.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/datasets/sampler.py",
+      "git_blob_sha1": "3f35f4942671311dcf7b0e591bdfe0d1e8f68e7e",
+      "raw_utf8_sha256": "b5acc56eee2a6f622944d65320315beb1385a5278cf81867744b9ee66b999908",
+      "bytes": 4803,
+      "line_count": 150,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "BalancedDatasetSampler",
+          "line": 6
+        },
+        {
+          "kind": "ClassDef",
+          "name": "EffectNumSampler",
+          "line": 47
+        },
+        {
+          "kind": "ClassDef",
+          "name": "RandomCycleIter",
+          "line": 89
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "class_aware_sample_generator",
+          "line": 110
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ClassAwareSampler",
+          "line": 130
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "get_sampler",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "path": "eval-modifed.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/eval-modifed.py",
+      "git_blob_sha1": "2b39a3532fed0c6db8f9446a12abd61c4b17b96e",
+      "raw_utf8_sha256": "ad20eee715ca39bc5b243f93a9426422752fe6c57f5155a8f2edd47f172a70ff",
+      "bytes": 13537,
+      "line_count": 318,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "parse_args",
+          "line": 36
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "main",
+          "line": 57
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "main_worker",
+          "line": 96
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "validate",
+          "line": 236
+        }
+      ]
+    },
+    {
+      "path": "loss.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/loss.py",
+      "git_blob_sha1": "7a249680fa1cd3f45c59445a7384b7cd2e2370d6",
+      "raw_utf8_sha256": "01f6dd3eec61f63927a1a9a7d89bdfbe92fb7ed0a3c3c406e108ea6d8f099a07",
+      "bytes": 14002,
+      "line_count": 312,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "CrossEntropyLoss",
+          "line": 8
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LabelAwareSmoothing",
+          "line": 33
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LDAMLoss",
+          "line": 69
+        },
+        {
+          "kind": "ClassDef",
+          "name": "RIDELoss",
+          "line": 137
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResLoss",
+          "line": 265
+        }
+      ]
+    },
+    {
+      "path": "methods.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/methods.py",
+      "git_blob_sha1": "63e4270f724484f672723a1d56940a072c01a111",
+      "raw_utf8_sha256": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "bytes": 2261,
+      "line_count": 76,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "mixup_data",
+          "line": 8
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "mixup_criterion",
+          "line": 27
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "H2T",
+          "line": 31
+        },
+        {
+          "kind": "ClassDef",
+          "name": "H2Tv2",
+          "line": 50
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LearnableWeightScaling",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "path": "models/resnet.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/resnet.py",
+      "git_blob_sha1": "cdbfc9c7985213889081337de2d951d37cee79ac",
+      "raw_utf8_sha256": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+      "bytes": 21202,
+      "line_count": 531,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 30
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "conv1x1",
+          "line": 36
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 41
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 81
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 124
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet_FE",
+          "line": 218
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Classifier",
+          "line": 312
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "_resnet",
+          "line": 326
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "_resnet_fe",
+          "line": 334
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet10",
+          "line": 344
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet10_fe",
+          "line": 356
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet18",
+          "line": 369
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet34",
+          "line": 381
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet50",
+          "line": 393
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet50_fe",
+          "line": 404
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet101",
+          "line": 416
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet101_fe",
+          "line": 428
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet152",
+          "line": 439
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet152_fe",
+          "line": 451
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnext50_32x4d",
+          "line": 464
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnext101_32x8d",
+          "line": 478
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnext152_32x4d",
+          "line": 491
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "wide_resnet50_2",
+          "line": 498
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "wide_resnet101_2",
+          "line": 516
+        }
+      ]
+    },
+    {
+      "path": "models/resnet_cifar.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/resnet_cifar.py",
+      "git_blob_sha1": "df1507c76270ea01a6da57c442b1592dd02a4437",
+      "raw_utf8_sha256": "ca29696631c24e91eda8d63b522a15345eb7a79d3d584f85f6876dd309ba8f5c",
+      "bytes": 7690,
+      "line_count": 224,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": false,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "_weights_init",
+          "line": 32
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 37
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LambdaLayer",
+          "line": 48
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 58
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet_s",
+          "line": 90
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet_fe",
+          "line": 126
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Classifier",
+          "line": 170
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet20",
+          "line": 183
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet32_fe",
+          "line": 186
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet32",
+          "line": 189
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet44",
+          "line": 193
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet56",
+          "line": 197
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet110",
+          "line": 201
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet1202",
+          "line": 205
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "test",
+          "line": 209
+        }
+      ]
+    },
+    {
+      "path": "models/resnet_places.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/resnet_places.py",
+      "git_blob_sha1": "9424324b5ef1b81c11e9ffb210ae2173b05d2d18",
+      "raw_utf8_sha256": "712eb3ba5ce4bd317f23d774ab6ec72faf46c50f3b7fcbbad6dbe70970a3f2f6",
+      "bytes": 22046,
+      "line_count": 553,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 30
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "conv1x1",
+          "line": 36
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 41
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 81
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 124
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet_FE",
+          "line": 218
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Classifier",
+          "line": 311
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "_resnet",
+          "line": 326
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "_resnet_fe",
+          "line": 334
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet10",
+          "line": 363
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet10_fe",
+          "line": 375
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet18",
+          "line": 388
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet34",
+          "line": 400
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet50",
+          "line": 412
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet50_fe",
+          "line": 423
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet101",
+          "line": 435
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet101_fe",
+          "line": 447
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet152",
+          "line": 458
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet152_fe",
+          "line": 470
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnext50_32x4d",
+          "line": 486
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnext101_32x8d",
+          "line": 500
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnext152_32x4d",
+          "line": 513
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "wide_resnet50_2",
+          "line": 520
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "wide_resnet101_2",
+          "line": 538
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/EAResNeXt.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/EAResNeXt.py",
+      "git_blob_sha1": "a4afce67e06c8d82571747e3e49d203040db7a33",
+      "raw_utf8_sha256": "af2a8e4611e87ca4cc139c8fa6c5c139d0a1ab2c01fad333f93d5a83fc7115b3",
+      "bytes": 12536,
+      "line_count": 312,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 21
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 26
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 37
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 68
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNext",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/EAResNet.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/EAResNet.py",
+      "git_blob_sha1": "b481c7ffb9f252aa0d781b8e4487cd918ebc904d",
+      "raw_utf8_sha256": "4666e23b6771933cb317dc510151a1642e425a2e7d6ead494ec08f3ced399d48",
+      "bytes": 12376,
+      "line_count": 310,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 21
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 26
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 37
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 68
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/RIDEResNeXt.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/RIDEResNeXt.py",
+      "git_blob_sha1": "6afe436b7ada4e05f0f5c7a767e9f5c7dea2d4d8",
+      "raw_utf8_sha256": "65bd50df409d992e11dd6f0508e9b847b4aee32d09afdf6b0845084f2b1fba1e",
+      "bytes": 8034,
+      "line_count": 238,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 16
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 21
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 32
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 63
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNext",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/RIDEResNet.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/RIDEResNet.py",
+      "git_blob_sha1": "c8c44670f71d40a955d24e3b91514d7b969140d0",
+      "raw_utf8_sha256": "548e48e0773b3a2fa4f78f6d8d9f8e3f268abdc6750365938bbd9672d08c060b",
+      "bytes": 8020,
+      "line_count": 243,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 23
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 28
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 39
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 70
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/ResNeXt.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/ResNeXt.py",
+      "git_blob_sha1": "9218bd5644b59d76f2f48f0d069d51d3e5151814",
+      "raw_utf8_sha256": "d80edad478136c5771b0a7f4cb32864e09692d05cb09d9ba4bd906a7cf607807",
+      "bytes": 6401,
+      "line_count": 195,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 15
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 20
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 51
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNext",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/ResNet.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/ResNet.py",
+      "git_blob_sha1": "b94229b6e4e7f4893aa2dcba055be425f76935c5",
+      "raw_utf8_sha256": "6345f25ee6e5f9bc9eb42b7323220b5ce91774229493bac9f2f295a2f5d166dc",
+      "bytes": 8924,
+      "line_count": 251,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 24
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 30
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 41
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 72
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/fb_resnets/__init__.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/fb_resnets/__init__.py",
+      "git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "raw_utf8_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "line_count": 0,
+      "retrieval_scope": "empty_file_verified_from_Git_tree_size_and_empty_blob_SHA1",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": []
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/ldam_drw_resnets/ride_resnet.py",
+      "git_blob_sha1": "fd13cd6d9ffd302dbc0600a89e5e359d04e97cb9",
+      "raw_utf8_sha256": "511a1d171a6ef51bc093dd5d269b3f6ce3eb358443ff0fbfd2a860db59328ff4",
+      "bytes": 12792,
+      "line_count": 359,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 33
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "conv1x1",
+          "line": 39
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 44
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 57
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 96
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 134
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Classifier",
+          "line": 259
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResClassifier",
+          "line": 285
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "_resnet",
+          "line": 343
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet50",
+          "line": 350
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/ldam_drw_resnets/ride_resnet_cifar.py",
+      "git_blob_sha1": "72299a102821e22b48be9ef09fc3dfe0a28dc296",
+      "raw_utf8_sha256": "3f11e7e6ae0dccfe6f39805f0f528d5ab32a80a59328a32d6d22a546985887e6",
+      "bytes": 11126,
+      "line_count": 300,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "_weights_init",
+          "line": 37
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 42
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LambdaLayer",
+          "line": 53
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 63
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet_s",
+          "line": 99
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Classifier",
+          "line": 200
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResClassifier",
+          "line": 226
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet20",
+          "line": 261
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet32",
+          "line": 265
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet44",
+          "line": 269
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet56",
+          "line": 273
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet110",
+          "line": 277
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet1202",
+          "line": 281
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "test",
+          "line": 285
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/ldam_drw_resnets/ride_resnet_places.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/ldam_drw_resnets/ride_resnet_places.py",
+      "git_blob_sha1": "812b9368f5900b48aef85caeac5f3168de06a6a0",
+      "raw_utf8_sha256": "26b483f18d4c3b73db54b88b467325847a997fce8cac999ee0be42b1c2ce69d3",
+      "bytes": 11899,
+      "line_count": 316,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "conv3x3",
+          "line": 44
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "conv1x1",
+          "line": 50
+        },
+        {
+          "kind": "ClassDef",
+          "name": "NormedLinear",
+          "line": 54
+        },
+        {
+          "kind": "ClassDef",
+          "name": "BasicBlock",
+          "line": 65
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Bottleneck",
+          "line": 97
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet",
+          "line": 140
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Block",
+          "line": 230
+        },
+        {
+          "kind": "ClassDef",
+          "name": "Classifier",
+          "line": 247
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "_resnet",
+          "line": 278
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "resnet152",
+          "line": 304
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/loss.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/loss.py",
+      "git_blob_sha1": "ca5ecd70ff28dc2ff15045ebe2918ab558a42569",
+      "raw_utf8_sha256": "b6b320c0d9b2ec9c9a65a013338eddf0d12cd5c30916fb417517e36af373eab5",
+      "bytes": 12086,
+      "line_count": 284,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "focal_loss",
+          "line": 16
+        },
+        {
+          "kind": "ClassDef",
+          "name": "FocalLoss",
+          "line": 22
+        },
+        {
+          "kind": "ClassDef",
+          "name": "CrossEntropyLoss",
+          "line": 35
+        },
+        {
+          "kind": "ClassDef",
+          "name": "LDAMLoss",
+          "line": 58
+        },
+        {
+          "kind": "ClassDef",
+          "name": "RIDELoss",
+          "line": 124
+        },
+        {
+          "kind": "ClassDef",
+          "name": "RIDELossWithDistill",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/metric.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/metric.py",
+      "git_blob_sha1": "20bea4a28a76bde7d1721427e6f70b6d2d79dded",
+      "raw_utf8_sha256": "e0c729b40b20bc610245bf57b4ae583d124332c5f56d2be5f791a208c4a7fbf0",
+      "bytes": 776,
+      "line_count": 24,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "accuracy",
+          "line": 3
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "top_k_acc",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "models/ride_model/model.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/models/ride_model/model.py",
+      "git_blob_sha1": "edd12239eec52a05c97763fce80e6b6404c5850a",
+      "raw_utf8_sha256": "b7930fadfb702895eec562e3e9d1896bab51f6635cbb157280cc125fb639f29b",
+      "bytes": 9617,
+      "line_count": 134,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "Model",
+          "line": 15
+        },
+        {
+          "kind": "ClassDef",
+          "name": "EAModel",
+          "line": 32
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet10Model",
+          "line": 52
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet10EAModel",
+          "line": 60
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet32Model",
+          "line": 65
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet32EAModel",
+          "line": 73
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet50Model",
+          "line": 78
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet50EAModel",
+          "line": 86
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNeXt50EAModel",
+          "line": 92
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNeXt50Model",
+          "line": 98
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet101Model",
+          "line": 106
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet152Model",
+          "line": 114
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNet152EAModel",
+          "line": 122
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ResNeXt152Model",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "path": "train_stage1.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/train_stage1.py",
+      "git_blob_sha1": "48963979b7e414d0a9d89576df163a6a7ccf8f21",
+      "raw_utf8_sha256": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+      "bytes": 19580,
+      "line_count": 479,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "parse_args",
+          "line": 41
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "main",
+          "line": 63
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "main_worker",
+          "line": 95
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "train",
+          "line": 285
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "validate",
+          "line": 373
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "save_checkpoint",
+          "line": 450
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "adjust_learning_rate",
+          "line": 457
+        }
+      ]
+    },
+    {
+      "path": "train_stage2.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/train_stage2.py",
+      "git_blob_sha1": "ffb9bdbd5dd80a950fcc9327ba505c25db8f566e",
+      "raw_utf8_sha256": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+      "bytes": 21091,
+      "line_count": 501,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "parse_args",
+          "line": 44
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "main",
+          "line": 65
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "main_worker",
+          "line": 97
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "train",
+          "line": 291
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "validate",
+          "line": 401
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "save_checkpoint",
+          "line": 480
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "adjust_learning_rate",
+          "line": 487
+        }
+      ]
+    },
+    {
+      "path": "utils/Unzip.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/utils/Unzip.py",
+      "git_blob_sha1": "64144ced7b1c90d048a0ee4fd7e904173519223b",
+      "raw_utf8_sha256": "db6badce518b786b45695a43276e355edb9bba84b6aa8d2ee47349d281c6d4cf",
+      "bytes": 1878,
+      "line_count": 60,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": false,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "extract",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "path": "utils/__init__.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/utils/__init__.py",
+      "git_blob_sha1": "3c39b00bcd0b6d9b9f382a5590a3cd22338ab179",
+      "raw_utf8_sha256": "7ee7c19e09851641a41f8182330f3514c61f050021b3ccdf4a5869d2beb21977",
+      "bytes": 359,
+      "line_count": 12,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": []
+    },
+    {
+      "path": "utils/logger.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/utils/logger.py",
+      "git_blob_sha1": "da7d5b318de9f0a84bb75e646b6c8c69b8a3bf11",
+      "raw_utf8_sha256": "bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88",
+      "bytes": 3229,
+      "line_count": 132,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "update_config",
+          "line": 96
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "create_logger",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "path": "utils/meter.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/utils/meter.py",
+      "git_blob_sha1": "03454b4d977ef6cc2baecfd905bc5c67ad904bc1",
+      "raw_utf8_sha256": "6d70adc2be7f5884da2688faac671fa57ef542584c9b3a1dbf9aa7e980aeed7e",
+      "bytes": 1208,
+      "line_count": 39,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "ClassDef",
+          "name": "AverageMeter",
+          "line": 1
+        },
+        {
+          "kind": "ClassDef",
+          "name": "ProgressMeter",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "path": "utils/metric.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/utils/metric.py",
+      "git_blob_sha1": "45a152fecf874dd21b5ea357863dcfb066d2662a",
+      "raw_utf8_sha256": "d5da5eb30abd9328f5342182f3c23b4ca44253f89fa17c3efeffe1fee8c9933e",
+      "bytes": 3141,
+      "line_count": 79,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": true,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "accuracy",
+          "line": 4
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "calibration",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "path": "utils/util.py",
+      "url": "https://raw.githubusercontent.com/Keke921/H2T/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8/utils/util.py",
+      "git_blob_sha1": "75acc01457131fff6fb3dbcac693d5e01557f601",
+      "raw_utf8_sha256": "8af78b3a38e13ceaea11a7e7b3957f5229aa97e357aaa083c7f0edd1dd35dfa9",
+      "bytes": 1075,
+      "line_count": 37,
+      "retrieval_scope": "live_connector_raw_text",
+      "frozen_archive_matches_after_CRLF_normalization": false,
+      "syntax_pass": true,
+      "definitions": [
+        {
+          "kind": "FunctionDef",
+          "name": "SetRandomSeed",
+          "line": 15
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "save_code",
+          "line": 25
+        },
+        {
+          "kind": "FunctionDef",
+          "name": "save_checkpoint",
+          "line": 33
+        }
+      ]
+    }
+  ],
+  "H2T_and_H2Tv2_and_conv1d_calls": [
+    {
+      "file": "models/resnet_cifar.py",
+      "line": 166,
+      "call": "self.conv1d(out_hat)"
+    },
+    {
+      "file": "train_stage2.py",
+      "line": 342,
+      "call": "H2T(feat1, feat2, rho=config.H2T)"
+    },
+    {
+      "file": "train_stage2.py",
+      "line": 348,
+      "call": "H2T(feat1, feat2, rho=config.H2T)"
+    },
+    {
+      "file": "train_stage2.py",
+      "line": 364,
+      "call": "H2T(feat1, feat2, rho=config.H2T)"
+    },
+    {
+      "file": "train_stage2.py",
+      "line": 370,
+      "call": "H2T(feat1, feat2, rho=config.H2T)"
+    }
+  ],
+  "H2Tv2_call_count": 0,
+  "PIF_constructor_arguments": [
+    "self",
+    "block",
+    "num_blocks"
+  ],
+  "PIF_forward_returns": [
+    {
+      "line": 168,
+      "expression": "out"
+    }
+  ],
+  "PIF_Conv1d_parameters_arithmetic": {
+    "weights": [
+      8,
+      8,
+      2
+    ],
+    "biases": [
+      4,
+      2,
+      1
+    ],
+    "total": 25
+  },
+  "public_constructor_CPU_probe": {
+    "type": "TypeError",
+    "message": "Conv2d.__init__() got an unexpected keyword argument 'feature_tuning'",
+    "scope": "Only pinned class definition executed; CPU construction only; no forward, training, checkpoint, dataset or CUDA queries"
+  },
+  "torch_CPU_probe_version": "2.14.1+cu132",
+  "GPU_training": false,
+  "frozen_archive_different_paths": [
+    "models/resnet_cifar.py",
+    "utils/Unzip.py",
+    "utils/util.py"
+  ]
+}

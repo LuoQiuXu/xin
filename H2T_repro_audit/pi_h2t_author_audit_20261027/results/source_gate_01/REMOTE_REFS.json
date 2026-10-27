@@ -1,0 +1,28 @@
+{
+  "checked_on": "2026-10-27",
+  "branches": {
+    "url": "https://api.github.com/repos/Keke921/H2T/branches?per_page=100",
+    "data": [
+      {
+        "name": "main",
+        "commit": {
+          "sha": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8",
+          "url": "https://api.github.com/repos/Keke921/H2T/commits/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8"
+        },
+        "protected": false
+      }
+    ]
+  },
+  "releases": {
+    "url": "https://api.github.com/repos/Keke921/H2T/releases?per_page=100",
+    "data": []
+  },
+  "git_ls_remote": {
+    "command": "git ls-remote --heads --tags https://github.com/Keke921/H2T.git",
+    "exit_code": 0,
+    "stdout": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8\trefs/heads/main\n",
+    "tags_observed": [],
+    "scope": "all advertised public heads/tags, not hidden refs"
+  },
+  "connector_tags_error": "GitHub fetch URL not allowed for /tags endpoint; replaced by git ls-remote --heads --tags"
+}
