@@ -26,7 +26,7 @@
 
 1. **Read/compare** PI paper and author repo, mark all unresolved fields `MATCH / MISMATCH / UNVERIFIED`. A complete exact-author reproduction is blocked while any author-specific required field is UNVERIFIED.
 2. **CPU formula tests** first. They should not require CIFAR data or a GPU.
-3. **Preflight** CUDA and official CIFAR data presence; data download only with opt-in `--download`. Test dependencies and source hashes, inspect stage/source choices and batch memory.
+3. **Preflight + one-batch real-data GPU smoke test** CUDA and official CIFAR data presence, PIF gradients and H2TF tensor shapes; data download only with opt-in `--download`. Test dependencies and source hashes, inspect stage/source choices and batch memory.
 4. **Stage I** (expensive: 200 epochs) only after Steps 1–3 pass and the user-authorized reconstruction scope is understood. No hidden fallback to historical 25-param checkpoint.
 5. **Stage II** 2 × 10 epochs from the **same** new StageI fixed epoch200, with no-fusion vs H2TF control. Use locked BN/W reference selected **before** results.
 6. **Report:** Overall/Many/Medium/Few, per-class paired correct→wrong and wrong→correct, average donor mass, learned PIF coefficients, exact provenance/hash of weights and selected LT samples.
@@ -38,6 +38,7 @@ From repository root (Windows PowerShell is fine):
 ```powershell
 python -m unittest discover -s H2T_repro_audit/pi_h2t_strict_20261027 -p "test_*.py" -v
 python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py preflight --run-id pih2t_if100_seed123_42_v1 --data-root H2T/data/cifar100
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py smoke --run-id pih2t_if100_seed123_42_v1 --data-root H2T/data/cifar100
 python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py stage1 --run-id pih2t_if100_seed123_42_v1 --data-root H2T/data/cifar100
 python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py stage2 --run-id pih2t_if100_seed123_42_v1 --data-root H2T/data/cifar100 --arm no_fusion
 python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py stage2 --run-id pih2t_if100_seed123_42_v1 --data-root H2T/data/cifar100 --arm h2tf
