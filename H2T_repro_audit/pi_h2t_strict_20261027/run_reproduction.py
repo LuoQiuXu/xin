@@ -362,8 +362,31 @@ def report(args):
         records[arm]=json.loads(p.read_text(encoding="utf-8"))
     a=records["no_fusion"]["metrics"];b=records["h2tf"]["metrics"]
     comparison={k:round(b[k]-a[k],5) for k in GROUP.keys()|{"Overall"}}
+    # Paired per-image changes, not just headline accuracy. Never select a new
+    # tuning target from these official-TEST observations.
+    with np.load(run/"stage2/no_fusion/test_epoch10_predictions.npz",allow_pickle=False) as z:
+        labels=z["labels"].copy();baseline=z["pred"].copy()
+    with np.load(run/"stage2/h2tf/test_epoch10_predictions.npz",allow_pickle=False) as z:
+        if not np.array_equal(z["labels"],labels):
+            raise RuntimeError("Evaluation label/order mismatch across arms")
+        fused=z["pred"].copy()
+    rows=[]
+    for klass in range(100):
+        mask=labels==klass
+        if int(mask.sum())!=100:raise ValueError(f"class {klass} TEST count differs from 100")
+        correct0=baseline[mask]==klass;correct1=fused[mask]==klass
+        wins=int(np.count_nonzero(correct1 & ~correct0))
+        losses=int(np.count_nonzero(~correct1 & correct0))
+        rows.append({"class":klass,"group":"Many" if klass<36 else ("Medium" if klass<71 else "Few"),
+                     "no_fusion_correct":int(correct0.sum()),"h2tf_correct":int(correct1.sum()),
+                     "h2tf_wins":wins,"h2tf_losses":losses,
+                     "delta_pp":wins-losses})
+    save_rows(run/"per_class_paired_changes.csv",rows)
     dump(run/"comparison.json",{"arms":records,"h2tf_minus_no_fusion_pp":comparison,
-        "caution":"One StageI seed + one StageII seed. Not official PI-H2T parity or evidence of published-method failure."})
+        "per_class_file":"per_class_paired_changes.csv",
+        "paired_total_wins":sum(x["h2tf_wins"] for x in rows),
+        "paired_total_losses":sum(x["h2tf_losses"] for x in rows),
+        "caution":"One StageI seed + one StageII seed. Reused official CIFAR TEST is NOT independent science confirmation; no tuning by this table."})
     print("H2TF - NO FUSION [pp]",comparison)
 
 
