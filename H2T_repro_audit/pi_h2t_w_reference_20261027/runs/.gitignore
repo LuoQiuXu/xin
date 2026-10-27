@@ -1,0 +1,6 @@
+*.pth
+*.pth.tar
+*.npz
+*.log
+*.tmp
+# Keep exact checkpoints and full logits locally; commit only summaries, CSV, JSON, reports.
