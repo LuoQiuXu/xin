@@ -155,7 +155,8 @@ def build_loader(args,stage: int):
     train=DataLoader(ds,batch_size=BATCH,shuffle=True,num_workers=0,pin_memory=True,drop_last=False)
     evalset=CIFAR100(root=args.data_root,train=False,download=args.download,transform=test_tf)
     test=DataLoader(evalset,batch_size=256,shuffle=False,num_workers=0,pin_memory=True)
-    return train,test,nums
+    lt_hash=hashlib.sha256(ds.data.tobytes()+np.asarray(ds.targets,dtype=np.int64).tobytes()).hexdigest()
+    return train,test,nums,lt_hash
 
 
 def make_models(device):
@@ -190,7 +191,10 @@ def preflight(args):
     # Do not auto-download or train during preflight.
     data=Path(args.data_root)
     if not (data/"cifar-100-python"/"train").is_file() or not (data/"cifar-100-python"/"test").is_file():
-        raise FileNotFoundError(f"CIFAR100 cached train/test not found under {data}; use --download only when permitted")
+        if not args.download:
+            raise FileNotFoundError(f"CIFAR100 cache missing under {data}; explicit --download is needed")
+        CIFAR100(root=args.data_root,train=True,download=True)
+        CIFAR100(root=args.data_root,train=False,download=True)
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA not detected; do not silently run a 200-epoch CPU training")
     print("PREFLIGHT PASS: original CIFAR files present, CUDA detected; unresolved author details remain explicitly labelled")
@@ -205,10 +209,11 @@ def stage1(args):
     device=torch.device("cuda:0")
     net,head=make_models(device)
     # Dataset ctor resets NumPy seed to zero as in frozen H2T.
-    loader,test,counts=build_loader(args,1)
+    loader,test,counts,lt_hash=build_loader(args,1)
     run.mkdir(parents=True,exist_ok=False)
     dump(run/"protocol.json",plan)
-    dump(run/"dataset_counts.json",{"class_counts":counts,"train_length":len(loader.dataset),"test_length":len(test.dataset)})
+    dump(run/"dataset_counts.json",{"class_counts":counts,"train_length":len(loader.dataset),
+        "test_length":len(test.dataset),"lt_data_and_labels_sha256":lt_hash})
     opt=torch.optim.SGD(list(net.parameters())+list(head.parameters()),
                         lr=.1,momentum=.9,weight_decay=2e-4)
     record=[]
@@ -284,7 +289,10 @@ def stage2(args):
     for p in net.parameters():p.requires_grad_(False)
     fixed_stage1_w=head.fc.weight.detach().clone()
     input_head_hash=hashlib.sha256(b"".join(x.detach().cpu().numpy().tobytes() for x in head.state_dict().values())).hexdigest()
-    loader,test,_=build_loader(args,2)
+    loader,test,_,lt_hash=build_loader(args,2)
+    reference=json.loads((run/"dataset_counts.json").read_text(encoding="utf-8"))
+    if lt_hash!=reference["lt_data_and_labels_sha256"]:
+        raise RuntimeError("StageII CIFAR-LT subset differs from StageI; stop")
     # run's stage2/arm is created only AFTER checkpoint, protocol and loader preflight.
     target.mkdir(parents=True,exist_ok=False)
     opt=torch.optim.SGD(head.parameters(),lr=.02,momentum=.9,weight_decay=5e-4)
