@@ -1,0 +1,70 @@
+CODEX 执行任务：PI-H2T 严格复现差距的最小协议核查——Stage II W-reference
+GitHub 仓库：LuoQiuXu/xin
+必须使用的唯一新分支：repro/pi-h2t-reference-w-parity-20261027
+本轮唯一工作目录：H2T_repro_audit/pi_h2t_w_reference_20261027/
+实验入口：run_current_w.py
+唯一对应的说明：README.md
+
+【研究动机】
+上轮完全训练了新2参数PIF StageI epoch200（39.91%）和StageII两臂：
+- 同一StageI固定epoch200，no_fusion: Overall45.53%，Many67.08，Medium46.34，Few17.79；
+- frozen_stage1 W 的H2TF: Overall36.50%，Many29.86，Medium43.29，Few36.55；
+- 该H2TF平均donor mass约.772，10轮末训练CE约4.01；
+- 作者PI-H2T论文IF100/ResNet32/CE：PIF StageI42.19%，StageII Last49.04%、Best49.22%。对比协议尚不完全一致。
+本轮不将本地−9.03pp称为论文失效，不发明新模块，不扫超参。
+
+这次只检验一个尚未核实的“论文-代码实现语义分叉”：
+PI-H2T v2的Eq8写分类器权重W，StageII训练中分类器会更新。
+之前本地H2TF固定使用StageI保存的W，且作者公开H2T仓库尚不能证明PI论文的W保持冻结。
+本轮只改成使用每次SGD更新中的当前StageII classifier W。融合公式、原始特征流、标签、数据、BN、优化器、训练预算完全不变。
+这是探索性协议消歧，而不是已确定的“官方正确实现”。准确率升高也不能证明作者就是如此实现。
+
+【阶段0：分支/资产确认，零训练】
+- 确认当前Git分支就是 repro/pi-h2t-reference-w-parity-20261027。若不一致，请先检查工作区和本地分支；不得另建实验分支或切换到早期TailOff/LowVS分支。
+- 已知历史未跟踪目录 fusion_semantic_audit、lowvs_mask_parity、mdlt_domain_probe 必须原样保留，可以忽略；其余新增/修改冲突报告后停止，不运行 git clean / reset --hard / stash / git add -A。
+- 读取本轮 README.md、ratio_reference.py、run_current_w.py、test_ratio_reference.py，和旧研究分支下的 PARITY_LOCK.md、run_reproduction.py、FINAL_INTEGRITY.json、SCIENTIFIC_RESULTS.md。
+- 固定旧run：H2T_repro_audit/pi_h2t_strict_20261027/runs/pih2t_if100_seed123_42_v1/。确认旧StageI pth（SHA256必须64f53e45a1b7f73f494f9c88374607e714b58dc6eb55118fa31154c4389f93ef），旧两组StageII的summary.csv/json、epoch历史和预测NPZ存在于本机。GitHub不含大pth/npz时，不允许伪造、用别的checkpoint替代或下载未知文件补上。
+- 检查原始CIFAR cache的官方TRAIN/TEST文件和SHA、环境/PyTorch/CUDA、旧运行protocol/source哈希；确保训练输入真实IF100且以前后两阶段使用相同子集。
+- 在论文/可用作者代码中重新核对Eq8和Algorithm1里W的含义。若发现明确作者代码或论文排除了“current StageII W”解释，请 STOP 而不是为跑实验强行改变论文含义，写 STOP_REPORT.md。
+
+【阶段1：真实测试和代码质量，不要工程过度】
+在仓库根目录按顺序执行以下命令（使用之前成功训练的同一个Python GPU解释器）：
+python -m unittest discover -s H2T_repro_audit/pi_h2t_w_reference_20261027 -p "test_*.py" -v
+python -m py_compile H2T_repro_audit/pi_h2t_w_reference_20261027/ratio_reference.py H2T_repro_audit/pi_h2t_w_reference_20261027/run_current_w.py
+python H2T_repro_audit/pi_h2t_w_reference_20261027/run_current_w.py preflight
+
+本轮新结果目录严格为：
+H2T_repro_audit/pi_h2t_w_reference_20261027/runs/w_reference_current_seed42_01/
+预检要求该目录尚不存在，否则停止，不删除/覆盖原结果。
+如果遇到真实实现bug：只在这个新study目录内最小修复，增加对应失败-通过测试，记录REPAIR_LOG.md；禁止修改旧源码、已完成checkpoint、旧historical结果或调整数学公式。不要因模型服务或沙箱限制掩盖测试失败。
+
+【阶段2：正式仅运行 ONE 个 StageII 训练组】
+通过全部门禁后运行：
+python H2T_repro_audit/pi_h2t_w_reference_20261027/run_current_w.py run
+
+本轮GPU训练量严格为 StageII 10 epochs，一组；绝不再跑StageI的200 epochs，也不重复旧无融合/frozen W两组。
+单次训练使用此前完全相同的StageI checkpoint、初始化FC、原始BS/IS双采样、batch128、SDG .02初始、cosine10轮、原hard CE、seed42，BN train且recipient/donor都前向。只将比例中的W从frozen_stage1切换到当前head.fc.weight.detach()。
+计算r=(1−cos)/2、混合 r*recipient + (1-r)*donor；不反转r与1-r，不引入新的kappa/尺度拟合，不改变标签损失，不追加学习率/epoch/seed sweep。
+每个epoch计算真实图像、donor图像、标签流SHA，与旧frozen W H2TF run逐值一致；最终BN buffers和冻结骨干/PIF参数与旧实验一致，否则失败STOP，不允许以精度好为理由接受不公平比较。
+务必保存每epoch真实CE、r_current与r_frozen均值差、实际mean donor mass、前向采样输入SHA、epoch10 checkpoint和输出logits，用于下轮科学分析。
+注意上轮已多次使用官方TEST，因此这次只作复现诊断与描述比较，不能作为未来新方法的独立验证或根据TEST数值选择超参数。
+
+【阶段3：停止性科学报告】
+本轮只比较旧no_fusion(45.53)、旧frozen W H2TF(36.50)与新current W H2TF，第10epoch固定指标Overall/Many/Medium/Few；对比 r分布和训练CE曲线。
+请生成/核验：preregistered_protocol.json, epochs.csv, ratio_epochXX.npz, classifier_current_W_epoch10.pth, test_epoch10.npz, result.json, comparison.json, per_class_current_vs_frozen.csv, SCIENTIFIC_REPORT.md。
+另写中文 SCIENTIFIC_REVIEW.md，回答：
+1) current W只改变W引用，配对门禁是否全部通过？可否解释因果对照仅关于本地W-reference选择？
+2) StageII最后精度与旧两臂及作者49.04%差多少？不能声称作者代码已确认。
+3) r/donor质量与分布如何沿epochs动态变化？是否与之前.772供体质量不同？
+4) StageII训练CE是变易还是同样停留高位？Many/Medium/Few如何变化？不要把r均值相关性当成证明。
+5) 作者协议其他未知项(初始化、BN、checkpoint/seed、StageI本身)仍有多少，能否称为“严格官方复现”？不能就明确不能。
+6) 无论正负，下一步应验证什么证据？**只提出一个最有证据的下一步，先不要继续训练。**
+预注册对照不能改成best-epoch，也不能看结果后加入额外arm；如果失败，报告真实报错、STOP，而非编造科学结论。
+
+【阶段4：GitHub安全交付】
+- 必须先 git diff --check，核查旧H2T_official_clean/、旧PI研究目录及三个历史未跟踪目录都没有被修改。
+- 只显式git add本研究目录内的小体积源码、md/csv/json以及测试记录；巨大的pth与NPZ保留本机，只在 VALIDATION_REPORT.md 记SHA256、bytes和本机相对路径；建立局部忽略规则而非全仓清理。
+- commit + push 到当前唯一分支。提供commit SHA、报告URL、正确/错误退出码、是否完成唯一StageII、旧checkpoint来源，以及论文一致性限制。
+- 不得新建PR、合并、修改历史分支、申请用户再提供已存在的信息。
+
+本轮理念：减少工程完美主义，唯一具体论文语义假设、真实配对源流、真实负结果也接受；不拿TEST调公式、不把近似复现冒充官方严格复现。
