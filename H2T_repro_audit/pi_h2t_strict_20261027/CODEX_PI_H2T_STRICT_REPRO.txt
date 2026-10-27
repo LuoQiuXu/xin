@@ -1,0 +1,78 @@
+CODEX TASK — PI-H2T v2 strict-parity-first independent reproduction (CIFAR100-LT IF100)
+Repository: LuoQiuXu/xin
+EXACT target branch: repro/pi-h2t-cifar100-paper-parity-20261027
+Directory: H2T_repro_audit/pi_h2t_strict_20261027/
+Entry: run_reproduction.py
+Reference: README.md, paper_components.py, test_paper_components.py
+Base evidence: H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/
+Paper: https://arxiv.org/pdf/2506.00625v2 (PI-H2T, Eq3/6/7/8)
+Original H2T author repo: https://github.com/Keke921/H2T (only main branch observed, not verified PI author training code)
+
+GOAL
+Reconstruct PI-H2T's PIF + H2TF faithful to VERIFIED paper formulas and original H2T CIFAR100-LT training protocol. Produce an auditable 200-epoch StageI and two-arm 10-epoch StageII run. The main scientific goal is REPRODUCTION PARITY, not tuning or modifying H2T. Do not introduce new modules or 3+ arms.
+
+IMPORTANT IDENTIFICATION
+Our code is an independent paper-aligned reconstruction, not official published PI-H2T source. The paper does not clearly settle the PIF initializer, frozen-vs-current W for Eq8, ratio detach, exact BN running-buffer policy, and exact StageI checkpoint-selection path. These are UNVERIFIED until grounded in author code/public settings. Do NOT claim 'exact official PI-H2T replicated' simply because Accuracy looks close. Do NOT reverse r to chase accuracy.
+
+GIT & HISTORICAL ASSET SAFETY
+1. First check branch, HEAD, git status, diff. Require branch repro/pi-h2t-cifar100-paper-parity-20261027. If another branch, stop unless working tree is clean and new branch exists; never create an unrequested branch.
+2. The known untracked historical directories H2T_repro_audit/fusion_semantic_audit/, lowvs_mask_parity/, mdlt_domain_probe/ may be left intact and ignored. Allow ONLY these pre-existing untracked directories. For any other unexpected dirty tracked change, stop and report.
+3. NEVER git reset --hard, git clean, overwrite/rewrite history, force push or stash away user data. Do NOT modify H2T_official_clean/H2T-main/, historical H2T/ models, historical saved checkpoints or prior experiment directories.
+4. All new code changes for this run must remain under pi_h2t_strict_20261027/. Do not merge branches or open PR.
+5. Reuse existing local CIFAR-100 official cache; do not substitute train-dev split or pre-balanced dataset. Download official CIFAR100 data ONLY with an explicit '--download' and document if required.
+
+PHASE A — PARITY CHECK BEFORE RUN
+Read PI-H2T v2 full PDF and relevant H2T official source and completed audit reports. Create PARITY_LOCK.md before training with:
+- Exact PIF input/output tensor dimensions and channel-mean direction; one bias-free Conv1d 2->1; 2 parameters (not historical 25).
+- Exact H2TF Eq7: fused = r*recipient + (1-r)*donor; Eq8 literal cosine distance r=(1-cos)/2.
+- BS receiver/IS donor selection in frozen H2T dataset class, receiver hard CE labels.
+- StageI input MixUp, ResNet32, 200ep, SGD original H2T default multistep with warmup; StageII classifier-only training10ep lr0.02 initial, cosine, H2TF after GAP.
+- StageII BN buffers default 'update' inherited from original H2T; both arms forward donor for MATCHED BN traffic. This paired no-fusion comparator is not author's untouched original DR path.
+- StageII W reference default 'frozen_stage1', ratio under no_grad; author semantics UNVERIFIED; default Conv1d PyTorch initialization not claimed authored.
+- Explicit classification of each field: VERIFIED_FROM_PI_PAPER / INHERITED_FROM_H2T / RECONSTRUCTION_ASSUMPTION / BLOCKED.
+- Record scanned commit/URL for Keke921/H2T, no claim of PI official release without code evidence.
+- Record all flags BEFORE reading newly obtained official CIFAR100 TEST accuracy.
+
+If you find an actual paper-to-code mathematical contradiction, STOP before training, fix new files minimally, add failing-then-passing test, publish patch rationale. Do not silently change ratio or dataset selection after metrics.
+
+PHASE B — UNIT TESTS AND PREFLIGHT
+From repository root run:
+python -m unittest discover -s H2T_repro_audit/pi_h2t_strict_20261027 -p "test_*.py" -v
+python -m py_compile H2T_repro_audit/pi_h2t_strict_20261027/paper_components.py H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py preflight --run-id pih2t_if100_seed123_42_v1 --data-root <EXISTING_CIFAR100_ROOT>
+
+Use literal existing CIFAR100 cache root, including cifar-100-python/train and test. If missing, only with explicit user-approved download use --download. Verify CUDA on RTX5070 8GB and compatible installed pytorch/torchvision. If OOM, stop and report; do not silently lower batch size or enable AMP as those alter protocol.
+
+CRITICAL CODE REVIEW before long run: inspect optimizer LR epoch boundaries (StageI default 5-epoch warmup and milestones160/180, NOT cosine), original CIFAR sample generation, correct device/mode, optimizer parameter groups, dataset counts class0=500 class99=5, paired StageII BN input traffic, PIF gradient and H2TF ratio direction. Inspect checkpoint source/hash checks.
+If errors: fix ONLY this study directory, add regression tests and write REPAIR_LOG.md (reason, before/after, test, parity effect). Never modify original H2T code to make new runner work.
+
+PHASE C — ACTUAL TRAINING, ONLY IF A AND B PASS
+Do not train if formula, data split or tests fail. Unknown author-specific config may remain UNVERIFIED; if so, you MAY run the transparently named INDEPENDENT RECONSTRUCTION using the pre-locked default choices, but must never claim official parity.
+
+Run (change only data root to verified real path):
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py stage1 --run-id pih2t_if100_seed123_42_v1 --data-root <EXISTING_CIFAR100_ROOT>
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py stage2 --run-id pih2t_if100_seed123_42_v1 --data-root <EXISTING_CIFAR100_ROOT> --arm no_fusion
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py stage2 --run-id pih2t_if100_seed123_42_v1 --data-root <EXISTING_CIFAR100_ROOT> --arm h2tf
+python H2T_repro_audit/pi_h2t_strict_20261027/run_reproduction.py report --run-id pih2t_if100_seed123_42_v1
+
+Note: default StageI seed123 and StageII seed42. This is one clean preliminary reproduction, not 3-seed publication significance. Do not append other seeds until analyzed.
+
+The program refuses overwriting old run directories. If the exact run ID already exists, NEVER delete/overwrite; use new run ID with reason and preserve prior. StageII checkpoint must be the NEW epoch200 stage1_final_epoch200.pth in the same run; reject any historical 25-param checkpoint.
+Both StageII arms must load the same StageI weights (same SHA), have identical data split, initial classifier and BN policy, StageII seed, SGD budget. The paper-v2 H2TF operation is the ONLY variable between arms. If training code does not actually hold these invariants, do not proceed or interpret its results.
+
+PHASE D — SCIENTIFIC AND INTEGRITY REPORT
+Create under H2T_repro_audit/pi_h2t_strict_20261027/runs/pih2t_if100_seed123_42_v1/:
+- PARITY_RUN_REPORT.md: literal paper formula parity, assumptions, dataset/initialization/scheduler/checkpoint/BN/protocol evidence.
+- SCIENTIFIC_RESULTS.md: StageI epoch200 metrics; StageII no_fusion and h2tf fixed epoch10 Overall/Many/Medium/Few; H2TF minus matched no_fusion; donor mass mean; PIF initial/final coefficients; classwise wins/losses summary and their limits.
+- VALIDATION_REPORT.md: test outputs, GPU, Python/PyTorch, CUDA, dataset counts and SHA, script/source hashes, checkpoint SHA/size, official TEST use; errors/stops; exact commands and exit codes.
+- RESULTS_INDEX.json: links/relative paths to artifacts and summaries; large checkpoints and logits NPZ can stay local with SHA256+byte sizes.
+- Report authors' paper baseline (if verified from actual PDF) separately; DON'T pool or treat exact equality mandatory because current reconstruction retains unverifiable choices and selects fixed final epoch200 not paper model_best.
+
+Read and preserve existing outputs: protocol.json, dataset_counts.json, stage1_epochs.csv, stage1_summary.json, stage2/*/train_epochs.csv, stage2/*/summary.json, comparison.json, per_class_paired_changes.csv. Verify npz label ordering and 100 images per class; no sampling from official TEST in training; never select modifications after examining TEST.
+
+If H2TF shows local degradation, do not instantly declare paper failure. The next analysis should isolate PI author uncertainty, BN traffic/control changes, PIF effective coefficients, ratio definition and checkpoint selection from genuine mechanism limits. Do not propose MarginProtect, TailOff, or a new attention plug-in.
+
+PHASE E — UPLOAD RESULTS
+Run git diff --check, confirm original code and historical assets untouched. Explicitly git add only H2T_repro_audit/pi_h2t_strict_20261027/ code and small run reports/CSV/JSON. Do NOT git add -A or push huge checkpoint/npz, do not modify old .gitignore globally; create a scoped .gitignore under this study's runs/ directory if needed. Preserve large binaries locally, record verified SHA256+paths in VALIDATION_REPORT.
+Commit and push ONLY repro/pi-h2t-cifar100-paper-parity-20261027. Report commit SHA, exact run ID, exact completed steps, metrics, and parity status. If tests/data/GPU fail, upload an honest STOP_REPORT.md and do not claim training complete.
+START.
