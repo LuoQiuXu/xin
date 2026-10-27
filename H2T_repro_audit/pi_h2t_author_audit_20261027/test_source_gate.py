@@ -87,10 +87,11 @@ class EvidenceGateTests(unittest.TestCase):
     def test_empty_and_incomplete_inventory_fail(self):
         tmp, root, doc = fixture()
         with tmp:
+            original_claim = doc["fields"][0]
             doc["fields"] = []
             with self.assertRaises(ValueError):
                 audit(root, doc)
-            doc["fields"] = [fixture()[2]["fields"][0]]
+            doc["fields"] = [original_claim]
             doc["upstream"]["complete_tree_observed"] = False
             with self.assertRaises(ValueError):
                 audit(root, doc)
