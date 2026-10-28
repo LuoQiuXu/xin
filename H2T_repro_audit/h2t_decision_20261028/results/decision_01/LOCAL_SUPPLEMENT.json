@@ -1,0 +1,120 @@
+{
+  "note": "Existing local logs only, not a fresh computation or full semantic audit. No historical file is copied, staged or changed.",
+  "sources": [
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/CONTROLLED_FINDINGS.md",
+      "sha256": "1236dc051fe7ad6d0b13c829967e580186f1360cfe443f86451b7c3fa8211732",
+      "bytes": 3188,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/SINGLE_BATCH_COMPUTE_REPORT.md",
+      "sha256": "a83d470005f936811ab47dafe27b445dcb0eb6965059c437dbe897a56b98e0e9",
+      "bytes": 3314,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/SUMMARY.json",
+      "sha256": "7ceffa601134f5d1dc6eb623a7fa411ea3181fdc2076c2f2d824a899841450b3",
+      "bytes": 31018,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/VALIDATION.json",
+      "sha256": "d6193d6b9d641f06d0c2850e97bb2640bd568a13489963e819e20a34fbf63e64",
+      "bytes": 2980,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/input_verification.json",
+      "sha256": "0241e6162e897ef9d0aec3a6d7864c0744dad935fbbcaff1888250531008236e",
+      "bytes": 16607,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/A/diagnostic.json",
+      "sha256": "68f4fedaa48884c404a01cdcf0c3fb0db82ca7b2009820c4d16640a3a3c9d73f",
+      "bytes": 4903,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/B/diagnostic.json",
+      "sha256": "336b03907dfdb9c991d5ba3d1c0f91750c6248c0f94c2e397b9e58d02389be62",
+      "bytes": 4902,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/C/diagnostic.json",
+      "sha256": "41fddceda5d5b209d13bd68a56cb126c3210a1c5d834b356e9d9d0ac7de4077c",
+      "bytes": 4901,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    },
+    {
+      "path": "H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/D/diagnostic.json",
+      "sha256": "8ac400082ba786895904fb988130f5ab44092dc84477612a9ca194cedd81a765",
+      "bytes": 4901,
+      "provenance": "LOCAL_UNTRACKED_READ_ONLY_NOT_IN_REGISTERED_BRANCH_COMMIT",
+      "source_url": null
+    }
+  ],
+  "recorded_groups": [
+    {
+      "arm": "A",
+      "seed": 124,
+      "epoch": 10,
+      "batch": 0,
+      "actual_features_sha256": "e5dc4ee26962c028fdb137d398a4ae67f5886e918cde2203a60c3b106e1e034d",
+      "expected_features_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5",
+      "exact_match_historical": false,
+      "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "indices_sha256": "6cfea901ef30207d794379729e4b6627c8a17646bcdce22013bb9705a1cddf69",
+      "images_sha256": "cdcd606bcba81d82affe9d60c25887151b1a4830eaa7b2298bb12a5156e782fe"
+    },
+    {
+      "arm": "B",
+      "seed": 124,
+      "epoch": 10,
+      "batch": 0,
+      "actual_features_sha256": "e5dc4ee26962c028fdb137d398a4ae67f5886e918cde2203a60c3b106e1e034d",
+      "expected_features_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5",
+      "exact_match_historical": false,
+      "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "indices_sha256": "6cfea901ef30207d794379729e4b6627c8a17646bcdce22013bb9705a1cddf69",
+      "images_sha256": "cdcd606bcba81d82affe9d60c25887151b1a4830eaa7b2298bb12a5156e782fe"
+    },
+    {
+      "arm": "C",
+      "seed": 124,
+      "epoch": 10,
+      "batch": 0,
+      "actual_features_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5",
+      "expected_features_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5",
+      "exact_match_historical": true,
+      "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "indices_sha256": "6cfea901ef30207d794379729e4b6627c8a17646bcdce22013bb9705a1cddf69",
+      "images_sha256": "cdcd606bcba81d82affe9d60c25887151b1a4830eaa7b2298bb12a5156e782fe"
+    },
+    {
+      "arm": "D",
+      "seed": 124,
+      "epoch": 10,
+      "batch": 0,
+      "actual_features_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5",
+      "expected_features_sha256": "7d111aeb5a0dc30cf76af609ffb251fc4152c0c38f80baaa01ae0e3862eafbb5",
+      "exact_match_historical": true,
+      "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "indices_sha256": "6cfea901ef30207d794379729e4b6627c8a17646bcdce22013bb9705a1cddf69",
+      "images_sha256": "cdcd606bcba81d82affe9d60c25887151b1a4830eaa7b2298bb12a5156e782fe"
+    }
+  ],
+  "full_audit_recovered": false,
+  "scientific_semantics_outcomes_available": false
+}

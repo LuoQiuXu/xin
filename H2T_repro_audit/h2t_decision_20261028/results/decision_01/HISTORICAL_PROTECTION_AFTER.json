@@ -1,0 +1,20 @@
+{
+  "tracked_small_files": 1599,
+  "tracked_small_raw_sha256": "f9bf174ae4bb37dfe49c8133194280c299bcc830ac7fc7036d3f4e6a72e7ac2d",
+  "tracked_large_files": 26,
+  "tracked_large_metadata_sha256": "f63b1234272eec7ec7042a523b2874a980c136193f40d00bdb8df95391eb65af",
+  "protected_metadata_files": 4855,
+  "protected_metadata_sha256": "fc11683f3ae0ece2240006542e4321f9407318b026dffc8fc9874230b0b7b931",
+  "checks": {
+    "tracked_small_files": true,
+    "tracked_small_raw_sha256": true,
+    "tracked_large_files": true,
+    "tracked_large_metadata_sha256": true,
+    "protected_metadata_files": true,
+    "protected_metadata_sha256": true
+  },
+  "all_equal": true,
+  "policy": "All tracked non-current-study files <=5MB raw SHA256; larger tracked file metadata and all history under H2T_official_clean,H2T,PI_H2T_review,H2T_repro_audit (current study excluded) size/mtime. No model/data interpretation.",
+  "metadata_sort": "per-root sorted Windows Path traversal",
+  "excluded_current_study_prefix": "H2T_repro_audit/h2t_decision_20261028/"
+}

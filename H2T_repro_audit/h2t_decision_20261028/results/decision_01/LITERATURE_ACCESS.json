@@ -1,0 +1,171 @@
+{
+  "review_date": "2026-10-28",
+  "access_scope": "Targeted primary-source mechanism review; not an exhaustive novelty proof",
+  "cached_pdfs": "PAPER_FILES.json records the actual eight PDF byte SHA256 values. Older cache files read without modification.",
+  "pages_read": {
+    "H2T": [
+      3,
+      4,
+      7
+    ],
+    "H2T_ARXIV_V3": [
+      10
+    ],
+    "PI_H2T": [
+      4,
+      5,
+      11,
+      12,
+      13,
+      16
+    ],
+    "SEL": [
+      3,
+      4,
+      5,
+      7
+    ],
+    "FEATRECON": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "DBG": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "SELMIX": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "KERNEL_MIXUP": [
+      4,
+      5,
+      6
+    ]
+  },
+  "visual_pages": [
+    {
+      "id": "PI_H2T",
+      "page": 5
+    },
+    {
+      "id": "SEL",
+      "page": 4
+    },
+    {
+      "id": "FEATRECON",
+      "page": 7
+    },
+    {
+      "id": "DBG",
+      "page": 4
+    },
+    {
+      "id": "SELMIX",
+      "page": 6
+    },
+    {
+      "id": "KERNEL_MIXUP",
+      "page": 4
+    }
+  ],
+  "visual_result": "Equations and footnotes checked against full page PNGs and extracted text. SEL and DBG rendered with Symbol/ArialUnicode warnings, exit0.",
+  "fresh_downloads": [
+    {
+      "id": "SELMIX",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2024/file/44a8ab79377a7fa99575b939f1b98a21-Paper-Conference.pdf",
+      "status": "FULL_PDF_DOWNLOADED_AND_READ"
+    },
+    {
+      "id": "KERNEL_MIXUP",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/1eac91b56dc20d4f2046951453dde527-Paper-Conference.pdf",
+      "status": "FULL_PDF_DOWNLOADED_AND_READ"
+    }
+  ],
+  "additional_primary_web_pdfs": [
+    {
+      "id": "CRT",
+      "url": "https://arxiv.org/pdf/1910.09217v2",
+      "pages_checked": [
+        4,
+        5
+      ],
+      "mechanism": "cRT and weight normalization/LWS; Eq3-4",
+      "local_sha256": null
+    },
+    {
+      "id": "LOGIT_ADJUSTMENT",
+      "url": "https://arxiv.org/pdf/2007.07314v2",
+      "pages_checked": [
+        5,
+        6,
+        7
+      ],
+      "mechanism": "posthoc prior offset Eq9, training Eq10 and additive/multiplicative distinction",
+      "local_sha256": null
+    }
+  ],
+  "restrictions": [
+    {
+      "source": "PI_H2T_IEEE_VERSION_OF_RECORD_AND_INDEPENDENT_SUPPLEMENT",
+      "url": "https://doi.org/10.1109/TPAMI.2026.3711911",
+      "status": "UNVERIFIED_FULL_TEXT_EQUIVALENCE",
+      "note": "DOI association supported by arXiv v2 metadata and previous author-source audit; this turn DOI target inaccessible. Do not infer equivalence to all formal material."
+    },
+    {
+      "source": "CURRMIX",
+      "url": "https://openaccess.thecvf.com/content/CVPR2026F/html/Jian_CurrMix_Curriculum-Enhanced_MixUp_for_Long-Tailed_Visual_Recognition_CVPRF_2026_paper.html",
+      "status": "INDEXED_PRIMARY_ABSTRACT_ONLY_FULL_MECHANISM_UNVERIFIED",
+      "note": "Official-index search result available; page and PDF open returned403. Not used as decisive duplication evidence, no invented equation/page."
+    },
+    {
+      "source": "SEL_AND_DBG_CURRENT_CVF_HTML",
+      "status": "403_ON_FRESH_OPEN",
+      "note": "Existing full-PDF cache hashes matched their prior PAPER_ACCESS records; cached primary PDF pages reviewed, no claim of fresh online PDF-byte equality."
+    },
+    {
+      "source": "CRT_AND_LA_OPENREVIEW",
+      "status": "BROWSER_CHALLENGE",
+      "note": "Used author arXiv PDFs instead; no challenge or access-control bypass."
+    }
+  ],
+  "download_execution": {
+    "first_attempt_exit": 1,
+    "first_attempt_reason": "sandbox DNS getaddrinfo failed",
+    "authorized_network_retry_exit": 0,
+    "python": "D:/app/minicondaaa/envs/xiaoju/python.exe",
+    "package_installation": false
+  },
+  "author_repository_heads": {
+    "url": "https://api.github.com/repos/Keke921/H2T/branches?per_page=100",
+    "branches": [
+      {
+        "name": "main",
+        "commit": {
+          "sha": "e0c849235d9655fca31cd9fa8a5f38f92a77c7e8",
+          "url": "https://api.github.com/repos/Keke921/H2T/commits/e0c849235d9655fca31cd9fa8a5f38f92a77c7e8"
+        },
+        "protected": false
+      }
+    ],
+    "interpretation": "main SHA unchanged from prior pinned author audit; this turn did not re-run its historical CPU construction test or infer complete PI protocol from the repository title.",
+    "releases": [],
+    "releases_url": "https://api.github.com/repos/Keke921/H2T/releases?per_page=100",
+    "current_tags_status": "UNVERIFIED_FRESH_QUERY",
+    "current_tags_note": "GitHub connector rejected tags endpoint as unsupported; unauthenticated public API GET returned403 rate limit exceeded (Python exit1). No further retry. Prior source audit tag snapshot remains historical evidence, not a fresh absence claim."
+  },
+  "queries": [
+    "selective mixup augmentation utility gradient direction long tailed 2024 2025 2026 site:openaccess.thecvf.com",
+    "mixup augmentation gradient utility 2024 2025 site:proceedings.iclr.cc",
+    "PI-H2T 2506.00625 v2 source code Keke921 H2T",
+    "Long-tail learning via logit adjustment ICLR 2021 arxiv 2007.07314",
+    "Decoupling Representation and Classifier for Long-Tailed Recognition ICLR 2020 1910.09217"
+  ]
+}

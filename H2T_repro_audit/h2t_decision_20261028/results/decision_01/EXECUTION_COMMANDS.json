@@ -1,0 +1,110 @@
+{
+  "unit": {
+    "chunk_id": "b66ffe",
+    "wall_time_seconds": 0.2356741,
+    "exit_code": 0,
+    "original_token_count": 123,
+    "output": "test_duplicate (test_analyze_ledger.Tests.test_duplicate) ... ok\r\ntest_escape (test_analyze_ledger.Tests.test_escape) ... ok\r\ntest_invalid (test_analyze_ledger.Tests.test_invalid) ... ok\r\ntest_missing (test_analyze_ledger.Tests.test_missing) ... ok\r\ntest_pass (test_analyze_ledger.Tests.test_pass) ... ok\r\ntest_train_disallowed (test_analyze_ledger.Tests.test_train_disallowed) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 6 tests in 0.009s\r\n\r\nOK\r\n"
+  },
+  "syntax": {
+    "chunk_id": "107441",
+    "wall_time_seconds": 0.3244255,
+    "exit_code": 0,
+    "original_token_count": 0,
+    "output": ""
+  },
+  "standard_gate_first": {
+    "chunk_id": "eca34f",
+    "wall_time_seconds": 0.2746449,
+    "exit_code": 1,
+    "original_token_count": 28,
+    "output": "FAIL FileNotFoundError('H2T_repro_audit/mdlt_domain_probe/results/transfer_risk_probe_20261019_01/report.md')\r\n"
+  },
+  "standard_gate_native_exit_retry": {
+    "chunk_id": "512ff5",
+    "wall_time_seconds": 0.5174766,
+    "exit_code": 2,
+    "original_token_count": 34,
+    "output": "FAIL FileNotFoundError('H2T_repro_audit/mdlt_domain_probe/results/transfer_risk_probe_20261019_01/report.md')\r\nNATIVE_PYTHON_EXIT=2\r\n"
+  },
+  "python": "D:/app/minicondaaa/envs/xiaoju/python.exe",
+  "review_steps": {
+  "branch_source_inventory": {
+    "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B -X utf8 H2T_repro_audit/h2t_decision_20261028/results/decision_01/build_evidence_index.py",
+    "exit_code": 0,
+    "chunk_id": "d1cf72",
+    "registered_records": 14,
+    "git_sources": 105
+  },
+  "numeric_reconciliation": {
+    "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B -X utf8 - (stdlib inline, saved text tables only)",
+    "result": {
+      "chunk_id": "43078e",
+      "wall_time_seconds": 0.4793358,
+      "exit_code": 0,
+      "original_token_count": 46,
+      "output": "{\"endpoint_rows\": 50, \"contrast_rows\": 32, \"arithmetic_checks\": 114, \"mismatches\": [], \"office_auroc_range\": [0.8205324596520334, 0.8397313572267179], \"gu_cross_arm_equal_rows\": 0}\r\n"
+    }
+  },
+  "classification_and_code_map": {
+    "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B -X utf8 - (stdlib inline, evidence CSV and code references)",
+    "result": {
+      "chunk_id": "730d65",
+      "wall_time_seconds": 0.6949561,
+      "exit_code": 0,
+      "original_token_count": 50,
+      "output": "{\"evidence_rows\": 14, \"classification_counts\": {\"SUPPORTED\": 3, \"UNSUPPORTED\": 4, \"REJECTED_SPECIFIC_RULE\": 3, \"BLOCKED\": 2, \"PROTOCOL_ONLY\": 2}, \"code_paths\": 23, \"additional_blobs_verified\": 3}\r\n"
+    }
+  },
+  "history_integrity_after": {
+    "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B -X utf8 - (same baseline hash/metadata algorithm)",
+    "result": {
+      "chunk_id": "aadd65",
+      "wall_time_seconds": 1.4700548,
+      "exit_code": 0,
+      "original_token_count": 265,
+      "output": "{\r\n  \"tracked_small_files\": 1599,\r\n  \"tracked_small_raw_sha256\": \"f9bf174ae4bb37dfe49c8133194280c299bcc830ac7fc7036d3f4e6a72e7ac2d\",\r\n  \"tracked_large_files\": 26,\r\n  \"tracked_large_metadata_sha256\": \"f63b1234272eec7ec7042a523b2874a980c136193f40d00bdb8df95391eb65af\",\r\n  \"protected_metadata_files\": 4855,\r\n  \"protected_metadata_sha256\": \"fc11683f3ae0ece2240006542e4321f9407318b026dffc8fc9874230b0b7b931\",\r\n  \"checks\": {\r\n    \"tracked_small_files\": true,\r\n    \"tracked_small_raw_sha256\": true,\r\n    \"tracked_large_files\": true,\r\n    \"tracked_large_metadata_sha256\": true,\r\n    \"protected_metadata_files\": true,\r\n    \"protected_metadata_sha256\": true\r\n  },\r\n  \"all_equal\": true,\r\n  \"policy\": \"All tracked non-current-study files <=5MB raw SHA256; larger tracked file metadata and all history under H2T_official_clean,H2T,PI_H2T_review,H2T_repro_audit (current study excluded) size/mtime. No model/data interpretation.\",\r\n  \"metadata_sort\": \"per-root sorted Windows Path traversal\",\r\n  \"excluded_current_study_prefix\": \"H2T_repro_audit/h2t_decision_20261028/\"\r\n}\r\n"
+    }
+  },
+  "paper_access": {
+    "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "first_urllib_exit_code": 1,
+    "first_error": "sandbox getaddrinfo failed",
+    "authorized_retry_exit_code": 0,
+    "retry_completion_chunk_id": "44df9d",
+    "retry_session_id": 94797,
+    "scope": "two public PDFs downloaded into this turn primary_cache; eight PDFs text-extracted using pypdf from bundled packages; no package install"
+  },
+  "read_only_ast_query": {
+    "first_exit_code": 1,
+    "error": "query selected RECEIVER README before filtering suffix, causing SyntaxError; not historical code execution",
+    "corrected_exit_code": 0,
+    "corrected_scope": "parse .py only and inspect selected lines"
+  },
+  "paper_visual_checks": {
+    "driver_exit_code": 0,
+    "chunk_id": "3c516d",
+    "poppler_child_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "warnings": "SEL/DBG Symbol and ArialUnicode fallback font warnings; pages visually reviewed"
+  },
+  "public_author_tag_query": {
+    "result": {
+      "chunk_id": "ac3874",
+      "wall_time_seconds": 0.6568414,
+      "exit_code": 1,
+      "original_token_count": 268,
+      "output": "Traceback (most recent call last):\r\n  File \"<stdin>\", line 6, in <module>\r\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\urllib\\request.py\", line 215, in urlopen\r\n    return opener.open(url, data, timeout)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\urllib\\request.py\", line 521, in open\r\n    response = meth(req, response)\r\n               ^^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\urllib\\request.py\", line 630, in http_response\r\n    response = self.parent.error(\r\n               ^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\urllib\\request.py\", line 559, in error\r\n    return self._call_chain(*args)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\urllib\\request.py\", line 492, in _call_chain\r\n    result = func(*args)\r\n             ^^^^^^^^^^^\r\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\urllib\\request.py\", line 639, in http_error_default\r\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\r\nurllib.error.HTTPError: HTTP Error 403: rate limit exceeded\r\n"
+    },
+    "reason": "connector did not support tags endpoint; public unauthenticated GET returned403 rate limit. Fresh tags remain UNVERIFIED; no further retry"
+  },
+  "read_only_queries_note": "Other successful shell operations were Git branch/status/show/ls-tree/rev-parse reads, Get-Content/rg file discovery, stdlib JSON/CSV/AST/text inspection, dependency discovery and view_image. No historical experiment entrypoint was invoked. Connector calls have success/error records rather than process exit codes.",
+  "publication_note": "git cached-diff check is recorded in REVIEW_VALIDATION.json before commit; actual commit/push and remote-SHA verification are reported after publication. No future successful publication is pre-recorded."
+}
+}

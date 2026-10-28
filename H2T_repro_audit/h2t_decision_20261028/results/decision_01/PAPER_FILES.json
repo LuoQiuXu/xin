@@ -1,0 +1,82 @@
+[
+  {
+    "id": "H2T",
+    "url": "https://ojs.aaai.org/index.php/AAAI/article/download/29262/30382",
+    "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/H2T.pdf",
+    "bytes": 3810786,
+    "sha256": "38ec38129c3dfa7d9d42d10dc1e9018ffd25bdca01ea5772c74c57f2234ccc0a",
+    "pages": 9,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": false
+  },
+  {
+    "id": "PI_H2T",
+    "url": "https://arxiv.org/pdf/2506.00625v2",
+    "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/PI_H2T.pdf",
+    "bytes": 12559590,
+    "sha256": "b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8",
+    "pages": 17,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": false
+  },
+  {
+    "id": "FEATRECON",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/adb2075b6dd31cb18dfa727240d2887e-Paper-Conference.pdf",
+    "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/FEATRECON.pdf",
+    "bytes": 2161681,
+    "sha256": "2452227af12940e9c3b115c381e669493ec8252865b1d2a0c71e4247fed22783",
+    "pages": 33,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": false
+  },
+  {
+    "id": "SEL",
+    "url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Jian_Supervised_Exploratory_Learning_for_Long-Tailed_Visual_Recognition_ICCV_2025_paper.pdf",
+    "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/SEL.pdf",
+    "bytes": 2934923,
+    "sha256": "60cde7cf1aee220b51965ddd68720c7a70f6dc16b1421810585147a0220aa688",
+    "pages": 11,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": false
+  },
+  {
+    "id": "DBG",
+    "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Yang_Decision_Boundary-aware_Generation_for_Long-tailed_Learning_CVPR_2026_paper.pdf",
+    "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/DBG.pdf",
+    "bytes": 4903284,
+    "sha256": "e5e2503be6d9745f7d199d86e25b43c1d99566ba1f0350a9a1a7833333cf04ad",
+    "pages": 10,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": false
+  },
+  {
+    "id": "H2T_ARXIV_V3",
+    "url": "https://arxiv.org/pdf/2306.06963v3",
+    "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/H2T_ARXIV_V3.pdf",
+    "bytes": 5368004,
+    "sha256": "74a71f43104b3d4e19be54ceb75a85d7e0eb4e64e478e4ffca021ca4bfeb9153",
+    "pages": 13,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": false
+  },
+  {
+    "id": "SELMIX",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2024/file/44a8ab79377a7fa99575b939f1b98a21-Paper-Conference.pdf",
+    "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/SELMIX.pdf",
+    "bytes": 6177146,
+    "sha256": "6de6294bae1089c8e27b17316c48bc2620ad7ea1930b302793d6c908b5dfa8e7",
+    "pages": 30,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": true
+  },
+  {
+    "id": "KERNEL_MIXUP",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/1eac91b56dc20d4f2046951453dde527-Paper-Conference.pdf",
+    "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/KERNEL_MIXUP.pdf",
+    "bytes": 3329665,
+    "sha256": "76b11a361395348566060a8af68f7c41cd0e6bc4c78c71341ef752c4b29435bf",
+    "pages": 31,
+    "extraction": "pypdf using xiaoju interpreter, no model import",
+    "downloaded_this_turn": true
+  }
+]

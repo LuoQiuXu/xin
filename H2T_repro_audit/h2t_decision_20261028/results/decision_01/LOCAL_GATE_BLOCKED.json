@@ -1,0 +1,14 @@
+{
+  "local_gate_passed": false,
+  "first_shell_exit_code": 1,
+  "native_exit_code_verified_on_repeat": 2,
+  "error": "FileNotFoundError: H2T_repro_audit/mdlt_domain_probe/results/transfer_risk_probe_20261019_01/report.md",
+  "missing_local_ids": [
+    "OFFICE_RISK",
+    "TARGET",
+    "RECEIVER",
+    "SEMANTIC"
+  ],
+  "registry_or_analyzer_changed": false,
+  "continuation_authority": "CODEX_H2T_DECISION_LEDGER.txt step3 explicitly permits per-branch source manifest and hashes in new results after branch-separation failure."
+}

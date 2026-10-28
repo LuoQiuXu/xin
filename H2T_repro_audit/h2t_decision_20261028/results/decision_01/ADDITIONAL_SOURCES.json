@@ -1,0 +1,90 @@
+[
+  {
+    "id": "OFFICE_RISK_PILOT_CONTEXT",
+    "commit": "cce7ad6b9b1447c0b5b5452b409079f939520efc",
+    "path": "H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/dataset_audit.json",
+    "sha256": "287d099dad98a4edace5831f125f43208fffa53365e06b0b2b83ddbd02b16698",
+    "bytes": 1314,
+    "source_url": "https://github.com/LuoQiuXu/xin/blob/cce7ad6b9b1447c0b5b5452b409079f939520efc/H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/dataset_audit.json",
+    "text_or_json": {
+      "csv_path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\mdlt_domain_probe\\protocol\\OfficeHome.csv",
+      "csv_url": "https://raw.githubusercontent.com/YyzHarry/multi-domain-imbalance/2efbfefd34542e365293f798d79f70cee5e54303/mdlt/dataset/split/OfficeHome.csv",
+      "csv_sha256": "0a6c4e7800f629b8c6b67ba71dd238a83d4f513ac77694ab58796e528985a5b5",
+      "mdlt_commit": "2efbfefd34542e365293f798d79f70cee5e54303",
+      "image_root": "D:\\xiangmuxunlian\\xin\\data\\OfficeHomeDataset_10072016",
+      "total_rows": 15588,
+      "split_counts": {
+        "train": 11688,
+        "test": 2600,
+        "val": 1300
+      },
+      "domain_counts_train": {
+        "Art": 1452,
+        "Clipart": 3390,
+        "Product": 3464,
+        "Real World": 3382
+      },
+      "global_class_train_min": 82,
+      "global_class_train_max": 303,
+      "global_train_min_over_max": 0.2706270627062706,
+      "zero_train_cells": 2,
+      "domain_class_group_counts": {
+        "Many": 79,
+        "Medium": 148,
+        "Few": 33
+      },
+      "val_count_per_cell": [
+        5
+      ],
+      "test_count_per_cell_metadata_only": [
+        10
+      ],
+      "duplicate_paths": 0,
+      "split_path_intersections": 0,
+      "resolved_path_aliases": 0,
+      "missing_image_count": 0,
+      "present_image_count": 15588,
+      "missing_domain_directories": [],
+      "ready": true,
+      "audit_decoded_images": 0,
+      "test_pixels_read": false,
+      "all_domains_in_all_splits": true
+    },
+    "git_blob_sha1": "d52762fe761405d9855d2815e6cebf7faaec2ef7",
+    "blob_hash_verified": true
+  },
+  {
+    "id": "OFFICE_RISK_PILOT_CONTEXT",
+    "commit": "cce7ad6b9b1447c0b5b5452b409079f939520efc",
+    "path": "H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/status.json",
+    "sha256": "c9d12f5f1da8767686055667351d258e5b0104badc84148b38f19342d5f76d79",
+    "bytes": 181,
+    "source_url": "https://github.com/LuoQiuXu/xin/blob/cce7ad6b9b1447c0b5b5452b409079f939520efc/H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/status.json",
+    "text_or_json": {
+      "status": "COMPLETE",
+      "utc": "2026-10-18T13:40:06.597593+00:00",
+      "elapsed_seconds": 1061.016477999976,
+      "peak_allocated_mib": 429.806640625,
+      "peak_reserved_mib": 660.0
+    },
+    "git_blob_sha1": "fd419d2c0bb25f203288ff5091315db912bc19fd",
+    "blob_hash_verified": true
+  },
+  {
+    "id": "OFFICE_RISK_PILOT_CONTEXT",
+    "commit": "cce7ad6b9b1447c0b5b5452b409079f939520efc",
+    "path": "H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/test_access.json",
+    "sha256": "1acceea27934fe6218bb8ac2a41b778e23260e74044cf827bce4fc0f3b3e5724",
+    "bytes": 257,
+    "source_url": "https://github.com/LuoQiuXu/xin/blob/cce7ad6b9b1447c0b5b5452b409079f939520efc/H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/test_access.json",
+    "text_or_json": {
+      "started_utc": "2026-10-18T13:39:26.739050+00:00",
+      "phase": "single final evaluation",
+      "all_final_checkpoints_locked": 12,
+      "manifest_sha256": "beb534b642d64cf67440fd90ab6998d49de4e357c37f23daebf50102c9cdf751",
+      "no_stage2_best_selection": true
+    },
+    "git_blob_sha1": "5a3591f816e5120d14b84b8c78106e093de56ac0",
+    "blob_hash_verified": true
+  }
+]

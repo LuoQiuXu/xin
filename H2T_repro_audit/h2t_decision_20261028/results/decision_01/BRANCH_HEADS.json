@@ -1,0 +1,98 @@
+[
+  {
+    "branch": "audit/h2t-component-map-20261026",
+    "sha": "f7ee098779879d6ace9af0e464424eef5941290a"
+  },
+  {
+    "branch": "audit/pi-h2t-author-source-gate-20261027",
+    "sha": "c30a36cf3d14415690d0834ab91c9f27aee52385"
+  },
+  {
+    "branch": "experiment/donor-affinity-margin-protect-20261019",
+    "sha": "1692ac39ad906107b50a4ce770ce69c289c4c3b2"
+  },
+  {
+    "branch": "experiment/fusion-semantic-audit-20261025",
+    "sha": "592655371c52354b3a3d02983a7fc96f8ba74855"
+  },
+  {
+    "branch": "experiment/gu-lowvs-utility-20261016",
+    "sha": "6247394a36d95bd98c796d042b51774911e125f2"
+  },
+  {
+    "branch": "experiment/h2t-if200-stress-20261017",
+    "sha": "fcfdb3e47ccba553c2ae07a1456e8e48fadf96e0"
+  },
+  {
+    "branch": "experiment/h2t-mask-selection-causal-20261015",
+    "sha": "e288c98852ffd02628fb86f40d70ad1f0073d17e"
+  },
+  {
+    "branch": "experiment/h2t-real-scenario-audit-20261019",
+    "sha": "e21c645dd3fa3040a97dcb58ef067d28aa38207f"
+  },
+  {
+    "branch": "experiment/h2t-receiver-selectivity-20261026",
+    "sha": "50da70fec95a565b3f585b624ed2cc8490b34a61"
+  },
+  {
+    "branch": "experiment/lowvs-boundary-direction-20261017",
+    "sha": "cc627c1dfbdd5983feae20d323c84133fc01a822"
+  },
+  {
+    "branch": "experiment/lowvs-disc-preserve-20261018",
+    "sha": "f7387942489a2db23ed59b4097b828bb8d5c2e81"
+  },
+  {
+    "branch": "experiment/lowvs-mask-parity-20261021",
+    "sha": "b4243d9a57f2ca094408b9aae7a7d63d8bcaee7f"
+  },
+  {
+    "branch": "experiment/lowvs-norm-direction-20261016",
+    "sha": "bef8adc8a47f5714bddd896963c15aceeeb5eecd"
+  },
+  {
+    "branch": "experiment/lowvs-target-semantics-20261025",
+    "sha": "2a2f8e4b91d80794f0edb27e868b917429abd48c"
+  },
+  {
+    "branch": "experiment/officehome-domain-transfer-pilot-20261018",
+    "sha": "ec8893c638b391b25b662b7f7690b37c699de552"
+  },
+  {
+    "branch": "experiment/officehome-transfer-risk-probe-20261019",
+    "sha": "cce7ad6b9b1447c0b5b5452b409079f939520efc"
+  },
+  {
+    "branch": "experiment/pi-h2t-paper-reproduction-20261021",
+    "sha": "aecd3375672be18a015758498ad24e42333a016b"
+  },
+  {
+    "branch": "experiment/ravs-h2t-v1-20261015",
+    "sha": "82c94109ad3073b2e459ef5186c601f29a67b81d"
+  },
+  {
+    "branch": "main",
+    "sha": "fd30a6d2bdfd86d8ecf680089e46731a983a31e9"
+  },
+  {
+    "branch": "repro/pi-h2t-cifar100-paper-parity-20261027",
+    "sha": "049f91158fca3de754f337f8e3ac0d41d7c5af7a"
+  },
+  {
+    "branch": "repro/pi-h2t-reference-w-parity-20261027",
+    "sha": "c8170854989192b00f46df47464096d5b33ee2c4"
+  },
+  {
+    "branch": "research/h2t-bias-vs-discrimination-20261028",
+    "sha": "9273b9d7c8083349a7599ef23a7f591dc448f7b9"
+  },
+  {
+    "branch": "research/h2t-decision-ledger-20261028",
+    "sha": "832e9747d992e2d67b32325a4e54d917e00c0325"
+  },
+  {
+    "branch": "research/h2t-pih2t-gap-20261026",
+    "sha": "d52f8c52a836b75717e2ad949bcd458ef4860c75"
+  }
+]

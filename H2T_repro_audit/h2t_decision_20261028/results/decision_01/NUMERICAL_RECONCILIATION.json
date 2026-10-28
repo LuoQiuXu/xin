@@ -1,0 +1,91 @@
+{
+  "status": "PASS_TABLE_RECONCILIATION_ONLY",
+  "fixed_endpoint_rows": 50,
+  "contrast_rows": 32,
+  "paired_delta_and_count_comparisons": 114,
+  "arithmetic_mismatches": [],
+  "decimal_tolerance_pp": 1e-08,
+  "not_a_feature_hash_tolerance": true,
+  "not_prediction_recomputation": true,
+  "donor_mixed_correctness": {
+    "All": {
+      "count": 5404,
+      "denominator": 20000,
+      "percent": 27.02
+    },
+    "Tail": {
+      "count": 1844,
+      "denominator": 5792,
+      "percent": 31.837016574585636
+    }
+  },
+  "boundary_tail_eligible": [
+    {
+      "seed": "124",
+      "n": "3064",
+      "mean_qL_minus_qU": "-0.03731646482273808",
+      "fraction_qL_less_qU": "0.5953002610966057",
+      "mean_matched_margin_L_minus_U": "-0.12191006406167804",
+      "mean_loss_matched_L_minus_U": "0.1753338379685588"
+    },
+    {
+      "seed": "125",
+      "n": "2986",
+      "mean_qL_minus_qU": "-0.040377494091654774",
+      "fraction_qL_less_qU": "0.5857334226389819",
+      "mean_matched_margin_L_minus_U": "-0.12825628848591503",
+      "mean_loss_matched_L_minus_U": "0.17534885462365402"
+    }
+  ],
+  "office_directional_auroc": {
+    "min": 0.8205324596520334,
+    "max": 0.8397313572267179,
+    "rows": 9
+  },
+  "office_summary": {
+    "delta_ce": {
+      "mean": 0.048448480665683746,
+      "ci95": [
+        0.015304655930958689,
+        0.0796348351985216
+      ],
+      "bootstrap_reps": 500,
+      "interpretation": "conditional on fixed trained checkpoints"
+    },
+    "delta_margin": {
+      "mean": -0.04904220625758171,
+      "ci95": [
+        -0.10425255093723536,
+        0.005861817277036603
+      ],
+      "bootstrap_reps": 500,
+      "interpretation": "conditional on fixed trained checkpoints"
+    },
+    "harm_rate": {
+      "mean": 0.002564102564102564,
+      "ci95": [
+        -0.003141025641025641,
+        0.00855929487179487
+      ],
+      "bootstrap_reps": 500,
+      "interpretation": "conditional on fixed trained checkpoints"
+    }
+  },
+  "gu_cross_arm_histograms": {
+    "rows": 20,
+    "equal_rows": 0,
+    "interpretation": "within-arm shuffle preserves its own actions; NOT an equal-dose cross-arm counterfactual"
+  },
+  "strict_reconstruction": {
+    "per_class_rows": 100,
+    "no_fusion_correct": 4553,
+    "h2tf_correct": 3650,
+    "wins": 796,
+    "losses": 1699,
+    "input_stream_hash_matches": 10,
+    "epochs_each": 10
+  },
+  "zero_training": true,
+  "no_checkpoint_deserialization": true,
+  "no_dataset_or_prediction_arrays_opened": true
+}

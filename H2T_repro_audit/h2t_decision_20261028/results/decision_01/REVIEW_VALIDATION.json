@@ -1,0 +1,194 @@
+{
+  "status": "PASS_CURRENT_REVIEW_STATIC_AND_TEXT_EVIDENCE_CHECKS",
+  "scientific_decision": "STOP_NO_DEFENSIBLE_GAP",
+  "registered_primary_coverage": "14/14 pinned branches",
+  "git_text_sources": 108,
+  "verified_git_blobs": 108,
+  "local_historical_text_sources": 9,
+  "local_sources_not_falsely_attributed_to_github": true,
+  "code_path_references": 23,
+  "classification_counts": {
+    "SUPPORTED": 3,
+    "UNSUPPORTED": 4,
+    "REJECTED_SPECIFIC_RULE": 3,
+    "BLOCKED": 2,
+    "PROTOCOL_ONLY": 2
+  },
+  "unit_tests": {
+    "passed": 6,
+    "total": 6,
+    "exit_code": 0
+  },
+  "initial_py_compile_exit_code": 0,
+  "standard_local_gate": {
+    "status": "FAILED_CLOSED_PRESERVED",
+    "native_python_exit_code": 2,
+    "reason": "four registered paths on separate branches, verified by Git objects; no gate override"
+  },
+  "numeric_reconciliation": {
+    "endpoints": 50,
+    "contrasts": 32,
+    "arithmetic_checks": 114,
+    "mismatches": 0,
+    "not_feature_replay": true
+  },
+  "paper_pdf_hashes_verified": 8,
+  "paper_pages_visually_reviewed": 6,
+  "ast_files": [
+    "H2T_repro_audit/h2t_decision_20261028/analyze_ledger.py",
+    "H2T_repro_audit/h2t_decision_20261028/test_analyze_ledger.py",
+    "H2T_repro_audit/h2t_decision_20261028/results/decision_01/build_evidence_index.py"
+  ],
+  "json_files_parsed": [
+    "ADDITIONAL_SOURCES.json",
+    "BRANCH_HEADS.json",
+    "EXECUTION_COMMANDS.json",
+    "HISTORICAL_PROTECTION_AFTER.json",
+    "HISTORICAL_PROTECTION_BEFORE.json",
+    "LITERATURE_ACCESS.json",
+    "LOCAL_GATE_BLOCKED.json",
+    "LOCAL_SUPPLEMENT.json",
+    "NUMERICAL_RECONCILIATION.json",
+    "PAPER_FILES.json",
+    "REVIEW_VALIDATION.json",
+    "SOURCE_MANIFEST.json"
+  ],
+  "markdown_local_links_checked": 39,
+  "pinned_github_links_checked": 17,
+  "working_tree_diff_check_exit_code": 0,
+  "cached_diff_check_before_commit": 0,
+  "branch": "research/h2t-decision-ledger-20261028",
+  "starting_head": "832e9747d992e2d67b32325a4e54d917e00c0325",
+  "tracked_modifications_outside_current_outputs": 0,
+  "unknown_untracked_paths_outside_allowed_prefixes": 0,
+  "history_protection_all_equal": true,
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "python_version": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+  "training": false,
+  "gpu_forward": false,
+  "official_test_data_access": false,
+  "checkpoint_deserialization": false,
+  "new_experiment_draft": false,
+  "output_files_excluding_self": [
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/.gitignore",
+      "bytes": 15,
+      "sha256": "3577526efcfd9794f1272e109e80b60de3cca2eee79f63bb8d54bb8452d33353"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/ADDITIONAL_SOURCES.json",
+      "bytes": 3743,
+      "sha256": "3d46037fbb6fbd2bf5cd29dc6f100687687faee3387d710c7c12a75fc8278cef"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/BRANCH_HEADS.json",
+      "bytes": 2892,
+      "sha256": "8fab60e26a8866aecda24fabf774997e00b23234ca7a06d908214f9c5f1db51c"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/BRANCH_SOURCE_INDEX.csv",
+      "bytes": 6403,
+      "sha256": "2ece71b6e926a6dea78592280e25417a53b66d96ca56953622f013b4708529bd"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/build_evidence_index.py",
+      "bytes": 8512,
+      "sha256": "583bcc19e10dcf893982f86e4fec1c8b6befe6ca7da6bccf135a2b6bdcdd7e54"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/CODE_PATH_EVIDENCE.csv",
+      "bytes": 9496,
+      "sha256": "4a17010d5d887bcde1180e502dce5d5eaca16da40622e1a1af24982457f4f2df"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/EVIDENCE_REVIEW.csv",
+      "bytes": 11600,
+      "sha256": "4f056e7b5a803c7c3ac739032a962037c8d67d62dc006bafd8c0d27af4442d00"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/EXECUTION_COMMANDS.json",
+      "bytes": 7390,
+      "sha256": "3001dc61acbe2a651ba2dd5dc5769465aba9c0534dbc4fe5836ddc13a3a88954"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/EXECUTION_REPORT.md",
+      "bytes": 8373,
+      "sha256": "1d12e741f45eb0f6c687a8b42e949c1a7037869a99b31a9a5f12ebd8923d2b34"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/FIXED_ENDPOINTS.csv",
+      "bytes": 13997,
+      "sha256": "9be86b85a0b08af37c95c0462eaea2c3a0c970f336f8388274adf55411f716f2"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/HISTORICAL_CONTRADICTION_AUDIT.md",
+      "bytes": 21713,
+      "sha256": "fc7834a376534a36a680ed5ec32f1567b8e0683cb889ce49efbbb8e366dab664"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/HISTORICAL_PROTECTION_AFTER.json",
+      "bytes": 1039,
+      "sha256": "97c932b898f738dab68e72ddd60e1aced738558fd6abe931ec1ccf7a25ccedf1"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/HISTORICAL_PROTECTION_BEFORE.json",
+      "bytes": 639,
+      "sha256": "2c514e847ef70cf5a81df6b5aaa0135eeaa3edfe9086263402d0877fa7a2b9a0"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/LITERATURE_ACCESS.json",
+      "bytes": 5244,
+      "sha256": "e745895eb49b6a29b150de28151bd42e6fe98df69572b7ebac6c2f2c25018a07"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/LOCAL_GATE_BLOCKED.json",
+      "bytes": 531,
+      "sha256": "8170434fbb39d988a5326cffdf2a9bbae4f72506f031f7059fbc0d293515bc3f"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/LOCAL_SUPPLEMENT.json",
+      "bytes": 5784,
+      "sha256": "69588b82ffae4b3d450a0e3d746dafd4580988ac1c82f68005ce5d20dddcf6b9"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/MECHANISM_NOVELTY_MATRIX.md",
+      "bytes": 11216,
+      "sha256": "a901ad2520b011c260f2502a4832a350aba8d52a23fd3f41d57b63c221e0a790"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/NUMERICAL_RECONCILIATION.json",
+      "bytes": 2488,
+      "sha256": "7234621e403638f1fa0e0ce405c2a58f6bf685c2f08f45db58c93d4f76d2edcd"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/ONE_QUESTION_OR_STOP.md",
+      "bytes": 5330,
+      "sha256": "3e4835151971d184dec3103908067001d89331bd1952751605b0e3ac00991f88"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/PAPER_FILES.json",
+      "bytes": 3724,
+      "sha256": "76b9cbcf382309c2f30c31a9975ccadb3711c684745b591addfd6507de7bb24c"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/RECONCILED_CONTRASTS.csv",
+      "bytes": 19747,
+      "sha256": "c4dc7cabd5e937f9c8852acea588f684f776000dac575b3065459a7bbd58ea11"
+    },
+    {
+      "path": "H2T_repro_audit/h2t_decision_20261028/results/decision_01/SOURCE_MANIFEST.json",
+      "bytes": 89883,
+      "sha256": "9bbc48027c64dbe45cd0211cc5f73a7ee6a1fd86d0c234c1a403d3b7ec6b6b8a"
+    }
+  ],
+  "self_hash_excluded_to_avoid_recursion": true,
+  "publication": "commit/push confirmation is reported after the operation, not pre-recorded",
+  "explicit_staging_scope_check": {
+    "files": 23,
+    "outside_result_directory": 0,
+    "only_new_text_files": true,
+    "no_dataset_weights_pdf_or_images": true
+  },
+  "remote_branch_head_before_commit": "832e9747d992e2d67b32325a4e54d917e00c0325",
+  "remote_before_check_method": "GitHub branches collection GET, exact branch-name match; encoded single-branch endpoint unsupported by connector"
+}
