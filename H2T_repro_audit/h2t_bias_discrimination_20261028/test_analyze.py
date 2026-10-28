@@ -32,8 +32,10 @@ class GroupBiasTests(unittest.TestCase):
         y, dr = demo_logits()
         h2t = dr.copy()
         where = np.flatnonzero(y == 71)[:9]
-        dr[where, 72] = dr[where, 71] + 1.0
-        h2t[where, 71] = dr[where, 72] + 1.0
+        dr[where, 71:100] = -10
+        h2t[where, 71:100] = -10
+        dr[where, 71], dr[where, 72] = 0.0, 1.0
+        h2t[where, 71], h2t[where, 72] = 2.0, 1.0
         d = a.within_group(dr, y)["Tail"]
         h = a.within_group(h2t, y)["Tail"]
         self.assertEqual(h["correct"] - d["correct"], 9)
