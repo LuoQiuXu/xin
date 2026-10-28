@@ -1,0 +1,85 @@
+任务：H2T 的增益究竟只是 Head/Medium/Tail 三组预测偏置变化，还是还改变了组内类别判别？
+性质：研究命题筛选／科学止损；**不开发新H2T模块、不训练任何模型、不读取官方TEST**。
+唯一仓库：LuoQiuXu/xin
+唯一分支：research/h2t-bias-vs-discrimination-20261028
+唯一新代码目录：H2T_repro_audit/h2t_bias_discrimination_20261028/
+必须先完整阅读：README.md、analyze.py、test_analyze.py。
+这次是新分支，基于experiment/h2t-if200-stress-20261017；不要切回旧的PI或Low-VS分支执行。
+
+【科学动机】
+已经完成的IF200固定BN两seed的Original-BatchShared H2T对比DR，普通Overall和Tail均提高；以往IF100/IF200、BN、mask granularity、LowVS、RAVS、GU等验证已探索过相当多次。我们不能再换名字重复“高风险融合筛选”“困难度通道池”或盲目换场景。
+这轮一个新问题：H2T是否做了“超出三个组级logit偏置”的判别调整？
+对于g=Head/OfficialMedium/Tail，z'_c=z_c+b_g。在某个真实类组内，各候选类同时加同一个b_g，组内argmax严格不变。因此组内真实类预测率的差别不能由三个组的常数偏置独立产生。
+第二个辅助诊断是DR组级bias oracle envelope：对开发集枚举已预注册的[-4,4]×中位top1-top2 gap、步长0.25的Medium/Tail偏移。它在同一开发集上优化，是过分乐观的解释上界，不能作为新模型方法或独立泛化表现。
+假设：如果H2T在两seed都改善Tail组内排序，且固定2D oracle无法同时覆盖H2T的Overall/Head/Medium/Tail，那么“仅仅改变组级预测偏置”的狭义解释不足。否则停止这条新命题，不自行扫其他bias维度寻涨点。
+
+【0．分支与写保护】
+确认git branch --show-current等于上述唯一分支；记录HEAD SHA、git status --short。
+如果有历史未跟踪文件、原本已有结果或本地修改，先列出，绝不能git clean、reset --hard、stash、add -A、删除任何checkpoint。历史所有分支、目录、代码、训练资产原封不动。
+不得修改H2T_official_clean/、H2T/、原if200_stress/results/、clean_vs_stability_runs/、其他实验目录。仅允许本轮新增目录内最小代码bug修正及新增结果。
+不要把“编写代码的commit”误认为实验已经执行。
+
+【1．来源真实性核查，不允许随意换输入】
+直接沿用现有IF200已完成实验：H2T_repro_audit/if200_stress/results/
+seed124/DR-NoFusion/validation_epoch10.npz
+seed124/Original-BatchShared/validation_epoch10.npz
+seed125/DR-NoFusion/validation_epoch10.npz
+seed125/Original-BatchShared/validation_epoch10.npz
+各组相邻summary.json与本地保留的final_fc.pth，另有stage1/stage1_fixed_epoch200.pth。
+TRUE TRAIN holdout原始标签/indices：
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/validation_labels.npy
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/split_indices.npz
+检查参考代码run_if200.py:真实NPZ的来源、epoch10的保存方法、labels/logits/predictions匹配、验证样本原始TRAIN索引不与LT训练交叉。Source中已保存的metadata要求Stage1 SHA=5abef38180bf85cd5c60c38bae08efe23173bdf4775fe44bc38299458448548f；分类器初始化hash=a8e9d399d61537ca6d085a55f131e6924634ff077f12cbb40ad2c9f5f55f44f9；总计750 optimizer.step；BN固定；TEST_used=false；两个seed各两arm同StageI。
+训练日志meta的断言不能替代实际文件身份；如checkpoint还在，独立计算其SHA256、可安全加载后检查模型state一致性（该部分只读）；如不在，写明只有元数据来源未能独立检查，不得标记完全核实。
+严禁把历史官方10000张TEST评估的logits拿来填入1980张TRAIN验证。缺任何一个原NPZ/标签/checkpoint/来源必要文件→停止写MISSING_SOURCE_REPORT.md，**不启动任何训练或重新提取大批特征**。
+
+【2．离线程序及单元测试】
+使用原项目可运行的Python环境，NumPy已安装。执行
+python -m unittest discover -s H2T_repro_audit/h2t_bias_discrimination_20261028 -p "test_*.py" -v
+python -m py_compile H2T_repro_audit/h2t_bias_discrimination_20261028/analyze.py H2T_repro_audit/h2t_bias_discrimination_20261028/test_analyze.py
+保存退出码与实际错误（若存在），测试synthetic数据只能说明代码行为正确，不能充当历史科学结果。
+如测试无误，执行且只执行一次：
+python H2T_repro_audit/h2t_bias_discrimination_20261028/analyze.py --output H2T_repro_audit/h2t_bias_discrimination_20261028/results/if200_bias_gate_01
+结果目录已存在则禁止覆盖，可使用新唯一run-id，确保没有跑过后为了挑选结果反复执行。
+脚本仅以已有NPZ、meta、train split为输入；无torch调用、没有GPU、没有训练、没有官方TEST访问。不得擅自调整定义、31/35/29类分组、oracle [-4,4]网格、1pp阈值或两个seed的规则。
+
+【3．科学结果必须完整、不挑选】
+应生成：
+within_group.csv：两个seed×三类组真实组内正确张数、分母、准确率、DR vs H2T差；
+oracle_grid.csv：每seed1089点Medium/Tail组级偏置及各组Top1、是否同时达到H2T；
+decision.json：决策、完整源哈希、各seed详细结果；
+SCIENTIFIC_REPORT.md：自动分析文本。
+Codex再人工复核：
+a) 组内排序对组常数bias严格不变，有单元测试；
+b) 按NPZ logits重算原Overall/Head/Medium/Tail与历史summary逐浮点匹配；
+c) oracle零偏置点严格等于DR原精度；oracle覆盖数量不大于1089，全部输出有限；
+d) class0缺失、共1980 TRAIN-only验证与类别频次正确；2种子同一StageI。
+e) 重点解读：组内Tail排名的提升/下降真实净张数，不能拿普通Tail精度增益直接替代。
+f) H2T相对DR既有提升是否可被三组简单bias的乐观上界覆盖；不等于类特异偏置/决策W方向/范数全部排除。
+g) 这是反复用过的开发集，oracle是开发集上的乐观选择；任何搜索/比较不能被宣称独立验证。
+
+【4．预注册决策与停止条件】
+每一个seed同时：H2T普通Overall>DR、普通Tail>DR，Tail组内restricted Top1改善至少1.0pp，并且oracle没有任何点同时达到H2T的Overall/Head/OfficialMedium/Tail。
+两个seed都满足 → EXPLORATORY_NON_GROUP_BIAS_SIGNAL。
+只要一个不满足 → NO_SUPPORT_STOP_THIS_HYPOTHESIS。
+即使PASS也只说明这个有限“组常数偏置解释”不足，不支持“语义迁移更好”“H2T表征学习更好”“PI-H2T有缺陷”或可发表创新。FAIL就停止，禁止自动增加类级bias、阈值、更多seed、损失、donor选择或跨域训练来挽救假设。
+本轮任何结果只作为方向决策，还必须考虑此前Low-VS/RAVS/GU方向NO-GO的已验证停止条件。
+
+【5．用户希望的中文深度分析】
+新增SCIENTIFIC_REVIEW_ZH.md（人工总结），按第一性原理解释：
+①为何“组内排序”与“组级偏置”数学上可区分；
+②普通Overall/Head/Tail变化、组内排序变化和oracle envelope分别意味着什么；
+③结果是否真的回答了之前机制审计没有回答的问题，还是已有W/b/Low-VS分析的重复；
+④以前的BN、VS、供体扰动、IF200结论应该如何保留、不越界；
+⑤这项命题新颖性仍然不够的环节、已有PI-H2T/SEL等相关工作可能覆盖范围；
+⑥唯一下一步决策：PASS时建议独立验证的精确对象，FAIL时明确终止并转向其他研究切入点。
+列出不支持的结论，不提出Risk-Off新模块，不新建训练工程。
+另写EXECUTION_REPORT.md：执行环境、所有命令/返回码、原始资产是否保持不变、source哈希、未训练/未使用官方TEST证明。原始checkpoint如果无法独立访问，诚实保留该核验缺口。
+
+【6．Github提交】
+仅提交本轮小体积CSV/JSON/MD、必要最小bug修复。明确排除大NPZ/训练权重/原训练数据/缓存；不改历史。
+执行git diff --check后逐文件git add本轮路径，commit+push到**同一个**research/h2t-bias-vs-discrimination-20261028分支。
+不创建新分支、不合并、不提交PR。报告真实最终commit、报告URL、两个seed的结果、PASS/FAIL或FAIL_SOURCE、是否有任何未解决异常。
+若环境/源缺失致停止，也应保存可复查FAILED_STOP报告，不造假数据。
+
+注意：本阶段尚未确定能写出方法论文，目标是明确排除一个以前没有彻底排除的解释，用最少科学计算做研究决策，而不是为写代码而写代码。
