@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "design": "read-only historical hypothesis decision gate",
+  "created": "2026-10-28",
+  "no_gpu": true,
+  "official_test_note": "Historical original replication used official TEST and some best-epoch selection; new decisions must not use it for tuning",
+  "records": [
+    {
+      "id": "H2T_BN",
+      "branch": "research/h2t-pih2t-gap-20261026",
+      "path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/H2T_BN_AUDIT.md",
+      "claim": "H2T has additional paired fixed-BN classifier gain",
+      "status": "SUPPORTED_CONDITIONAL",
+      "evidence": "fixed BN epoch10 H2T 47.25 vs DR 46.49; original 47.87 vs 47.00",
+      "confound": "one StageII seed; fixed BN differs official protocol",
+      "next": "Do not rerun unless an independent targeted hypothesis requires it"
+    },
+    {
+      "id": "DONOR_K4",
+      "branch": "research/h2t-pih2t-gap-20261026",
+      "path": "H2T_repro_audit/donor_audit_runs/donor_perturbation_20261012_phase1_seed123/H2T_DONOR_PERTURBATION_AUDIT.md",
+      "claim": "Donor identity changes fixed-model margin response",
+      "status": "SUPPORTED_DIAGNOSTIC_ONLY",
+      "evidence": "27.02% receiver groups mixed right/wrong among four candidates; Tail 31.84%",
+      "confound": "cached eval features, fixed classifier; not downstream utility",
+      "next": "No donor strategy without a held-out training-utility test"
+    },
+    {
+      "id": "MASK",
+      "branch": "experiment/h2t-mask-selection-causal-20261015",
+      "path": "H2T_repro_audit/mask_granularity_iteration/results/MASK_GRANULARITY_RESULTS.md",
+      "claim": "Mask granularity alters H2T-style outcomes",
+      "status": "PARTIAL_CONFOUNDED",
+      "evidence": "Shared vs PerSample recorded; two-seed differences",
+      "confound": "historical source hash mismatch was preserved; not exact one-factor pair",
+      "next": "Avoid rephrasing mask granularity as a newly found gap"
+    },
+    {
+      "id": "LOWVS_NORM",
+      "branch": "experiment/lowvs-norm-direction-20261016",
+      "path": "H2T_repro_audit/lowvs_norm_direction/results/LOWVS_NORM_DIRECTION_SCIENTIFIC_REPORT.md",
+      "claim": "Low-VS superiority reflects uniquely safer discriminative direction",
+      "status": "NOT_ESTABLISHED",
+      "evidence": "matched Overall mean difference +0.0505pp and sign reversal across seeds",
+      "confound": "two StageII seeds, one StageI, reused TRAIN holdout",
+      "next": "Stop direction-based LowVS claims"
+    },
+    {
+      "id": "GU",
+      "branch": "experiment/gu-lowvs-utility-20261016",
+      "path": "H2T_repro_audit/gu_lowvs/results/GU_LOWVS_SCIENTIFIC_REPORT.md",
+      "claim": "Gradient-utility intensity routing improves H2T",
+      "status": "NO_GO",
+      "evidence": "GU vs full Overall -0.7323pp Tail -4.0517pp means",
+      "confound": "utility proxy changes strength distribution",
+      "next": "No tuning alpha or recycling this selection rule"
+    },
+    {
+      "id": "RAVS",
+      "branch": "experiment/ravs-h2t-v1-20261015",
+      "path": "H2T_repro_audit/ravs_v1/results/RAVS_V1_SCIENTIFIC_REPORT.md",
+      "claim": "Frequency plus hardness gating improves LowVS",
+      "status": "NO_GO",
+      "evidence": "missed both preregistered gates",
+      "confound": "only two StageII seeds",
+      "next": "No new sigmoid K variants"
+    },
+    {
+      "id": "IF200",
+      "branch": "experiment/h2t-if200-stress-20261017",
+      "path": "H2T_repro_audit/if200_stress/results/IF200_STRESS_SCIENTIFIC_REPORT.md",
+      "claim": "Greater IF alone makes H2T fail",
+      "status": "NOT_SUPPORTED",
+      "evidence": "fixed BN IF200 H2T-like Overall 42.83/42.63 vs DR 41.62/41.87",
+      "confound": "not direct equal-protocol IF100 vs IF200 effect",
+      "next": "Do not perform an IF sweep"
+    },
+    {
+      "id": "BOUNDARY",
+      "branch": "experiment/lowvs-boundary-direction-20261017",
+      "path": "H2T_repro_audit/lowvs_boundary_direction/results/BOUNDARY_DIRECTION_SCIENTIFIC_REPORT.md",
+      "claim": "Instantaneous margin movement identifies end-to-end beneficial blends",
+      "status": "NOT_ESTABLISHED",
+      "evidence": "greater local boundary disturbance, no training-utility demonstration",
+      "confound": "fixed classifier TRAIN-only instant perturbation",
+      "next": "Do not elevate margin probe to causal benefit"
+    },
+    {
+      "id": "CLEAN_CE",
+      "branch": "experiment/lowvs-disc-preserve-20261018",
+      "path": "H2T_repro_audit/lowvs_disc_preserve/results/LOWVS_DISC_SCIENTIFIC_REPORT.md",
+      "claim": "Top competitor supervised loss yields better tail balance than clean CE",
+      "status": "NO_GO",
+      "evidence": "C-B Tail -0.5172/-1.0345pp for seeds 124/125",
+      "confound": "not matched gradient semantics",
+      "next": "Stop this supervised target variant"
+    },
+    {
+      "id": "OFFICE_RISK",
+      "branch": "experiment/officehome-transfer-risk-probe-20261019",
+      "path": "H2T_repro_audit/mdlt_domain_probe/results/transfer_risk_probe_20261019_01/report.md",
+      "claim": "Directional proxy can rank one-step loss effect",
+      "status": "SUPPORTED_DIAGNOSTIC_ONLY",
+      "evidence": "AUROC .821-.840; cross-vs-matched deltaCE +.04845",
+      "confound": "first-order Taylor CE, fixed classifier and domain donor identity",
+      "next": "Not proof of final training utility"
+    },
+    {
+      "id": "PARITY",
+      "branch": "research/h2t-pih2t-gap-20261026",
+      "path": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/ONE_QUESTION_DECISION.md",
+      "claim": "PI-H2T local performance drop is author method limitation",
+      "status": "BLOCKED_PARITY",
+      "evidence": "PIF 25 vs 2 parameters; multiple unresolved author semantics",
+      "confound": "reconstruction differs author implementation",
+      "next": "Do not use as PI author flaw"
+    },
+    {
+      "id": "TARGET",
+      "branch": "experiment/lowvs-target-semantics-20261025",
+      "path": "H2T_repro_audit/lowvs_target_semantics/PROTOCOL.md",
+      "claim": "Change fused tail supervision improves training",
+      "status": "PROTOCOL_ONLY",
+      "evidence": "pre-registered arms, no verified result files in checked branch",
+      "confound": "unrun or unpublished output, not a negative result",
+      "next": "No claim of outcome"
+    },
+    {
+      "id": "RECEIVER",
+      "branch": "experiment/h2t-receiver-selectivity-20261026",
+      "path": "H2T_repro_audit/receiver_selectivity/README.md",
+      "claim": "TailOff beats fusion-dose matched RandomOff",
+      "status": "PROTOCOL_ONLY",
+      "evidence": "preregistered IF200 four arms, no verified result files in checked branch",
+      "confound": "only proposal, not supported or refuted",
+      "next": "Do not rebrand as a new experiment"
+    },
+    {
+      "id": "SEMANTIC",
+      "branch": "experiment/fusion-semantic-audit-20261025",
+      "path": "H2T_repro_audit/fusion_semantic_audit/results/FAILED_STOP.json",
+      "claim": "Semantic risk probe identifies causal H2T failure",
+      "status": "BLOCKED_REPLAY",
+      "evidence": "STOPPED_ON_EXACT_REPLAY_MISMATCH",
+      "confound": "no valid recovered run",
+      "next": "Do not interpret missing results"
+    }
+  ]
+}
