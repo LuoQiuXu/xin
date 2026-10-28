@@ -1,0 +1,35 @@
+CODEX TASK: H2T 既有机制研究去重、历史反证整合与下一轮科学决策（不训练）
+仓库：LuoQiuXu/xin
+唯一分支：research/h2t-decision-ledger-20261028
+唯一工作目录：H2T_repro_audit/h2t_decision_20261028/
+本轮不是方法开发，不准 GPU 训练，不准创建新模型或新压力数据集，不准调整任何旧实验配置。
+
+0. 首先核查当前分支、工作区和祖先；只在指定分支工作，不得重新换分支。旧分支和已有产物全部只读，不做 reset、clean、stash 或覆盖。
+1. 读本轮 README.md、EVIDENCE_LEDGER.json 和 analyze_ledger.py。理解 NO_GO 不等于整个概念永远失败，PROTOCOL_ONLY 不等于跑完，BLOCKED_REPLAY 不等于负结果；工具核查历史文件存在/哈希，不替代科学判断。
+2. 依次运行：
+python -m unittest discover -s H2T_repro_audit/h2t_decision_20261028 -p "test_*.py" -v
+python -m py_compile H2T_repro_audit/h2t_decision_20261028/analyze_ledger.py H2T_repro_audit/h2t_decision_20261028/test_analyze_ledger.py
+python H2T_repro_audit/h2t_decision_20261028/analyze_ledger.py --output H2T_repro_audit/h2t_decision_20261028/results/decision_01
+新目录已存在则用 decision_02；历史来源文件缺失直接 fail closed，禁止重写证据绕过检查。
+3. 逐个核实14条记录是否真实对应其 GitHub 分支内的历史源码和结果。当前分支继承 research/h2t-pih2t-gap-20261026，部分未来分支的文件**不一定在当前工作树里**：先以 GitHub API 或 git show 读取那些对应分支的文件，用 repo/ref/path 核验，不得把分支不存在的文件误当作科学否定。如果标准工具因分支分离而缺文件，可以执行单元测试+阻断报告，随后只在新目录建立逐分支线上来源清单和哈希，不能修改旧源码，不能编辑登记路径伪称本地文件存在。
+4. 重点深读：
+- bn_audit_runs/.../H2T_BN_AUDIT.md
+- donor_audit_runs/.../H2T_DONOR_PERTURBATION_AUDIT.md
+- mask_granularity_iteration/results/MASK_GRANULARITY_RESULTS.md
+- lowvs_norm_direction/results/LOWVS_NORM_DIRECTION_SCIENTIFIC_REPORT.md
+- gu_lowvs/results/GU_LOWVS_SCIENTIFIC_REPORT.md
+- ravs_v1/results/RAVS_V1_SCIENTIFIC_REPORT.md
+- lowvs_boundary_direction / lowvs_disc_preserve 两项报告
+- if200_stress/results/IF200_STRESS_SCIENTIFIC_REPORT.md
+- officehome-transfer-risk-probe/report.md
+- research_gap_20261026/ONE_QUESTION_DECISION.md 和 PRIOR_EXPERIMENT_EVIDENCE.md
+- fusion_semantic_audit/FAILED_STOP.json、lowvs_target_semantics/PROTOCOL.md、receiver_selectivity/README.md
+全部历史 URL、branch commit SHA、真实主对照、准确率、样本数、协议和局限必须可查；区分 TEST、TRAIN 留出、相同 checkpoint 多个 StageII seeds。
+5. 新颖性核查：重读原 H2T、PI-H2T (arXiv v2/正式版有访问限制则注明)、SEL、FeatRecon、DBG，以及与判别方向/增强效用/选择性Mixup相关的近期论文。每个候选机制提出作者已有的具体算法/公式与我们的不同点，不许只说“考虑了困难度”就认为新颖。不确认的文献标为 UNVERIFIED；不可编造论文引用和页码。
+6. 建立 HISTORICAL_CONTRADICTION_AUDIT.md，精确标记 SUPPORTED / REJECTED_SPECIFIC_RULE / UNSUPPORTED / PROTOCOL_ONLY / BLOCKED；不可再发起RAVS/LowVS风险筛选方向的换名试错。
+7. 最关键：输出 ONE_QUESTION_OR_STOP.md。只有同时满足：A过去没有直接做过；B有足够强的现象，且不会被BN/剂量/采样/分类器偏置等简单解释直接覆盖；C未被PI/其他方法实现；D可以在8GB、既有StageI和训练划分下单因素可证伪；E存在不再重复调同一开发集阈值的验证路径，才允许 GO_ONE_QUESTION。必须明确有何反证结果使其 STOP，不能制定“只要涨点都算成功”的假设。
+否则选择 STOP_NO_DEFENSIBLE_GAP 或 BLOCKED_EVIDENCE，建议重新评估基底或研究问题，而不是提出新模块。GO 时仅提出一个实验草案并写 CODEX_NEXT_EXPERIMENT_DRAFT.txt，但严禁执行。
+8. 保存 MECHANISM_NOVELTY_MATRIX.md、EXECUTION_REPORT.md。记录全部命令真实 exit code；本轮结果中不允许声称新性能突破或成功复现PI。只提交本轮目录小文件到同一分支，显式 git add，git diff --check、commit push；不额外建分支、PR/merge、不提交数据/权重。
+9. 最终告诉用户：真实审计结果、14条记录是否覆盖完整、具体科学结论、推荐下一步及STOP/GO门禁、GitHub精确URL/commit SHA。禁止空泛“继续探索H2T局限”，禁止无论如何都推荐新实验。
+
+原则：少做工程完美主义，多做高质量科学迭代。先判定我们还有没有值得问的问题，再决定下一轮是否花算力。
