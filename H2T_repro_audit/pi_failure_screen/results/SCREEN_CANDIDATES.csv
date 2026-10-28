@@ -1,0 +1,17 @@
+pair,family,group,n,low_severity_DiD_pp,high_severity_DiD_pp,low_excess_net_correct,high_excess_net_correct,low_negative_DiD_images,high_negative_DiD_images,within_checkpoint_candidate,frequency_specific_candidate,independent_seed_confirmation
+h2t,noise,all,1980,0.8080808080808081,-0.10101010101010101,16,-2,66,70,False,False,False
+h2t,noise,many,680,1.0294117647058822,1.3235294117647058,7,9,20,21,False,False,False
+h2t,noise,medium,700,0.4285714285714286,-1.7142857142857144,3,-12,26,29,False,False,False
+h2t,noise,few,600,1.0,0.16666666666666669,6,1,20,20,False,False,False
+h2t,blur,all,1980,-0.15151515151515152,-1.0101010101010102,-3,-20,76,78,False,False,False
+h2t,blur,many,680,-1.1764705882352942,0.14705882352941177,-8,1,27,23,False,False,False
+h2t,blur,medium,700,1.0,-1.8571428571428572,7,-13,25,32,False,False,False
+h2t,blur,few,600,-0.33333333333333337,-1.3333333333333335,-2,-8,24,23,False,False,False
+pi_local,noise,all,1980,1.0606060606060608,6.969696969696971,21,138,251,201,False,False,False
+pi_local,noise,many,680,5.147058823529411,28.52941176470588,35,194,106,39,False,False,False
+pi_local,noise,medium,700,-0.7142857142857143,2.4285714285714284,-5,17,83,66,False,False,False
+pi_local,noise,few,600,-1.5,-12.166666666666668,-9,-73,62,96,True,True,False
+pi_local,blur,all,1980,0.30303030303030304,5.505050505050505,6,109,181,217,False,False,False
+pi_local,blur,many,680,3.823529411764706,16.470588235294116,26,112,66,73,False,False,False
+pi_local,blur,medium,700,0.7142857142857143,4.285714285714286,5,30,57,67,False,False,False
+pi_local,blur,few,600,-4.166666666666666,-5.5,-25,-33,58,77,True,True,False

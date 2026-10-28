@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "syntax_files": [
+    "H2T_repro_audit/pi_failure_screen/inference.py",
+    "H2T_repro_audit/pi_failure_screen/screen.py",
+    "H2T_repro_audit/pi_failure_screen/summarize.py",
+    "H2T_repro_audit/pi_failure_screen/test_contracts.py",
+    "H2T_repro_audit/pi_failure_screen/test_screen.py",
+    "H2T_repro_audit/pi_failure_screen/verify_outputs.py"
+  ],
+  "syntax_file_count": 6,
+  "syntax_command": "compile(source_text, filename, exec) for all six task Python files; -B -X utf8; no pycache writes",
+  "git_diff_check_exit_code": 0,
+  "branch": "experiment/pi-h2t-failure-scenario-screen-20261028",
+  "unchanged_supplied_protocol_and_test_sha256": {
+    "README.md": "971c21e0c8d36ecf3bce1a16fb1f444d93092c30c313517cc02621ba924ebec5",
+    "test_screen.py": "4a4e597eabf3acd1812c585e5b545c1c98d4faa7313c73c06d4f368eb64888f4",
+    "CODEX_PI_FAILURE_SCENARIO_SCREEN.txt": "d35f56e900a254c7346d6109880d6aca307ecebc0f4a91cfe9700bce5b5f55e5"
+  }
+}

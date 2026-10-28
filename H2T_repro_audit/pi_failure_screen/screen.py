@@ -8,6 +8,7 @@ Manifest: {"class_counts":[...], "methods":{"crt":{"clean":"...npz","noise_s1":"
 """
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 import numpy as np
@@ -17,6 +18,8 @@ def load(path, classes):
         for k in ("ids", "labels", "logits"):
             if k not in z: raise ValueError(f"{path}: missing {k}")
         ids, labels, logits = z["ids"], z["labels"], z["logits"]
+    if not len(ids) or ids.dtype.kind not in "iuUS" or labels.dtype.kind not in "iu" or logits.dtype.kind != "f":
+        raise ValueError(f"{path}: expected nonempty integer/string IDs, integer labels, floating logits")
     if ids.ndim != 1 or labels.shape != ids.shape or logits.shape != (len(ids), classes):
         raise ValueError(f"{path}: invalid shapes")
     if len(np.unique(ids)) != len(ids) or np.any((labels < 0) | (labels >= classes)):
@@ -47,8 +50,8 @@ def main():
     args = p.parse_args()
     cfg = json.loads(Path(args.manifest).read_text(encoding="utf8"))
     methods, conditions = cfg["methods"], cfg["conditions"]
-    counts = np.asarray(cfg["class_counts"], dtype=int)
-    if counts.ndim != 1 or len(counts) < 2 or (counts <= 0).any(): raise ValueError("invalid class counts")
+    counts = np.asarray(cfg["class_counts"])
+    if counts.ndim != 1 or counts.dtype.kind not in "iu" or len(counts) < 2 or (counts <= 0).any(): raise ValueError("invalid class counts")
     ref, cand = cfg["reference"], cfg["candidate"]
     if ref == cand or ref not in methods or cand not in methods: raise ValueError("invalid comparison")
     if not conditions or conditions[0] != "clean" or len(set(conditions)) != len(conditions):
@@ -94,17 +97,54 @@ def main():
                 if not mask.any(): continue
                 changes.append({"method":method,"condition":condition,"group":group,
                                 "clean_to_shift_delta_pp":float(100*(shifted[mask].mean()-clean[mask].mean()))})
-    out=Path(args.output);out.mkdir(parents=True,exist_ok=True)
-    for name,data in (("metrics",rows),("paired_contrasts",contrasts),("shift_degradation",changes)):
-        with (out/(name+".csv")).open("w",newline="",encoding="utf8") as f:
-            w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
+    did_rows, class_rows = [], []
+    clean_delta = loaded[cand,"clean"].astype(int) - loaded[ref,"clean"].astype(int)
+    group_defs = {"all":np.ones(len(y),bool),"many":counts[y]>100,
+                  "medium":(counts[y]>=20)&(counts[y]<=100),"few":counts[y]<20}
+    did_arrays = []
+    for condition in conditions:
+        delta = loaded[cand,condition].astype(int) - loaded[ref,condition].astype(int)
+        did = delta - clean_delta
+        did_arrays.append(did.astype(np.int8))
+        for group, mask in group_defs.items():
+            if not mask.any(): continue
+            d = did[mask]
+            did_rows.append(dict(condition=condition,group=group,n=int(mask.sum()),
+                candidate_minus_reference_clean_pp=float(100*clean_delta[mask].mean()),
+                candidate_minus_reference_shift_pp=float(100*delta[mask].mean()),
+                difference_in_differences_pp=float(100*d.mean()),excess_net_correct=int(d.sum()),
+                negative_DiD_images=int((d<0).sum()),positive_DiD_images=int((d>0).sum()),
+                one_image_resolution_pp=float(100/mask.sum())))
+        for method in methods:
+            for c in range(len(counts)):
+                mask=y==c; n=int(mask.sum()); correct=int(loaded[method,condition][mask].sum())
+                class_rows.append(dict(condition=condition,method=method,class_id=c,n=n,correct=correct,
+                                      accuracy_pp=100*correct/n if n else None))
+    out=Path(args.output)
+    tables=(("metrics",rows),("paired_contrasts",contrasts),("shift_degradation",changes),
+            ("difference_in_differences",did_rows),("per_class",class_rows))
+    targets=[out/(name+".csv") for name,_ in tables]+[out/"summary.json",out/"paired_image_changes.npz"]
+    if any(path.exists() for path in targets): raise FileExistsError("Refuse to overwrite existing analysis outputs")
+    out.mkdir(parents=True,exist_ok=True)
+    for name,data in tables:
+        with (out/(name+".csv")).open("x",newline="",encoding="utf8") as f:
+            w=csv.DictWriter(f,fieldnames=list(data[0]),lineterminator="\n");w.writeheader();w.writerows(data)
+    archive=out/"paired_image_changes.npz"
+    with archive.open("xb") as f:
+        np.savez_compressed(f,ids=original_ids,labels=y,conditions=np.asarray(conditions),
+            reference_correct=np.stack([loaded[ref,c] for c in conditions]),
+            candidate_correct=np.stack([loaded[cand,c] for c in conditions]),
+            difference_in_differences=np.stack(did_arrays))
     report={"reference":ref,"candidate":cand,"conditions":conditions,
             "evaluated_images":len(y),"observed_classes":int(len(np.unique(y))),
+            "missing_classes":np.setdiff1d(np.arange(len(counts)),np.unique(y)).tolist(),
+            "paired_image_archive_sha256":hashlib.sha256(archive.read_bytes()).hexdigest(),
             "caveats":["Screening only; no claims of paper-faithful PI-H2T without implementation audit.",
                        "Paired image counts are descriptive; no independent training seed inference.",
                        "Synthetic corruptions must be visually audited for label preservation.",
                        "If clean/shift datasets were used during method selection, this is development evidence.",
                        "Worst class can be unstable when class samples are scarce."]}
-    (out/"summary.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf8")
+    with (out/"summary.json").open("x",encoding="utf8",newline="\n") as f:
+        json.dump(report,f,ensure_ascii=False,indent=2,allow_nan=False);f.write("\n")
     print(json.dumps(report,ensure_ascii=False,indent=2))
 if __name__=="__main__": main()

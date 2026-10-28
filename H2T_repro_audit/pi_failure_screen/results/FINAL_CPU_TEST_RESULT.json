@@ -1,0 +1,18 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "H2T_repro_audit\\pi_failure_screen",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "stdout": "test_blur_is_three_by_three_and_channel_independent (test_contracts.Contracts.test_blur_is_three_by_three_and_channel_independent) ... ok\ntest_clean_and_corruption_leave_source_unchanged (test_contracts.Contracts.test_clean_and_corruption_leave_source_unchanged) ... ok\ntest_corruption_rejects_nonpixel_input (test_contracts.Contracts.test_corruption_rejects_nonpixel_input) ... ok\ntest_difference_in_differences_and_no_overwrite (test_contracts.Contracts.test_difference_in_differences_and_no_overwrite) ... ok\ntest_ids_must_be_unique_and_typed (test_contracts.Contracts.test_ids_must_be_unique_and_typed) ... ok\ntest_labels_must_be_integer (test_contracts.Contracts.test_labels_must_be_integer) ... ok\ntest_noise_is_raw_id_specific_and_order_independent (test_contracts.Contracts.test_noise_is_raw_id_specific_and_order_independent) ... ok\ntest_nonfinite_and_shape_checks (test_contracts.Contracts.test_nonfinite_and_shape_checks) ... ok\ntest_screen_requires_two_severities_and_multiple_images (test_contracts.Contracts.test_screen_requires_two_severities_and_multiple_images) ... ok\ntest_sort_preserves_label_prediction_alignment (test_contracts.Contracts.test_sort_preserves_label_prediction_alignment) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.611s\n\nOK\n"
+}

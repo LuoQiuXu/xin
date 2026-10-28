@@ -1,0 +1,25 @@
+{
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "python_flags": ["-B", "-X", "utf8"],
+  "working_directory": "D:\\xiangmuxunlian\\xin",
+  "commands": [
+    {"step": "initial supplied CPU smoke", "arguments": "H2T_repro_audit/pi_failure_screen/test_screen.py", "exit_code": 0, "tool_evidence": "dd357d"},
+    {"step": "supplied CPU smoke after screen extensions", "arguments": "H2T_repro_audit/pi_failure_screen/test_screen.py", "exit_code": 0, "tool_evidence": "003e06"},
+    {"step": "initial CPU contract tests", "arguments": "-m unittest discover -s H2T_repro_audit/pi_failure_screen -p test_*.py -v", "tests": 9, "exit_code": 0, "tool_evidence": "a7b417"},
+    {"step": "strict loading and TRAIN-only preparation", "arguments": "H2T_repro_audit/pi_failure_screen/inference.py prepare", "exit_code": 0, "tool_evidence": "826fdd; PREPARE_GUARD.json"},
+    {"step": "real GPU inference only", "arguments": "H2T_repro_audit/pi_failure_screen/inference.py infer", "exit_code": 0, "tool_evidence": "91de58; session49429 completion d02115; INFER_GUARD.json"},
+    {"step": "H2T paired analysis", "arguments": "H2T_repro_audit/pi_failure_screen/screen.py --manifest H2T_repro_audit/pi_failure_screen/manifest.json --output H2T_repro_audit/pi_failure_screen/results", "exit_code": 0, "tool_evidence": "6204f1"},
+    {"step": "local PIF paired analysis", "arguments": "H2T_repro_audit/pi_failure_screen/screen.py --manifest H2T_repro_audit/pi_failure_screen/manifest_pi_local.json --output H2T_repro_audit/pi_failure_screen/results/pi_local_pair", "exit_code": 0, "tool_evidence": "288eaa"},
+    {"step": "locked screening decision and figures", "arguments": "H2T_repro_audit/pi_failure_screen/summarize.py", "exit_code": 0, "tool_evidence": "06216a"},
+    {"step": "CPU contracts including two-severity gate", "arguments": "-m unittest discover -s H2T_repro_audit/pi_failure_screen -p test_*.py -v", "tests": 10, "exit_code": 0, "tool_evidence": "6bdc25; FINAL_CPU_TEST_RESULT.json"}
+  ],
+  "legacy_checkpoint_loading": [
+    {"attempt": 1, "status": "NOT_LOADED", "reason": "weights_only=True rejected NumPy scalar/dtype metadata; original errors retained in CHECKPOINT_METADATA.json"},
+    {"attempt": 2, "status": "PARTIAL_CPU_LOAD_THEN_STOP", "reason": "Restricted NumPy allowlist lacked UInt32DType from saved RNG state; no inference occurred"},
+    {"attempt": 3, "status": "ALL_SIX_CPU_LOADS_PASS", "reason": "Closed allowlist of primitive numeric NumPy types; weights_only=True retained; CHECKPOINT_METADATA_NUMPY_COMPAT.json"}
+  ],
+  "no_unrestricted_checkpoint_pickle_fallback": true,
+  "visual_audit_before_inference": true,
+  "official_test_dataset_read": false,
+  "scope": "One forward-evaluation pass per existing model/condition; no training, no extra severities, no repeat seeds, no model or fusion changes. CPU verification reads saved outputs only."
+}

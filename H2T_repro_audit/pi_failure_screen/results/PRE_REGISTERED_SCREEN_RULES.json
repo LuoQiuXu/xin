@@ -1,0 +1,40 @@
+{
+  "written_before_real_model_forward": true,
+  "comparisons": [
+    "h2t",
+    "pi_local"
+  ],
+  "conditions": [
+    "clean",
+    "noise_003",
+    "noise_008",
+    "blur_05",
+    "blur_10"
+  ],
+  "families": {
+    "noise": [
+      "noise_003",
+      "noise_008"
+    ],
+    "blur": [
+      "blur_05",
+      "blur_10"
+    ]
+  },
+  "groups": [
+    "all",
+    "many",
+    "medium",
+    "few"
+  ],
+  "primary_effect": "DiD=(candidate-reference)_shift-(candidate-reference)_clean",
+  "minimum_effect_pp": 0.5,
+  "minimum_excess_net_loss": 3,
+  "minimum_distinct_negative_DiD_images": 3,
+  "candidate_scenario": "Same pair and group must meet all thresholds at BOTH severities of one prespecified family",
+  "frequency_specific": "Additionally group DiD <= Overall DiD - .5pp at both severities",
+  "inference_limit": "screening signal only; one Stage-I and one Stage-II seed per pair, reused holdout, 12 frequency-specific family/pair checks",
+  "no_new_method": true,
+  "no_training": true,
+  "no_threshold_search": true
+}

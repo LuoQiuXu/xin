@@ -1,0 +1,24 @@
+{
+  "reference": "h2t_no_fusion",
+  "candidate": "h2t",
+  "conditions": [
+    "clean",
+    "noise_003",
+    "noise_008",
+    "blur_05",
+    "blur_10"
+  ],
+  "evaluated_images": 1980,
+  "observed_classes": 99,
+  "missing_classes": [
+    0
+  ],
+  "paired_image_archive_sha256": "d12400e592b67c8961067cc4eb45ed69835343ed44188d7b3bdbeeaa4f5df623",
+  "caveats": [
+    "Screening only; no claims of paper-faithful PI-H2T without implementation audit.",
+    "Paired image counts are descriptive; no independent training seed inference.",
+    "Synthetic corruptions must be visually audited for label preservation.",
+    "If clean/shift datasets were used during method selection, this is development evidence.",
+    "Worst class can be unstable when class samples are scarce."
+  ]
+}

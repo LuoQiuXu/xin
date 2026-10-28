@@ -1,0 +1,26 @@
+{
+  "seed": 20261028,
+  "raw_ids": [
+    9165,
+    4592,
+    11962,
+    15702,
+    42108,
+    13992,
+    11623,
+    37127,
+    27975
+  ],
+  "labels": [
+    1,
+    19,
+    6,
+    35,
+    60,
+    57,
+    71,
+    73,
+    94
+  ],
+  "selection": "3 random images per frequency group, fixed before predictions"
+}

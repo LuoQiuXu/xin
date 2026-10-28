@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "historical_files_metadata_unchanged": 4108,
+  "metadata_fields": [
+    "relative path",
+    "size bytes",
+    "mtime_ns (exact string)"
+  ],
+  "metadata_is_not_full_content_hashing": true,
+  "checkpoints_sha256_rechecked": 6,
+  "imported_model_dataset_sources_sha256_rechecked": 4,
+  "source_and_protocol_files_sha256_rechecked": 15,
+  "prediction_archives_verified": 20,
+  "recomputed_metric_rows": 20,
+  "recomputed_DiD_rows": 40,
+  "shared_raw_ids_and_labels": true,
+  "all_NPZ_no_pickle": true,
+  "official_test_open_attempts": 0,
+  "historical_write_attempts": 0,
+  "guards_scope": "Python open events in prepare/infer; metadata inventory stats do not open dataset contents",
+  "no_training_or_optimizer": true,
+  "screen_rules_sha256": "42c7baf0aeb261728944a72c6461ebd72ea2c34f399f18d96e809e9357412b92"
+}

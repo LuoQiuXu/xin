@@ -1,0 +1,181 @@
+{
+  "models": [
+    {
+      "model": "h2t_no_fusion",
+      "pair": "h2t",
+      "available": true,
+      "checkpoint_path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/saved/cifar100_if100_stage2_fixed_bn_20261011_2255_dr_202610112255/ckps/model_final.pth.tar",
+      "checkpoint_sha256": "1b054d8b45753c25dedd9897e3052e5f33c73b0c38b47acaa277c0f61c50283d",
+      "stage1_path": "H2T_repro_audit/runtime/saved/cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428/ckps/model_best.pth.tar",
+      "stage1_sha256": "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e",
+      "stage1_epoch": 198,
+      "stage2_epoch": 10,
+      "stage2_seed": 123,
+      "stage2_type": "no_fusion",
+      "architecture": "ResNet32 Option-A + 100-way FC",
+      "classes": 100,
+      "model_source": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/models/resnet_cifar.py",
+      "normalization": [
+        [
+          0.4914,
+          0.4822,
+          0.4465
+        ],
+        [
+          0.2023,
+          0.1994,
+          0.201
+        ]
+      ],
+      "strict_state_load": true,
+      "parameter_count": 463504,
+      "pif_parameters": 0,
+      "fc_parameters": 6500,
+      "full_backbone_state_sha256": "897031ae6790df9a93b7f0e26660386dbf48fc4ebe1204011bfd1f921ce605f3",
+      "classifier_state_sha256": "8003e2029054d24a854eac3573d0d85a18c97ef86a7e14d6c6fb8a752614033b",
+      "all_parameters_match_stage1": true,
+      "author_full_PI_implementation_verified": false,
+      "selection": "Stage-I historical best on official TEST; Stage-II fixed epoch10, no shift selection"
+    },
+    {
+      "model": "h2t",
+      "pair": "h2t",
+      "available": true,
+      "checkpoint_path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/saved/cifar100_if100_stage2_fixed_bn_20261011_2255_h2t_202610112300/ckps/model_final.pth.tar",
+      "checkpoint_sha256": "29d28c4c27cd5d7b2e25e7710a23cf92554a43970ab624cc35fd44b5de8752e3",
+      "stage1_path": "H2T_repro_audit/runtime/saved/cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428/ckps/model_best.pth.tar",
+      "stage1_sha256": "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e",
+      "stage1_epoch": 198,
+      "stage2_epoch": 10,
+      "stage2_seed": 123,
+      "stage2_type": "H2T_batch_shared",
+      "architecture": "ResNet32 Option-A + 100-way FC",
+      "classes": 100,
+      "model_source": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/models/resnet_cifar.py",
+      "normalization": [
+        [
+          0.4914,
+          0.4822,
+          0.4465
+        ],
+        [
+          0.2023,
+          0.1994,
+          0.201
+        ]
+      ],
+      "strict_state_load": true,
+      "parameter_count": 463504,
+      "pif_parameters": 0,
+      "fc_parameters": 6500,
+      "full_backbone_state_sha256": "897031ae6790df9a93b7f0e26660386dbf48fc4ebe1204011bfd1f921ce605f3",
+      "classifier_state_sha256": "bb45b717335ef0b176ca983c2508bc64f7ed4021bee857b80956edfdd4ae00a8",
+      "all_parameters_match_stage1": true,
+      "author_full_PI_implementation_verified": false,
+      "selection": "Stage-I historical best on official TEST; Stage-II fixed epoch10, no shift selection"
+    },
+    {
+      "model": "pi_no_fusion",
+      "pair": "pi_local",
+      "available": true,
+      "checkpoint_path": "H2T/outputs/pif_endpoint_seed42_T2_k0_bnshift/pi_recipient_only/current.pth",
+      "checkpoint_sha256": "b1d38bce3d8b9c0e617bc6fdc577f7b51a1cf337f8216f1c81909cd52ca94961",
+      "stage1_path": "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/ckps/model_best.pth.tar",
+      "stage1_sha256": "a1b1630bec4ac46eadb6b1e519af82ed24165dbcf72ba00a9acbc14d77bed8f8",
+      "stage1_epoch": 164,
+      "stage2_epoch": 10,
+      "stage2_seed": 42,
+      "stage2_type": "no_fusion",
+      "architecture": "ResNet32 Option-A + historical 25-parameter PIF + 100-way FC",
+      "classes": 100,
+      "model_source": "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/codes/models/resnet_cifar.py",
+      "normalization": [
+        [
+          0.4914,
+          0.4822,
+          0.4465
+        ],
+        [
+          0.2023,
+          0.1994,
+          0.201
+        ]
+      ],
+      "strict_state_load": true,
+      "parameter_count": 463529,
+      "pif_parameters": 25,
+      "fc_parameters": 6500,
+      "full_backbone_state_sha256": "9bab94046ed66d223da938bacaabdf6a7d5ffa890f6bdfd12ebf8ada88be92f4",
+      "classifier_state_sha256": "13450b1b21937a1b1c8b3f0f48f50f9bb0aebb2deb9d94bfe69b55a270b530c8",
+      "all_parameters_match_stage1": true,
+      "author_full_PI_implementation_verified": false,
+      "selection": "Stage-I historical best on official TEST; Stage-II fixed epoch10, no shift selection"
+    },
+    {
+      "model": "pi_local",
+      "pair": "pi_local",
+      "available": true,
+      "checkpoint_path": "H2T/outputs/pi_h2t_ratio_only_pif_stage1seed123_seed42/pi_recipient_only/current.pth",
+      "checkpoint_sha256": "a37e23a897d74661c2a30594cf0c148a014f7da9b5b0300d54551f3fcc4cccc4",
+      "stage1_path": "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/ckps/model_best.pth.tar",
+      "stage1_sha256": "a1b1630bec4ac46eadb6b1e519af82ed24165dbcf72ba00a9acbc14d77bed8f8",
+      "stage1_epoch": 164,
+      "stage2_epoch": 10,
+      "stage2_seed": 42,
+      "stage2_type": "local_ratio_only",
+      "architecture": "ResNet32 Option-A + historical 25-parameter PIF + 100-way FC",
+      "classes": 100,
+      "model_source": "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/codes/models/resnet_cifar.py",
+      "normalization": [
+        [
+          0.4914,
+          0.4822,
+          0.4465
+        ],
+        [
+          0.2023,
+          0.1994,
+          0.201
+        ]
+      ],
+      "strict_state_load": true,
+      "parameter_count": 463529,
+      "pif_parameters": 25,
+      "fc_parameters": 6500,
+      "full_backbone_state_sha256": "9bab94046ed66d223da938bacaabdf6a7d5ffa890f6bdfd12ebf8ada88be92f4",
+      "classifier_state_sha256": "d56befb84d2813e347cbfc37e61748f6ecff3f33c713c3b0a8f4e1426fa30950",
+      "all_parameters_match_stage1": true,
+      "author_full_PI_implementation_verified": false,
+      "selection": "Stage-I historical best on official TEST; Stage-II fixed epoch10, no shift selection"
+    }
+  ],
+  "pairs": {
+    "h2t": {
+      "reference": "h2t_no_fusion",
+      "candidate": "h2t",
+      "same_stage1": true,
+      "same_eval_architecture": true,
+      "identical_final_backbone_and_BN": true,
+      "stage1_sha256": "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e",
+      "compared_state_tensors": 186,
+      "classifier_only_difference": true
+    },
+    "pi_local": {
+      "reference": "pi_no_fusion",
+      "candidate": "pi_local",
+      "same_stage1": true,
+      "same_eval_architecture": true,
+      "identical_final_backbone_and_BN": true,
+      "stage1_sha256": "a1b1630bec4ac46eadb6b1e519af82ed24165dbcf72ba00a9acbc14d77bed8f8",
+      "compared_state_tensors": 192,
+      "classifier_only_difference": true
+    }
+  },
+  "source_sha256": {
+    "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/models/resnet_cifar.py": "5da74ceeefded52a721a710a71765edd5d26f6183622b41ff5d3413456d3f42b",
+    "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/datasets/cifar100.py": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/codes/models/resnet_cifar.py": "661c308eab963ad6f4c7bc6b49d48f5133f35715024247e4466346d1c88d31b8",
+    "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/codes/datasets/cifar100.py": "b544d9682ae069b57433544036c9ee05b19e8f0e43704e74e0aea946db929e68"
+  },
+  "reused_saved_model_definitions": true
+}

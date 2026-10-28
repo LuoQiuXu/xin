@@ -1,0 +1,341 @@
+{
+  "weights_only": true,
+  "allowlisted_numpy_primitives": [
+    "numpy.dtype",
+    "numpy.ndarray",
+    "numpy._core.multiarray.scalar",
+    "numpy._core.multiarray._reconstruct",
+    "numpy.dtypes.Float16DType",
+    "numpy.dtypes.Float32DType",
+    "numpy.dtypes.Float64DType",
+    "numpy.dtypes.Int8DType",
+    "numpy.dtypes.Int16DType",
+    "numpy.dtypes.Int32DType",
+    "numpy.dtypes.Int64DType",
+    "numpy.dtypes.UInt8DType",
+    "numpy.dtypes.UInt16DType",
+    "numpy.dtypes.UInt32DType",
+    "numpy.dtypes.UInt64DType",
+    "numpy.dtypes.BoolDType"
+  ],
+  "checkpoints": [
+    {
+      "id": "h2t_no_fusion",
+      "path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/saved/cifar100_if100_stage2_fixed_bn_20261011_2255_dr_202610112255/ckps/model_final.pth.tar",
+      "sha256": "1b054d8b45753c25dedd9897e3052e5f33c73b0c38b47acaa277c0f61c50283d",
+      "bytes": 1954577,
+      "status": "SAFE_CPU_LOAD_WITH_NUMPY_PRIMITIVES_PASS",
+      "keys": [
+        "epoch",
+        "state_dict_model",
+        "state_dict_classifier",
+        "best_acc1",
+        "its_ece"
+      ],
+      "metadata": {
+        "epoch": 10,
+        "best_acc1": 46.54999923706055,
+        "its_ece": 4.70367209147662
+      },
+      "state_dicts": {
+        "state_dict_model": {
+          "tensors": 186,
+          "first_keys": [
+            "module.conv1.weight",
+            "module.bn1.weight",
+            "module.bn1.bias",
+            "module.bn1.running_mean"
+          ],
+          "last_keys": [
+            "module.layer3.4.bn1.num_batches_tracked",
+            "module.layer3.4.conv2.weight",
+            "module.layer3.4.bn2.weight",
+            "module.layer3.4.bn2.bias",
+            "module.layer3.4.bn2.running_mean",
+            "module.layer3.4.bn2.running_var",
+            "module.layer3.4.bn2.num_batches_tracked"
+          ]
+        },
+        "state_dict_classifier": {
+          "tensors": 2,
+          "first_keys": [
+            "module.fc.weight",
+            "module.fc.bias"
+          ],
+          "last_keys": [
+            "module.fc.weight",
+            "module.fc.bias"
+          ]
+        }
+      }
+    },
+    {
+      "id": "h2t",
+      "path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/saved/cifar100_if100_stage2_fixed_bn_20261011_2255_h2t_202610112300/ckps/model_final.pth.tar",
+      "sha256": "29d28c4c27cd5d7b2e25e7710a23cf92554a43970ab624cc35fd44b5de8752e3",
+      "bytes": 1954577,
+      "status": "SAFE_CPU_LOAD_WITH_NUMPY_PRIMITIVES_PASS",
+      "keys": [
+        "epoch",
+        "state_dict_model",
+        "state_dict_classifier",
+        "best_acc1",
+        "its_ece"
+      ],
+      "metadata": {
+        "epoch": 10,
+        "best_acc1": 47.29999923706055,
+        "its_ece": 5.306193606629968
+      },
+      "state_dicts": {
+        "state_dict_model": {
+          "tensors": 186,
+          "first_keys": [
+            "module.conv1.weight",
+            "module.bn1.weight",
+            "module.bn1.bias",
+            "module.bn1.running_mean"
+          ],
+          "last_keys": [
+            "module.layer3.4.bn1.num_batches_tracked",
+            "module.layer3.4.conv2.weight",
+            "module.layer3.4.bn2.weight",
+            "module.layer3.4.bn2.bias",
+            "module.layer3.4.bn2.running_mean",
+            "module.layer3.4.bn2.running_var",
+            "module.layer3.4.bn2.num_batches_tracked"
+          ]
+        },
+        "state_dict_classifier": {
+          "tensors": 2,
+          "first_keys": [
+            "module.fc.weight",
+            "module.fc.bias"
+          ],
+          "last_keys": [
+            "module.fc.weight",
+            "module.fc.bias"
+          ]
+        }
+      }
+    },
+    {
+      "id": "h2t_stage1",
+      "path": "H2T_repro_audit/runtime/saved/cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428/ckps/model_best.pth.tar",
+      "sha256": "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e",
+      "bytes": 1954577,
+      "status": "SAFE_CPU_LOAD_WITH_NUMPY_PRIMITIVES_PASS",
+      "keys": [
+        "epoch",
+        "state_dict_model",
+        "state_dict_classifier",
+        "best_acc1",
+        "its_ece"
+      ],
+      "metadata": {
+        "epoch": 198,
+        "best_acc1": 40.48999786376953,
+        "its_ece": 9.983427554517986
+      },
+      "state_dicts": {
+        "state_dict_model": {
+          "tensors": 186,
+          "first_keys": [
+            "module.conv1.weight",
+            "module.bn1.weight",
+            "module.bn1.bias",
+            "module.bn1.running_mean"
+          ],
+          "last_keys": [
+            "module.layer3.4.bn1.num_batches_tracked",
+            "module.layer3.4.conv2.weight",
+            "module.layer3.4.bn2.weight",
+            "module.layer3.4.bn2.bias",
+            "module.layer3.4.bn2.running_mean",
+            "module.layer3.4.bn2.running_var",
+            "module.layer3.4.bn2.num_batches_tracked"
+          ]
+        },
+        "state_dict_classifier": {
+          "tensors": 2,
+          "first_keys": [
+            "module.fc.weight",
+            "module.fc.bias"
+          ],
+          "last_keys": [
+            "module.fc.weight",
+            "module.fc.bias"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pi_no_fusion",
+      "path": "H2T/outputs/pif_endpoint_seed42_T2_k0_bnshift/pi_recipient_only/current.pth",
+      "sha256": "b1d38bce3d8b9c0e617bc6fdc577f7b51a1cf337f8216f1c81909cd52ca94961",
+      "bytes": 1999153,
+      "status": "SAFE_CPU_LOAD_WITH_NUMPY_PRIMITIVES_PASS",
+      "keys": [
+        "epoch",
+        "method",
+        "ratio_bins",
+        "donor_mass_scale",
+        "uses_pif",
+        "backbone",
+        "classifier",
+        "optimizer",
+        "best_overall",
+        "history",
+        "rng",
+        "shuffle_generator"
+      ],
+      "metadata": {
+        "epoch": 10,
+        "method": "pi_recipient_only",
+        "ratio_bins": 4,
+        "donor_mass_scale": 0.0,
+        "uses_pif": true,
+        "best_overall": 0.4584999978542328
+      },
+      "state_dicts": {
+        "backbone": {
+          "tensors": 192,
+          "first_keys": [
+            "conv1.weight",
+            "bn1.weight",
+            "bn1.bias",
+            "bn1.running_mean"
+          ],
+          "last_keys": [
+            "layer3.4.bn2.num_batches_tracked",
+            "conv1d.0.weight",
+            "conv1d.0.bias",
+            "conv1d.1.weight",
+            "conv1d.1.bias",
+            "conv1d.2.weight",
+            "conv1d.2.bias"
+          ]
+        },
+        "classifier": {
+          "tensors": 2,
+          "first_keys": [
+            "fc.weight",
+            "fc.bias"
+          ],
+          "last_keys": [
+            "fc.weight",
+            "fc.bias"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pi_local",
+      "path": "H2T/outputs/pi_h2t_ratio_only_pif_stage1seed123_seed42/pi_recipient_only/current.pth",
+      "sha256": "a37e23a897d74661c2a30594cf0c148a014f7da9b5b0300d54551f3fcc4cccc4",
+      "bytes": 1999217,
+      "status": "SAFE_CPU_LOAD_WITH_NUMPY_PRIMITIVES_PASS",
+      "keys": [
+        "epoch",
+        "method",
+        "ratio_bins",
+        "uses_pif",
+        "backbone",
+        "classifier",
+        "optimizer",
+        "best_overall",
+        "history",
+        "rng",
+        "shuffle_generator"
+      ],
+      "metadata": {
+        "epoch": 10,
+        "method": "pi_recipient_only",
+        "ratio_bins": 4,
+        "uses_pif": true,
+        "best_overall": 0.4099000096321106
+      },
+      "state_dicts": {
+        "backbone": {
+          "tensors": 192,
+          "first_keys": [
+            "conv1.weight",
+            "bn1.weight",
+            "bn1.bias",
+            "bn1.running_mean"
+          ],
+          "last_keys": [
+            "layer3.4.bn2.num_batches_tracked",
+            "conv1d.0.weight",
+            "conv1d.0.bias",
+            "conv1d.1.weight",
+            "conv1d.1.bias",
+            "conv1d.2.weight",
+            "conv1d.2.bias"
+          ]
+        },
+        "classifier": {
+          "tensors": 2,
+          "first_keys": [
+            "fc.weight",
+            "fc.bias"
+          ],
+          "last_keys": [
+            "fc.weight",
+            "fc.bias"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pi_stage1",
+      "path": "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/ckps/model_best.pth.tar",
+      "sha256": "a1b1630bec4ac46eadb6b1e519af82ed24165dbcf72ba00a9acbc14d77bed8f8",
+      "bytes": 1954461,
+      "status": "SAFE_CPU_LOAD_WITH_NUMPY_PRIMITIVES_PASS",
+      "keys": [
+        "epoch",
+        "state_dict_model",
+        "state_dict_classifier",
+        "best_acc1",
+        "its_ece"
+      ],
+      "metadata": {
+        "epoch": 164,
+        "best_acc1": 40.27000045776367,
+        "its_ece": 13.86965240545571
+      },
+      "state_dicts": {
+        "state_dict_model": {
+          "tensors": 192,
+          "first_keys": [
+            "conv1.weight",
+            "bn1.weight",
+            "bn1.bias",
+            "bn1.running_mean"
+          ],
+          "last_keys": [
+            "layer3.4.bn2.num_batches_tracked",
+            "conv1d.0.weight",
+            "conv1d.0.bias",
+            "conv1d.1.weight",
+            "conv1d.1.bias",
+            "conv1d.2.weight",
+            "conv1d.2.bias"
+          ]
+        },
+        "state_dict_classifier": {
+          "tensors": 2,
+          "first_keys": [
+            "fc.weight",
+            "fc.bias"
+          ],
+          "last_keys": [
+            "fc.weight",
+            "fc.bias"
+          ]
+        }
+      }
+    }
+  ]
+}

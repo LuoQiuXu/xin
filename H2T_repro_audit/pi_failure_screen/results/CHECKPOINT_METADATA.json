@@ -1,0 +1,82 @@
+{
+  "torch": "2.14.1+cu132",
+  "cuda_build": "13.2",
+  "checkpoints": [
+    {
+      "id": "h2t_no_fusion",
+      "path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/saved/cifar100_if100_stage2_fixed_bn_20261011_2255_dr_202610112255/ckps/model_final.pth.tar",
+      "bytes": 1954577,
+      "sha256": "1b054d8b45753c25dedd9897e3052e5f33c73b0c38b47acaa277c0f61c50283d",
+      "status": "UNAVAILABLE_SAFE_LOAD",
+      "error": "UnpicklingError('Weights only load failed. This file can still be loaded, to do so you have two options, \\x1b[1mdo those steps only if you trust the source of the checkpoint\\x1b[0m. \\n\\t(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.\\n\\t(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.\\n\\tWeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.\\n\\nCheck the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.')",
+      "unsafe_globals": [
+        "numpy.dtype",
+        "numpy._core.multiarray.scalar"
+      ]
+    },
+    {
+      "id": "h2t",
+      "path": "H2T_repro_audit/bn_audit_runs/fixed_bn_20261011_2255/runtime/saved/cifar100_if100_stage2_fixed_bn_20261011_2255_h2t_202610112300/ckps/model_final.pth.tar",
+      "bytes": 1954577,
+      "sha256": "29d28c4c27cd5d7b2e25e7710a23cf92554a43970ab624cc35fd44b5de8752e3",
+      "status": "UNAVAILABLE_SAFE_LOAD",
+      "error": "UnpicklingError('Weights only load failed. This file can still be loaded, to do so you have two options, \\x1b[1mdo those steps only if you trust the source of the checkpoint\\x1b[0m. \\n\\t(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.\\n\\t(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.\\n\\tWeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.\\n\\nCheck the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.')",
+      "unsafe_globals": [
+        "numpy.dtype",
+        "numpy._core.multiarray.scalar"
+      ]
+    },
+    {
+      "id": "h2t_stage1",
+      "path": "H2T_repro_audit/runtime/saved/cifar100_imb001_stage1_ce_mixup_formal_20261011_1429_r2_202610111428/ckps/model_best.pth.tar",
+      "bytes": 1954577,
+      "sha256": "0cf3e67a87f2a8c45f4470fadc06c3d7c47796c691797d21ed6c2fa8c6b7033e",
+      "status": "UNAVAILABLE_SAFE_LOAD",
+      "error": "UnpicklingError('Weights only load failed. This file can still be loaded, to do so you have two options, \\x1b[1mdo those steps only if you trust the source of the checkpoint\\x1b[0m. \\n\\t(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.\\n\\t(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.\\n\\tWeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.\\n\\nCheck the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.')",
+      "unsafe_globals": [
+        "numpy.dtype",
+        "numpy._core.multiarray.scalar"
+      ]
+    },
+    {
+      "id": "pi_no_fusion",
+      "path": "H2T/outputs/pif_endpoint_seed42_T2_k0_bnshift/pi_recipient_only/current.pth",
+      "bytes": 1999153,
+      "sha256": "b1d38bce3d8b9c0e617bc6fdc577f7b51a1cf337f8216f1c81909cd52ca94961",
+      "status": "UNAVAILABLE_SAFE_LOAD",
+      "error": "UnpicklingError('Weights only load failed. This file can still be loaded, to do so you have two options, \\x1b[1mdo those steps only if you trust the source of the checkpoint\\x1b[0m. \\n\\t(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.\\n\\t(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.\\n\\tWeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.\\n\\nCheck the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.')",
+      "unsafe_globals": [
+        "numpy.dtype",
+        "numpy._core.multiarray.scalar",
+        "numpy.ndarray",
+        "numpy._core.multiarray._reconstruct"
+      ]
+    },
+    {
+      "id": "pi_local",
+      "path": "H2T/outputs/pi_h2t_ratio_only_pif_stage1seed123_seed42/pi_recipient_only/current.pth",
+      "bytes": 1999217,
+      "sha256": "a37e23a897d74661c2a30594cf0c148a014f7da9b5b0300d54551f3fcc4cccc4",
+      "status": "UNAVAILABLE_SAFE_LOAD",
+      "error": "UnpicklingError('Weights only load failed. This file can still be loaded, to do so you have two options, \\x1b[1mdo those steps only if you trust the source of the checkpoint\\x1b[0m. \\n\\t(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.\\n\\t(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.\\n\\tWeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.\\n\\nCheck the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.')",
+      "unsafe_globals": [
+        "numpy.dtype",
+        "numpy._core.multiarray.scalar",
+        "numpy.ndarray",
+        "numpy._core.multiarray._reconstruct"
+      ]
+    },
+    {
+      "id": "pi_stage1",
+      "path": "H2T/saved/cifar100_imb001_stage1_ce_mixup_pif_202608082320/ckps/model_best.pth.tar",
+      "bytes": 1954461,
+      "sha256": "a1b1630bec4ac46eadb6b1e519af82ed24165dbcf72ba00a9acbc14d77bed8f8",
+      "status": "UNAVAILABLE_SAFE_LOAD",
+      "error": "UnpicklingError('Weights only load failed. This file can still be loaded, to do so you have two options, \\x1b[1mdo those steps only if you trust the source of the checkpoint\\x1b[0m. \\n\\t(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.\\n\\t(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.\\n\\tWeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.\\n\\nCheck the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.')",
+      "unsafe_globals": [
+        "numpy.dtype",
+        "numpy._core.multiarray.scalar"
+      ]
+    }
+  ]
+}

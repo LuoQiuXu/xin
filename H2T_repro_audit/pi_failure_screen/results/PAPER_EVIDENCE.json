@@ -1,0 +1,19 @@
+{
+  "title": "PI-H2T: Enhancing Long-Tailed Visual Recognition with Permutation-Invariant and Head-to-Tail Feature Fusion",
+  "version": "arXiv:2506.00625v2 (2026-07-18)",
+  "url": "https://arxiv.org/abs/2506.00625v2",
+  "pdf_url": "https://arxiv.org/pdf/2506.00625v2",
+  "local_pdf": "H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/PI_H2T.pdf",
+  "local_pdf_sha256": "b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8",
+  "pages": 17,
+  "reviewed_pdf_pages": [4, 5, 11, 12, 13],
+  "evidence": [
+    {"pages": "4-5", "anchor": "Eq3/Eq6 and implementation paragraph", "finding": "Paper specifies one 2-to-1 Conv1d: two weights, optionally a third bias. The retained local prototype has 25 parameters; author parity is not established."},
+    {"pages": "11", "anchor": "Fig7/Table9 discussion", "finding": "Author discusses residual head-tail trade-offs and some head features assigned toward tail regions."},
+    {"pages": "12", "anchor": "Fig8 and Table10 discussion", "finding": "Overly strong fusion semantic noise is discussed. H2TF is not used at inference."},
+    {"pages": "13", "anchor": "Concluding remarks", "finding": "ECE and representation/classifier interaction are acknowledged limitations."}
+  ],
+  "input_corruption_gap_status": "UNVERIFIED: this limited paper recheck and local-prototype screen do not establish novelty beyond PI-H2T",
+  "final_IEEE_text_equivalence": "UNVERIFIED; the primary arXiv v2 PDF was examined",
+  "online_check": "2026-10-28: arXiv primary version history confirms v2 title/date; technical findings checked in local primary PDF"
+}

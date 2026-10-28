@@ -1,0 +1,12 @@
+{
+  "branch": "experiment/pi-h2t-failure-scenario-screen-20261028",
+  "head": "54160b7e450d37ae0c227ea616e25ba186d5905f",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "new_output": "H2T_repro_audit/pi_failure_screen/results",
+  "initial_cpu_synthetic_test": {
+    "command": "python -B -X utf8 H2T_repro_audit/pi_failure_screen/test_screen.py",
+    "exit_code": 0,
+    "output": "PASS: positive analysis and invalid pairing rejection"
+  },
+  "initial_inventory_display_note": "First metadata query output exceeded tool budget; repeated only metadata listing and saved full list locally. No model inference or weight loading in either query."
+}

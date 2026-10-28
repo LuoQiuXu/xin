@@ -1,0 +1,27 @@
+{
+  "approved_conditions": [
+    "clean",
+    "noise_003",
+    "noise_008",
+    "blur_05",
+    "blur_10"
+  ],
+  "before_model_inference": true,
+  "assessed_at_utc": "2026-10-28T13:39:32.298343+00:00",
+  "raw_ids": [
+    9165,
+    4592,
+    11962,
+    15702,
+    42108,
+    13992,
+    11623,
+    37127,
+    27975
+  ],
+  "review": "Inspected the fixed nine-image by five-condition contact sheet (three preselected random images per frequency group). Noise .08 visibly adds grain; blur 1.0 removes fine detail, but no sampled condition visibly changes the depicted category or destroys the main scene relative to its already low-resolution clean image. Retain all preset conditions; no individual images removed.",
+  "limitation": "Visual sampling is not an exhaustive guarantee of label preservation across 1980 images. Some clean CIFAR images are intrinsically ambiguous.",
+  "no_result_based_selection": true,
+  "screen_rules_sha256": "42c7baf0aeb261728944a72c6461ebd72ea2c34f399f18d96e809e9357412b92",
+  "contact_sheet_sha256": "e54afb181b6f720228f680f5b284d538cb8e86fabd74c3a8aa33f098213f6e4a"
+}
