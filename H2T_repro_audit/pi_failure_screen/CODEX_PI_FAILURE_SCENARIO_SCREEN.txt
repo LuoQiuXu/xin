@@ -1,0 +1,33 @@
+# CODEX — PI-H2T 之后的失效场景筛查（仅运行，不换融合方法）
+日期：2026-10-28
+工作分支：experiment/pi-h2t-failure-scenario-screen-20261028
+仓库：LuoQiuXu/xin
+本任务只验证一个问题：相较于不进行特征融合的同源 Stage-II cRT/no-fusion，现有 H2T 和本地 PI-H2T ratio-only 在受控输入分布扰动下是否出现可重复、特别不利于某些类频组的性能退化？不要设计 donor、ratio、mask、loss、路由、监督的新变体。
+
+## 最关键的证据边界
+- 本地 PIF+H2TF 原型不是论文官方完整 PI-H2T；只可称「本地 ratio-only/PIF 原型」，不能把负结果写成 PI-H2T 论文失效。
+- 原报告 H2T/PI_H2T_PIF_CAUSAL_DIAGNOSTIC_REPORT.md 已显示 PIF 原型 Stage-II no-fusion Overall 45.69、native ratio-only 34.82，Many 大降 Few 上升；后验继续调缩放没有解决。该结果只能作为动机，不是新测试集上的结论。
+- 如果没有同 Stage-I checkpoint、完全一致的 eval architecture、可加载的本地 PI 原型权重，明确记录“PI 不可评估”，绝不临时拼凑一个新方法或借其他分支的权重充当原始 PI。
+- 如果 H2T、PI 原型来自不同 Stage-I/backbone，禁止和 no-fusion 作同源因果对照。分开展示；只比较相同 Stage-I 的组合。
+- 严禁读取或用官方 TEST 进行调参；开发筛查使用官方 CIFAR-100 TRAIN 中不属于当前 LT 训练子集的固定 holdout，或已固定的合法验证集。旧验证集已用于多次开发，明确标注“重复使用的开发集”。
+- 禁止重新训练 Stage-I/II、修改模型、调参以及更换算法。只有已有 checkpoint 的前向推理与诊断；缺少必要权重时以 unavailable 结束相应对照。
+- 不要把数据增强引入训练过程。只在 eval 输入施加确定性的、可以解释的轻度 label-preserving corruption。
+
+## 要执行的最小设计（一个科学问题，两个扰动家族）
+1. 先完成可用性清单：对每个可用模型记录 checkpoint 路径、SHA256、Stage-I 来源、Stage-II 类型、架构、类数、预处理、是否官方实现、模型选择集；把哪些组能“同源配对”明确列出来。
+2. 统一 clean holdout：使用同一 raw image IDs、标签、类顺序、评价流程。仅在已有证据保证不进入当前模型训练样本时继续。对齐测试集选择后必须固定，不准依据结果筛选。
+3. 选两个不改变语义的受控扰动：Gaussian noise（归一化前 pixel-space sigma=0.03 与 0.08）和 Gaussian blur（预设 kernel=3、sigma=0.5 和 1.0）。固定图像原始像素与扰动随机种子20261028；噪声按 raw image ID 独立决定，不能依赖 batch 次序。均在 ToTensor/Normalize 之前进行；做视觉抽样检查标签可辨识性，严重破坏语义时剔除“扰动条件”而不是挑有利样本。
+4. 对每个模型×条件，生成同样 ids/labels/logits 的压缩 .npz（禁止含 pickle），logits必须为100维，使用 model.eval() 不更新 BN，无 dropout，保持原始架构，批次32或64。clean、noise_003、noise_008、blur_05、blur_10。
+5. 在新分支运行脚本：python H2T_repro_audit/pi_failure_screen/screen.py --manifest H2T_repro_audit/pi_failure_screen/manifest.json --output H2T_repro_audit/pi_failure_screen/results 。manifest 依照 README。缺失必要模型时不要伪造 manifest。
+6. 给出 clean/shift Overall、Macro、Many/Medium/Few、Worst-Class，逐图配对 wrong→right/right→wrong；计算各条件下 candidate-reference 的 Δpp 与其相对 clean 的变化。至少画一张 clean→severity 的分组差值图（画图工具可选，不要求工程框架）。
+7. 预注册式 go/no-go：只有在【合法同源 checkpoint】+【相同 holdout images】+【至少两个扰动强度同方向】+【明显超出单个图像变动】时，记为“候选失效场景”；若仅某种扰动条件有小幅波动，标记 inconclusive。不能根据观察后改变门槛或尝试更多扰动。
+8. 结果保存 FAILURE_SCENARIO_REPORT.md，清楚区分 Observed / Interpretation / Limitation；保留代码版本、checkpoint hashes、文件清单和运行命令。未跑完必须写明卡在哪一步，不可把静态/合成 PASS 说成实证结论。
+
+## 输出必须回答
+A. 原方法在 clean 是否已有头尾取舍？受控扰动是否显著放大该问题？
+B. 性能下降是所有方法都发生的输入噪声问题，还是候选方法相对同源 no-fusion 更脆弱（看 difference-in-differences）？
+C. 是否存在足够可靠、未被 PI-H2T 本文覆盖、值得进一步研究的场景？证据不够就 NO-GO。
+D. 下一阶段需要补什么一个最关键的证据？不要建议新的融合策略。
+
+## 工程约束
+低成本、Windows + RTX5070 Laptop 8GB。先CPU合成测试 screen.py 形状和配对检查，再真实推理。保护历史 checkpoint 和数据，结果只写新目录。优先重用已有 eval 入口，不复制训练框架，不增加工程仪式。只增加必要测试和简洁报告；绝不训练或修改历史目录。
