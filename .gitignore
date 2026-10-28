@@ -97,5 +97,19 @@ desktop.ini
 *.swo
 *~
 
-# Intentionally kept: *.py, *.yaml, *.yml, ordinary *.json, summary *.csv,
+# Local audit caches (downloaded papers, page renders and intermediate extracts)
+/H2T_repro_audit/**/primary_cache/
+
+# Protected local-only historical probe assets, outside decision-ledger deliverables
+/H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/
+/H2T_repro_audit/fusion_semantic_audit/single_batch_compute_probe.py
+/H2T_repro_audit/fusion_semantic_audit/test_single_batch_compute_probe.py
+
+# Raw replay traces and generated reference-source copies from historical runs
+/H2T_repro_audit/lowvs_mask_parity/results/**/batch_signatures.csv
+/H2T_repro_audit/mdlt_domain_probe/output/reference_source/
+# These per-run schedules override the generic sampling_plan.npz exception above
+/H2T_repro_audit/mdlt_domain_probe/results/**/output/sampling_plan.npz
+
+# Otherwise kept: *.py, *.yaml, *.yml, ordinary *.json, summary *.csv,
 # *.md, LICENSE, dependency files and selected scientific figures.
