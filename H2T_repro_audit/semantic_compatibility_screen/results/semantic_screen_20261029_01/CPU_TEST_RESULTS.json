@@ -1,0 +1,19 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "H2T_repro_audit\\semantic_compatibility_screen",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "exit_code": 1,
+  "stdout": "test_changing_cached_recipient_is_rejected (test_contracts.Contracts.test_changing_cached_recipient_is_rejected) ... ok\ntest_few_many_eligibility_does_not_borrow_medium_donors (test_contracts.Contracts.test_few_many_eligibility_does_not_borrow_medium_donors) ... FAIL\ntest_mapping_rejects_noninteger_labels_and_missing_fine_class (test_contracts.Contracts.test_mapping_rejects_noninteger_labels_and_missing_fine_class) ... ok\ntest_nonfinite_feature_and_illegal_mass_are_rejected (test_contracts.Contracts.test_nonfinite_feature_and_illegal_mass_are_rejected) ... ok\ntest_official_mapping_requires_consistent_fine_coarse_pairs (test_contracts.Contracts.test_official_mapping_requires_consistent_fine_coarse_pairs) ... ok\ntest_provided_screen_known_null_at_exactly_matched_distance (test_contracts.Contracts.test_provided_screen_known_null_at_exactly_matched_distance) ... ok\ntest_repeated_pair_is_rejected (test_contracts.Contracts.test_repeated_pair_is_rejected) ... ok\n\n======================================================================\nFAIL: test_few_many_eligibility_does_not_borrow_medium_donors (test_contracts.Contracts.test_few_many_eligibility_does_not_borrow_medium_donors)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\semantic_compatibility_screen\\test_contracts.py\", line 44, in test_few_many_eligibility_does_not_borrow_medium_donors\n    np.testing.assert_array_equal(eligible, [False, False, False, True, False])\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\site-packages\\numpy\\testing\\_private\\utils.py\", line 1128, in assert_array_equal\n    assert_array_compare(operator.__eq__, actual, desired, err_msg=err_msg,\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\site-packages\\numpy\\testing\\_private\\utils.py\", line 988, in assert_array_compare\n    raise AssertionError(msg)\nAssertionError: \nArrays are not equal\n\nMismatched elements: 1 / 5 (20%)\nMismatch at index:\n [3]: False (ACTUAL), True (DESIRED)\n ACTUAL: array([False, False, False, False, False])\n DESIRED: array([False, False, False,  True, False])\n\n----------------------------------------------------------------------\nRan 7 tests in 0.982s\n\nFAILED (failures=1)\n",
+  "scientific_evidence": false
+}

@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "branch": "experiment/semantic-compatibility-screen-20261029",
+  "initial_commit": "c2c1b4e92b54e764baab27ebe3fbace614bad071",
+  "initial_tracked_changes": 0,
+  "known_retained_untracked_directories": [
+    "fusion_semantic_audit",
+    "h2t_decision_20261028",
+    "lowvs_mask_parity",
+    "mdlt_domain_probe",
+    "pi_failure_screen",
+    "pi_h2t_author_audit_20261027",
+    "research_gap_20261026"
+  ],
+  "initial_untracked_file_count": 92,
+  "historical_metadata_files": 4880,
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "full_300_coverage_issue_raised_before_features": true
+}

@@ -1,0 +1,30 @@
+{
+  "scientific_decision": "NO_GO",
+  "diagnostic_status": "NO_GO_NO_ROBUST_GEOMETRIC_SIGNAL",
+  "pre_analysis_plan_sha256": "7973c8b5eeb78f9351297efd20777935a9ef6d33f935d063b1f369cfa9eaee6a",
+  "design_and_proxy_quality": {
+    "unique_matched_recipients": true,
+    "matched_fine_classes": true,
+    "matched_superclasses": true,
+    "class_concentration": true,
+    "distance_median": true,
+    "distance_p90": true,
+    "reference_clean_correct_fraction": true
+  },
+  "semantic_signal_requirements": {
+    "practical_accuracy": false,
+    "practical_standardized_margin": true,
+    "aligned_accuracy_margin_direction": true,
+    "fine_class_direction": true,
+    "superclass_direction": true,
+    "both_cluster_intervals_exclude_zero_same_direction": false
+  },
+  "failed_quality_requirements": [],
+  "failed_signal_requirements": [
+    "practical_accuracy",
+    "both_cluster_intervals_exclude_zero_same_direction"
+  ],
+  "scope": "Frozen scalar-mixture diagnostic in the user-approved210-image/21-class Few subset; Many donors only",
+  "training_executed": false,
+  "publication_or_author_method_failure_claim": false
+}

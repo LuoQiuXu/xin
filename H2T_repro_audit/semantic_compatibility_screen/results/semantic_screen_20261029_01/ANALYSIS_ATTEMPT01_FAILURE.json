@@ -1,0 +1,40 @@
+{
+  "exit_code": 1,
+  "stage": "SCIENTIFIC_DECISION.json export after numeric summary and CSV creation",
+  "exception": "TypeError: Object of type bool is not JSON serializable (numpy.bool_)",
+  "analyze_source_sha256": "6ae4be710587c80855afce749aa2bac651ba1adb8cbc153a058978985da62840",
+  "preserved_initial_outputs": [
+    {
+      "path": "RECIPIENT_ANALYSIS.csv",
+      "bytes": 83490,
+      "sha256": "0c9afb2d6a975cd8719b33c87e6223a19251655394179adc899f82364c2af8ee"
+    },
+    {
+      "path": "CLASS_ANALYSIS.csv",
+      "bytes": 1918,
+      "sha256": "4553cb6a958ebd4bb6919dba4fc0d197a177d007466041e12c8ad1e8b0f3f7b1"
+    },
+    {
+      "path": "SUPERCLASS_ANALYSIS.csv",
+      "bytes": 1279,
+      "sha256": "d38464ade75a1d10bdfaab4363be164415f92f5d6fa33c2052b279cf5b5f9905"
+    },
+    {
+      "path": "MATCH_DISTANCE_AUDIT.csv",
+      "bytes": 523210,
+      "sha256": "b0515f71b661ad40360c380ea4561ae1503f5cac7decc671765db9ae27b957cd"
+    },
+    {
+      "path": "ANALYSIS_SUMMARY.json",
+      "bytes": 2883,
+      "sha256": "f15502daefc2e1ea347928e56c1a552bcecf8ca0a46ab50cd3e1e5b2d23ab0c7"
+    },
+    {
+      "path": "SCIENTIFIC_DECISION.json",
+      "bytes": 532,
+      "sha256": "04f55ef62b4b9980bbf26eb4de4037358f59a7342df1ceaf0a2afe1882dda79d"
+    }
+  ],
+  "correction": "Convert decision flags explicitly to Python bool; use a fresh analysis_v2 output directory. Same input features and original matched rows, no new model forward.",
+  "incomplete_decision_json_not_scientific_evidence": true
+}

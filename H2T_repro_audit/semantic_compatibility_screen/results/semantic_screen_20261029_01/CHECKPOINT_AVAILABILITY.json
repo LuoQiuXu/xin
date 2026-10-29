@@ -1,0 +1,54 @@
+{
+  "available": true,
+  "checkpoint_path": "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/stage1/checkpoints/clean_stage1_best.pth",
+  "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "epoch": 184,
+  "seed": 42,
+  "selection_partition": "official TRAIN holdout",
+  "selection_metric": "Overall",
+  "historical_validation_Overall": 40.05050505050505,
+  "historical_selection_notes": "Max over 200 epochs on reused 1980-image TRAIN holdout, 99 observed classes; no official TEST selection",
+  "strict_loading": true,
+  "weights_only": true,
+  "map_location": "cpu",
+  "architecture": "ResNet32 Option-A, feature_tuning=False, original 100-way biased linear head",
+  "feature_dimension": 64,
+  "weight_shape": [
+    100,
+    64
+  ],
+  "bias_shape": [
+    100
+  ],
+  "dtype": "torch.float32",
+  "normalization": [
+    [
+      0.4914,
+      0.4822,
+      0.4465
+    ],
+    [
+      0.2023,
+      0.1994,
+      0.201
+    ]
+  ],
+  "backbone_state_sha256": "d6625568cb5faed047784fe7de172f2ba7cc72fab353753463282e5819781757",
+  "classifier_state_sha256": "ff6994e9d9988e7f36fcc100aaebcb8966918cd3526824c9c7e175ca8627e5ef",
+  "CPU_model_forward_calls": 0,
+  "GPU_model_forward_calls": 0,
+  "trained_this_run": false,
+  "BN_updated": false,
+  "source_sha256": {
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/runtime/models/resnet_cifar.py": "5da74ceeefded52a721a710a71765edd5d26f6183622b41ff5d3413456d3f42b",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/runtime/datasets/cifar100.py": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/common.py": "9126e5b2d1bee00d2bd1bb41977e786485cb94355d1b0a4cc05bf5a8a0c9addb",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/clean_stage1.py": "7adb864c934a0a784d1a25a1dc0f49c2f7f5a8f6009d399e9f51d5fb5fcf1f38",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/clean_stage1_protocol.json": "e8a21c391dc9f74d56ed37a62f7b907a811ffcfb5bb0363bf45d1024697f36a2",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/CLEAN_STAGE1_PROTOCOL.md": "f37dc675c1d1ece3b006e9020aabfb60e210b2046ba133f8cffc2654c182b223",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/clean_stage1_effective.yaml": "ca96781148762c2dc51717ed5f3875c985cfa5384362afb82f920164e18e1d43",
+    "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/split_indices.npz": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1"
+  },
+  "author_PI_H2T_evaluated": false,
+  "use_status": "Availability only; feature extraction waits for coverage-gate resolution"
+}

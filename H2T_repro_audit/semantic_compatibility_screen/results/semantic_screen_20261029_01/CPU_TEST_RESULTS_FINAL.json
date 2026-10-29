@@ -1,0 +1,20 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "H2T_repro_audit\\semantic_compatibility_screen",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "stdout": "test_changing_cached_recipient_is_rejected (test_contracts.Contracts.test_changing_cached_recipient_is_rejected) ... ok\ntest_few_many_eligibility_does_not_borrow_medium_donors (test_contracts.Contracts.test_few_many_eligibility_does_not_borrow_medium_donors) ... ok\ntest_mapping_rejects_noninteger_labels_and_missing_fine_class (test_contracts.Contracts.test_mapping_rejects_noninteger_labels_and_missing_fine_class) ... ok\ntest_nonfinite_feature_and_illegal_mass_are_rejected (test_contracts.Contracts.test_nonfinite_feature_and_illegal_mass_are_rejected) ... ok\ntest_official_mapping_requires_consistent_fine_coarse_pairs (test_contracts.Contracts.test_official_mapping_requires_consistent_fine_coarse_pairs) ... ok\ntest_provided_screen_known_null_at_exactly_matched_distance (test_contracts.Contracts.test_provided_screen_known_null_at_exactly_matched_distance) ... ok\ntest_repeated_pair_is_rejected (test_contracts.Contracts.test_repeated_pair_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.988s\n\nOK\n",
+  "scientific_evidence": false,
+  "initial_failure_note": "Synthetic fixture omitted any different-superclass Many donor; coverage gate correctly rejected it. Fixed the fixture by adding that required donor class. No real-data coverage or eligibility code changed."
+}

@@ -1,0 +1,105 @@
+{
+  "passed": true,
+  "phase": "pilot",
+  "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "fresh_forward_images": 498,
+  "cached_reused_images": 0,
+  "feature_bank_images": 498,
+  "feature_shape": [
+    498,
+    64
+  ],
+  "dtype": "float32",
+  "all_finite": true,
+  "feature_bank_sha256": "3ad144213c810c91c71a09311c1dc27b7f4bf786d85c008c5629bd1c8fb7cdd1",
+  "feature_tensor_sha256": "b43e7a77f1c93e497a64c353c918938bb2af0f4ffa986066b6bdc4660c991d79",
+  "normalized_input_sha256": "0b32bd1223538ef029a1413a281e5454250f2501369540f7cb8f14c3480dca21",
+  "state_before": [
+    "d6625568cb5faed047784fe7de172f2ba7cc72fab353753463282e5819781757",
+    "ff6994e9d9988e7f36fcc100aaebcb8966918cd3526824c9c7e175ca8627e5ef"
+  ],
+  "state_after": [
+    "d6625568cb5faed047784fe7de172f2ba7cc72fab353753463282e5819781757",
+    "ff6994e9d9988e7f36fcc100aaebcb8966918cd3526824c9c7e175ca8627e5ef"
+  ],
+  "BN_and_parameters_unchanged": true,
+  "original_head_vs_pooled_feature_logits_exact": true,
+  "NumPy_float64_vs_GPU_float32_max_abs_logit_gap": 2.1728408610144356e-06,
+  "NumPy_float64_vs_GPU_float32_argmax_disagreements": 0,
+  "model_eval": true,
+  "dropout_modules": 0,
+  "all_requires_grad": false,
+  "optimizer_created": false,
+  "backward_calls": 0,
+  "runtime": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "numpy": "2.5.2",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "total_gpu_bytes": 8546484224,
+    "batch_size": 64,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "cudnn_allow_tf32": false,
+    "matmul_allow_tf32": false,
+    "float32_matmul_precision": "highest",
+    "deterministic_algorithms": true,
+    "cublas_workspace_config": ":4096:8",
+    "autocast": false,
+    "peak_allocated_bytes": 58379264
+  },
+  "batch_shapes": [
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      64,
+      3,
+      32,
+      32
+    ],
+    [
+      50,
+      3,
+      32,
+      32
+    ]
+  ],
+  "clean_accuracy_used_to_choose_recipients": false
+}

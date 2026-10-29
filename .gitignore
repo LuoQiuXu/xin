@@ -97,5 +97,23 @@ desktop.ini
 *.swo
 *~
 
-# Intentionally kept: *.py, *.yaml, *.yml, ordinary *.json, summary *.csv,
+# Local audit caches and retained intermediate assets from prior branches
+/H2T_repro_audit/**/primary_cache/
+/H2T_repro_audit/**/paper_cache/
+/H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/*_PAGES.json
+/H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/
+/H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/
+/H2T_repro_audit/fusion_semantic_audit/single_batch_compute_probe.py
+/H2T_repro_audit/fusion_semantic_audit/test_single_batch_compute_probe.py
+/H2T_repro_audit/lowvs_mask_parity/results/**/batch_signatures.csv
+/H2T_repro_audit/mdlt_domain_probe/output/reference_source/
+/H2T_repro_audit/mdlt_domain_probe/results/**/output/sampling_plan.npz
+
+# Preserve incomplete first analysis export locally; canonical results are in analysis_v2/
+/H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/*_ANALYSIS.csv
+/H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/MATCH_DISTANCE_AUDIT.csv
+/H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/ANALYSIS_SUMMARY.json
+/H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/SCIENTIFIC_DECISION.json
+
+# Otherwise kept: *.py, *.yaml, *.yml, ordinary *.json, summary *.csv,
 # *.md, LICENSE, dependency files and selected scientific figures.

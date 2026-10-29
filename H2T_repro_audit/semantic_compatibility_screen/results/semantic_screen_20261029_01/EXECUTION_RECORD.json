@@ -1,0 +1,92 @@
+{
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "flags": [
+    "-B",
+    "-X",
+    "utf8"
+  ],
+  "script_directory": "H2T_repro_audit/semantic_compatibility_screen",
+  "commands": [
+    {
+      "step": "Coverage",
+      "arguments": "coverage.py",
+      "exit_code": 0,
+      "evidence": "12c772"
+    },
+    {
+      "step": "Clean checkpoint CPU availability",
+      "arguments": "checkpoint.py",
+      "exit_code": 0,
+      "evidence": "0cc504"
+    },
+    {
+      "step": "Initial synthetic contracts",
+      "arguments": "-m unittest discover -s H2T_repro_audit/semantic_compatibility_screen -p test_*.py -v",
+      "exit_code": 1,
+      "evidence": "169ac8; CPU_TEST_RESULTS.json",
+      "note": "Fixture lacked a different-superclass Many donor; correct implementation rejected it. Fixture corrected; no real-data eligibility logic changed."
+    },
+    {
+      "step": "Corrected synthetic contracts",
+      "arguments": "same unittest command",
+      "tests": 7,
+      "exit_code": 0,
+      "evidence": "f5203c; CPU_TEST_RESULTS_FINAL.json"
+    },
+    {
+      "step": "User scope resolution",
+      "arguments": "SCOPE_RESOLUTION.json and PRE_ANALYSIS_PLAN.json written before model forwards",
+      "exit_code": 0,
+      "evidence": "d769d5; explicit human option2 reply"
+    },
+    {
+      "step": "Fixed donor plan",
+      "arguments": "extract_features.py plan",
+      "exit_code": 0,
+      "evidence": "b32c73"
+    },
+    {
+      "step": "Expanded CPU input/candidate contracts",
+      "arguments": "same unittest command",
+      "tests": 9,
+      "exit_code": 0,
+      "evidence": "6438cf; CPU_TEST_RESULTS_FEATURE_PIPELINE.json"
+    },
+    {
+      "step": "Small real pilot",
+      "arguments": "extract_features.py pilot",
+      "exit_code": 0,
+      "evidence": "158ddb; session80654 completed ee53ed; PILOT_VALIDATION.json"
+    },
+    {
+      "step": "Full real feature extraction",
+      "arguments": "extract_features.py features",
+      "exit_code": 0,
+      "evidence": "af85b2; session89160 completed881444; FEATURE_EXTRACTION.json"
+    },
+    {
+      "step": "Original screen",
+      "arguments": "screen.py --input results/semantic_screen_20261029_01/primary_cache/pairs.npz --output results/semantic_screen_20261029_01/screen_output --lambda-fixed 0.25",
+      "exit_code": 0,
+      "evidence": "71116d",
+      "note": "PowerShell checked output directory was absent before calling original script; default4 distance bins retained."
+    },
+    {
+      "step": "Initial analysis export",
+      "arguments": "analyze.py",
+      "exit_code": 1,
+      "evidence": "a67d6b; ANALYSIS_ATTEMPT01_FAILURE.json",
+      "note": "NumPy bool serialization failed at decision JSON; partial files/source preserved unchanged locally."
+    },
+    {
+      "step": "Corrected analysis export to new directory",
+      "arguments": "analyze.py --analysis-output results/semantic_screen_20261029_01/analysis_v2",
+      "exit_code": 0,
+      "evidence": "f0bd82",
+      "note": "Only output type conversion/destination changed; same features, candidates, original matches and pre-analysis rules."
+    }
+  ],
+  "no_training": true,
+  "no_official_TEST_content_read": true,
+  "no_branch_switch": true
+}

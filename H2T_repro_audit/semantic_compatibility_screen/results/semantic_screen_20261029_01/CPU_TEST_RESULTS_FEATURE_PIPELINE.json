@@ -1,0 +1,26 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "H2T_repro_audit\\semantic_compatibility_screen",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "stdout": "test_candidate_draw_is_order_independent_and_does_not_broaden (test_contracts.Contracts.test_candidate_draw_is_order_independent_and_does_not_broaden) ... ok\ntest_changing_cached_recipient_is_rejected (test_contracts.Contracts.test_changing_cached_recipient_is_rejected) ... ok\ntest_few_many_eligibility_does_not_borrow_medium_donors (test_contracts.Contracts.test_few_many_eligibility_does_not_borrow_medium_donors) ... ok\ntest_fixed_candidates_preserve_semantic_arms_and_raw_ids (test_contracts.Contracts.test_fixed_candidates_preserve_semantic_arms_and_raw_ids) ... ok\ntest_mapping_rejects_noninteger_labels_and_missing_fine_class (test_contracts.Contracts.test_mapping_rejects_noninteger_labels_and_missing_fine_class) ... ok\ntest_nonfinite_feature_and_illegal_mass_are_rejected (test_contracts.Contracts.test_nonfinite_feature_and_illegal_mass_are_rejected) ... ok\ntest_official_mapping_requires_consistent_fine_coarse_pairs (test_contracts.Contracts.test_official_mapping_requires_consistent_fine_coarse_pairs) ... ok\ntest_provided_screen_known_null_at_exactly_matched_distance (test_contracts.Contracts.test_provided_screen_known_null_at_exactly_matched_distance) ... ok\ntest_repeated_pair_is_rejected (test_contracts.Contracts.test_repeated_pair_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.964s\n\nOK\n",
+  "syntax_files": [
+    "checkpoint.py",
+    "coverage.py",
+    "extract_features.py",
+    "screen.py",
+    "test_contracts.py"
+  ],
+  "scientific_evidence": false
+}

@@ -1,0 +1,20 @@
+{
+  "path": "results/semantic_screen_20261029_01/primary_cache/pairs.npz",
+  "sha256": "984b771257ea03de2461dc1b18dc9bacb6c885a30af7a0677d2f17be6fe0ef97",
+  "n_pairs": 13440,
+  "n_recipients": 210,
+  "feature_dimension": 64,
+  "candidate_arms": [
+    32,
+    32
+  ],
+  "all_numeric_no_pickle": true,
+  "feature_array_dtype": "float64 exact cast from cached float32",
+  "frozen_head_dtype": "float64 exact cast from original float32 weights/bias",
+  "donor_mass_fixed": 0.25,
+  "candidate_plan_sha256": "c5d8c47b712b0af4d03438af38778550cec7e2fb27200e3d528d8a55c2fb6594",
+  "analysis_plan_sha256": "7973c8b5eeb78f9351297efd20777935a9ef6d33f935d063b1f369cfa9eaee6a",
+  "rec_ids_sha256": "60525d975a58b471cb37a5a2313e3ce1465a75b9a1166d243a142f647c9960cf",
+  "donor_ids_sha256": "43b5af9920f74c237dfaee74cae18060aa960bf089cfecc8b5fda3cfa0d0c5e4",
+  "algorithm": "Protocol scalar frozen-feature proxy only; no original H2T/PI-H2T algorithm or training changed"
+}

@@ -1,0 +1,21 @@
+{
+  "n_candidate_pairs": 13440,
+  "n_recipients": 210,
+  "n_same_superclass_pairs": 6720,
+  "n_different_superclass_pairs": 6720,
+  "n_matched_pairs": 4138,
+  "n_matched_recipients": 210,
+  "matched_same_minus_diff_accuracy_pp": -0.7249879168680522,
+  "matched_same_minus_diff_margin": -0.03199244912800988,
+  "matched_same_minus_diff_margin_drop": -0.03199244912800988,
+  "mean_absolute_distance_gap": 0.08929815793596489,
+  "mean_mass_gap": 0.0,
+  "screen_sufficient_pairs": true,
+  "interpretation": "Exploratory frozen-classifier diagnostic, NOT final Stage-II benefit or author PI-H2T failure.",
+  "important_controls": [
+    "Same recipient; approximately matched feature distance; check mass gap before interpreting.",
+    "Superclass similarity is a coarse proxy, not semantic causality; image/content and donor-frequency confounding remain.",
+    "No checkpoint trained or modified; no evaluation data should tune a method.",
+    "Do not attribute failures to PI-H2T without author-faithful parity."
+  ]
+}

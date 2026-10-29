@@ -1,0 +1,27 @@
+{
+  "reviewed_before_features": true,
+  "references": [
+    {
+      "source": "H2T/PI_H2T_DONOR_SELECTION_VALIDATION.md",
+      "sha256": "da0d28b34e1de391d6a555b4657bb87051d01f075e5ea4ac1b06d0634610445b",
+      "review": "Frozen donor geometry can vary, but safest/hardest-safe donor training did not beat random or shuffled controls in the reported seed42 comparison.",
+      "boundary": "Historical local results, not evidence that an author method fails"
+    },
+    {
+      "source": "H2T/PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md",
+      "sha256": "1eaaf016c2cc11f52ef37787ad08ecc54ae7a1a0baec10f8308bbb21c86d5567",
+      "review": "Local PIF setting did not pass B>C correspondence control across all three Stage-II seeds; older claims of full paper parity are not adopted.",
+      "boundary": "Historical local results, not evidence that an author method fails"
+    },
+    {
+      "source": "8b00d96b591a5e600048821c0f6915c7c70fc886:H2T_repro_audit/pi_failure_screen/results/FAILURE_SCENARIO_REPORT.md",
+      "sha256": "940285e804438d5d1fa0df1b8de1e3f7cfc399fc81ea8d61e44be4c3884fb5a9",
+      "review": "Local25-parameter PIF prototype is not verified complete author PI-H2T; earlier input-shift screening gave NO-GO.",
+      "boundary": "Read through git show; no branch switch or historical-file restoration"
+    }
+  ],
+  "not_inherited": [
+    "Older wording declaring a PI-H2T defect without author-parity evidence",
+    "Frozen proxy improvement implies Stage-II benefit"
+  ]
+}

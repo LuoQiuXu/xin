@@ -1,0 +1,76 @@
+{
+  "n_recipients": 210,
+  "n_matched_pairs": 4138,
+  "n_independent_recipient_units": 210,
+  "n_fine_classes": 21,
+  "n_superclasses": 13,
+  "clean_correct": 108,
+  "clean_correct_percent": 51.42857142857142,
+  "clean_wrong_percent": 48.57142857142858,
+  "clean_margin_mean": 0.08784963779326134,
+  "clean_margin_median": 0.0840944528095613,
+  "maximum_fine_class_recipient_share": 0.08571428571428572,
+  "receiver_balanced_accuracy_delta_pp": -2.3053841000269575,
+  "receiver_balanced_margin_delta": -0.09640546899340734,
+  "standardized_margin_difference": -0.20656996466683694,
+  "class_balanced_accuracy_delta_pp": -1.735700320953653,
+  "class_balanced_margin_delta": -0.10387837712118078,
+  "fine_class_cluster_bootstrap_95_percent_CI": {
+    "accuracy_delta_pp": [
+      -5.633435336990303,
+      1.3444994002075255
+    ],
+    "margin_delta": [
+      -0.21070220710835624,
+      0.0022818495265240794
+    ]
+  },
+  "fine_class_direction_fraction": 0.6666666666666666,
+  "superclass_direction_fraction": 0.8461538461538461,
+  "mean_absolute_distance_gap": 0.08929815793596492,
+  "mean_signed_distance_gap": -0.0072006538429495,
+  "relative_distance_gap": {
+    "mean": 0.012354379655719273,
+    "median": 0.004297627048025268,
+    "p90": 0.031027134490107078,
+    "maximum": 0.23904782153343584
+  },
+  "exact_donor_mass_all_matches": 0.25,
+  "tight_distance_sensitivity": {
+    "relative_caliper": 0.05,
+    "n_pairs": 3906,
+    "n_recipients": 210,
+    "accuracy_delta_pp": -2.4767923145537853,
+    "margin_delta": -0.09927489517065796
+  },
+  "unmatched_receiver_balanced_accuracy_delta_pp": -0.46130952380952384,
+  "unmatched_receiver_balanced_margin_delta": -0.03360179514276536,
+  "clean_correctness_strata": [
+    {
+      "clean_correct": true,
+      "n_recipients": 108,
+      "accuracy_delta_pp": -4.829042485292486,
+      "margin_delta": -0.12078147497061059
+    },
+    {
+      "clean_correct": false,
+      "n_recipients": 102,
+      "accuracy_delta_pp": 0.36672477848948437,
+      "margin_delta": -0.07059558031166277
+    }
+  ],
+  "donor_confounding": {
+    "same_Many_LT_class_count_mean": 251.9598840019333,
+    "diff_Many_LT_class_count_mean": 311.8890768487192,
+    "same_donor_norm_mean": 8.159391038791197,
+    "diff_donor_norm_mean": 7.57458171562164
+  },
+  "independent_recomputed_max_source_output_error": 0.0,
+  "margin_drop_contrast_is_algebraically_same_as_margin_contrast": true,
+  "caveats": [
+    "Same fixed training images, same frozen checkpoint; not a generalization test or training benefit.",
+    "Shared donors and superclasses create dependence beyond the fine-class bootstrap; intervals are descriptive.",
+    "Matching Euclidean distance does not randomize semantic relationships or remove label/frequency/head-geometry confounding.",
+    "Only21 eligible Few classes; omitted9 classes are a selection limitation, not a method failure."
+  ]
+}
