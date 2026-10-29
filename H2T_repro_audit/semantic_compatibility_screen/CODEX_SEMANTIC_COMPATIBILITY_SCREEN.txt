@@ -1,0 +1,35 @@
+# CODEX TASK — 语义兼容性的最小失效场景审计（不训练，不改融合）
+研究分支：experiment/semantic-compatibility-screen-20261029
+仓库：LuoQiuXu/xin
+读完本文件和 SEMANTIC_SCREEN_PROTOCOL.md 再执行，禁止修改历史分支/历史权重。
+
+## 研究判断
+不是证明“语义相异一定有害”，也不是给H2T再加donor策略。
+唯一问题：固定受体及融合强度后，同一受体面对同superclass和不同superclass的供体，是否在冻结的接收类 margin/标签一致性上出现系统性差异？这种差异在近似控制特征距离后是否仍存在？
+若没有，就对“语义兼容性是关键失效原因”NO-GO，避免继续凭直觉做模块。
+同一受体的供体语义类别不是可随机操控的纯因果变量，结果最多表明关联，不称因果证明。
+
+## 已有否定证据（必须先读）
+- H2T/PI_H2T_DONOR_SELECTION_VALIDATION.md：同受体供体几何风险方差明显；但安全选择最终性能未优于随机。
+- H2T/PI_H2T_RATIO_ONLY_PIF_FULL_REPORT.md：PIF条件B>C打乱对照不成立。
+- H2T_repro_audit/pi_failure_screen/results/FAILURE_SCENARIO_REPORT.md（在另一分支）：本地PIF25参数原型不能冒充作者完整PI-H2T。
+- 禁止重复训练最安全donor、hardest-safe、margin-protect、LowVS、修改比例。
+
+## 最低成本实施
+1. 先核对可用的合法Stage-I checkpoint、CIFAR100-LT IF100原始TRAIN、其100类fine->coarse标签映射、冻结线性分类器。优先用Clean Stage-I且不使用官方TEST选模的checkpoint；若只有曾用TEST选模的历史权重，必须标明开发诊断，不能做确认性结论。
+2. 从LT TRAIN中选择固定150-300个受体，尽量覆盖Many/Medium/Few；类别与raw ID取样使用局部 RNG seed 20261029。每个受体固定同一张原始图片及其特征，不要每次重新增强。
+3. 每受体从LT TRAIN准备候选donor：同CIFAR100 coarse superclass不同fine类、以及其他coarse superclass，尽可能每边>=4个。排除自身raw ID和同fine类别。**不要人为把头类固定为所有donor**，但若研究“头→尾”应先把recipients限定Few、donors限定Many并检查superclass覆盖是否充分；不足时不要偷换为跨频组并仍称头尾转移。可以先审计可得性再决定是否GO。
+4. 全部特征由同一个eval() frozen checkpoint提取，BN不得更新。优先随机固定300个Few受体，尽量每个有至少4 same-coarse 的Many donor和4 diff-coarse 的Many donor；无此覆盖率则报告可行性NO-GO，禁止静默放宽组别。
+5. 输入压缩NPZ：rec_id,rec_label,donor_id,donor_label,rec_feat,donor_feat,coarse_label,weight,bias；均为数值，allow_pickle=False；100类权重形状(100,D)，bias(100,)；使用固定donor mass=0.25。coarse_label必须来自官方CIFAR100 coarse标签或官方meta，不能凭名称自行猜。
+6. 执行：python H2T_repro_audit/semantic_compatibility_screen/screen.py --input <保存的pairs.npz> --output <新目录> --lambda-fixed 0.25。脚本已提供同受体+近距离分层配对、混合后冻结head margin/accuracy差。审计每受体同/异候选覆盖数、匹配数、实际平均距离差；不能只报告聚合差。
+7. 除默认固定比例外，可在**同一输入对与同一冻结特征**上计算论文PI recipient-only donor mass（仅作为几何诊断；需先核对定义和公式），但不要新增新的ratio方法或Stage-II训练。若无法确认PI原文/本地PIF对应关系，直接跳过。
+8. 不读官方TEST做实验选择，不做训练，不更换损失，不跑正式多seed。GPU显存8GB，batch<=64。先一组小真实受体完成数据管线，再跑全部。
+9. 结果给 SEMANTIC_COMPATIBILITY_REPORT.md。强制报告：候选覆盖率、哪些超级类不匹配、匹配距离残差、原型margin有效性（clean已错误的受体占比）、同受体同/异语义的方向是否一致、头尾频次组是否真实满足，以及这是否只是冻结旧分类器的proxy而非训练收益。
+10. GO门槛：必须能构成>=30个受体内、距离差合理且**donor mass严格相同**的独立配对；且同受体比较有实质效应，不能仅基于很小样本或单个受体类别；若成立，只提出下一步完整Stage-II的一个验证设计，不要直接训练或设计模块。若不成立，NO-GO。
+11. 完成后提交新分支中代码、可审计的小型报告、汇总CSV/JSON；较大特征和原始数据不推送；说明产物hash与恢复运行命令。不许把静态测试当科学实验成功。
+
+## 科学解释必须回答
+A 同一接收者面对语义相关/无关的供体，是否确实有不同的冻结几何损害？
+B 这种差异是否独立于简单特征距离；是否可能来自类别混淆、频次、模型错误？
+C 是否支持“在这一具体场景下H2T随机donor有潜在问题”，而不是证明整个H2T或PI-H2T失败？
+D 下一步究竟是GO（值得完整训练确认）还是NO-GO？
