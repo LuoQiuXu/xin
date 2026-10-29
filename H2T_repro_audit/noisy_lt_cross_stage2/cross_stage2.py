@@ -48,7 +48,7 @@ def name(rep, labels, seed2, method):
 
 def source_proof(rep):
     assert read(SRC_OUT / "VALIDATION.json")["passed"]
-    orig = read(SRC_OUT / "stage1_" + rep / "RUN.json")
+    orig = read(SRC_OUT / ("stage1_" + rep) / "RUN.json")
     # The previous experiment's Stage-I models are immutable input objects.
     parent = ROOT / orig["checkpoint"]["file"]
     assert parent.exists(), f"Missing source weight: {parent}"
