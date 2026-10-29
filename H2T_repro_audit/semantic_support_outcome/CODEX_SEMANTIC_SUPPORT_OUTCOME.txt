@@ -1,0 +1,32 @@
+# CODEX — H2T原方法按语义头类供体可得性进行最终性能分组审计
+日期 2026-10-29；唯一分支 experiment/h2t-semantic-support-outcome-20261029
+目标不是再验证融合margin，也不是优化donor：回答「没有同superclass Many供体的Few类，原始H2T相对于同源No-Fusion的最终分类收益是否系统性更低？」
+禁止修改原H2T/PI-H2T算法；禁止重训、调比例、调mask、添加新模型。只使用已存在固定权重前向，并运行仓库里的 evaluate.py。
+
+## 已知证据
+- 先读 H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/SEMANTIC_COMPATIBILITY_REPORT.md；在该分支继承原文件。
+- 21/30 Few类有同superclass Many供体，9类（70,74,80,81,82,85,89,92,96）没有。**这仅是数据结构事实，非模型失效**。
+- 上轮冻结几何proxy的语义差异无稳定证据，NO-GO；本轮不要重复。
+- 先读另一分支 experiment/pi-h2t-failure-scenario-screen-20261028 的 CHECKPOINT_AVAILABILITY.json 与 FAILURE_SCENARIO_REPORT.md，其中 h2t_no_fusion 与 h2t 使用同一Stage-I epoch198 seed123，Stage-II 10epoch，固定BN，完整backbone+BN相同但分类头不同；这是本轮候选严格同源权重，**不是作者默认 BN shift 协议**。
+- 这些历史 Stage-I epoch198 checkpoint 曾在官方TEST选模；本轮绝不能隐瞒这种历史选择偏差。仅作开发筛查，不能称独立测试；推理不能打开官方TEST数据。
+- 另一分支的20个NPZ预测只留本地，未提交Git，切勿假装Git中有预测。如果本机能找到且SHA/ids/labels/checkpoint对得上，可以只复用clean预测；否则用原 inference.py 的真实eval模块/相同数据协议生成clean logits，并核验4个checkpoint的来源。只跑该配对，不跑本地PI原型。
+- 本轮可以用现有 clean 1980张TRAIN holdout：它有99个观察类，class0缺失，但30个Few类均有20张，共600个Few图片。整个holdout被重复用过，非新的独立检验。
+
+## 最小执行步骤
+1. 记录候选no_fusion与h2t checkpoint完整路径、SHA256、Stage-I SHA、模型架构、epoch、数据增强/标准化、固定BN、Stage-II随机种子。若无法证明同源或无法严格载入，直接BLOCKED而不是偷换模型。
+2. 由原始CIFAR100 TRAIN的fine/coarse标签建立长度100的coarse_labels，并从真实LT训练索引生成长度100的class_counts。验证官方coarse标签映射与前一轮数据一致，不使用名称猜测。
+3. 同一批原始holdout images在model.eval/inference_mode分别推理，输出ids/labels/logits。确保同一图像rawID+标签与预测对齐，shape=(1980,100)，全部有限，BN不变；可以复用先前有效的clean NPZ，禁止重新选择epoch。
+4. 生成小型 metadata.json (class_counts, coarse_labels, checkpoint provenance note)，并执行：
+   python H2T_repro_audit/semantic_support_outcome/evaluate.py --no-fusion <no_fusion_clean.npz> --h2t <h2t_clean.npz> --metadata <metadata.json> --output <全新结果目录>
+5. 主指标每个Few fine类的(last H2T - last no-fusion)准确率百分点；再按有无同superclass Many donor分组做**类别等权**均值、升降类数、支持组-缺失组差值。不能使用图片数替代独立类别数；每类仅20张、一张就改变5pp。
+6. 结果报告必须对比两组的baseline准确率、训练样本频次、类别组合、真实support counts；按类别重采样95%区间仅作为探索性描述。不可把group gap解释为因果效应。重要：H2T并不只融合Many→Few，其donor是instance-sampled全训练分布，recipient也非总是Few，语义support只是一个外部场景proxy。
+7. 阴性解释检查：若两组起始baseline准确率差异很大、某组头尾类频系统不同，明确记录混杂；缺class0不影响Few完整观察但其他指标仍不可视作官方TEST结果。
+8. 预先给出GO判据：仅当缺失语义support的Few类相对于有支持组有**一致且非极小的负收益差异**，而且至少多个不同coarse组有同向现象，才标为「候选场景，需多seed及其他数据集确认」。如果无差异、反向，或由1-2个类主导，就NO-GO。不能事后改组别或换epoch挑正结果。
+9. 若通过：只提出下一步「原版H2T固定协议多seed+官方未用于选模的独立评价」的验证建议，不直接训练或设计新模块。若不通过：终止以semantic-support为主线的后续工作，回到文献问题审计。
+10. 文件仅保存到新目录（例如 H2T_repro_audit/semantic_support_outcome/results/screen_20261029_01）；上传代码、报告、summary.json和per_few_class.csv，NPZ大文件留本地并附SHA。不要工程化太多校验框架，保证关键科学公平性即可。
+
+## 必须回答的四个问题
+A 有无语义相关Many供体的Few类别，真实H2T尾类收益是否不同？
+B 差异是否可能完全来自类别频次/难度/固定BN协议，而非语义支持？
+C 是否已有足够证据说明「原始H2T在语义支持缺失场景失效」？若否请明确NO-GO。
+D 与PI-H2T是什么关系？目前只能说待验证，不得用本地PIF原型代替完整原论文。
