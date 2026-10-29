@@ -1,0 +1,49 @@
+# CODEX 指令：真实人工错标长尾场景下 H2T 失效筛查（2026-10-29）
+
+**唯一工作分支**：`experiment/h2t-cifar100n-lt-failure-screen-20261029`。
+任务目标：寻找原始 H2T 在 **CIFAR-100-LT IF100 + CIFAR-100N 真实人工细粒度错标** 条件下，相对于严格同源 No-Fusion（cRT/DR）的最终分类收益是否消失或反转。**不是优化融合机制，不是研究旧分类头 margin**。本轮不实现 PI-H2T，因为其完整作者一致性未建立。
+
+### 先读的科学证据
+- `H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/SEMANTIC_COMPATIBILITY_REPORT.md`：语义几何 NO-GO，停止 donor/margin/语义代理迭代。
+- `experiment/h2t-if200-stress-20261017` 内 `H2T_repro_audit/if200_stress/results/IF200_STRESS_SCIENTIFIC_REPORT.md`：IF200 固定BN无稳定尾类负迁移。
+- `experiment/officehome-domain-transfer-pilot-20261018` 内 `H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/final_report.md`：域匹配干预没有稳定 Few 负迁移。
+- 论文：H2T AAAI 2024 https://ojs.aaai.org/index.php/AAAI/article/view/29262 ；CIFAR-100N 原始 ICLR 2022 人工噪声标签：https://github.com/UCSC-REAL/cifar-10-100n 。CIFAR-100N 全训练集 fine 标签整体约40.2%错误率，**在IF100子集上必须重新测量，不能照搬**。
+
+### 要回答的因果对照
+设`D_g(regime)=Acc(H2T,regime,g)-Acc(NoFusion,regime,g)`；
+`Interaction_g=D_g(noisy)-D_g(clean)`；g∈Overall/Many/Medium/Few。
+只问：**标签质量条件变化后，H2T 的相对收益是否显著缩小或反转？** 不把二者共同降分称为 H2T 特有失效。
+
+### 步骤 1：严格数据就绪门槛（没有就 STOP，不训）
+1. 先查本机原始 CIFAR100 Python 版训练文件、已锁定 IF100 seed0 的 10847 张 LT raw-ID 分割和相同来源的固定 TRAIN 留出验证集，不准新抽分割。不要访问官方TEST，不得在评价集上选择epoch。
+2. 查是否已有 `CIFAR-100_human.pt` 人工标注文件；只有没有时才从 CIFAR-N 论文官方仓库/官网取得，记录下载来源与 SHA256，不要使用未审核的第三方pickle。CIFAR100N 的 `clean_label` 必须与原始50,000张 Python CIFAR100 TRAIN fine labels **逐项全相等**，否则是图片顺序错位，立刻 STOP。官方数据字段为 clean_label、noisy_label。旧torch/NumPy文件需要反序列化时只读取可信来源并记录安全兼容处理；转换成纯整数NPZ以后的训练只读NPZ（allow_pickle=False）。
+3. 准备三个中间输入：原CIFAR100 TRAIN全50k fine label的 `raw_clean_labels.npy`；CIFAR-N 两列整数标签的 `human_labels.npz`；固定LT/val原始TRAIN索引的 `split.npz`（键train_ids,val_ids）。只需要写一个极小适配脚本，不动历史数据包装器。
+4. 执行 `python H2T_repro_audit/noisy_lt_failure_screen/prepare_protocol.py --original-labels raw_clean_labels.npy --human-labels human_labels.npz --split split.npz --output <新输出目录>`。检查DATA_AUDIT.json：真实LT噪声比例、各类observed noisy counts、有无noisy label类彻底缺失、clean vs noisy观察类频差。若有空标签类，原 class-balanced sampler 不能原样运行，必须BLOCKED，不许借用clean真实标签补课、不许调noise rate寻找好看的结果。
+5. IF100样本的**构造**可使用clean label作为基准生成协议；实际noise模型的StageI和StageII训练、采样类别身份及loss target只能读取`noisy_train.npz`里的**observed标签**。`clean_validation.npz`只用于固定最后epoch的评价。
+
+### 步骤2：作者方法保持不变、训练成对公平
+1. 官方参考 `H2T_official_clean/H2T-main/train_stage1.py`、`train_stage2.py`、`datasets/cifar100.py`、`methods.py`。保留真实 H2T StageI: CE+MixUp，ResNet32，200epoch，StageII: class-balanced receiver/instance-sampled donor、原随机batch-shared16/64完整通道替换、receiver hard label CE、10epoch FC训练。必须核实作者默认stageII BN-shift协议，**两条比较臂保持相同输入forward及BN更新路径**；无融合仅关闭替换，不允许无融合组少前向一条供体而导致BN不配对。两臂相同网络、SGD参数、LR、优化器更新次数、epoch。
+2. 可复用原始训练核心函数，但只在`H2T_repro_audit/noisy_lt_failure_screen/`添加轻量训练入口和label适配文件。原始 H2T 代码、历史checkpoint、旧报告一律冻结不动。若要调整Windows兼容性/AMP，只允许所有组统一处理并记录配置差异；不许依据精度调整方法参数。
+3. pilot只用 **StageI seed42**（clean和noisy分别从同一初始化权重开始，独立各200epoch；不能noisy从clean checkpoint微调；固定epoch200、不能选best）。保存两个StageI的SHA、初始state哈希、epoch200固定文件；如内存/资源不够可停止报告BLOCKED。
+4. StageII seeds 124和125：在每一个Regime (clean/noisy) StageI上分别训练DR-NoFusion和Original-H2T，共**8次10epoch分类器训练**；每个regime+seed对要证实相同初始FC、receiver/donor图片流及增强、BN路径。Clean/Noisy的observed标签不同，balanced sampling自然可能不同，这是**含标注噪声的真实场景总体效应**，不能宣称只改变了损失标签且采样不变。
+5. StageI全部验证仅留作描述；主指标固定StageII epoch10，禁止最佳epoch替代，禁止测试集选模。做一个真实batch干跑通过后正式训练，不进行机制消融、noise sweep、fusion策略改动。
+
+### 步骤3：固定结果格式，运行已经提交的分析代码
+按训练benchmark的 **clean true class counts** 定义Many>100/Medium20..100/Few<20。相同 TRAIN holdout 图像和clean GT，记录class0是否缺失。每个方法只用最后epoch10的模型eval一次，保存同raw_id同label的(1980,100) logits（仅本地）。主结果输出CSV必须包含
+`stage1_seed,stage2_seed,regime,method,group,accuracy_pct,n,stage1_sha,val_ids_sha,epoch`
+其中regime=clean/noisy，method=no_fusion/h2t，group=Overall/Many/Medium/Few。
+执行：`python H2T_repro_audit/noisy_lt_failure_screen/compare_outcomes.py --csv <主结果.csv> --output <新报告目录>`。这个程序会拒绝不配对的stage1 SHA、val ID哈希、组别分母、epoch。
+同时导出100类逐类准确率和净改判图像数（无需大工程）。
+
+### 预注册式判定
+- **初筛候选**：两个StageII seed都满足`Interaction_Few<=-2pp`，并且noisy条件下H2T Few严格低于noisy DR Few。此结果仅授权下一轮**独立StageI seed**重复，不授权模块设计或宣称 PI-H2T 失效。
+- **NO-GO**：未出现一致且有实际幅度的相对退化，或只有两法共同下降；该场景停下，不事后换噪声等级、标签集或IF找负结果。
+- **INCONCLUSIVE/BLOCKED**：CIFAR-N顺序无法确认、noisy观察类空缺、checkpoint配对/BN不一致、真值泄露、缺失真实验证图像等；报告缺口，不伪造结论。
+
+### 交付
+- 当前分支内新增小文件：必要的数据标签适配、训练包装器、最少单元测试，不复制/重构整个原方法。
+- `NOISY_LT_FAILURE_SCREEN_REPORT.md` 必须回答：真实场景观察到否？相对NO-FUSION是否独有？可否归因于标签质量还是其造成的观测类频变化？是否要再做独立seed？完整PI-H2T尚不可判定。
+- 保留`DATA_AUDIT.json`、`RUN_MANIFEST.json`（代码、数据和权重SHA）、`paired_interactions.csv`、`summary.json`、最后epoch指标；20/40份大NPZ、模型与原始数据只留本地并提供hash索引；禁止覆写历史资产。
+- 用Windows+RTX5070 Laptop 8GB，先跑CPU单测+数据审核和1 batch真实dryrun，再训练。科学迭代优先，不进行工程完美主义和没完没了的可视化。所有结果推送**同一分支**，绝不另起分支。
+
+本实验的目标是*找到 H2T 真正失效的条件*，不是拆解其收益，也不是为一种新融合方式寻找理由。
