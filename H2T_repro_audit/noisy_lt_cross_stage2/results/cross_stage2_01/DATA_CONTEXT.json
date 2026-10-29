@@ -1,0 +1,7 @@
+{
+  "observed_Few_pool_images": 1234,
+  "matching_true_labels": 164,
+  "instance_weighted_purity": 0.13290113452188007,
+  "class_balanced_purity": 0.15895029258653554,
+  "note": "Post-training offline data context only; not evidence of a specific H2T causal mechanism"
+}

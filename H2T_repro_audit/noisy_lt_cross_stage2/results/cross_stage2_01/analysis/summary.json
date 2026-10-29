@@ -1,0 +1,135 @@
+{
+  "status": "DESCRIPTIVE_FACTORIAL_ONLY",
+  "source_stage1_sha_by_repr": {
+    "clean": "378efb8ac7fba039b3809ec925e87e06818374b6364414113c2a2edeb7604eb1",
+    "noisy": "2a3a587865314e87397b8e9b5ea958756f69bffefb3657d8576ba6f901bfa0d7"
+  },
+  "note": "Two Stage-II seeds, ONE clean and ONE noisy Stage-I checkpoint; do not infer Stage-I seed robustness.",
+  "definitions": {
+    "representation_effect": "Noisy minus clean Stage-I, averaged over both Stage-II label regimes",
+    "label_effect": "Noisy minus clean Stage-II observed-label/sampler regime, averaged over both Stage-I sources",
+    "interaction": "nonadditive 2x2 term; do NOT treat as causal label-only effect"
+  },
+  "groups": {
+    "Overall": {
+      "per_seed": [
+        {
+          "stage2_seed": 124,
+          "representation_effect_pp": -1.1363636363636367,
+          "observed_stage2_label_sampling_effect_pp": 0.3787878787878789,
+          "factorial_interaction_pp": -0.45454545454546036,
+          "total_diagonal_change_pp": -0.7575757575757578,
+          "clean_on_clean_gain_pp": 0.9595959595959584,
+          "clean_repr_noisy_labels_gain_pp": 1.5656565656565675,
+          "noisy_repr_clean_labels_gain_pp": 0.05050505050505194,
+          "noisy_on_noisy_gain_pp": 0.20202020202020066
+        },
+        {
+          "stage2_seed": 125,
+          "representation_effect_pp": -1.3383838383838338,
+          "observed_stage2_label_sampling_effect_pp": -0.07575757575757791,
+          "factorial_interaction_pp": 0.5555555555555571,
+          "total_diagonal_change_pp": -1.4141414141414117,
+          "clean_on_clean_gain_pp": 1.6666666666666643,
+          "clean_repr_noisy_labels_gain_pp": 1.3131313131313078,
+          "noisy_repr_clean_labels_gain_pp": 0.05050505050505194,
+          "noisy_on_noisy_gain_pp": 0.2525252525252526
+        }
+      ],
+      "mean_representation_effect_pp": -1.2373737373737352,
+      "mean_stage2_label_sampling_effect_pp": 0.1515151515151505,
+      "mean_factorial_interaction_pp": 0.05050505050504839,
+      "mean_total_diagonal_change_pp": -1.0858585858585847
+    },
+    "Many": {
+      "per_seed": [
+        {
+          "stage2_seed": 124,
+          "representation_effect_pp": -1.6176470588235325,
+          "observed_stage2_label_sampling_effect_pp": 3.9705882352941195,
+          "factorial_interaction_pp": -4.999999999999993,
+          "total_diagonal_change_pp": 2.352941176470587,
+          "clean_on_clean_gain_pp": -2.352941176470587,
+          "clean_repr_noisy_labels_gain_pp": 4.117647058823529,
+          "noisy_repr_clean_labels_gain_pp": -1.470588235294123,
+          "noisy_on_noisy_gain_pp": 0.0
+        },
+        {
+          "stage2_seed": 125,
+          "representation_effect_pp": -2.5000000000000036,
+          "observed_stage2_label_sampling_effect_pp": 4.4117647058823515,
+          "factorial_interaction_pp": -3.235294117647065,
+          "total_diagonal_change_pp": 1.911764705882348,
+          "clean_on_clean_gain_pp": -2.352941176470587,
+          "clean_repr_noisy_labels_gain_pp": 3.676470588235297,
+          "noisy_repr_clean_labels_gain_pp": -3.235294117647058,
+          "noisy_on_noisy_gain_pp": -0.44117647058823906
+        }
+      ],
+      "mean_representation_effect_pp": -2.058823529411768,
+      "mean_stage2_label_sampling_effect_pp": 4.1911764705882355,
+      "mean_factorial_interaction_pp": -4.117647058823529,
+      "mean_total_diagonal_change_pp": 2.1323529411764675
+    },
+    "Medium": {
+      "per_seed": [
+        {
+          "stage2_seed": 124,
+          "representation_effect_pp": -1.642857142857146,
+          "observed_stage2_label_sampling_effect_pp": 0.5,
+          "factorial_interaction_pp": -0.7142857142857224,
+          "total_diagonal_change_pp": -1.142857142857146,
+          "clean_on_clean_gain_pp": 1.8571428571428612,
+          "clean_repr_noisy_labels_gain_pp": 2.7142857142857224,
+          "noisy_repr_clean_labels_gain_pp": 0.5714285714285765,
+          "noisy_on_noisy_gain_pp": 0.7142857142857153
+        },
+        {
+          "stage2_seed": 125,
+          "representation_effect_pp": -2.357142857142854,
+          "observed_stage2_label_sampling_effect_pp": -0.5,
+          "factorial_interaction_pp": 0.4285714285714164,
+          "total_diagonal_change_pp": -2.857142857142854,
+          "clean_on_clean_gain_pp": 3.142857142857139,
+          "clean_repr_noisy_labels_gain_pp": 2.4285714285714306,
+          "noisy_repr_clean_labels_gain_pp": 0.5714285714285765,
+          "noisy_on_noisy_gain_pp": 0.2857142857142847
+        }
+      ],
+      "mean_representation_effect_pp": -2.0,
+      "mean_stage2_label_sampling_effect_pp": 0.0,
+      "mean_factorial_interaction_pp": -0.142857142857153,
+      "mean_total_diagonal_change_pp": -2.0
+    },
+    "Few": {
+      "per_seed": [
+        {
+          "stage2_seed": 124,
+          "representation_effect_pp": -1.7763568394002505e-15,
+          "observed_stage2_label_sampling_effect_pp": -3.8333333333333304,
+          "factorial_interaction_pp": 5.0000000000000036,
+          "total_diagonal_change_pp": -3.833333333333332,
+          "clean_on_clean_gain_pp": 3.666666666666668,
+          "clean_repr_noisy_labels_gain_pp": -2.6666666666666643,
+          "noisy_repr_clean_labels_gain_pp": 1.1666666666666643,
+          "noisy_on_noisy_gain_pp": -0.1666666666666643
+        },
+        {
+          "stage2_seed": 125,
+          "representation_effect_pp": 1.1666666666666643,
+          "observed_stage2_label_sampling_effect_pp": -4.666666666666664,
+          "factorial_interaction_pp": 5.0,
+          "total_diagonal_change_pp": -3.5,
+          "clean_on_clean_gain_pp": 4.5,
+          "clean_repr_noisy_labels_gain_pp": -2.6666666666666643,
+          "noisy_repr_clean_labels_gain_pp": 3.1666666666666643,
+          "noisy_on_noisy_gain_pp": 1.0
+        }
+      ],
+      "mean_representation_effect_pp": 0.5833333333333313,
+      "mean_stage2_label_sampling_effect_pp": -4.249999999999997,
+      "mean_factorial_interaction_pp": 5.000000000000002,
+      "mean_total_diagonal_change_pp": -3.666666666666666
+    }
+  }
+}

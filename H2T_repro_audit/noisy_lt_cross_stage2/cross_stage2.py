@@ -8,8 +8,10 @@ import argparse
 import csv
 import json
 import hashlib
+import subprocess
 import sys
 import time
+import traceback
 from pathlib import Path
 
 import numpy as np
@@ -26,11 +28,59 @@ LOCAL = OUT / "local_only"
 sys.path.insert(0, str(SOURCE))
 
 from runtime import (Core, ObservedDataset, AuditedLoader, AuditedSGD,
-                     config, seed, models, transform, state_hash, cpu_state)
+                     config, seed, models, transform, state_hash, cpu_state, ahash)
+import runtime as frozen_runtime
 from train import (read, sha, save_weights, load_weights, counters, bn_state,
-                   parameter_hash)
+                   parameter_hash, environment)
 
 GROUPS = ("Overall", "Many", "Medium", "Few")
+BRANCH = "experiment/noisy-h2t-crossed-stage2-20261029"
+
+
+def guard(phase, labels=None):
+    # Configure only the existing IO guard's writable root in this process.
+    # ObservedDataset retains its original OUT/CACHE input locations.
+    frozen_runtime.TASK = THIS
+    return frozen_runtime.install_guard(phase, labels)
+
+
+def preflight():
+    assert subprocess.check_output(["git","branch","--show-current"],text=True).strip()==BRANCH
+    assert not OUT.exists(), "Never overwrite an existing result directory"
+    locked=read(SRC_OUT / "TRAINING_LOCK.json")
+    for n,h in locked["code_sha256"].items():assert sha(ROOT/n)==h, n
+    checkpoints={}
+    for rep in ("clean","noisy"):
+        p,proof=source_proof(rep)
+        weights=torch.load(p,map_location="cpu",weights_only=True)
+        assert weights["epoch"]==200 and weights["fc"]["fc.weight"].shape==(100,64)
+        assert state_hash(weights["bb"])==proof["checkpoint"]["bb_state_sha"]
+        assert state_hash(weights["fc"])==proof["checkpoint"]["fc_state_sha"]
+        assert all(torch.isfinite(v).all() for v in list(weights["bb"].values())+list(weights["fc"].values()))
+        checkpoints[rep]=proof["checkpoint"]
+    evaluation=read(SRC_OUT / "evaluation/EVALUATION_LOCK.json")
+    assert sha(SRC_CACHE/"inputs/lt_images.npy")==locked["lt_image_sha256"]
+    assert sha(SRC_CACHE/"inputs/validation_images.npy")==evaluation["validation_images_sha"]
+    assert sha(SRC_OUT/"protocol/clean_validation.npz")==evaluation["validation_ids_and_labels_sha"]
+    history=[]
+    for dirname in ("H2T_official_clean","H2T","PI_H2T_review","H2T_repro_audit","data"):
+        for p in (ROOT/dirname).rglob("*"):
+            if p.is_file() and not p.is_relative_to(THIS):
+                s=p.stat();history.append([p.relative_to(ROOT).as_posix(),s.st_size,str(s.st_mtime_ns)])
+    safe_json(LOCAL/"historical_before.json",history)
+    safe_json(OUT/"SOURCE_AUDIT.json",dict(passed=True,branch=BRANCH,
+        initial_head=subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
+        checkpoint_sources=checkpoints,protected_metadata_entries=len(history),
+        data_sha256={str(p.relative_to(ROOT)):sha(p) for p in [SRC_CACHE/"inputs/lt_images.npy",SRC_CACHE/"inputs/validation_images.npy",*[SRC_OUT/"protocol"/n for n in ("clean_train.npz","noisy_train.npz","clean_validation.npz")]]},
+        code_sha256={**locked["code_sha256"],**{p.relative_to(ROOT).as_posix():sha(p) for p in THIS.glob("*.py")}},
+        stage1_training_epochs=0))
+    print("SOURCE CHECK PASSED: two authentic Stage-I epoch200 checkpoints; zero Stage-I training",flush=True)
+
+
+def check_sources():
+    proof=read(OUT/"SOURCE_AUDIT.json");assert proof["passed"]
+    assert subprocess.check_output(["git","branch","--show-current"],text=True).strip()==BRANCH
+    for n,h in proof["code_sha256"].items():assert sha(ROOT/n)==h,n
 
 
 def safe_json(path, value):
@@ -60,10 +110,14 @@ def source_proof(rep):
 
 
 def run(rep, labels, seed2, method, dryrun=False):
+    check_sources()
+    if not dryrun:assert read(OUT/"DRYRUN.json")["passed"]
     tag = ("dryrun_" if dryrun else "") + name(rep, labels, seed2, method)
     if seed2 not in (124, 125) or method not in ("no_fusion", "h2t"):
         raise ValueError("Unsupported arm")
     parent, src = source_proof(rep)
+    io=guard("dryrun" if dryrun else "stage2",labels)
+    started=time.perf_counter()
     runpath = OUT / tag
     runpath.mkdir(parents=True, exist_ok=False)
     local = LOCAL / tag
@@ -71,6 +125,7 @@ def run(rep, labels, seed2, method, dryrun=False):
     cfg = config(2)
     seed(seed2, cfg)
     bb, fc = models()
+    torch.cuda.reset_peak_memory_stats()
     loaded = load_weights(parent, bb, fc)
     assert loaded["epoch"] == 200
     for p in bb.parameters():
@@ -84,6 +139,9 @@ def run(rep, labels, seed2, method, dryrun=False):
     optimizer = AuditedSGD([{"params": fc.parameters()}], cfg.lr,
                            momentum=cfg.momentum, weight_decay=cfg.weight_decay)
     assert not optimizer.state
+    initial_optimizer_entries=len(optimizer.state)
+    forwards=[0]
+    bb.register_forward_hook(lambda *unused:forwards.__setitem__(0,forwards[0]+1))
     baseline = None
     if method == "h2t":
         baseline_tag = ("dryrun_" if dryrun else "") + name(rep, labels, seed2, "no_fusion")
@@ -105,6 +163,7 @@ def run(rep, labels, seed2, method, dryrun=False):
             assert all(now - init["BN_counters"][key] == 2 * (1 if dryrun else 85) * (epoch+1)
                        for key, now in counters(bb).items())
             assert parameter_hash(bb) == init["bb_parameters_sha"]
+            assert all(p.grad is None for p in bb.parameters())
             all_controls.extend(loader.rows)
             print(tag, "epoch", epoch+1, "loss", round(float(s["Loss"]), 4), flush=True)
     assert len(all_controls) == (1 if dryrun else 850)
@@ -121,6 +180,8 @@ def run(rep, labels, seed2, method, dryrun=False):
     if method == "h2t":
         assert bn_hash == nf["BN_final_sha"], "paired BN shift not identical"
     checkpoint = save_weights(local / ("epoch1.pth" if dryrun else "epoch10.pth"), bb, fc, 1 if dryrun else 10)
+    assert forwards[0]==2*optimizer.updates
+    frozen_runtime.assert_guard(io)
     safe_json(runpath / "RUN.json", dict(
         representation_regime=rep, observed_label_regime=labels,
         stage1_seed=42, stage2_seed=seed2, method=method,
@@ -132,11 +193,17 @@ def run(rep, labels, seed2, method, dryrun=False):
         paired_all_steps=(baseline is not None), dryrun=dryrun,
         H2T_replacements=core.replacements, optimizer_updates=optimizer.updates,
         controls_file_sha=sha(local / "batch_controls.csv"),
+        elapsed_seconds=time.perf_counter()-started,peak_GPU_bytes=torch.cuda.max_memory_allocated(),
+        environment=environment(cfg),optimizer_initial_entries=initial_optimizer_entries,
+        finite_gradient_checks=optimizer.finite_gradient_checks,BB_forwards=forwards[0],
+        BN_final_counters=counters(bb),IO_guard=io,
         diagnostic_note="Labels and sampler follow the selected Stage-II regime, which may use clean (oracle) labels solely for research diagnosis; no test or validation labels enter training."
     ))
 
 
 def evaluate():
+    check_sources()
+    io=guard("evaluation")
     # Cannot evaluate until ALL eight crossed arms finish.
     tags = [name(r, l, s, m) for r,l in (("clean", "noisy"), ("noisy", "clean"))
             for s in (124, 125) for m in ("no_fusion", "h2t")]
@@ -146,7 +213,9 @@ def evaluate():
         cp = ROOT / runinfo["checkpoint"]["file"]
         assert cp.exists() and sha(cp) == runinfo["checkpoint"]["sha256"]
         checks[tag] = runinfo["checkpoint"]["sha256"]
-    safe_json(OUT / "EVAL_LOCK.json", {"checkpoints": checks, "all_8_complete_before_eval": True})
+    safe_json(OUT / "EVAL_LOCK.json", {"checkpoints": checks, "all_8_complete_before_eval": True,
+        "validation_images_sha":sha(SRC_CACHE/"inputs/validation_images.npy"),
+        "validation_ids_labels_sha":sha(SRC_OUT/"protocol/clean_validation.npz")})
     with np.load(SRC_OUT / "protocol/clean_validation.npz", allow_pickle=False) as f:
         ids, targets = f["ids"].copy(), f["labels"].copy()
     images = np.load(SRC_CACHE / "inputs/validation_images.npy", mmap_mode="r", allow_pickle=False)
@@ -156,7 +225,9 @@ def evaluate():
     mask = dict(Overall=np.ones(1980, bool), Many=counts[targets]>100,
                 Medium=(counts[targets]>=20)&(counts[targets]<=100), Few=counts[targets]<20)
     assert [sum(mask[g]) for g in GROUPS] == [1980,680,700,600]
-    rows, perclass = [], []
+    val_sha=ahash(ids);label_sha=ahash(targets)
+    assert val_sha==read(SRC_OUT/"evaluation/EVALUATION_AUDIT.json")["val_ids_sha"]
+    rows, perclass, eval_records = [], [], {}
     for tag in tags:
         rec = runs[tag]
         cfg = config(2)
@@ -166,14 +237,21 @@ def evaluate():
         bb.eval(); fc.eval()
         before = state_hash(cpu_state(bb))
         t = transform("eval")
-        pred = []
+        pred,logit_batches = [],[]
         with torch.inference_mode():
             for k in range(0,1980,128):
                 batch = torch.stack([t(Image.fromarray(im)) for im in images[k:k+128]]).cuda()
                 logits = fc(bb(batch))
                 assert torch.isfinite(logits).all()
+                logit_batches.append(logits.cpu().numpy())
                 pred.append(logits.argmax(1).cpu().numpy())
         prediction = np.concatenate(pred)
+        all_logits=np.concatenate(logit_batches)
+        assert all_logits.shape==(1980,100) and all_logits.dtype==np.float32
+        with (LOCAL/tag/"evaluation.npz").open("xb") as f:
+            np.savez_compressed(f,raw_ids=ids,labels=targets,logits=all_logits,predictions=prediction)
+        eval_records[tag]=dict(single_eval_passes=1,val_ids_sha=val_sha,val_labels_sha=label_sha,
+            logits_sha256=sha(LOCAL/tag/"evaluation.npz"),BB_state_unchanged=True)
         assert state_hash(cpu_state(bb)) == before
         correct = prediction == targets
         for g in GROUPS:
@@ -182,7 +260,8 @@ def evaluate():
                 method=rec["method"], group=g, n=int(mask[g].sum()),
                 accuracy_pct=float(100*correct[mask[g]].mean()),
                 source_checkpoint_sha=rec["source_checkpoint_sha"],
-                checkpoint_sha=rec["checkpoint"]["sha256"]))
+                checkpoint_sha=rec["checkpoint"]["sha256"],val_ids_sha=val_sha,
+                val_labels_sha=label_sha,epoch=10,stage1_seed=42))
         for cls in range(100):
             ix=targets==cls
             perclass.append(dict(tag=tag,class_id=cls,n=int(ix.sum()),
@@ -192,21 +271,29 @@ def evaluate():
         with (OUT/filename).open("x", newline="", encoding="utf8") as f:
             writer=csv.DictWriter(f,fieldnames=list(data[0]))
             writer.writeheader(); writer.writerows(data)
+    frozen_runtime.assert_guard(io)
+    safe_json(OUT/"EVALUATION_AUDIT.json",dict(models=eval_records,IO_guard=io))
     print("EVALUATED 8 crossed models; no official TEST accessed", flush=True)
 
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("mode",choices=("train","evaluate"))
+    p.add_argument("mode",choices=("preflight","train","evaluate"))
     p.add_argument("--representation",choices=("clean","noisy"))
     p.add_argument("--labels",choices=("clean","noisy"))
     p.add_argument("--seed",type=int,choices=(124,125),default=124)
     p.add_argument("--method",choices=("no_fusion","h2t"),default="no_fusion")
     p.add_argument("--dryrun",action="store_true")
     a=p.parse_args()
-    if a.mode=="train":
+    if a.mode=="preflight":preflight()
+    elif a.mode=="train":
         assert a.representation and a.labels
-        run(a.representation, a.labels, a.seed, a.method, a.dryrun)
+        try:
+            run(a.representation, a.labels, a.seed, a.method, a.dryrun)
+        except BaseException:
+            tag=("dryrun_" if a.dryrun else "")+name(a.representation,a.labels,a.seed,a.method)
+            safe_json(OUT/(tag+"_FAILURE.json"),dict(traceback=traceback.format_exc()))
+            raise
     else:
         evaluate()
 

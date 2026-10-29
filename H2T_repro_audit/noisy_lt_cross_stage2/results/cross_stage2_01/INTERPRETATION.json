@@ -1,0 +1,76 @@
+{
+  "decision": "PRIORITIZE_STAGE2_LABEL_AND_SAMPLING_WITH_R_DEPENDENCE",
+  "status": "DESCRIPTIVE_DIAGNOSTIC",
+  "primary_group": "Few",
+  "few_main_effects": {
+    "per_seed": [
+      {
+        "stage2_seed": 124,
+        "representation_effect_pp": -1.7763568394002505e-15,
+        "observed_stage2_label_sampling_effect_pp": -3.8333333333333304,
+        "factorial_interaction_pp": 5.0000000000000036,
+        "total_diagonal_change_pp": -3.833333333333332,
+        "clean_on_clean_gain_pp": 3.666666666666668,
+        "clean_repr_noisy_labels_gain_pp": -2.6666666666666643,
+        "noisy_repr_clean_labels_gain_pp": 1.1666666666666643,
+        "noisy_on_noisy_gain_pp": -0.1666666666666643
+      },
+      {
+        "stage2_seed": 125,
+        "representation_effect_pp": 1.1666666666666643,
+        "observed_stage2_label_sampling_effect_pp": -4.666666666666664,
+        "factorial_interaction_pp": 5,
+        "total_diagonal_change_pp": -3.5,
+        "clean_on_clean_gain_pp": 4.5,
+        "clean_repr_noisy_labels_gain_pp": -2.6666666666666643,
+        "noisy_repr_clean_labels_gain_pp": 3.1666666666666643,
+        "noisy_on_noisy_gain_pp": 1
+      }
+    ],
+    "mean_representation_effect_pp": 0.5833333333333313,
+    "mean_stage2_label_sampling_effect_pp": -4.249999999999997,
+    "mean_factorial_interaction_pp": 5.000000000000002,
+    "mean_total_diagonal_change_pp": -3.666666666666666
+  },
+  "conditional_Few_effects": [
+    {
+      "stage2_seed": 124,
+      "S_given_clean_R": -6.333333333333332,
+      "S_given_noisy_R": -1.3333333333333286,
+      "R_given_clean_S": -2.5000000000000036,
+      "R_given_noisy_S": 2.5
+    },
+    {
+      "stage2_seed": 125,
+      "S_given_clean_R": -7.166666666666664,
+      "S_given_noisy_R": -2.1666666666666643,
+      "R_given_clean_S": -1.3333333333333357,
+      "R_given_noisy_S": 3.6666666666666643
+    }
+  ],
+  "R_includes": [
+    "backbone",
+    "initial_classifier",
+    "BN_buffers"
+  ],
+  "S_includes": [
+    "observed_targets",
+    "class_balanced_receiver_pools"
+  ],
+  "clean_conditions_are_oracle_diagnostic": true,
+  "not_a_deployable_method": true,
+  "whole_noisy_pipeline_stable_negative_transfer_proven": false,
+  "new_stage1_epochs": 0,
+  "new_stage2_runs": 8,
+  "next_locus_only": "class-aware receiver reliability / fusion supervision",
+  "next_module_implemented_or_trained": false,
+  "limitations": [
+    "one Stage-I seed",
+    "two Stage-II seeds share Stage-I models",
+    "reused TRAIN holdout",
+    "class0 absent",
+    "no official TEST",
+    "positive interaction is not synergistic worsening",
+    "Few relative loss does not imply absolute Few accuracy loss"
+  ]
+}

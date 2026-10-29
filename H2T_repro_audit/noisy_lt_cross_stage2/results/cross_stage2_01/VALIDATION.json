@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "paired_runs": 4,
+  "paired_batches": 3400,
+  "same_S_diagonal_stream_pairing_passed": true,
+  "all_final_logits_recomputed": true,
+  "old_validation_ids_and_labels_equal": true,
+  "historical_metadata_entries": 20712,
+  "historical_metadata_changed": 0,
+  "stage1_epochs_trained": 0,
+  "stage2_updates": 6800,
+  "checkpoint_sources_unchanged": true,
+  "pair_details": [
+    {
+      "representation": "clean",
+      "labels": "noisy",
+      "seed": 124,
+      "exact_paired_batches": 850,
+      "same_final_BN": true,
+      "diagonal_sampling_augmentation_and_mask_equal": true
+    },
+    {
+      "representation": "clean",
+      "labels": "noisy",
+      "seed": 125,
+      "exact_paired_batches": 850,
+      "same_final_BN": true,
+      "diagonal_sampling_augmentation_and_mask_equal": true
+    },
+    {
+      "representation": "noisy",
+      "labels": "clean",
+      "seed": 124,
+      "exact_paired_batches": 850,
+      "same_final_BN": true,
+      "diagonal_sampling_augmentation_and_mask_equal": true
+    },
+    {
+      "representation": "noisy",
+      "labels": "clean",
+      "seed": 125,
+      "exact_paired_batches": 850,
+      "same_final_BN": true,
+      "diagonal_sampling_augmentation_and_mask_equal": true
+    }
+  ]
+}

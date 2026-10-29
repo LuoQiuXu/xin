@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "updates_per_arm": 1,
+  "BB_forwards_per_arm": 2,
+  "initial_FC_BB_equal": true,
+  "all_control_hashes_exact": true,
+  "BN_final_equal": true,
+  "not_used_as_formal_weights": true
+}

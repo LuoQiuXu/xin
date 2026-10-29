@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "branch": "experiment/noisy-h2t-crossed-stage2-20261029",
+  "initial_head": "71bd1e56147d90ad9adf7620a43fa8ca864485de",
+  "checkpoint_sources": {
+    "clean": {
+      "file": "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\primary_cache\\stage1_clean\\epoch200.pth",
+      "sha256": "378efb8ac7fba039b3809ec925e87e06818374b6364414113c2a2edeb7604eb1",
+      "epoch": 200,
+      "bb_state_sha": "63098253c1318c09dfe17565ade1642a001532bf311c585a546719662204be8c",
+      "fc_state_sha": "53b1e36603c891fa1782a17123bf0f95963fd099ddd4c6d5bee49e6ef8cd0431"
+    },
+    "noisy": {
+      "file": "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\primary_cache\\stage1_noisy\\epoch200.pth",
+      "sha256": "2a3a587865314e87397b8e9b5ea958756f69bffefb3657d8576ba6f901bfa0d7",
+      "epoch": 200,
+      "bb_state_sha": "34012710d9f149d2e14c8864fdd90f8d028df05add309c8f431353ec4b2874cd",
+      "fc_state_sha": "68e4cddbd50a127eaea63c76d51a0ec514f9ebfec32a8b954a49667735622028"
+    }
+  },
+  "protected_metadata_entries": 20712,
+  "data_sha256": {
+    "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\primary_cache\\inputs\\lt_images.npy": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64",
+    "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\primary_cache\\inputs\\validation_images.npy": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656",
+    "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\protocol\\clean_train.npz": "5c3175fd89878f8352d76dcd2d833755a7fa34421ad4680892c5cd4ee122fe55",
+    "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\protocol\\noisy_train.npz": "4ac57a5cf0205eaf1932ab2a9c448edf7305299faae67f86f1fc8ced2f86756a",
+    "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\protocol\\clean_validation.npz": "79b23befd95374ad6a3f5467e05d6800fb73032f01727787cb4a03aaa8d396ab"
+  },
+  "code_sha256": {
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "H2T_official_clean/H2T-main/datasets/cifar100.py": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "H2T_official_clean/H2T-main/models/resnet_cifar.py": "a0f43fb293de0072a81d6329bbafc0b12b00706570596710b4021846eb6163fd",
+    "H2T_official_clean/H2T-main/loss.py": "01f6dd3eec61f63927a1a9a7d89bdfbe92fb7ed0a3c3c406e108ea6d8f099a07",
+    "H2T_official_clean/H2T-main/utils/logger.py": "bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88",
+    "H2T_official_clean/H2T-main/utils/metric.py": "d5da5eb30abd9328f5342182f3c23b4ca44253f89fa17c3efeffe1fee8c9933e",
+    "H2T_official_clean/H2T-main/utils/meter.py": "6d70adc2be7f5884da2688faac671fa57ef542584c9b3a1dbf9aa7e980aeed7e",
+    "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb001_stage1_ce_mixup.yaml": "96b8b504a44c194ba3c06a70e4691f71c73e3192af084674ad50b329c0fe7c5b",
+    "H2T_official_clean/H2T-main/config/cifar100/cifar100_imb001_stage2_ce_H2T.yaml": "e5fcac39017036a7ad4f58d420460eebb0c5faa70cce1fcf02eddb4bfd9794c5",
+    "H2T_repro_audit/noisy_lt_failure_screen/runtime.py": "33db0dd2702dc5909b85a594be4da27cbca88dcef844105f8df868bb9e8565e9",
+    "H2T_repro_audit/noisy_lt_failure_screen/train.py": "9b65a2f6caae9e0c19f5bd50ac8f8e28b3a36b525708e5b11c4328523f0a34fc",
+    "H2T_repro_audit/noisy_lt_failure_screen/prepare_inputs.py": "0bedb619d572b76da1eaf82b8b668b0112a082a187d0a21aec647f6082c6a125",
+    "H2T_repro_audit/noisy_lt_failure_screen/prepare_protocol.py": "ced9e7bf19aaae319af0fff37cacea9943ef962796312fd3e44d53f9c5654a16",
+    "H2T_repro_audit/noisy_lt_failure_screen/compare_outcomes.py": "01b4c4c8bf259b79fbfd8c46e66d9c3600e230d05f242b81f636abf923d26eb2",
+    "H2T_repro_audit/noisy_lt_failure_screen/CODEX_CIFAR100N_LT_FAILURE_SCREEN.txt": "a50a9e50768b63db28066280139910355b7f86ae38f52fa63c1237490da2091f",
+    "H2T_repro_audit/noisy_lt_failure_screen/SCIENTIFIC_RATIONALE.md": "63305928bc06cda9c310ffc74d5929c87e16bc660987fa2ac11d57b58bbb9d23",
+    "H2T_repro_audit/noisy_lt_cross_stage2/analyze_factorial.py": "285d83957f4a3e192581d0add23b94c87dba3962ebdd57a230a42eed5017bc31",
+    "H2T_repro_audit/noisy_lt_cross_stage2/cross_stage2.py": "13b4cc97cf4c4e82836adb612a07bf2e4716ee592d33e0899040d113a1302a30",
+    "H2T_repro_audit/noisy_lt_cross_stage2/test_factorial.py": "5e412248df0d5242ba49455b0a8fbddfe6200dd63368dad12f24a82587dc8d3d"
+  },
+  "stage1_training_epochs": 0
+}

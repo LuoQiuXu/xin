@@ -1,0 +1,15 @@
+{
+  "checkpoints": {
+    "repr_clean_labels_noisy_seed124_no_fusion": "92729fcefe3d3cc9620e25ca38b7255eedeb71b9fc5713ac90d7a327c34608e4",
+    "repr_clean_labels_noisy_seed124_h2t": "9ee99d8a9882bc391411f3de8913b685b5e5c59fdd7817627e73e760bca14b08",
+    "repr_clean_labels_noisy_seed125_no_fusion": "00779849e5c87fd92b35d172f1fd05bd128fdb3a1705117e67056ba5938c1ba8",
+    "repr_clean_labels_noisy_seed125_h2t": "144d1d0cb53490a67537f28a4fda0575000747cd7677bacb08faa5d4738c2f10",
+    "repr_noisy_labels_clean_seed124_no_fusion": "ff3733f538d4ba0d288c78f1be7c367f269faabb3ef2c49d5c9bff44e8375bb2",
+    "repr_noisy_labels_clean_seed124_h2t": "778aca4664acbda7c0324e47488d8d2885b97ae1c507dca2888d787a28ebba3b",
+    "repr_noisy_labels_clean_seed125_no_fusion": "5a0788aae3c59f6dc4f77662fd7674b0ec154248c684944988e7b86f1b1bf2d2",
+    "repr_noisy_labels_clean_seed125_h2t": "42facc15e1dbde09b940bd0785c5def1e9322d1b352e1ab2d54dd2ea729233d9"
+  },
+  "all_8_complete_before_eval": true,
+  "validation_images_sha": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656",
+  "validation_ids_labels_sha": "79b23befd95374ad6a3f5467e05d6800fb73032f01727787cb4a03aaa8d396ab"
+}

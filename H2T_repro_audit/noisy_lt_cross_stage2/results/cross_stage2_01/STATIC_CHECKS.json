@@ -1,0 +1,12 @@
+{
+  "python_files": 4,
+  "py_compile_passed": true,
+  "CPU_tests": 4,
+  "CPU_tests_passed": 4,
+  "source_SHA256": {
+    "H2T_repro_audit/noisy_lt_cross_stage2/analyze_factorial.py": "285d83957f4a3e192581d0add23b94c87dba3962ebdd57a230a42eed5017bc31",
+    "H2T_repro_audit/noisy_lt_cross_stage2/cross_stage2.py": "13b4cc97cf4c4e82836adb612a07bf2e4716ee592d33e0899040d113a1302a30",
+    "H2T_repro_audit/noisy_lt_cross_stage2/finalize.py": "515f5bb71e6bd63fbc50e8d885b4a19018fa57f37918bb59384e8b0b413c9c91",
+    "H2T_repro_audit/noisy_lt_cross_stage2/test_factorial.py": "5e412248df0d5242ba49455b0a8fbddfe6200dd63368dad12f24a82587dc8d3d"
+  }
+}

@@ -1,0 +1,9 @@
+test_effects (test_factorial.FactorialContract.test_effects) ... ok
+test_eval_denominator_rejected (test_factorial.FactorialContract.test_eval_denominator_rejected) ... ok
+test_missing_arm_rejected (test_factorial.FactorialContract.test_missing_arm_rejected) ... ok
+test_wrong_source_rejected (test_factorial.FactorialContract.test_wrong_source_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK

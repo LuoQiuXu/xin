@@ -100,6 +100,7 @@ desktop.ini
 # Local audit caches and retained intermediate assets from prior branches
 /H2T_repro_audit/**/primary_cache/
 /H2T_repro_audit/**/paper_cache/
+/H2T_repro_audit/noisy_lt_cross_stage2/results/**/local_only/
 /H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/*_PAGES.json
 /H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/
 /H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/
