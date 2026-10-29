@@ -2,10 +2,10 @@
 
 ## 仓库与分支
 - Repo: LuoQiuXu/xin
-- 只在分支 \`experiment/noisy-h2t-crossed-stage2-20261029\` 工作，结果和小报告提交回同一分支；禁止覆盖旧实验及创建其他分支。
-- 源实验目录：\`H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/\`
-- 本实验目录：\`H2T_repro_audit/noisy_lt_cross_stage2/\`
-- 先阅读 \`SCIENTIFIC_PROTOCOL.md\` 和旧实验 \`NOISY_LT_FAILURE_SCREEN_REPORT.md\`、\`PROTOCOL_AUDIT.md\`。
+- 只在分支 `experiment/noisy-h2t-crossed-stage2-20261029` 工作，结果和小报告提交回同一分支；禁止覆盖旧实验及创建其他分支。
+- 源实验目录：`H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/`
+- 本实验目录：`H2T_repro_audit/noisy_lt_cross_stage2/`
+- 先阅读 `SCIENTIFIC_PROTOCOL.md` 和旧实验 `NOISY_LT_FAILURE_SCREEN_REPORT.md`、`PROTOCOL_AUDIT.md`。
 - 任务重点：**基于已经观察到的真实Few额外收益衰减，定位是Stage I噪声表征还是Stage II噪声监督/采样所主导**。不要求绝对原创，不要求在当前步骤证明稳定负迁移，也不能因为旧门槛NO-GO否定已经出现的稳定衰减。不得无限扩展机制审计。
 
 ## 已有事实（不要重新跑）
@@ -37,11 +37,11 @@ Clean: H2T-DR Few = +3.6667/+4.5000pp；Noisy: -0.1667/+1.0000pp；衰减−3.83
    - SOURCE/protocol/clean_train.npz + noisy_train.npz + clean_validation.npz
    - 对照SOURCE/stage1_{regime}/RUN.json中权重SHA。
 2. CPU静态、最小纯分析单元测试：
-   \`python -m unittest discover -s H2T_repro_audit/noisy_lt_cross_stage2 -p "test_*.py" -v\`
-   \`python -m py_compile H2T_repro_audit/noisy_lt_cross_stage2/*.py\`（PowerShell通配符若不能按预期展开则用compileall）
-3. 先用真实GPU训练**一组新的交叉单元的一个batch小测试**；优先不引入新框架，直接在本轮脚本加\`--dry-run\`功能用于一批前向/反向、mask/BN核验且不保存正式模型。如果出现对齐或GPU报错，允许在本轮文件内修复必要的bug，写在CHANGELOG；不改原始作者模块及旧报告。
+   `python -m unittest discover -s H2T_repro_audit/noisy_lt_cross_stage2 -p "test_*.py" -v`
+   `python -m py_compile H2T_repro_audit/noisy_lt_cross_stage2/*.py`（PowerShell通配符若不能按预期展开则用compileall）
+3. 先执行已实现的真实单batch `--dryrun`：`python H2T_repro_audit/noisy_lt_cross_stage2/cross_stage2.py train --representation clean --labels noisy --seed 124 --method no_fusion --dryrun`，随后相同参数把method改为h2t。检查每臂1次更新、相同BN状态和mask/受体/供体配对。两次dryrun产物在独立dryrun_*目录，不作为正式模型；出现错误仅修复本轮文件并写入报告。
 4. 正式运行时，每个cross cell+seed必须先NoFusion再H2T，让H2T从NoFusion的850批预更新审计记录配对；若配对或BN不一致应停止，不得改成近似容忍。
-   \`\`\`powershell
+   ```powershell
    $script = "H2T_repro_audit/noisy_lt_cross_stage2/cross_stage2.py"
    foreach ($pair in @(@("clean","noisy"),@("noisy","clean"))) {
      foreach ($seed in @(124,125)) {
@@ -51,13 +51,13 @@ Clean: H2T-DR Few = +3.6667/+4.5000pp；Noisy: -0.1667/+1.0000pp；衰减−3.83
        if ($LASTEXITCODE -ne 0) { throw "H2T failed" }
      }
    }
-   \`\`\`
+   ```
 5. 全8个模型训练结束且SHA固定后，再允许一次性读取已有TRAIN holdout数据执行：
-   \`\`\`
+   ```
    python H2T_repro_audit/noisy_lt_cross_stage2/cross_stage2.py evaluate
    python H2T_repro_audit/noisy_lt_cross_stage2/analyze_factorial.py --diagonal H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/evaluation/final_metrics.csv --crossed H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/crossed_final_metrics.csv --output H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/analysis
-   \`\`\`
-6. 报告\`CROSSED_STAGE2_SCIENTIFIC_REPORT.md\`必须给出全部4个R×S单元上的Few/Overall和其他频组H2T−DR相对收益（每seed和均值）；解释主要效应：
+   ```
+6. 报告`CROSSED_STAGE2_SCIENTIFIC_REPORT.md`必须给出全部4个R×S单元上的Few/Overall和其他频组H2T−DR相对收益（每seed和均值）；解释主要效应：
    R-effect = 1/2[(D_noisy,clean−D_clean,clean)+(D_noisy,noisy−D_clean,noisy)]
    S-effect = 1/2[(D_clean,noisy−D_clean,clean)+(D_noisy,noisy−D_noisy,clean)]
    interaction = D_noisy,noisy−D_noisy,clean−D_clean,noisy+D_clean,clean。
@@ -68,7 +68,7 @@ Clean: H2T-DR Few = +3.6667/+4.5000pp；Noisy: -0.1667/+1.0000pp；衰减−3.83
    - 若二者协同、交互强，明确提出“联合效应”，下一轮也只挑一个可测子问题，不进行一大批ablation。
    - 若新结果互相矛盾或变化非常小，不要强行归因；封存该局部假设即可，但**不等于整个噪声长尾研究方向无价值**。
 8. 新结果仅为Clean TRAIN holdout的开发集，class0不存在；不能利用官方TEST选模，也不能和论文官方Few定义混为一谈。不得用分类器或测试集预测修正训练标签。
-9. 交付：本分支代码、测试日志、报告、\`factorial_accuracy.csv\`、\`factorial_contrasts.csv\`、\`summary.json\`、新8组epoch CSV、模型SHA索引；模型/大logits/含图像阵列仅本地并留恢复命令。README中列出训练耗时/显存，避免额外工程完美主义。
+9. 交付：本分支代码、测试日志、报告、`factorial_accuracy.csv`、`factorial_contrasts.csv`、`summary.json`、新8组epoch CSV、模型SHA索引；模型/大logits/含图像阵列仅本地并留恢复命令。README中列出训练耗时/显存，避免额外工程完美主义。
 
 ## 期望的研究出口
 这是**最后一个定位型对照**，目的不是追求完美机制解释，而是直接决定下一轮把创新点放在哪里：
