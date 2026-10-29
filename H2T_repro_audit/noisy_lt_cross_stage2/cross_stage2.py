@@ -59,8 +59,8 @@ def source_proof(rep):
     return parent, orig
 
 
-def run(rep, labels, seed2, method):
-    tag = name(rep, labels, seed2, method)
+def run(rep, labels, seed2, method, dryrun=False):
+    tag = ("dryrun_" if dryrun else "") + name(rep, labels, seed2, method)
     if seed2 not in (124, 125) or method not in ("no_fusion", "h2t"):
         raise ValueError("Unsupported arm")
     parent, src = source_proof(rep)
@@ -80,35 +80,35 @@ def run(rep, labels, seed2, method):
                 bb_parameters_sha=parameter_hash(bb),
                 BN_counters=counters(bb))
     ds = ObservedDataset(labels, cfg)  # Reads existing observed-label pools, not clean oracle
-    loader = AuditedLoader(ds, 2)
+    loader = AuditedLoader(ds, 2, 1 if dryrun else None)
     optimizer = AuditedSGD([{"params": fc.parameters()}], cfg.lr,
                            momentum=cfg.momentum, weight_decay=cfg.weight_decay)
     assert not optimizer.state
     baseline = None
     if method == "h2t":
-        baseline_tag = name(rep, labels, seed2, "no_fusion")
+        baseline_tag = ("dryrun_" if dryrun else "") + name(rep, labels, seed2, "no_fusion")
         nf = read(OUT / baseline_tag / "RUN.json")
         assert nf["source_checkpoint_sha"] == sha(parent) and nf["initial"] == init
         assert nf["labels_file_sha"] == sha(SRC_OUT / "protocol" / (labels + "_train.npz"))
         with (LOCAL / baseline_tag / "batch_controls.csv").open(newline="", encoding="utf8") as f:
             baseline = list(csv.DictReader(f))
-        assert len(baseline) == 850
+        assert len(baseline) == (1 if dryrun else 850)
     rows = []
     all_controls = []
     with (runpath / "native_train.log").open("x", encoding="utf8") as logfile:
         core = Core(2, cfg, loader, method, logfile)
-        for epoch in range(10):
+        for epoch in range(1 if dryrun else 10):
             s = core.epoch_run(optimizer, epoch, bb, fc, cfg, baseline)
             rows.append({"epoch": epoch + 1, **s})
-            assert len(loader.rows) == 85
-            assert optimizer.updates == 85 * (epoch + 1)
-            assert all(now - init["BN_counters"][key] == 170 * (epoch+1)
+            assert len(loader.rows) == (1 if dryrun else 85)
+            assert optimizer.updates == (1 if dryrun else 85) * (epoch + 1)
+            assert all(now - init["BN_counters"][key] == 2 * (1 if dryrun else 85) * (epoch+1)
                        for key, now in counters(bb).items())
             assert parameter_hash(bb) == init["bb_parameters_sha"]
             all_controls.extend(loader.rows)
             print(tag, "epoch", epoch+1, "loss", round(float(s["Loss"]), 4), flush=True)
-    assert len(all_controls) == 850
-    assert core.replacements == (850 if method == "h2t" else 0)
+    assert len(all_controls) == (1 if dryrun else 850)
+    assert core.replacements == ((1 if dryrun else 850) if method == "h2t" else 0)
     with (local / "batch_controls.csv").open("x", newline="", encoding="utf8") as f:
         writer = csv.DictWriter(f, fieldnames=list(all_controls[0]))
         writer.writeheader()
@@ -120,7 +120,7 @@ def run(rep, labels, seed2, method):
     bn_hash = state_hash(bn_state(bb))
     if method == "h2t":
         assert bn_hash == nf["BN_final_sha"], "paired BN shift not identical"
-    checkpoint = save_weights(local / "epoch10.pth", bb, fc, 10)
+    checkpoint = save_weights(local / ("epoch1.pth" if dryrun else "epoch10.pth"), bb, fc, 1 if dryrun else 10)
     safe_json(runpath / "RUN.json", dict(
         representation_regime=rep, observed_label_regime=labels,
         stage1_seed=42, stage2_seed=seed2, method=method,
@@ -129,7 +129,7 @@ def run(rep, labels, seed2, method):
         labels_file_sha=sha(SRC_OUT / "protocol" / (labels + "_train.npz")),
         checkpoint=checkpoint, BN_final_sha=bn_hash,
         BB_parameters_frozen=(parameter_hash(bb) == init["bb_parameters_sha"]),
-        paired_all_850_steps=(baseline is not None),
+        paired_all_steps=(baseline is not None), dryrun=dryrun,
         H2T_replacements=core.replacements, optimizer_updates=optimizer.updates,
         controls_file_sha=sha(local / "batch_controls.csv"),
         nonoracle_note="Only observed labels used for sampler/targets; representation checkpoint is a preexisting controlled diagnostic input."
@@ -202,10 +202,11 @@ def main():
     p.add_argument("--labels",choices=("clean","noisy"))
     p.add_argument("--seed",type=int,choices=(124,125),default=124)
     p.add_argument("--method",choices=("no_fusion","h2t"),default="no_fusion")
+    p.add_argument("--dryrun",action="store_true")
     a=p.parse_args()
     if a.mode=="train":
         assert a.representation and a.labels
-        run(a.representation, a.labels, a.seed, a.method)
+        run(a.representation, a.labels, a.seed, a.method, a.dryrun)
     else:
         evaluate()
 
