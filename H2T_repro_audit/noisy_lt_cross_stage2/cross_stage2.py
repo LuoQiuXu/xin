@@ -132,7 +132,7 @@ def run(rep, labels, seed2, method, dryrun=False):
         paired_all_steps=(baseline is not None), dryrun=dryrun,
         H2T_replacements=core.replacements, optimizer_updates=optimizer.updates,
         controls_file_sha=sha(local / "batch_controls.csv"),
-        nonoracle_note="Only observed labels used for sampler/targets; representation checkpoint is a preexisting controlled diagnostic input."
+        diagnostic_note="Labels and sampler follow the selected Stage-II regime, which may use clean (oracle) labels solely for research diagnosis; no test or validation labels enter training."
     ))
 
 
