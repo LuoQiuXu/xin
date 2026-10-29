@@ -1,0 +1,17 @@
+{
+  "UTC": "2026-10-29T09:01:40.244229+00:00",
+  "AST_syntax_passed": true,
+  "Python_files": 10,
+  "source_sha256": {
+    "H2T_repro_audit/noisy_lt_failure_screen/compare_outcomes.py": "01b4c4c8bf259b79fbfd8c46e66d9c3600e230d05f242b81f636abf923d26eb2",
+    "H2T_repro_audit/noisy_lt_failure_screen/evaluate.py": "173c79e8374ec498d2f1d55ed02d3ee3764705355afce387b05389295b2c3544",
+    "H2T_repro_audit/noisy_lt_failure_screen/prepare_inputs.py": "0bedb619d572b76da1eaf82b8b668b0112a082a187d0a21aec647f6082c6a125",
+    "H2T_repro_audit/noisy_lt_failure_screen/prepare_protocol.py": "ced9e7bf19aaae319af0fff37cacea9943ef962796312fd3e44d53f9c5654a16",
+    "H2T_repro_audit/noisy_lt_failure_screen/report.py": "4209b152b54da5b40501bffcff9c9feb42ef16764c46f69068d22e6d409ad7fc",
+    "H2T_repro_audit/noisy_lt_failure_screen/runtime.py": "33db0dd2702dc5909b85a594be4da27cbca88dcef844105f8df868bb9e8565e9",
+    "H2T_repro_audit/noisy_lt_failure_screen/test_contracts.py": "84c53e2d5fe3c1332da876100a6d54b13c070f1850214133d5208c4173a74e76",
+    "H2T_repro_audit/noisy_lt_failure_screen/test_training_contracts.py": "5eca3fe10542c11104a1d6513ef98d130fbf27e3ab85db11a8e467d881040ec5",
+    "H2T_repro_audit/noisy_lt_failure_screen/train.py": "9b65a2f6caae9e0c19f5bd50ac8f8e28b3a36b525708e5b11c4328523f0a34fc",
+    "H2T_repro_audit/noisy_lt_failure_screen/validate.py": "d245d652c534f41d00edf8610159f6611fb2b7acb299857126019418afa3c513"
+  }
+}

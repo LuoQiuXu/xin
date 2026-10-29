@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "branch": "experiment/h2t-cifar100n-lt-failure-screen-20261029",
+  "initial_head": "23c1281fcd376d788d2ff996ad288613de3064dd",
+  "initial_tracked_or_untracked_changes": 0,
+  "protected_historical_file_metadata_count": 20543,
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "initial_CPU_tests": 5,
+  "initial_CPU_test_exit": 0
+}

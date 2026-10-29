@@ -1,0 +1,15 @@
+test_image_order_mismatch_rejected (test_contracts.Contracts.test_image_order_mismatch_rejected) ... ok
+test_invalid_results_rejected (test_contracts.Contracts.test_invalid_results_rejected) ... ok
+test_paired_interaction (test_contracts.Contracts.test_paired_interaction) ... ok
+test_train_val_overlap_rejected (test_contracts.Contracts.test_train_val_overlap_rejected) ... ok
+test_valid_audited_subset (test_contracts.Contracts.test_valid_audited_subset) ... ok
+test_actual_noisy_sampler_class_pools_use_observed_labels (test_training_contracts.TrainingContracts.test_actual_noisy_sampler_class_pools_use_observed_labels) ... ok
+test_benchmark_group_boundaries (test_training_contracts.TrainingContracts.test_benchmark_group_boundaries) ... ok
+test_original_channel_replacement_is_batch_shared (test_training_contracts.TrainingContracts.test_original_channel_replacement_is_batch_shared) ... ok
+test_original_learning_rate_boundaries (test_training_contracts.TrainingContracts.test_original_learning_rate_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.144s
+
+OK
+Syntax PASS: 8 files

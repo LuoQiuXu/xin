@@ -1,0 +1,10 @@
+{
+  "UTC": "2026-10-29T09:01:40.246199+00:00",
+  "decision": "NO-GO",
+  "validity": "PASS",
+  "supplied_summary_status": "NO_GO_OR_INCONCLUSIVE",
+  "reason": "Both Few interactions <=-2pp, but noisy H2T is worse than No-Fusion only for seed124; seed125 is better. The conjunctive preregistered candidate gate fails.",
+  "independent_StageI_confirmation_triggered": false,
+  "PI_H2T_failure_established": false,
+  "new_module_or_noise_sweep_authorized": false
+}

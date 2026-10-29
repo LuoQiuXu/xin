@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "UTC": "2026-10-29T08:09:34.286189+00:00",
+  "checks": "Both regimes, one real S1 batch and paired S2 NF/H2T real batches, exact pre-update control hashes and final BN equality; smoke states not reused",
+  "runs": {
+    "dryrun_stage1_clean": "0d1d1bb48427b4123fa08b9482d34fcd630ea1d928c3379419cf897e037cafbf",
+    "dryrun_stage2_clean_seed124_no_fusion": "57ea6aefceb035ff6b75943b75adf810543ff77ba352f488417bf1e8993b1c50",
+    "dryrun_stage2_clean_seed124_h2t": "67844a32f7d49daf241e49e10a6a8021181175cae8dd5c7ca5fc36abd25af2d6",
+    "dryrun_stage1_noisy": "e83b8fbd09cdec7c28b0a618c6cad17f6380d278c60597786e945e374e262402",
+    "dryrun_stage2_noisy_seed124_no_fusion": "a7eca57f2288211bdaa7cf8739a9289d63edf80869c7ce2674298bdccb8e15bd",
+    "dryrun_stage2_noisy_seed124_h2t": "f20c6f8230a444f57d7a33d25935278227403776c8e55abbf35390ba289c9b2f"
+  }
+}

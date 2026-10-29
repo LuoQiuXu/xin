@@ -1,0 +1,19 @@
+{
+  "UTC": "2026-10-29T08:56:37.208385+00:00",
+  "training_completed_sha": "0bfe10621207e39e3b193d26638ae45f87fc928025e1ce1bb0c4ee82727f50c7",
+  "checkpoints_before_any_evaluation": {
+    "stage1_clean": "378efb8ac7fba039b3809ec925e87e06818374b6364414113c2a2edeb7604eb1",
+    "stage1_noisy": "2a3a587865314e87397b8e9b5ea958756f69bffefb3657d8576ba6f901bfa0d7",
+    "stage2_clean_seed124_no_fusion": "6045717983d5db54b680d42e1d2f5e50a9c9b4c0a191ce02c7bdd62d1a9bbff3",
+    "stage2_clean_seed124_h2t": "cbc0e88dd53f94f085e7df8e1ae028e09026af2fa93e0573ed823586880a3acb",
+    "stage2_clean_seed125_no_fusion": "235cceb3051c567041b1cd74a496dc82839769943d112fb55c519e764cc2165e",
+    "stage2_clean_seed125_h2t": "709e7d0d9ccfc826c0e51698eb282b160b8dcd2c8ea164752fc3966321460c46",
+    "stage2_noisy_seed124_no_fusion": "c2c3cbf9c959b1483ac4de3dec8150ec1adca816be04164640bbe6bcb4fd9106",
+    "stage2_noisy_seed124_h2t": "cae55660fc6717d9a91d2e02840a99ac01efbd309f76d3f77c273aebedfa80a1",
+    "stage2_noisy_seed125_no_fusion": "56f75eeaab8b2d03573ede71c6121beb7e834c4170ae3493f9ab7f644651f455",
+    "stage2_noisy_seed125_h2t": "c3344557c943192a7dc39837b375fa5b27155bf456338ae8bb385e0039be82ee"
+  },
+  "validation_ids_and_labels_sha": "79b23befd95374ad6a3f5467e05d6800fb73032f01727787cb4a03aaa8d396ab",
+  "validation_images_sha": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656",
+  "evaluation_script_sha256": "173c79e8374ec498d2f1d55ed02d3ee3764705355afce387b05389295b2c3544"
+}

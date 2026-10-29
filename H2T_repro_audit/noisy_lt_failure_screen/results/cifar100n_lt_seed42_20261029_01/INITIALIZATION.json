@@ -1,0 +1,44 @@
+{
+  "checkpoint": {
+    "file": "H2T_repro_audit\\noisy_lt_failure_screen\\results\\cifar100n_lt_seed42_20261029_01\\primary_cache\\initial_seed42.pth",
+    "sha256": "0b91d3d05d5f21f1b727bf278ee7cc7326406ca750f99e827432234591c17a33",
+    "epoch": 0,
+    "bb_state_sha": "0671589d05294f32e2b4d1d5f1862ad75a8cf11abecf01f5006756df319d0033",
+    "fc_state_sha": "d51793f00e04831a01a2520ed83e1ded2ba804c52cde5a93e844ec8f11e29635"
+  },
+  "environment": {
+    "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "CUDA": "13.2",
+    "cuDNN": 92400,
+    "GPU": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "GPU_bytes": 8546484224,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "deterministic_algorithms": false,
+    "float32_matmul_precision": "highest",
+    "AMP": false,
+    "batch_size": 128,
+    "workers": 0,
+    "DataParallel": true,
+    "config": "H2T: -1.0\nResLT:\n  gamma: 0.7\nalpha: 1.0\nbackbone: resnet32_fe\nbatch_size: 128\nclassifier: Classifier\ndata_path: ./data/cifar100\ndataset: cifar100\ndeterministic: true\ndist_backend: nccl\ndist_url: tcp://224.66.41.62:23456\ndistributed: false\ngpu: null\nhead_class_idx:\n- 0\n- 36\nimb_factor: 0.01\nlog_dir: logs\nloss:\n  CE:\n    reweight_CE: false\n  LDAM:\n    max_m: 0.5\n    reweight_epoch: -1\n    s: 30\n  RIDE:\n    additional_diversity_factor: -0.2\n    base_diversity_temperature: 1.0\n    base_loss_factor: 1.0\n    max_m: 0.5\n    reweight: false\n    reweight_epoch: -1\n    reweight_factor: 0.05\n    s: 30\n  ResLT:\n    beta: 0.99\n    smooth: 0.0\n  add_extra_info: false\n  type: CrossEntropyLoss\nlr: 0.1\nlr_scheduler:\n  lr_factor: 0.1\n  lr_step:\n  - 160\n  - 180\n  type: multistep\nmed_class_idx:\n- 36\n- 71\nmixup: true\nmode: stage1\nmodel_dir: ckps\nmomentum: 0.9\nmultiprocessing_distributed: false\nname: cifar100_imb001_stage1_ce_mixup\nnum_classes: 100\nnum_epochs: 200\nnum_experts: 1\nprint_freq: 40\nrank: -1\nresume: ''\nsampler:\n  dual_sample:\n    enable: false\n    type: long-tailed\n  type: default\n  weighted_sampler:\n    type: balance\nshift_bn: false\nsmooth_head: null\nsmooth_tail: null\ntail_class_idx:\n- 71\n- 100\nuse_norm: false\nweight_decay: 0.0002\nworkers: 0\nworld_size: -1\n"
+  },
+  "IO_guard": {
+    "phase": "initialize",
+    "regime": null,
+    "official_TEST_attempts": [],
+    "historical_write_attempts": [],
+    "prohibited_label_or_validation_attempts": [],
+    "numeric_files_read": [
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/protocol/clean_train.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/protocol/noisy_train.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/inputs/lt_images.npy",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/initial_seed42.pth"
+    ]
+  }
+}

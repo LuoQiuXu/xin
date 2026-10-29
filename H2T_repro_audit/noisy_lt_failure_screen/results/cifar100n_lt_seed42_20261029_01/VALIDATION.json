@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "UTC": "2026-10-29T08:57:12.179749+00:00",
+  "checks": {
+    "stage1_same_initialization_images_and_mixup_all200_epochs": true,
+    "stage2_all3400_pairs_exact_controls_BN_and_frozen_BB": true,
+    "no_training_validation_clean_oracle_or_official_TEST_access": true,
+    "all_final_logits_recompute_exact_metrics_interactions_and_paired_counts": true,
+    "historical20543_metadata_unchanged_and_locked_source_SHA256_unchanged": true
+  },
+  "protected_files_checked": 20543,
+  "metadata_changes": [],
+  "historical_check_scope": "Full path/size/mtime_ns metadata census; cryptographic content checks additionally cover locked original source and used historical inputs. Not a full content hash of all20543 files.",
+  "IO_guard": {
+    "phase": "validation",
+    "regime": null,
+    "official_TEST_attempts": [],
+    "historical_write_attempts": [],
+    "prohibited_label_or_validation_attempts": [],
+    "numeric_files_read": [
+      "H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/split_indices.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/protocol/clean_train.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/protocol/noisy_train.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/protocol/clean_validation.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/initial_seed42.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage1_clean/epoch200.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage1_noisy/epoch200.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed124_no_fusion/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed124_h2t/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed125_no_fusion/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed125_h2t/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed124_no_fusion/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed124_h2t/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed125_no_fusion/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed125_h2t/epoch10.pth",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage1_clean.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage1_noisy.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_clean_seed124_no_fusion.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_clean_seed124_h2t.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_clean_seed125_no_fusion.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_clean_seed125_h2t.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_noisy_seed124_no_fusion.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_noisy_seed124_h2t.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_noisy_seed125_no_fusion.npz",
+      "H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/evaluation/stage2_noisy_seed125_h2t.npz"
+    ]
+  }
+}

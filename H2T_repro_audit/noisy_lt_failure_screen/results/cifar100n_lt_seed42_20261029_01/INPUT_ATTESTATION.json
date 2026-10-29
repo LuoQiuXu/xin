@@ -1,0 +1,36 @@
+{
+  "official_repository": "https://github.com/UCSC-REAL/cifar-10-100n",
+  "download_url": "https://raw.githubusercontent.com/UCSC-REAL/cifar-10-100n/main/data/CIFAR-100_human.pt",
+  "final_download_url": "https://raw.githubusercontent.com/UCSC-REAL/cifar-10-100n/main/data/CIFAR-100_human.pt",
+  "official_git_blob_sha1": "5dac9db8af8f7224f982fbac9794c67f60f8bd45",
+  "human_file_bytes": 1000959,
+  "human_file_sha256": "bd2d80409754d420292d622e15e25248ba21e37d27429efac49c8da723f44394",
+  "official_human_keys": [
+    "clean_label",
+    "noisy_label",
+    "clean_coarse_label",
+    "noisy_coarse_label"
+  ],
+  "weights_only": true,
+  "compatibility": "Closed primitive NumPy safe globals including old numpy.core aliases; no weights_only=False",
+  "human_clean_matches_Python_TRAIN_all50000": true,
+  "order": "Python/PyTorch (not TFDS ordered file)",
+  "train_file_sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+  "historical_split_sha256": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1",
+  "train_ids_exact_seed0": true,
+  "train_val_id_overlap": 0,
+  "train_val_exact_pixel_overlap": 0,
+  "raw_train_pixel_cache_matches": true,
+  "validation_pixel_cache_matches": true,
+  "input_sha256": {
+    "human_labels.npz": "e50697c3d0e956ea837ba689b298d6fc2ccd97841b075ae613fc2d2e90d94e87",
+    "lt_images.npy": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64",
+    "raw_clean_labels.npy": "233cdd4afc94cd00f3ddec6f8640168bf76a6872168cf6c5a9990ac9f144be3b",
+    "split.npz": "2f2b478a349cf94f632f92b766aba5197cc18edc983b4ffea82582f7a000bc88",
+    "validation_images.npy": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656"
+  },
+  "full_noise_fraction": 0.402,
+  "LT_noise_fraction": 0.35973080114317324,
+  "no_official_TEST_open": true,
+  "trained": false
+}

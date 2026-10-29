@@ -1,0 +1,55 @@
+{
+  "by_group": {
+    "Overall": {
+      "stage1_seeds": 1,
+      "paired_runs": 2,
+      "per_run_interaction_pp": [
+        -0.75757576,
+        -1.41414141
+      ],
+      "mean_interaction_pp": -1.085858585,
+      "all_negative": true
+    },
+    "Many": {
+      "stage1_seeds": 1,
+      "paired_runs": 2,
+      "per_run_interaction_pp": [
+        2.35294118,
+        1.91176471
+      ],
+      "mean_interaction_pp": 2.132352945,
+      "all_negative": false
+    },
+    "Medium": {
+      "stage1_seeds": 1,
+      "paired_runs": 2,
+      "per_run_interaction_pp": [
+        -1.14285714,
+        -2.85714286
+      ],
+      "mean_interaction_pp": -2.0,
+      "all_negative": true
+    },
+    "Few": {
+      "stage1_seeds": 1,
+      "paired_runs": 2,
+      "per_run_interaction_pp": [
+        -3.83333333,
+        -3.5
+      ],
+      "mean_interaction_pp": -3.666666665,
+      "all_negative": true
+    }
+  },
+  "warnings": [
+    "This compares human noisy training scenario against clean; observed class frequency changes as well as loss targets.",
+    "One Stage-I seed and two Stage-II seeds form a PILOT, not independent Stage-I replication.",
+    "Only valid for a clean TRAIN-held-out development validation; not official TEST.",
+    "A negative interaction alone is not a demonstrated method failure; noisy H2T must be worse than same-source DR.",
+    "This cannot establish a PI-H2T failure."
+  ],
+  "pilot_gate": {
+    "status": "NO_GO_OR_INCONCLUSIVE",
+    "rule": "At least two Stage-II seeds: Few noise interaction <= -2pp AND noisy H2T Few < noisy DR Few in each; then independently reproduce with new Stage-I seed."
+  }
+}
