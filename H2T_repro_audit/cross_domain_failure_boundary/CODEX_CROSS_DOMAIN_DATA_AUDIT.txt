@@ -1,0 +1,100 @@
+任务名称：H2T / PI-H2T 跨领域失效边界研究——第一阶段数据有效性审计
+
+仓库：LuoQiuXu/xin
+目标分支：experiment/h2t-cross-domain-data-gate-20261030
+本轮只做数据审计，不启动 GPU 训练。
+
+一、研究目的（必须先读）
+
+请先阅读：
+- H2T_repro_audit/cross_domain_failure_boundary/SCIENTIFIC_PROTOCOL.md
+- H2T_repro_audit/cross_domain_failure_boundary/README.md
+
+我们的核心目标是寻找 H2T / PI-H2T 在不同视觉领域的适用边界。当前这一轮是正式跨领域训练前的数据有效性门禁，不是继续拆解 H2T 的融合模块，也不是方法性能实验。
+
+候选数据：
+1. ISIC 2019：医学皮肤病变分类，使用 lesion_id 防止同一病灶跨集合。
+2. Fish4Knowledge FRGT：水下鱼类分类，使用 tracking ID 防止同一鱼类轨迹跨集合。
+
+二、代码边界
+
+1. 只允许修改本目录：
+   H2T_repro_audit/cross_domain_failure_boundary/
+2. 不得修改 H2T/、PI_H2T_review/、H2T_repro_audit/noisy_lt_failure_screen/、H2T_repro_audit/noisy_lt_cross_stage2/ 中的任何文件。
+3. 不得覆盖、删除或重新生成之前实验的结果、权重、日志和数据缓存。
+4. 不得自动下载数据集；先使用我本地已经下载并解压的数据。
+5. 不得执行 git checkout、git switch、git reset、git clean、git commit、git push 等操作。当前分支由用户管理。
+6. 本轮禁止任何 GPU 训练，不需要安装新的深度学习依赖。
+
+三、执行顺序
+
+A. CPU 契约测试
+
+在仓库根目录运行：
+
+python -m unittest discover -s H2T_repro_audit/cross_domain_failure_boundary -p "test_*.py" -v
+
+要求全部通过。若失败，先修复本目录内代码并重新运行测试，不得跳过失败测试。
+
+B. 语法检查
+
+python -m py_compile H2T_repro_audit/cross_domain_failure_boundary/audit_external_domains.py
+
+C. ISIC 2019 审计
+
+确认本地目录包含完整训练图像、Training_Metadata.csv 和 Training_GroundTruth.csv。运行：
+
+python H2T_repro_audit/cross_domain_failure_boundary/audit_external_domains.py --dataset isic2019 --images-root "<本地ISIC训练图像目录>" --metadata-csv "<Training_Metadata.csv>" --ground-truth-csv "<Training_GroundTruth.csv>" --output-dir "<仓库外目录>/isic2019"
+
+D. Fish4Knowledge 审计
+
+确认本地目录已解压官方23个 fish 图像类别包，目录结构能从 fish_01 或 01.Species 识别类别；只放图像，不要放 mask 包。运行：
+
+python H2T_repro_audit/cross_domain_failure_boundary/audit_external_domains.py --dataset fish4knowledge --images-root "<本地Fish4Knowledge图像目录>" --output-dir "<仓库外目录>/fish4knowledge"
+
+如果当前解压结构不符合脚本要求，不要猜类别或手工编造 tracking ID。先报告真实目录结构和文件名样例，再决定是否增加一个明确的路径适配器。
+
+四、严格的数据有效性要求
+
+1. ISIC：使用官方8类one-hot标签，按 lesion_id 分组；缺失 lesion_id 的样本必须单独统计，不能伪造 lesion ID。
+2. Fish4Knowledge：按官方 tracking ID 分组，同一 tracking ID 必须始终在同一个 split。
+3. 两个数据集都要检查图像能否解码、SHA256、完全重复图像、类别计数和独立 group 数。
+4. 不能随机按图片划分训练/验证/测试集。
+5. Fish4Knowledge 全23类必须保留在审计结果中。只有满足至少9条训练轨迹、3条验证轨迹和3条独立测试轨迹的类别，才能进入 primary manifest。其余类别列明具体原因，不得静默删除。
+6. ISIC 2019 必须有8个类别全部满足预先规定的独立组数量门槛，否则该数据集不能进入8类确认性训练。
+7. 输出中的 Head / Medium / Tail 是各数据集训练类频的三分位分组，不得冒充 H2T 原论文 CIFAR Many / Medium / Few 的绝对阈值。
+8. 如果官方发布图像数量、类别数量或 Fish4Knowledge 轨迹数量不匹配，状态必须是 NO-GO，先核对数据版本，不能通过改阈值强行放行。
+
+五、输出与交付
+
+输出目录必须在仓库外，至少交付：
+
+- audit_summary.json
+- audit_issues.json
+- class_counts.csv
+- manifest_all.csv
+- manifest_primary.csv
+
+另外创建一个简短的执行报告：
+CROSS_DOMAIN_DATA_AUDIT_REPORT.md
+
+报告必须包含：
+1. Python解释器、Pillow版本、操作系统；
+2. 两个数据集的实际图像数、类别数、每类图像数和独立组数；
+3. 各 split 的图像数与独立组数；
+4. 缺失ID、无效图像、完全重复图像、类别计数不匹配；
+5. ISIC是否达到8类 primary 门槛；
+6. Fish4Knowledge是否达到12类 primary 门槛，以及哪些类别被排除、原因是什么；
+7. 明确区分 PASS、PASS_LIMITED_SCOPE、NO-GO；
+8. 是否建议进入下一阶段训练，并说明数据范围限制。
+
+六、禁止事项
+
+- 不训练 ResNet、ConvNeXt、FAST 或任何模型。
+- 不运行 H2T / PI-H2T Stage I 或 Stage II。
+- 不改变数据标签、删除极少数类、复制样本、过采样或增强样本。
+- 不修改 group split 门槛以追求 PASS。
+- 不根据模型精度或期望结果调整数据协议。
+- 不把数据集审计失败描述为 H2T 方法失效。
+
+本轮目标是得到可信的数据入口。只有数据协议通过后，下一轮才实现共同骨干上的 H2T / PI-H2T 跨领域训练。
