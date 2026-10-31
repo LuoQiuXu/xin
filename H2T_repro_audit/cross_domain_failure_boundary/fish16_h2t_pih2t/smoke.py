@@ -23,6 +23,7 @@ from torch import nn
 import models
 from data import load_rows, schedules, Views, loader, transform
 from preflight import BRANCH, EXPECTED_SHA, MANIFEST
+from amp_recovery import OptimizerStepCounter, guarded_scaler_step, make_grad_scaler
 
 VALIDATION = Path(r"D:\h2t_cross_domain_results\fish16_validation_seed42_20261031_01")
 
@@ -93,7 +94,7 @@ def batch_smoke(rows, rec, donors, batch, output):
         weight_before = model.classifier.weight.detach().clone()
         opt = torch.optim.SGD(model.classifier.parameters(), lr=.01, momentum=.9, weight_decay=5e-4)
         opt.zero_grad(set_to_none=True)
-        scaler = torch.amp.GradScaler("cuda")
+        scaler = make_grad_scaler()
         with torch.no_grad(), torch.amp.autocast("cuda", dtype=torch.float16):
             r = model.extractor(one["recipient"].cuda())
             d = model.extractor(one["donor"].cuda()) if mode != "crt" else None
@@ -138,7 +139,14 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     before_classifier = models.state_sha(model.classifier)
     before_pif = [float(p.detach().flatten()[i]) for p in model.extractor.pif.parameters() for i in range(p.numel())]
     opt = torch.optim.SGD(parameters, lr=lr, momentum=.9, weight_decay=wd)
-    scaler = torch.amp.GradScaler("cuda")
+    scaler = make_grad_scaler()
+    step_counter = OptimizerStepCounter(opt)
+    optimizer_ids = {id(p) for group in opt.param_groups for p in group["params"]}
+    named_optimizer_parameters = [
+        (name, p) for name, p in model.named_parameters() if id(p) in optimizer_ids
+    ]
+    assert len(named_optimizer_parameters) == len(parameters)
+    initial_loss_scale = scaler.get_scale()
     accumulation = 16 // batch
     dataset = Views(rows, indices, True, donors=donors)
     batches = loader(dataset, batch)
@@ -148,6 +156,11 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     torch.cuda.reset_peak_memory_stats()
     start = time.perf_counter()
     loss_sum, updates, samples, finite_checks = 0., 0, 0, 0
+    attempted_steps = 0
+    overflow_skips = 0
+    consecutive_overflow_skips = 0
+    max_consecutive_overflow_skips = 0
+    optimizer_step_events = []
     for i, item in enumerate(batches):
         target = item["label"].cuda(non_blocking=True)
         row = {"batch": i, "samples": len(target), "recipient_sha256": digest_tensor(item["recipient"]),
@@ -182,23 +195,64 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
         scaler.scale(loss * len(target) / group_size).backward()
         if (i+1) % accumulation == 0 or i+1 == len(batches):
             scaler.unscale_(opt)
-            finite_gradients(parameters)
             assert model.classifier.weight.grad is not None
             if stage == 2:
                 assert all(p.grad is None for p in model.extractor.parameters())
-            scaler.step(opt)
-            scaler.update()
-            opt.zero_grad(set_to_none=True)
-            updates += 1
+            outcome = guarded_scaler_step(
+                optimizer=opt,
+                scaler=scaler,
+                named_parameters=named_optimizer_parameters,
+                step_counter=step_counter,
+                allow_pif_b_overflow=(stage == 1 and model.use_pif),
+                consecutive_overflow_skips=consecutive_overflow_skips,
+                max_consecutive_overflow_skips=2,
+            )
+            attempted_steps += 1
             finite_checks += 1
+            if outcome.skipped:
+                overflow_skips += 1
+                consecutive_overflow_skips += 1
+                max_consecutive_overflow_skips = max(
+                    max_consecutive_overflow_skips, consecutive_overflow_skips
+                )
+            else:
+                updates += 1
+                consecutive_overflow_skips = 0
+            event = outcome.as_dict()
+            event.update({
+                "condition": name,
+                "batch_start": group_start,
+                "batch_end": i,
+                "optimizer_updates_total": updates,
+                "overflow_skips_total": overflow_skips,
+                "consecutive_overflow_skips": consecutive_overflow_skips,
+            })
+            optimizer_step_events.append(event)
+            opt.zero_grad(set_to_none=True)
         samples += len(target)
         loss_sum += float(loss.detach()) * len(target)
         controls.append(row)
         if (i+1) % 100 == 0:
             print(f"{name} smoke epoch1 batch {i+1}/{len(batches)}, loss={float(loss.detach()):.5f}", flush=True)
+    step_counter.close()
     torch.cuda.synchronize()
     duration = time.perf_counter()-start
-    assert samples == 16269 and updates == math.ceil(16269 / 16)
+    expected_attempts = math.ceil(16269 / 16)
+    assert samples == 16269 and attempted_steps == expected_attempts
+    assert updates + overflow_skips == attempted_steps
+    assert updates == step_counter.count
+    assert overflow_skips <= 3 and max_consecutive_overflow_skips <= 2
+    if not (stage == 1 and model.use_pif):
+        assert overflow_skips == 0, "Unexpected AMP overflow outside B0 PIF Stage-I"
+    else:
+        first_skip = next((row for row in optimizer_step_events
+                           if row["kind"] == "recoverable_pif_b_overflow_skip"), None)
+        assert first_skip is not None, "Expected B0 PIF overflow was not reproduced"
+        assert first_skip["batch_end"] == 6, "B0 overflow moved away from archived batch 6"
+        assert first_skip["scale_before"] == 65536.0 and first_skip["scale_after"] == 32768.0
+        next_step = optimizer_step_events[first_skip["batch_end"] + 1]
+        assert next_step["kind"] == "optimizer_step" and next_step["scale_before"] == 32768.0
+    save_json(folder / "optimizer_step_events.json", optimizer_step_events)
     if stage == 2:
         assert before_extractor == models.state_sha(model.extractor), "Extractor or BN mutated"
     assert before_classifier != models.state_sha(model.classifier)
@@ -211,7 +265,11 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                     "scaler": scaler.state_dict(), "validation": validation}, f)
     save_json(folder / "input_controls.json", controls)
     result = {"condition": name, "scope": "ONE_EPOCH_SMOKE_ONLY", "stage": stage,
-              "samples": samples, "optimizer_updates": updates, "finite_gradient_checks": finite_checks,
+              "samples": samples, "optimizer_updates": updates,
+              "attempted_optimizer_steps": attempted_steps, "amp_overflow_skips": overflow_skips,
+              "max_consecutive_overflow_skips": max_consecutive_overflow_skips,
+              "initial_loss_scale": initial_loss_scale, "final_loss_scale": float(scaler.get_scale()),
+              "finite_gradient_checks": finite_checks,
               "lr": lr, "momentum": .9, "weight_decay": wd, "micro_batch": batch,
               "accumulation": accumulation, "effective_batch": 16, "amp": True, "workers": 4,
               "train_loss": loss_sum / samples, "train_seconds": duration,
