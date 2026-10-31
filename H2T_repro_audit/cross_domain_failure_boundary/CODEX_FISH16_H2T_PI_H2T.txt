@@ -1,0 +1,128 @@
+CODEX TASK: Implement and run the first Fish4Knowledge-16 external-domain comparison for H2T and PI-H2T.
+
+Repository: LuoQiuXu/xin
+Target branch: experiment/fish16-h2t-pih2t-cross-domain-20261031
+Base branch: experiment/h2t-cross-domain-data-gate-20261030
+
+FIRST READ:
+1. H2T_repro_audit/cross_domain_failure_boundary/CROSS_DOMAIN_EXPERIMENT_PROTOCOL.md
+2. H2T_repro_audit/cross_domain_failure_boundary/results/formal_data_audit_20261031_01/CROSS_DOMAIN_DATA_AUDIT_REPORT.md
+3. H2T_official_clean/H2T-main/methods.py
+4. H2T_official_clean/H2T-main/models/resnet.py
+5. H2T_official_clean/H2T-main/train_stage1.py and train_stage2.py
+6. PI_H2T_review/H2T-main/pi_h2t.py
+7. PI_H2T_review/H2T-main/models/resnet_cifar.py
+8. PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md
+
+RESEARCH OBJECTIVE
+Find genuine external-domain performance degradation / blind spots of H2T and PI-H2T before proposing any algorithm modification. This is an evaluation-first task. Do not invent or add a new fusion, loss, donor-selection, channel-selection, or routing mechanism.
+
+DATA GATE (LOCKED)
+Use ONLY the Fish4Knowledge 16-class primary manifest that passed the formal group-aware audit.
+Local manifest:
+D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv
+Image root:
+D:\xiangmuxunlian\xin\data\fishRecognition_GT\fish_image
+Optional mapping audit file:
+D:\xiangmuxunlian\xin\data\class_id.csv
+Before any training, inspect the actual manifest header and assert:
+- 27,133 image rows
+- exactly 16 primary classes
+- split counts: train 16,269; val 5,396; test 5,468 images
+- group counts: train 5,208; val 1,736; test 1,736
+- no tracking/group ID crosses splits
+- no exact image SHA crosses splits
+Do NOT regenerate, reshuffle, or modify this manifest. Do NOT use mask_image. Do NOT use the 7 excluded classes in primary training. Keep original data read-only.
+ISIC 2019 is NO-GO due two pairs of byte-identical images with conflicting MEL/NV labels and connected lesion IDs. Do not train ISIC or delete/relable those images. Do not treat its data-integrity failure as method failure.
+
+BRANCH / GIT SAFETY
+- Verify current branch and worktree before edits.
+- Work only on experiment/fish16-h2t-pih2t-cross-domain-20261031.
+- If the local worktree is dirty or branch mismatch cannot be resolved safely, STOP and report; do not stash, reset, clean, or overwrite user changes.
+- Do not create another branch.
+- Do not modify existing files under H2T_official_clean/ or PI_H2T_review/.
+- Add all new implementation under:
+  H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/
+- Do not add datasets, manifests, image hashes, checkpoints, or bulky result files to Git.
+- Do not silently change protocol choices below.
+
+IMPLEMENTATION DESIGN
+Create a clean, self-contained runner and unit tests. Reuse original method operations where practical, but keep old upstream code immutable.
+
+A. Backbone
+- Use H2T's ResNet50_FE from H2T_official_clean/H2T-main/models/resnet.py with pretrained=True.
+- Return the 2048-channel feature map after layer4 (before GAP).
+- Plain branch uses the backbone unchanged.
+- PIF branch wraps the SAME ResNet50_FE initialization and inserts the existing PI-H2T PermutationInvariantFusion after layer4 and before GAP.
+- Both branches must load identical ImageNet-pretrained ResNet50 weights; PIF has only the existing two shared PIF parameters.
+- Do not substitute ResNet32 or an unrelated backbone.
+- Record the pretrained weight source and SHA256. If pretrained weights are not cached and cannot be obtained, STOP; do not silently switch to random initialization.
+
+B. Stage-I
+- Train Plain and PIF branches separately but with identical data split, initialization source, transforms, seed, optimizer, LR schedule, batch, epoch count, and MixUp.
+- 224x224 input.
+- Train transform: RandomResizedCrop(224), RandomHorizontalFlip, ColorJitter(0.4), ToTensor, ImageNet normalization.
+- Eval transform: Resize(256), CenterCrop(224), ToTensor, ImageNet normalization.
+- CE + MixUp alpha=1.0.
+- Pilot: seed=42, 90 epochs, SGD lr=0.01, momentum=0.9, weight_decay=1e-4, 5-epoch warmup + cosine.
+- Save best checkpoint by validation only; keep current/final checkpoint too.
+- No test-set evaluation during training.
+
+C. Stage-II six conditions (see protocol table)
+1. A0 Plain Stage-I evaluation.
+2. A1 Plain cRT, no fusion.
+3. A2 H2T, rho=0.25.
+4. B0 PIF Stage-I evaluation.
+5. B1 PIF-cRT, no fusion.
+6. B2 PI-H2TF, paper_theoretical_bounds, ratio_detach=True.
+- Stage-II 10 epochs, SGD lr=0.01, momentum=0.9, weight_decay=5e-4, cosine.
+- All Stage-II conditions freeze extractor parameters AND BN running statistics (eval mode); optimize classifier only. This is the primary matched-BN comparison. Clearly document that the original H2T config uses shift_bn=True; do not silently claim exact reproduction of that BN behavior.
+- cRT, H2T, and PI-H2T use identical class-balanced recipient schedules.
+- For H2T and PI-H2T, use the same pre-generated donor index pairs for each epoch: donors sampled from the natural long-tailed train distribution with replacement. Do not force donors to be head-only, different-class, or different-track. Log those relationships.
+- H2T must preserve the original random channel replacement semantics and rho=0.25; no new channel selector.
+- PI-H2TF must use the existing formula: GAP; cosine between recipient feature and current classifier weight for recipient label; r=(1-cosine)/2; fused=r*recipient+(1-r)*donor; ratio_detach=True.
+- PIF-only cRT is required to separate the PIF representation contribution from H2TF fusion.
+
+D. Evaluation
+- Use validation for model selection and test exactly once after checkpoint selection.
+- Report image-level Overall, Macro, Head/Medium/Tail, per-class, worst-class, confusion matrix.
+- Head/Medium/Tail are training-frequency tertiles with 6/5/5 classes, not CIFAR paper's absolute thresholds.
+- Also report trajectory-level mean-logit accuracy.
+- Bootstrap by test trajectories (not independent images), >=1000 resamples, for Macro and Tail confidence intervals.
+- Save test logits and sample IDs.
+- Compare fused model against matched cRT on identical test images: correct->wrong, wrong->correct, target-margin delta, per-class delta.
+- Log H2T selected channel IDs/counts, PI r and (1-r) distributions by class, recipient/donor class, donor frequency group, same-class and same-track pair rates.
+- Show test image count and independent test-trajectory count per class. Explicitly warn that some tail classes have only 3 test tracks.
+
+E. Output
+Write all results outside the repo:
+D:\h2t_cross_domain_results\fish16_pilot_seed42\
+Do not commit checkpoints, manifests, image hashes, or output data.
+Required artifacts:
+run_manifest.json, per_epoch_metrics.csv, best_validation_metrics.json, final_test_metrics.json, per_class_metrics.csv, confusion_matrix.csv, trajectory_metrics.json, cluster_bootstrap_ci.json, sample_transition_audit.csv, h2t_channel_audit.json, pi_ratio_audit.json, donor_pair_audit.csv, TRAINING_REPORT.md, and external checkpoints.
+
+IMPLEMENTATION / TEST ORDER
+1. Read and validate the real manifest; print exact class and split support.
+2. Build dataset loader and class mapping; test no split leakage and image path resolution.
+3. Implement Plain/PIF ResNet50 feature maps and test output shape [B,2048,H,W].
+4. Test PIF formula, parameter count, and pretrained backbone weight equality between Plain/PIF.
+5. Test H2T channel replacement count and original semantics.
+6. Test PI-H2TF formula, ratio detach, recipient/donor mass, and classifier gradients.
+7. Test Stage-II extractor and BN are frozen; classifier receives gradients.
+8. Run one real batch forward/backward for all three Stage-II modes.
+9. Run a real-data 1-epoch smoke for the six conditions (or at minimum each distinct Stage-I and Stage-II code path); validate and save temporary outputs outside repo.
+10. If all tests pass, run the full seed=42 pilot exactly as specified.
+11. Stop after seed=42. Do NOT automatically start seeds 43/44. Report results and wait for scientific analysis before expanding to multi-seed confirmation.
+
+COMPUTE
+Target GPU is an 8GB RTX 5070 Laptop.
+- Start batch_size=16, AMP enabled, workers=4.
+- If CUDA OOM, retry only after a clean process restart with batch_size=8 and gradient accumulation=2; record micro-batch/effective batch and keep this identical for all methods.
+- Do not change input resolution, backbone, data split, optimizer, or epoch count to hide OOM.
+- Save checkpoints periodically and resume safely; never overwrite a nonempty output directory.
+- Report epoch time, peak GPU memory, throughput, and total runtime.
+
+STOP CONDITIONS
+Stop and report without training if manifest assertions fail, pretrained weights are unavailable, class mapping is ambiguous, data leakage is detected, PIF/H2T/PI smoke tests fail, or the worktree/branch safety check fails.
+If a method crashes or produces NaN, preserve logs and do not silently skip that condition.
+Do not modify algorithms in response to the first pilot. The only deliverable is a trustworthy comparison and a diagnostic report identifying whether a real performance degradation signal exists.
