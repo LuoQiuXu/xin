@@ -1,0 +1,41 @@
+{
+  "status": "FAILED_SMOKE_STOPPED",
+  "scope": "ADAPTER_CPU_TESTS_AND_REAL_DATA_SMOKE_ONLY",
+  "branch": "experiment/fish16-h2t-pih2t-cross-domain-20261031",
+  "head": "61d2e42200d3d46b77f74c0553d63fe5721f74ed",
+  "data_gate": "PASS;27133 image SHA/path checks; exact counts and no leakage",
+  "weights": "PASS;265 exact backbone tensors;53 legacy integer counters only;no shape mismatch",
+  "cpu_tests": "10/10 PASS",
+  "syntax": "5/5 PASS",
+  "real_stage2_batch_tests": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "B1": "PASS",
+    "B2": "PASS"
+  },
+  "stage1_epoch_status": {
+    "A0": "COMPLETE_1_SMOKE_EPOCH",
+    "B0": "FAILED_GRADIENT_VALIDITY_CHECK;epoch_incomplete"
+  },
+  "stage2_epoch_status": {
+    "A1": "NOT_RUN_AFTER_B0_FAILURE",
+    "A2": "NOT_RUN_AFTER_B0_FAILURE",
+    "B1": "NOT_RUN_AFTER_B0_FAILURE",
+    "B2": "NOT_RUN_AFTER_B0_FAILURE"
+  },
+  "A0_smoke_samples": 16269,
+  "A0_smoke_updates": 1017,
+  "B0_exact_failure_batch": "UNRECORDED;before first 100-batch progress print",
+  "root_cause": "UNCONFIRMED;guard combines empty gradients and nonfinite gradients;per-parameter gradients and AMP scale not persisted",
+  "forward_loss_and_logits": "Finiteness guard was passed before the failing backward/unscale gradient check",
+  "total_smoke_attempt_seconds": 111.12360405921936,
+  "formal_training_started": false,
+  "test_model_evaluations": 0,
+  "seeds_43_44_started": false,
+  "original_sources_unchanged": true,
+  "downloaded_19c_weight_unchanged": true,
+  "old_11ad_weight_unchanged_and_unused": true,
+  "all_executed_new_source_hashes_match_manifest": true,
+  "run_manifest_epoch_field_limit": "Pre-run stage1_epochs_executed/stage2_epochs_executed are intended budgets, not proof of completion; use this actual execution status",
+  "method_failure_inference_allowed": false
+}
