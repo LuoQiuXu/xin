@@ -58,7 +58,7 @@ If it exists, do not overwrite it; use a new suffix _02 and report that path.
 Run exactly:
 & 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\b0_recovery_smoke.py --output-dir 'D:\h2t_cross_domain_results\fish16_b0_amp_recovery_gate1_seed42_20261031_01'
 
-The runner itself enforces the known environment (PyTorch 2.14.1+cu132, CUDA build 13.2, cuDNN 92400, RTX 5070 Laptop), locked manifest and pretrained-weight hashes, clean worktree, and unchanged original H2T/PI-H2T source hashes. If any prerequisite differs, it must stop; do not weaken the assertion.
+The runner itself enforces the known environment (Python 3.12.12, PyTorch 2.14.1+cu132, CUDA build 13.2, cuDNN 92400, RTX 5070 Laptop), locked manifest and pretrained-weight hashes, clean worktree, and unchanged original H2T/PI-H2T source hashes. If any prerequisite differs, it must stop; do not weaken the assertion.
 
 The runner must reproduce the archived batch 6 exactly:
 - row indices: [13582, 7987, 15285, 17141, 2724, 13480, 16315, 9510, 1680, 15366, 1164, 1640, 18775, 14261, 13777, 19669]
