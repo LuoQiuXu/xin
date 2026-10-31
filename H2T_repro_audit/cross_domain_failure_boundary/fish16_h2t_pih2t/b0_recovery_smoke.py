@@ -205,6 +205,10 @@ def run(output):
         "mixup_alpha": 1.0,
         "batches_requested": 100,
         "expected_replay_batch": EXPECTED_B6,
+        "experiment_python_source_hashes": {
+            source.name: models.sha(source)
+            for source in sorted(Path(__file__).parent.glob("*.py"))
+        },
         "validation_evaluations": 0,
         "test_evaluations": 0,
         "stage2_epochs": 0,
