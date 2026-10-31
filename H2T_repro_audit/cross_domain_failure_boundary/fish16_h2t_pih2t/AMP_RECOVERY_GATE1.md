@@ -11,7 +11,7 @@ The controlled replay archived under `diagnostics/results/b0_grad_diag_20261031_
 - zero-based batch 6, after six successful SGD updates;
 - finite forward logits and loss;
 - no missing parameter gradients and no NaN;
-- exactly one Inf at `extractor.pif.fuse.weight[0,1,0]`, the shared PIF coefficient b;
+- exactly one positive Inf at `extractor.pif.fuse.weight[0,1,0]`, the shared PIF coefficient b;
 - the same input and forward hashes pass at AMP scales 32768, 16384, 8192, 4096, and in FP32;
 - the finite unscaled b-gradient at lower scales is 1.2802734375, which exceeds the FP16 finite range after multiplication by 65536;
 - a disposable clone confirms native GradScaler behavior: zero optimizer.step calls and scale 65536 -> 32768.
