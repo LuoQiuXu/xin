@@ -245,13 +245,20 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     if not (stage == 1 and model.use_pif):
         assert overflow_skips == 0, "Unexpected AMP overflow outside B0 PIF Stage-I"
     else:
-        first_skip = next((row for row in optimizer_step_events
-                           if row["kind"] == "recoverable_pif_b_overflow_skip"), None)
-        assert first_skip is not None, "Expected B0 PIF overflow was not reproduced"
-        assert first_skip["batch_end"] == 6, "B0 overflow moved away from archived batch 6"
-        assert first_skip["scale_before"] == 65536.0 and first_skip["scale_after"] == 32768.0
-        next_step = optimizer_step_events[first_skip["batch_end"] + 1]
-        assert next_step["kind"] == "optimizer_step" and next_step["scale_before"] == 32768.0
+        first_skip_index = next(
+            (i for i, row in enumerate(optimizer_step_events)
+             if row["kind"] == "recoverable_pif_b_overflow_skip"),
+            None,
+        )
+        assert first_skip_index is not None, "Expected B0 PIF overflow was not reproduced"
+        first_skip = optimizer_step_events[first_skip_index]
+        if batch == 16:
+            assert first_skip["batch_end"] == 6, "B0 overflow moved away from archived batch 6"
+            assert first_skip["scale_before"] == 65536.0 and first_skip["scale_after"] == 32768.0
+        assert first_skip_index + 1 < len(optimizer_step_events), "No optimizer window after the overflow"
+        next_step = optimizer_step_events[first_skip_index + 1]
+        assert next_step["kind"] == "optimizer_step", "No successful optimizer step after overflow"
+        assert next_step["scale_before"] == first_skip["scale_after"]
     save_json(folder / "optimizer_step_events.json", optimizer_step_events)
     if stage == 2:
         assert before_extractor == models.state_sha(model.extractor), "Extractor or BN mutated"
