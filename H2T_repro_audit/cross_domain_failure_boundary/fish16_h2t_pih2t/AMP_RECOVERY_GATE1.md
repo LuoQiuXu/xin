@@ -1,17 +1,17 @@
 # Fish16 B0 AMP recovery: Gate 1 protocol
 
 Date: 2026-10-31  
-Branch: \`experiment/fish16-h2t-pih2t-cross-domain-20261031\`  
+Branch: `experiment/fish16-h2t-pih2t-cross-domain-20261031`  
 Scope: numerical recovery validation only; no algorithm change and no formal training.
 
 ## 1. Evidence being acted on
 
-The controlled replay archived under \`diagnostics/results/b0_grad_diag_20261031_01/\` identifies:
+The controlled replay archived under `diagnostics/results/b0_grad_diag_20261031_01/` identifies:
 
 - zero-based batch 6, after six successful SGD updates;
 - finite forward logits and loss;
 - no missing parameter gradients and no NaN;
-- exactly one Inf at \`extractor.pif.fuse.weight[0,1,0]\`, the shared PIF coefficient b;
+- exactly one Inf at `extractor.pif.fuse.weight[0,1,0]`, the shared PIF coefficient b;
 - the same input and forward hashes pass at AMP scales 32768, 16384, 8192, 4096, and in FP32;
 - the finite unscaled b-gradient at lower scales is 1.2802734375, which exceeds the FP16 finite range after multiplication by 65536;
 - a disposable clone confirms native GradScaler behavior: zero optimizer.step calls and scale 65536 -> 32768.
@@ -20,14 +20,14 @@ The diagnosis does **not** justify changing PIF, its initialization, the backbon
 
 ## 2. Implementation contract
 
-\`amp_recovery.py\` is intentionally fail-closed:
+`amp_recovery.py` is intentionally fail-closed:
 
 1. The optimizer parameter set must exactly match the named gradient-audit set.
 2. Every optimized parameter must have a gradient; all-zero gradients are rejected.
 3. NaN is always fatal.
-4. Inf is fatal except for exactly one Inf at the audited PIF tensor coordinate \`extractor.pif.fuse.weight[0,1,0]\`, shape \`(1,2,1)\`, during PIF Stage-I.
+4. Inf is fatal except for exactly one Inf at the audited PIF tensor coordinate `extractor.pif.fuse.weight[0,1,0]`, shape `(1,2,1)`, during PIF Stage-I.
 5. No gradient is clamped, replaced, clipped, or silently discarded.
-6. The code calls the ordinary \`scaler.step(optimizer)\` and \`scaler.update()\`. It then verifies:
+6. The code calls the ordinary `scaler.step(optimizer)` and `scaler.update()`. It then verifies:
    - the optimizer post-step hook did not fire;
    - the GradScaler scale decreased;
    - optimized parameter hashes are unchanged.
@@ -40,7 +40,7 @@ Important: a skipped SGD update is not a rollback of the forward pass. BatchNorm
 
 ## 3. Gate 1: exact 100-batch B0 recovery
 
-Run only \`b0_recovery_smoke.py\`:
+Run only `b0_recovery_smoke.py`:
 
 - Fish4Knowledge-16 locked manifest; Stage-I training split only;
 - seed 42, PIF-ResNet50, original ImageNet weight SHA;
@@ -59,7 +59,7 @@ No validation or TEST images are loaded. No checkpoint is produced. No Stage-II 
 ## 4. Gate sequence
 
 - **Gate 1 (this task):** exact B0 first-100-batch recovery.
-- **Gate 2 (separate approval):** B0 complete one-epoch smoke, then the complete six-condition smoke. The existing \`smoke.py\` now uses the same strict helper and records actual optimizer updates separately from skipped attempts.
+- **Gate 2 (separate approval):** B0 complete one-epoch smoke, then the complete six-condition smoke. The existing `smoke.py` now uses the same strict helper and records actual optimizer updates separately from skipped attempts.
 - **Gate 3 (separate approval):** only after review of Gate 2, consider the seed-42 90+10 pilot.
 
 A Gate 1 pass is evidence that the known numerical failure is handled safely in a short real-data run. It is not evidence of classification performance, PI-H2T cross-domain effectiveness, or permission to begin formal training.
