@@ -46,6 +46,8 @@ EXPECTED_B6 = {
     "raw_input_sha256": "b9ce6c99dd498e3213ebdff893466bbc365833295904b3b153281965b6c81ad5",
     "rng_before_mixup_sha256": "78b3dde6c54238603e730541568ea8f2ef9d5b3531fb11562c69ac38c75a19b3",
     "mixup_lambda": 0.814341567785799,
+    "labels_a": [0, 2, 0, 0, 3, 0, 0, 2, 3, 0, 3, 3, 0, 0, 0, 0],
+    "labels_b": [2, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0, 3, 3, 0, 0, 3],
     "pif_parameters_before": [-0.02449430152773857, -0.6112035512924194],
 }
 
@@ -249,6 +251,12 @@ def run(output):
                     float(lam), EXPECTED_B6["mixup_lambda"],
                     rel_tol=0.0, abs_tol=1e-12
                 ), f"Batch-6 MixUp lambda drift: {lam}"
+                assert labels_a.detach().cpu().tolist() == EXPECTED_B6["labels_a"], (
+                    "Batch-6 MixUp recipient-label order drift."
+                )
+                assert labels_b.detach().cpu().tolist() == EXPECTED_B6["labels_b"], (
+                    "Batch-6 MixUp permutation/label order drift."
+                )
 
             with torch.amp.autocast("cuda", dtype=torch.float16):
                 logits = model(x)
