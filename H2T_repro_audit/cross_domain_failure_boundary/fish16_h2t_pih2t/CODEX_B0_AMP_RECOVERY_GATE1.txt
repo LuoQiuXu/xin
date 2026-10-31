@@ -6,7 +6,7 @@ This is a continuation of the current experiment. Do NOT create or switch to ano
 
 ## Research decision
 
-The archived controlled replay confirms one recoverable numerical event: on B0 PIF Stage-I, zero-based batch 6 produces exactly one Inf at extractor.pif.fuse.weight[0,1,0] under FP16 GradScaler scale 65536. The finite lower-scale replay and disposable GradScaler clone show that the correct response is the native GradScaler skip + scale backoff, not a PIF formula or initialization change.
+The archived controlled replay confirms one recoverable numerical event: on B0 PIF Stage-I, zero-based batch 6 produces exactly one positive Inf at extractor.pif.fuse.weight[0,1,0] under FP16 GradScaler scale 65536. The finite lower-scale replay and disposable GradScaler clone show that the correct response is the native GradScaler skip + scale backoff, not a PIF formula or initialization change.
 
 Your task is ONLY to execute Gate 1: the first 100 B0 Stage-I batches with the exact replay checks. Do not run the full six-condition smoke, Stage-II, validation/test evaluation, or formal 90+10 training.
 
@@ -71,7 +71,7 @@ The runner must reproduce the archived batch 6 exactly:
 
 Required recovery evidence:
 - first and expected overflow is zero-based batch 6;
-- only one Inf, at extractor.pif.fuse.weight[0,1,0]; no NaN, no missing gradient, no other nonfinite gradient;
+- only one positive Inf, at extractor.pif.fuse.weight[0,1,0]; no NaN, no missing gradient, no other nonfinite gradient;
 - scaler.step/update uses native GradScaler behavior;
 - optimizer post-step hook count does not increase on batch 6;
 - scale changes 65536 -> 32768;
