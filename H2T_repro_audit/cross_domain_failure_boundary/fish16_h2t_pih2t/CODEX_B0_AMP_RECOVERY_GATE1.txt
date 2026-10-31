@@ -100,7 +100,7 @@ If the archived batch-6 replay differs, if another parameter/coordinate is nonfi
 
 The external output directory should contain run_manifest.json, batch_log.csv (or batch_log_partial.csv on failure), optimizer_step_events.csv (or partial version on failure), and result.json on pass OR FAILURE.json on failure.
 
-After the run, create a compact Git-tracked report directory:
+After the run, create a compact Git-tracked report directory with the same attempt suffix as the external output path (for example, use amp_recovery_gate1_20261031_02 if the external output used suffix _02):
 H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/results/amp_recovery_gate1_20261031_01/
 
 Include only:
