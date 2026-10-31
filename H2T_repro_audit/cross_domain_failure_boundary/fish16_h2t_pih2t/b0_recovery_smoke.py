@@ -353,6 +353,9 @@ def run(output):
                 assert outcome.scale_after == 32768.0
                 assert outcome.optimizer_steps_before == 6
                 assert outcome.optimizer_steps_after == 6
+                assert outcome.inf_count == 1 and outcome.nan_count == 0
+                assert outcome.nonfinite_parameters == ("extractor.pif.fuse.weight",)
+                assert outcome.nonfinite_positions["extractor.pif.fuse.weight"] == [[0, 1, 0]]
             if batch_index == EXPECTED_B6["batch"] + 1:
                 assert not outcome.skipped, (
                     "The first batch after scale backoff did not execute an optimizer step."
