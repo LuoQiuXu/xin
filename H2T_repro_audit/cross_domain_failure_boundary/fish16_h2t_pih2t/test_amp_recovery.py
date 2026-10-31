@@ -112,6 +112,22 @@ class AmpRecoveryTests(unittest.TestCase):
         self.assertEqual(scaler.update_calls, 1)
         self.assertNotEqual(parameter_sha(named), before)
 
+    def test_exact_pif_inf_is_fatal_without_explicit_b0_permission(self):
+        model, optimizer, self.counter, named = make_case()
+        model.extractor.pif.fuse.weight.grad[0, 1, 0] = float("inf")
+        scaler = FakeScaler()
+
+        with self.assertRaises(GradientContractError):
+            guarded_scaler_step(
+                optimizer=optimizer,
+                scaler=scaler,
+                named_parameters=named,
+                step_counter=self.counter,
+                allow_pif_b_overflow=False,
+            )
+        self.assertEqual(scaler.step_calls, 0)
+        self.assertEqual(self.counter.count, 0)
+
     def test_nan_is_never_recoverable(self):
         model, optimizer, self.counter, named = make_case()
         model.extractor.pif.fuse.weight.grad[0, 1, 0] = float("nan")
