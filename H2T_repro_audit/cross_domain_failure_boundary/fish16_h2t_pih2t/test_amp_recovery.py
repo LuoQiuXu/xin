@@ -174,6 +174,21 @@ class AmpRecoveryTests(unittest.TestCase):
             )
         self.assertEqual(scaler.step_calls, 0)
 
+    def test_negative_inf_at_pif_b_is_not_the_archived_event(self):
+        model, optimizer, self.counter, named = make_case()
+        model.extractor.pif.fuse.weight.grad[0, 1, 0] = float("-inf")
+        scaler = FakeScaler()
+
+        with self.assertRaises(GradientContractError):
+            guarded_scaler_step(
+                optimizer=optimizer,
+                scaler=scaler,
+                named_parameters=named,
+                step_counter=self.counter,
+                allow_pif_b_overflow=True,
+            )
+        self.assertEqual(scaler.step_calls, 0)
+
     def test_multiple_inf_values_are_fatal(self):
         model, optimizer, self.counter, named = make_case()
         model.extractor.pif.fuse.weight.grad[0, 0, 0] = float("inf")
