@@ -8,6 +8,7 @@ import argparse
 import csv
 import hashlib
 import json
+from itertools import islice
 import math
 import platform
 from pathlib import Path
@@ -212,9 +213,7 @@ def run(output):
 
     optimizer.zero_grad(set_to_none=True)
     try:
-        for batch_index, item in enumerate(batches):
-            if batch_index >= 100:
-                break
+        for batch_index, item in enumerate(islice(batches, 100)):
             target = item["label"].cuda(non_blocking=True)
             raw = item["recipient"]
             raw_sha = digest_tensor(raw)
@@ -337,9 +336,36 @@ def run(output):
                     flush=True,
                 )
 
-        torch.cuda.synchronize()
+    except Exception:
+        if batch_rows:
+            write_csv(
+                output / "batch_log_partial.csv",
+                batch_rows,
+                [
+                    "batch_index", "row_indices", "recipient_sha256", "mixup_rng_sha256",
+                    "mixup_lambda", "labels_a", "labels_b", "loss", "logits_finite",
+                    "step_kind", "scale_before", "scale_after",
+                ],
+            )
+        if step_rows:
+            write_csv(
+                output / "optimizer_step_events_partial.csv",
+                step_rows,
+                [
+                    "kind", "scale_before", "scale_after", "optimizer_steps_before",
+                    "optimizer_steps_after", "nan_count", "inf_count",
+                    "nonfinite_parameters", "nonfinite_positions",
+                    "parameter_sha_before", "parameter_sha_after", "batch_index",
+                    "samples", "optimizer_updates_total", "overflow_skips_total",
+                    "consecutive_overflow_skips", "extractor_state_sha_before_step",
+                    "extractor_state_sha_after_step",
+                ],
+            )
+        raise
     finally:
         counter.close()
+
+    torch.cuda.synchronize()
 
     duration = time.perf_counter() - started
     assert len(batch_rows) == 100, f"Only {len(batch_rows)} batches completed."
