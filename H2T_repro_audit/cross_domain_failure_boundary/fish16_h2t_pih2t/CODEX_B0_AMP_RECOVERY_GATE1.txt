@@ -65,6 +65,8 @@ The runner must reproduce the archived batch 6 exactly:
 - raw input SHA256: b9ce6c99dd498e3213ebdff893466bbc365833295904b3b153281965b6c81ad5
 - pre-MixUp RNG SHA256: 78b3dde6c54238603e730541568ea8f2ef9d5b3531fb11562c69ac38c75a19b3
 - MixUp lambda: 0.814341567785799
+- labels_a: [0, 2, 0, 0, 3, 0, 0, 2, 3, 0, 3, 3, 0, 0, 0, 0]
+- labels_b: [2, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0, 3, 3, 0, 0, 3]
 - PIF a/b immediately before batch 6: [-0.02449430152773857, -0.6112035512924194]
 
 Required recovery evidence:
