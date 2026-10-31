@@ -227,6 +227,8 @@ def guarded_scaler_step(
 
     steps_after = int(step_counter.count)
     scale_after = float(scaler.get_scale())
+    if not math.isfinite(scale_after) or scale_after <= 0:
+        raise GradientContractError(f"Invalid GradScaler scale after step: {scale_after}")
 
     if has_nonfinite:
         parameter_after = parameter_sha(named_parameters)
