@@ -1,0 +1,24 @@
+label,all_images,all_independent_groups,raw_lesion_or_tracking_ids,primary_eligible,primary_reason_if_excluded,frequency_group_primary,all_train_images,all_train_groups,primary_train_images,primary_train_groups,all_val_images,all_val_groups,primary_val_images,primary_val_groups,all_test_images,all_test_groups,primary_test_images,primary_test_groups,class_id
+Dascyllus reticulatus,12112,4240,4240,True,,Head,7342,2544,7342,2544,2365,848,2365,848,2405,848,2405,848,1
+Plectroglyphidodon dickii,2683,1225,1225,True,,Head,1588,735,1588,735,547,245,547,245,548,245,548,245,2
+Chromis chrysura,3593,1175,1175,True,,Head,2114,705,2114,705,687,235,687,235,792,235,792,235,3
+Amphiprion clarkii,4049,1021,1021,True,,Head,2513,613,2513,613,825,204,825,204,711,204,711,204,4
+Chaetodon lunulatus,2534,536,536,True,,Head,1469,322,1469,322,547,107,547,107,518,107,518,107,5
+Chaetodon trifascialis,190,79,79,True,,Tail,101,47,101,47,26,16,26,16,63,16,63,16,6
+Myripristis kuntee,450,71,71,True,,Medium,171,43,171,43,125,14,125,14,154,14,154,14,7
+Acanthurus nigrofuscus,218,71,71,True,,Medium,144,43,144,43,33,14,33,14,41,14,41,14,8
+Hemigymnus fasciatus,241,58,58,True,,Medium,144,34,144,34,46,12,46,12,51,12,51,12,9
+Neoniphon sammara,299,53,53,True,,Head,205,31,205,31,52,11,52,11,42,11,42,11,10
+Abudefduf vaigiensis,98,42,42,True,,Tail,59,26,59,26,14,8,14,8,25,8,25,8,11
+Canthigaster valentini,147,28,28,True,,Tail,64,16,64,16,26,6,26,6,57,6,57,6,12
+Pomacentrus moluccensis,181,27,27,True,,Medium,133,17,133,17,39,5,39,5,9,5,9,5,13
+Zebrasoma scopas,90,23,23,True,,Tail,48,13,48,13,25,5,25,5,17,5,17,5,14
+Hemigymnus melapterus,42,16,16,True,,Tail,29,10,29,10,9,3,9,3,4,3,4,3,15
+Lutjanus fulvus,206,15,15,True,,Medium,145,9,145,9,30,3,30,3,31,3,31,3,16
+Scolopsis bilineata,49,8,8,False,only 8 independent groups; need at least 15,excluded,26,4,0,0,14,2,0,0,9,2,0,0,17
+Scaridae,56,5,5,False,only 5 independent groups; need at least 15,excluded,36,3,0,0,2,1,0,0,18,1,0,0,18
+Pempheris vanicolensis,29,6,6,False,only 6 independent groups; need at least 15,excluded,19,4,0,0,1,1,0,0,9,1,0,0,19
+Zanclus cornutus,21,6,6,False,only 6 independent groups; need at least 15,excluded,8,4,0,0,12,1,0,0,1,1,0,0,20
+Neoglyphidodon nigroris,16,8,8,False,only 8 independent groups; need at least 15,excluded,12,4,0,0,2,2,0,0,2,2,0,0,21
+Balistapus undulatus,41,6,6,False,only 6 independent groups; need at least 15,excluded,20,4,0,0,10,1,0,0,11,1,0,0,22
+Siganus fuscescens,25,6,6,False,only 6 independent groups; need at least 15,excluded,18,4,0,0,6,1,0,0,1,1,0,0,23

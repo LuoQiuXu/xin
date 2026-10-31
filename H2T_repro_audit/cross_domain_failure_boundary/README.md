@@ -56,3 +56,59 @@ Outputs should remain outside the Git repository; do not commit datasets, image 
 A passing dataset is only eligible for the next training iteration. It is not evidence that H2T or PI-H2T fails. A failure to meet group support is a dataset/protocol NO-GO, not a method failure.
 
 Do not start a backbone comparison yet. Keep one common architecture fixed when the later H2T / PI-H2T training begins so that domain and architecture effects are not confounded.
+
+## Local execution on 2026-10-31
+
+See [CROSS_DOMAIN_DATA_AUDIT_REPORT.md](CROSS_DOMAIN_DATA_AUDIT_REPORT.md) and
+[DATASET_DIRECTORY_INSPECTION.md](DATASET_DIRECTORY_INSPECTION.md).
+The branch was kept unchanged and no training, dataset download, commit, or push
+was performed. CPU tests passed 11/11; all three Python tools passed compilation.
+
+New local audit outputs are outside the repository at
+`D:\h2t_cross_domain_audit\audit_20261031_01\`.
+Fish4Knowledge passed only for the predeclared 16-class primary subset (the
+complete 23-class manifest is retained). ISIC remains NO-GO for training because
+both required ISIC CSV files were absent in a complete recursive inspection of
+`data`; the only CSV found belongs to Office-Home. Its empty failure manifests
+are diagnostics, not training inputs. All data remain in their original paths.
+
+Audit output directories must now be **new, nonexistent paths outside both the
+repository and the source image tree**; existing outputs are rejected. Failed
+audits persist an explicit error and unknown measurements before exiting.
+Pixel decoding uses both `verify()` and `load()`; raw trajectory counts are
+checked separately from duplicate-merged groups. Split ratios and minimum group
+support are unchanged. An ISIC image-ID fallback is explicitly marked and does
+not verify independence of missing lesion identifiers.
+
+The directory inspection can be reproduced with new output filenames:
+
+    D:\app\minicondaaa\envs\xiaoju\python.exe -B -X utf8 H2T_repro_audit/cross_domain_failure_boundary/inspect_dataset_directory.py --data-root D:\xiangmuxunlian\xin\data --inspection-date 2026-10-31 --output-json D:\h2t_cross_domain_audit\NEW_INSPECTION.json --output-report H2T_repro_audit/cross_domain_failure_boundary/NEW_INSPECTION.md
+
+This command only reads the datasets; its JSON and Markdown reports are created
+exclusively and must be outside the dataset directory.
+
+## Formal audit after CSV supply (2026-10-31)
+
+The earlier reports above remain snapshots from before the three CSV files were
+supplied. See the new
+[formal audit report](results/formal_data_audit_20261031_01/CROSS_DOMAIN_DATA_AUDIT_REPORT.md)
+and [validation](results/formal_data_audit_20261031_01/VALIDATION_REPORT.md).
+
+All 15 CPU tests and syntax checks passed. ISIC decoded and hashed all 25,331
+images, but stopped with `NO_GO_DATA_INTEGRITY`: two byte-identical pairs have
+conflicting MEL/NV labels and connect two lesion IDs. No ISIC splits were
+created. Its original failed attempt is retained; actual per-class measurements
+are supplemented in `ISIC_INTEGRITY_DIAGNOSIS.json` and the new report tables.
+The upstream origin of the local conflict remains unverified.
+
+Fish4Knowledge passed as `PASS_LIMITED_SCOPE` for 16 classes. The supplied
+`class_id.csv` has headers `file_name,cluster_id`; all 27,370 rows matched both
+decimal tracking/fish IDs and class folders. Numeric leading-zero normalization
+is used only for mapping comparison; original tracking IDs and split rules
+remain unchanged. The optional `--class-id-csv` flag enables this strict gate.
+
+Full new outputs are in `D:\h2t_cross_domain_audit\isic2019\` and
+`D:\h2t_cross_domain_audit\fish4knowledge\`; logs, conflict proofs and provenance
+are in `D:\h2t_cross_domain_audit\formal_data_audit_20261031_01\`.
+Old reports and `audit_20261031_01` outputs are preserved. No GPU training,
+dataset download, Git commit/push or branch change was performed.

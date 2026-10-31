@@ -1,0 +1,211 @@
+{
+  "isic2019": {
+    "status": "NO_GO_DATA_INTEGRITY",
+    "images_decoded_and_hashed": 25331,
+    "classes": 8,
+    "official_class_counts_match": true,
+    "known_distinct_lesion_ids": 11847,
+    "missing_lesion_id_images": 2084,
+    "missing_lesion_id_pct": 8.22707354624768,
+    "raw_protocol_groups_with_fallback": 13931,
+    "diagnostic_merged_components": 13927,
+    "conflicting_components": 1,
+    "conflict_image_ids": [
+      [
+        "ISIC_0067502",
+        "ISIC_0067980",
+        "ISIC_0069013",
+        "ISIC_0071017"
+      ]
+    ],
+    "cross_label_duplicate_pairs_byte_verified": 2,
+    "duplicate_statistics": {
+      "unique_hashes": 25281,
+      "duplicate_hash_sets": 50,
+      "duplicate_excess_images": 50,
+      "cross_base_duplicate_hash_sets": 11
+    },
+    "class_counts": [
+      {
+        "label": "MEL",
+        "actual_images": 4522,
+        "official_expected_images": 4522,
+        "distinct_known_lesion_ids": 1339,
+        "missing_lesion_id_images": 337,
+        "missing_lesion_id_pct": 7.4524546660769575,
+        "protocol_base_groups_with_fallback": 1676,
+        "diagnostic_components_containing_class": 1676,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "NV",
+        "actual_images": 12875,
+        "official_expected_images": 12875,
+        "distinct_known_lesion_ids": 7095,
+        "missing_lesion_id_images": 1549,
+        "missing_lesion_id_pct": 12.031067961165048,
+        "protocol_base_groups_with_fallback": 8644,
+        "diagnostic_components_containing_class": 8642,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "BCC",
+        "actual_images": 3323,
+        "official_expected_images": 3323,
+        "distinct_known_lesion_ids": 1310,
+        "missing_lesion_id_images": 0,
+        "missing_lesion_id_pct": 0.0,
+        "protocol_base_groups_with_fallback": 1310,
+        "diagnostic_components_containing_class": 1310,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "AK",
+        "actual_images": 867,
+        "official_expected_images": 867,
+        "distinct_known_lesion_ids": 324,
+        "missing_lesion_id_images": 0,
+        "missing_lesion_id_pct": 0.0,
+        "protocol_base_groups_with_fallback": 324,
+        "diagnostic_components_containing_class": 324,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "BKL",
+        "actual_images": 2624,
+        "official_expected_images": 2624,
+        "distinct_known_lesion_ids": 1269,
+        "missing_lesion_id_images": 198,
+        "missing_lesion_id_pct": 7.545731707317073,
+        "protocol_base_groups_with_fallback": 1467,
+        "diagnostic_components_containing_class": 1466,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "DF",
+        "actual_images": 239,
+        "official_expected_images": 239,
+        "distinct_known_lesion_ids": 113,
+        "missing_lesion_id_images": 0,
+        "missing_lesion_id_pct": 0.0,
+        "protocol_base_groups_with_fallback": 113,
+        "diagnostic_components_containing_class": 113,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "VASC",
+        "actual_images": 253,
+        "official_expected_images": 253,
+        "distinct_known_lesion_ids": 135,
+        "missing_lesion_id_images": 0,
+        "missing_lesion_id_pct": 0.0,
+        "protocol_base_groups_with_fallback": 135,
+        "diagnostic_components_containing_class": 135,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      },
+      {
+        "label": "SCC",
+        "actual_images": 628,
+        "official_expected_images": 628,
+        "distinct_known_lesion_ids": 262,
+        "missing_lesion_id_images": 0,
+        "missing_lesion_id_pct": 0.0,
+        "protocol_base_groups_with_fallback": 262,
+        "diagnostic_components_containing_class": 262,
+        "split_status": "NOT_CREATED_INTEGRITY_FAILURE"
+      }
+    ],
+    "split_leakage": "NOT_EVALUATED_NO_SPLITS_CREATED",
+    "primary_certified": false,
+    "interpretation": "Local images/labels conflict is proven; upstream-release origin is not independently established. No labels changed and no split assigned."
+  },
+  "fish4knowledge": {
+    "status": "PASS_LIMITED_SCOPE",
+    "images_decoded_and_hashed": 27370,
+    "classes": 23,
+    "raw_tracks": 8725,
+    "primary_classes": 16,
+    "primary_images": 27133,
+    "primary_groups": 8680,
+    "excluded_classes": [
+      {
+        "label": "Balistapus undulatus",
+        "reason": "only 6 independent groups; need at least 15"
+      },
+      {
+        "label": "Neoglyphidodon nigroris",
+        "reason": "only 8 independent groups; need at least 15"
+      },
+      {
+        "label": "Pempheris vanicolensis",
+        "reason": "only 6 independent groups; need at least 15"
+      },
+      {
+        "label": "Scaridae",
+        "reason": "only 5 independent groups; need at least 15"
+      },
+      {
+        "label": "Scolopsis bilineata",
+        "reason": "only 8 independent groups; need at least 15"
+      },
+      {
+        "label": "Siganus fuscescens",
+        "reason": "only 6 independent groups; need at least 15"
+      },
+      {
+        "label": "Zanclus cornutus",
+        "reason": "only 6 independent groups; need at least 15"
+      }
+    ],
+    "mapping_matches": 27370,
+    "split_leakage": {
+      "base_group": 0,
+      "merged_group": 0,
+      "exact_hash": 0
+    },
+    "duplicate_statistics": {
+      "unique_hashes": 27060,
+      "duplicate_hash_sets": 310,
+      "duplicate_excess_images": 310,
+      "cross_base_duplicate_hash_sets": 0
+    },
+    "prior_manifests_byte_identical": {
+      "manifest_all.csv": true,
+      "manifest_primary.csv": true
+    },
+    "splits": {
+      "all": {
+        "train": {
+          "images": 16408,
+          "groups": 5235
+        },
+        "val": {
+          "images": 5443,
+          "groups": 1745
+        },
+        "test": {
+          "images": 5519,
+          "groups": 1745
+        }
+      },
+      "primary": {
+        "train": {
+          "images": 16269,
+          "groups": 5208
+        },
+        "val": {
+          "images": 5396,
+          "groups": 1736
+        },
+        "test": {
+          "images": 5468,
+          "groups": 1736
+        }
+      }
+    },
+    "primary_train_imbalance_ratio": 253.17241379310346
+  },
+  "cpu_tests_passed": 15,
+  "gpu_training_runs": 0,
+  "decision": "FISH_16_CLASS_EXPLORATORY_CANDIDATE_ONLY; ISIC_INTEGRITY_STOP"
+}
