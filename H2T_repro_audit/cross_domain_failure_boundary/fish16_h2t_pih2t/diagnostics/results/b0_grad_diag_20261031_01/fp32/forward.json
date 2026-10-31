@@ -1,0 +1,244 @@
+{
+  "ranges": {
+    "backbone.layer1": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        256,
+        56,
+        56
+      ],
+      "numel": 12845056,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 12845056,
+      "min": 0.0,
+      "max": 6.802377700805664,
+      "max_abs": 6.802377700805664,
+      "l2_norm": 842.2759117175706,
+      "finite_max_abs": 6.802377700805664,
+      "finite_l2_norm": 842.2759117175706
+    },
+    "backbone.layer2": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        512,
+        28,
+        28
+      ],
+      "numel": 6422528,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 6422528,
+      "min": 0.0,
+      "max": 3.96401309967041,
+      "max_abs": 3.96401309967041,
+      "l2_norm": 489.3679625527034,
+      "finite_max_abs": 3.96401309967041,
+      "finite_l2_norm": 489.3679625527034
+    },
+    "backbone.layer3": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        1024,
+        14,
+        14
+      ],
+      "numel": 3211264,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 3211264,
+      "min": 0.0,
+      "max": 2.7400221824645996,
+      "max_abs": 2.7400221824645996,
+      "l2_norm": 193.17108182649608,
+      "finite_max_abs": 2.7400221824645996,
+      "finite_l2_norm": 193.17108182649608
+    },
+    "backbone.layer4": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "numel": 1605632,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 1605632,
+      "min": 0.0,
+      "max": 14.116203308105469,
+      "max_abs": 14.116203308105469,
+      "l2_norm": 1081.294470817879,
+      "finite_max_abs": 14.116203308105469,
+      "finite_l2_norm": 1081.294470817879
+    },
+    "PIF.Conv1d": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        32768,
+        1,
+        49
+      ],
+      "numel": 1605632,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 1605632,
+      "min": -8.955606460571289,
+      "max": 0.023794185370206833,
+      "max_abs": 8.955606460571289,
+      "l2_norm": 678.6378871935175,
+      "finite_max_abs": 8.955606460571289,
+      "finite_l2_norm": 678.6378871935175
+    },
+    "PIF": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "numel": 1605632,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 1605632,
+      "min": -8.955606460571289,
+      "max": 0.023794185370206833,
+      "max_abs": 8.955606460571289,
+      "l2_norm": 678.6378871935175,
+      "finite_max_abs": 8.955606460571289,
+      "finite_l2_norm": 678.6378871935175
+    },
+    "PIF_input": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "numel": 1605632,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 1605632,
+      "min": 0.0,
+      "max": 14.116203308105469,
+      "max_abs": 14.116203308105469,
+      "l2_norm": 1081.294470817879,
+      "finite_max_abs": 14.116203308105469,
+      "finite_l2_norm": 1081.294470817879
+    },
+    "pooled_features": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        2048
+      ],
+      "numel": 32768,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 32768,
+      "min": -1.9671860933303833,
+      "max": 0.011934920214116573,
+      "max_abs": 1.9671860933303833,
+      "l2_norm": 61.639337916527815,
+      "finite_max_abs": 1.9671860933303833,
+      "finite_l2_norm": 61.639337916527815
+    },
+    "classifier": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        16
+      ],
+      "numel": 256,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 256,
+      "min": -0.6321929693222046,
+      "max": 2.310612440109253,
+      "max_abs": 2.310612440109253,
+      "l2_norm": 9.221642247029548,
+      "finite_max_abs": 2.310612440109253,
+      "finite_l2_norm": 9.221642247029548
+    },
+    "input": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "numel": 2408448,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 2408448,
+      "min": -2.1179039478302,
+      "max": 2.640000104904175,
+      "max_abs": 2.640000104904175,
+      "l2_norm": 1837.0168605660976,
+      "finite_max_abs": 2.640000104904175,
+      "finite_l2_norm": 1837.0168605660976
+    },
+    "loss": {
+      "is_none": false,
+      "dtype": "torch.float32",
+      "shape": [],
+      "numel": 1,
+      "finite": true,
+      "nan_count": 0,
+      "inf_count": 0,
+      "finite_count": 1,
+      "min": 1.7096147537231445,
+      "max": 1.7096147537231445,
+      "max_abs": 1.7096147537231445,
+      "l2_norm": 1.7096147537231445,
+      "finite_max_abs": 1.7096147537231445,
+      "finite_l2_norm": 1.7096147537231445
+    }
+  },
+  "pif_parameters": [
+    -0.02449430152773857,
+    -0.6112035512924194
+  ],
+  "convolution": {
+    "module_weight_dtype": "torch.float32",
+    "input_dtype": "torch.float32",
+    "saved_weight_dtype": "torch.float32",
+    "saved_weight_shape": [
+      1,
+      2,
+      1
+    ],
+    "backward_node": "ConvolutionBackward0"
+  },
+  "input_sha256": "6da226a25c0727b458b2f784246a7458317065a722071448fd8a753c8847ee6c",
+  "feature_sha256": "959d4fa55f29538db06f6854fa867429d1a94cca06e2ed06bb9a5945ab52b007",
+  "logit_sha256": "5e2cd077e1e40b4c6a28f579b72dbbe23ecb2fbaec29c9b02fb4d26e6da7f15c",
+  "loss_sha256": "f81faccded2a1911141d2352728e79db00927ff38d510b7efa01403a322afd1f"
+}

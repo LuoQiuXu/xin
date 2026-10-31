@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "primary_url": "https://arxiv.org/html/2506.00625v2",
+    "pdf_pages": [
+      4,
+      5
+    ],
+    "tex_eq3": "Sec/3_Method.tex:60",
+    "tex_conv1d_eq6": "Sec/3_Method.tex:85",
+    "tex_conv1d_two_parameters_no_bias": "Sec/3_Method.tex:88",
+    "tex_generic_model_random_initialization": "tab/algorithm.tex:9",
+    "exact_author_pif_a_b_initialization": "UNVERIFIED"
+  },
+  "local_pif": {
+    "path": "D:\\xiangmuxunlian\\xin\\PI_H2T_review\\H2T-main\\models\\resnet_cifar.py",
+    "class_line": 159,
+    "conv1d_line": 167,
+    "channel_mean_line": 172,
+    "residual_raw_order_line": 173,
+    "conv1d_apply_line": 175
+  },
+  "local_model": {
+    "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\models.py",
+    "seeded_common_initialization_line": 110,
+    "pif_allocation_line": 118
+  },
+  "original_strict_gate": {
+    "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py",
+    "definition_line": 52,
+    "unscale_line": 184,
+    "gate_call_line": 185,
+    "step_line": 189,
+    "update_line": 190
+  },
+  "diagnostic_gradient_records": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\diagnostics\\diagnose_b0.py",
+  "before_state_protection_snapshot": "D:\\h2t_cross_domain_results\\pif_grad_diagnosis_seed42_20261031_01\\PROTECTED_BEFORE.json",
+  "evidence_scope": "Only the bounded B0 replay and exact failing batch comparisons; no method accuracy inference."
+}

@@ -1,0 +1,146 @@
+{
+  "before_unscale": {
+    "PIF": {
+      "parameter_tensors": 1,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 8560.0,
+      "finite_l2_norm": 10112.420877317161
+    },
+    "backbone.layer1": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 6594.03076171875,
+      "finite_l2_norm": 121557.69989916836
+    },
+    "backbone.layer2": {
+      "parameter_tensors": 39,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 2706.38671875,
+      "finite_l2_norm": 93509.63788428022
+    },
+    "backbone.layer3": {
+      "parameter_tensors": 57,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 2108.875244140625,
+      "finite_l2_norm": 147114.1258344541
+    },
+    "backbone.layer4": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 2416.849365234375,
+      "finite_l2_norm": 156672.21634552578
+    },
+    "backbone.stem": {
+      "parameter_tensors": 3,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 23440.0,
+      "finite_l2_norm": 249600.98500377772
+    },
+    "classifier": {
+      "parameter_tensors": 2,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 27792.0,
+      "finite_l2_norm": 428848.1300703551
+    }
+  },
+  "after_unscale": {
+    "PIF": {
+      "parameter_tensors": 1,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.130615234375,
+      "finite_l2_norm": 0.15430329707820375
+    },
+    "backbone.layer1": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.1006169244647026,
+      "finite_l2_norm": 1.8548233016840876
+    },
+    "backbone.layer2": {
+      "parameter_tensors": 39,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.041296184062957764,
+      "finite_l2_norm": 1.4268438397869907
+    },
+    "backbone.layer3": {
+      "parameter_tensors": 57,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.032178882509469986,
+      "finite_l2_norm": 2.244783414222017
+    },
+    "backbone.layer4": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.03687819465994835,
+      "finite_l2_norm": 2.3906283011707425
+    },
+    "backbone.stem": {
+      "parameter_tensors": 3,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.357666015625,
+      "finite_l2_norm": 3.80860877996487
+    },
+    "classifier": {
+      "parameter_tensors": 2,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.424072265625,
+      "finite_l2_norm": 6.5437031565911115
+    }
+  }
+}

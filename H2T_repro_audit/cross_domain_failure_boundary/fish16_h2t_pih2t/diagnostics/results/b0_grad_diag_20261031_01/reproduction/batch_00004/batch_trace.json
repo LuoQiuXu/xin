@@ -1,0 +1,249 @@
+{
+  "batch": 4,
+  "samples": [
+    {
+      "row_index": 21724,
+      "image_id": "fish_004360977106_11152",
+      "track_id": "track:fish_004360977106",
+      "group_id": "grp_c2a99c24bdf8e1bd",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "de2ad450b661663b2aee744ae2087720b1e5b992b58121ad54754383620022e9"
+    },
+    {
+      "row_index": 15597,
+      "image_id": "fish_003425595286_19099",
+      "track_id": "track:fish_003425595286",
+      "group_id": "grp_1ab6eb71fca9edcf",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "c7e404525f5c5a8a1a7f5b7ac924ffe30c392d8f4da662834151dd60be1be65f"
+    },
+    {
+      "row_index": 20843,
+      "image_id": "fish_004136286774_24422",
+      "track_id": "track:fish_004136286774",
+      "group_id": "grp_5fb0f2d630068e38",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "3d993e5caeb33206df6cd70da7e37bd970b892ccbf08e9417c1c2b4431b825fe"
+    },
+    {
+      "row_index": 5024,
+      "image_id": "fish_003571485521_19287",
+      "track_id": "track:fish_003571485521",
+      "group_id": "grp_20774b5405b7e577",
+      "label": 4,
+      "class_name": "Chaetodon lunulatus",
+      "image_sha256": "ddb899f66788625298510ddcd6cbdca752cfffb3c6bd3ee64d409323e4e8ba8f"
+    },
+    {
+      "row_index": 24302,
+      "image_id": "fish_000022849596_04034",
+      "track_id": "track:fish_000022849596",
+      "group_id": "grp_135f19fc21b806f9",
+      "label": 1,
+      "class_name": "Plectroglyphidodon dickii",
+      "image_sha256": "c334e17991001d36359c1920ddaf5b6831531e178293e53a28d834252a1be37f"
+    },
+    {
+      "row_index": 24951,
+      "image_id": "fish_003494825372_10874",
+      "track_id": "track:fish_003494825372",
+      "group_id": "grp_16e04ca025bbf479",
+      "label": 1,
+      "class_name": "Plectroglyphidodon dickii",
+      "image_sha256": "1bf0165d1f2c19550103522aacee0e72aae6c066348b811d984e356af3d6a0bb"
+    },
+    {
+      "row_index": 9849,
+      "image_id": "fish_004269716972_22162",
+      "track_id": "track:fish_004269716972",
+      "group_id": "grp_d115430596ccfc8d",
+      "label": 2,
+      "class_name": "Chromis chrysura",
+      "image_sha256": "1a0234fbc63f1372a687d11534a3bf036e78b2069b82952bfa6dabacbeb04f54"
+    },
+    {
+      "row_index": 20330,
+      "image_id": "fish_004099766725_16640",
+      "track_id": "track:fish_004099766725",
+      "group_id": "grp_a74ffc239d6e9f64",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "bc10c34cc2cf3e8929e9d5d812b9e4d6c7cee7cbc3c5efb241cb6edf3b5461f6"
+    },
+    {
+      "row_index": 12854,
+      "image_id": "fish_000022140001_02057",
+      "track_id": "track:fish_000022140001",
+      "group_id": "grp_2031d2a65df2b98a",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "5755a897487bbb228070c8d3956b41623a04a29fdca97ea6cdcebbcac3850e74"
+    },
+    {
+      "row_index": 13840,
+      "image_id": "fish_000069549598_06292",
+      "track_id": "track:fish_000069549598",
+      "group_id": "grp_e4f86a8f2a25cf1c",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "8500713223b31d4081f7e3ec89e2393e12bda0e19a9c4d0ae8367edff92f0135"
+    },
+    {
+      "row_index": 15667,
+      "image_id": "fish_003426055286_21732",
+      "track_id": "track:fish_003426055286",
+      "group_id": "grp_d8cc876166cd6c0c",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "3f0a6abddcd888e17f16a6a25df0bda0a77dc82b9f487392de45caa6b48a7daa"
+    },
+    {
+      "row_index": 25659,
+      "image_id": "fish_003790726075_10043",
+      "track_id": "track:fish_003790726075",
+      "group_id": "grp_964bb34d1cd45c31",
+      "label": 1,
+      "class_name": "Plectroglyphidodon dickii",
+      "image_sha256": "83c84938be22307160614550c1690098f48eaa87b5028a0351aecc5b54ec6d89"
+    },
+    {
+      "row_index": 11221,
+      "image_id": "fish_000004490001_00292",
+      "track_id": "track:fish_000004490001",
+      "group_id": "grp_f102d86115cccfc2",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "ab3eefd97511507a7b9f3c48453ce433793a19cab83744c743927025cbb0d887"
+    },
+    {
+      "row_index": 9539,
+      "image_id": "fish_004154856805_22484",
+      "track_id": "track:fish_004154856805",
+      "group_id": "grp_0758505b1275f71d",
+      "label": 2,
+      "class_name": "Chromis chrysura",
+      "image_sha256": "1a984e2117d959a7d99d3a28bf57d5b03c82727f4a9924543da3510540795bc5"
+    },
+    {
+      "row_index": 11228,
+      "image_id": "fish_000004500001_00299",
+      "track_id": "track:fish_000004500001",
+      "group_id": "grp_f896c7cb16c6bea2",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "32ffc01574883b1a55d93a2dba68b83c3896086f786a9b0398567b3ed6499cb8"
+    },
+    {
+      "row_index": 20093,
+      "image_id": "fish_003977186512_20117",
+      "track_id": "track:fish_003977186512",
+      "group_id": "grp_1d3c578d12219f88",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "e3bae29c9b5606c0159bbb0978ccadfb852d75b18e74df70a0501c4acff977f0"
+    }
+  ],
+  "mixup_lambda": 0.36699967356323693,
+  "mixup_permutation": [
+    2,
+    1,
+    4,
+    6,
+    10,
+    13,
+    9,
+    8,
+    11,
+    3,
+    15,
+    0,
+    12,
+    14,
+    5,
+    7
+  ],
+  "labels_a": [
+    0,
+    0,
+    0,
+    4,
+    1,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    2,
+    0,
+    0
+  ],
+  "labels_b": [
+    0,
+    0,
+    1,
+    2,
+    0,
+    2,
+    0,
+    0,
+    1,
+    4,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+  ],
+  "raw_input_sha256": "2d3630a0cad43e7f080b88419d141e9263d40612bf2be10a30770138fc12d787",
+  "rng_before_mixup_sha256": "2b7ba714a7921769aa447dafc2f9507e1d11fd75874aaed18548c0aec2ed6fdd",
+  "raw_input_range": {
+    "is_none": false,
+    "dtype": "torch.float32",
+    "shape": [
+      16,
+      3,
+      224,
+      224
+    ],
+    "numel": 2408448,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 2408448,
+    "min": -2.1179039478302,
+    "max": 2.640000104904175,
+    "max_abs": 2.640000104904175,
+    "l2_norm": 2349.316640562242,
+    "finite_max_abs": 2.640000104904175,
+    "finite_l2_norm": 2349.316640562242
+  },
+  "mixed_input_range": {
+    "is_none": false,
+    "dtype": "torch.float32",
+    "shape": [
+      16,
+      3,
+      224,
+      224
+    ],
+    "numel": 2408448,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 2408448,
+    "min": -2.1179039478302,
+    "max": 2.640000104904175,
+    "max_abs": 2.640000104904175,
+    "l2_norm": 1972.0973682336264,
+    "finite_max_abs": 2.640000104904175,
+    "finite_l2_norm": 1972.0973682336264
+  },
+  "historical_A0_same_stream_pixel_rng_lambda_matches": true
+}

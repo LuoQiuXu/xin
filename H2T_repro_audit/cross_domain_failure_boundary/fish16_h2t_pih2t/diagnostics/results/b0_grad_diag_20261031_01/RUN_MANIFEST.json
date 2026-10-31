@@ -1,0 +1,52 @@
+{
+  "branch": "experiment/fish16-h2t-pih2t-cross-domain-20261031",
+  "head": "4916ba98855910659433c6f50ac596ca0fb1d30f",
+  "original_smoke_source_hashes": {
+    "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "preflight.py": "1d5f738f6e1ba885997cb71bd8e66ed6a2396935e4f744739e308fd0837398ae",
+    "smoke.py": "cf6dec874bc9bd0fe0cef9020ce489cc1d6f645f3013728b774245ecb9601b97",
+    "test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a"
+  },
+  "upstream_source_hashes": {
+    "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+    "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+    "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+    "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+  },
+  "diagnostic_source_sha256": "376dccc875bfc87ba5c8b29052840f0c1378b4f9d28c48f44c34e5a1d452224c",
+  "manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+  "original_weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+  "schedule_sha256": "cad6161b5b0703e224e18fea353fcdc37120bb4ba529c78d6b2f5cdf67cf7b49",
+  "seed": 42,
+  "batch_size": 16,
+  "effective_batch": 16,
+  "workers": 4,
+  "lr": 0.002,
+  "momentum": 0.9,
+  "weight_decay": 0.0001,
+  "mixup_alpha": 1.0,
+  "max_reproduction_batches": 100,
+  "bound_reason": "Original failure occurred before the first 100-batch progress print; do not expand training if not reproduced there",
+  "numeric_config": {
+    "cudnn_deterministic": true,
+    "benchmark": false,
+    "cudnn_tf32": false,
+    "matmul_tf32": false
+  },
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "formal_training": false,
+  "test_evaluation": false,
+  "counterfactuals_are_diagnostic_only": true,
+  "original_smoke_gate_modified": false
+}

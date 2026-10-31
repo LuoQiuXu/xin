@@ -1,0 +1,124 @@
+{
+  "scenario": "normal_scaler_disposable",
+  "batch": 6,
+  "amp": true,
+  "scale_before_unscale": 65536.0,
+  "scale_after_unscale": 65536.0,
+  "strict_gate_passed": false,
+  "gate_error": "Nonfinite/missing gradients",
+  "loss": 1.7094205617904663,
+  "pif_parameters_before": [
+    -0.02449430152773857,
+    -0.6112035512924194
+  ],
+  "pif_gradient_after_unscale": null,
+  "nonfinite_parameters": [
+    "extractor.pif.fuse.weight"
+  ],
+  "missing_gradient_parameters": [],
+  "gradient_groups": {
+    "PIF": {
+      "parameter_tensors": 1,
+      "missing_parameters": [],
+      "nonfinite_parameters": [
+        "extractor.pif.fuse.weight"
+      ],
+      "nan_count": 0,
+      "inf_count": 1,
+      "all_present_and_finite": false,
+      "finite_max_abs": 0.0006914138793945312,
+      "finite_l2_norm": 0.0006914138793945312
+    },
+    "backbone.layer1": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.0664263367652893,
+      "finite_l2_norm": 1.2987889760797382
+    },
+    "backbone.layer2": {
+      "parameter_tensors": 39,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.033125508576631546,
+      "finite_l2_norm": 1.2639148909433304
+    },
+    "backbone.layer3": {
+      "parameter_tensors": 57,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.031511206179857254,
+      "finite_l2_norm": 2.0136160458003958
+    },
+    "backbone.layer4": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.04142075404524803,
+      "finite_l2_norm": 2.099300758055753
+    },
+    "backbone.stem": {
+      "parameter_tensors": 3,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.09747314453125,
+      "finite_l2_norm": 1.937502360560161
+    },
+    "classifier": {
+      "parameter_tensors": 2,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.349853515625,
+      "finite_l2_norm": 5.580329030011628
+    }
+  },
+  "convolution": {
+    "module_weight_dtype": "torch.float32",
+    "input_dtype": "torch.float16",
+    "saved_weight_dtype": "torch.float16",
+    "saved_weight_shape": [
+      1,
+      2,
+      1
+    ],
+    "backward_node": "ConvolutionBackward0"
+  },
+  "pif_cast_gradient_stats": {
+    "is_none": false,
+    "dtype": "torch.float16",
+    "shape": [
+      1,
+      2,
+      1
+    ],
+    "numel": 2,
+    "finite": false,
+    "nan_count": 0,
+    "inf_count": 1,
+    "finite_count": 1,
+    "min": -45.3125,
+    "max": -45.3125,
+    "max_abs": "Inf",
+    "l2_norm": "Inf",
+    "finite_max_abs": 45.3125,
+    "finite_l2_norm": 45.3125
+  }
+}

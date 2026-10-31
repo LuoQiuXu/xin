@@ -1,0 +1,42 @@
+{
+  "decision": "CONFIRMED_AMP_FP16_PIF_B_GRADIENT_OVERFLOW_IN_CONTROLLED_REPLAY",
+  "epoch_zero_based": 0,
+  "batch_zero_based": 6,
+  "successful_updates_before_failure": 6,
+  "failed_actual_optimizer_step_executed": false,
+  "pif_initial_a_b": [
+    -0.027100861072540283,
+    -0.604386568069458
+  ],
+  "pif_before_failure_a_b": [
+    -0.02449430152773857,
+    -0.6112035512924194
+  ],
+  "loss": 1.7094205617904663,
+  "mixup_lambda": 0.814341567785799,
+  "parameter_gradients_missing": [],
+  "nonfinite_gradient": "extractor.pif.fuse.weight[0,1,0] (b)",
+  "inf_count": 1,
+  "nan_count": 0,
+  "half_max_finite": 65504.0,
+  "finite_amp_b_gradient": 1.2802734375,
+  "expected_scaled_b_at_original_scale": 83904.0,
+  "same_input_all_cases": true,
+  "amp_forward_feature_logit_loss_hashes_exactly_equal": true,
+  "all_four_lower_amp_scales_finite": true,
+  "full_fp32_finite": true,
+  "normal_gradscaler_skip_update": {
+    "optimizer_step_calls": 0,
+    "scale_after_update": 32768.0,
+    "parameters_unchanged": true,
+    "post_forward_bn_buffers_unchanged_by_step": true,
+    "bn_note": "Training forward updates BN naturally; comparison is before vs after scaler.step/update, not against pre-forward BN"
+  },
+  "historical_input_rng_lambda_matches": true,
+  "original_historical_batch_limit": "Old B0 log did not record its batch index; batch6 is directly established for this replay, without rewriting old evidence",
+  "actual_smoke_gate_modified_or_bypassed": false,
+  "formal_training": false,
+  "test_evaluations": 0,
+  "other_stage2_epochs": 0,
+  "extra_training_seeds": []
+}

@@ -1,0 +1,7 @@
+scenario,batch,amp,scale_before_unscale,scale_after_unscale,strict_gate_passed,loss,missing_parameter_count,nonfinite_parameter_count,nonfinite_parameters,unscaled_grad_a,unscaled_grad_b,conv_weight_dtype_in_backward,conv_scaled_grad_a,conv_scaled_grad_b,same_input_sha256,same_amp_forward_sha256
+amp_original_scale,6,True,65536.0,65536.0,False,1.7094205617904663,0,1,extractor.pif.fuse.weight,-0.0006914138793945312,+Inf,torch.float16,-45.3125,+Inf,True,True
+amp_32768,6,True,32768.0,32768.0,True,1.7094205617904663,0,0,,-0.0006914138793945312,1.2802734375,torch.float16,-22.65625,41952.0,True,True
+amp_16384,6,True,16384.0,16384.0,True,1.7094205617904663,0,0,,-0.0006914138793945312,1.2802734375,torch.float16,-11.328125,20976.0,True,True
+amp_8192,6,True,8192.0,8192.0,True,1.7094205617904663,0,0,,-0.0006914138793945312,1.2802734375,torch.float16,-5.6640625,10488.0,True,True
+amp_4096,6,True,4096.0,4096.0,True,1.7094205617904663,0,0,,-0.0006914138793945312,1.2802734375,torch.float16,-2.83203125,5244.0,True,True
+fp32,6,False,,,True,1.7096147537231445,0,0,,-0.0007348607759922743,1.2799643278121948,torch.float32,-0.0007348607759922743,1.2799643278121948,True,FP32_DIFFERENT_PRECISION

@@ -1,0 +1,315 @@
+{
+  "status": "PASS_DIAGNOSTIC_VALIDATION_NO_FORMAL_TRAINING",
+  "branch": "experiment/fish16-h2t-pih2t-cross-domain-20261031",
+  "head_unchanged": "4916ba98855910659433c6f50ac596ca0fb1d30f",
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "initial_worktree_clean": true,
+  "tracked_worktree_changes": [],
+  "staged_files": [],
+  "only_new_untracked_source_files": [
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/diagnose_b0.py",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/summarize_b0.py",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/test_diagnostic_stats.py"
+  ],
+  "syntax": {
+    "diagnose_b0.py": {
+      "status": "PASS",
+      "sha256": "376dccc875bfc87ba5c8b29052840f0c1378b4f9d28c48f44c34e5a1d452224c"
+    },
+    "summarize_b0.py": {
+      "status": "PASS",
+      "sha256": "2f0d5a3eb732c5310d960e3eaa403e7dbb5f0be0508334f0e4d445323e0b685d"
+    },
+    "test_diagnostic_stats.py": {
+      "status": "PASS",
+      "sha256": "5dc676aee1f675df8c64601e6924972c6d8a4f704c977691723a3d90f7b59e4a"
+    }
+  },
+  "cpu_tests": {
+    "new_diagnostic": {
+      "passed": 5,
+      "total": 5
+    },
+    "existing_contract": {
+      "passed": 10,
+      "total": 10
+    }
+  },
+  "protected_files_checked": 29,
+  "protected_file_checks": [
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_preflight_seed42_20261031_01\\preflight.json",
+      "unchanged": true,
+      "bytes": 9061,
+      "mtime_ns": 1793438291332796700,
+      "sha256": "3ba06ff24dd184ad66f391f9b781b727fc50d16a21afc186e7d8e97bda16aa95"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_weight_cache_20261031_01\\ADAPTER_PROVENANCE.json",
+      "unchanged": true,
+      "bytes": 3097,
+      "mtime_ns": 1793438832968279000,
+      "sha256": "eabeb88c5d01b2ce558e072fa1c091622852c3a2102699200a19942e30abc975"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_weight_cache_20261031_01\\DOWNLOAD_PROVENANCE.json",
+      "unchanged": true,
+      "bytes": 546,
+      "mtime_ns": 1793438422423895100,
+      "sha256": "fcdbc4ccce9e51964aed524c3e4c5ee4ea8b8d76fdab85e8bd500c7045ac8d08"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_weight_cache_20261031_01\\extractor_tensor_state.pth",
+      "unchanged": true,
+      "bytes": 94344515,
+      "mtime_ns": 1793438832827175700,
+      "sha256": "c1bc33a75ef4d4dd607aa1cb0635ed42d547265a41ad0467081276e5009a7b3e"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_weight_cache_20261031_01\\LEGACY_FORMAT_INSPECTION.json",
+      "unchanged": true,
+      "bytes": 2845,
+      "mtime_ns": 1793438558757677400,
+      "sha256": "012c8fbd306b144691be3f5e63848eabaf222d37e6208db04465bff919adfead"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_weight_cache_20261031_01\\resnet50-19c8e357.pth",
+      "unchanged": true,
+      "bytes": 102502400,
+      "mtime_ns": 1793438422421698000,
+      "sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_validation_seed42_20261031_01\\CPU_TEST_RESULTS.txt",
+      "unchanged": true,
+      "bytes": 1494,
+      "mtime_ns": 1793438949944657800,
+      "sha256": "80f968639479f8190dfc1c318cb23ce9f3c088a3162b5d219b8c3b6cc9d0e7eb"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_validation_seed42_20261031_01\\CPU_TEST_RESULTS_FINAL.txt",
+      "unchanged": true,
+      "bytes": 1494,
+      "mtime_ns": 1793439211546097000,
+      "sha256": "a5ee270a0a450cdfd9155d3430e7cff8a0d62aa9bf2cc263e3c217e317b605fe"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_validation_seed42_20261031_01\\FINAL_VALIDATION.json",
+      "unchanged": true,
+      "bytes": 1198,
+      "mtime_ns": 1793439821434173200,
+      "sha256": "8f631a505d80fb599cd8807ed0e1fe6b9a5625a4a0e6f370f3d9cb0dabcb1071"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_validation_seed42_20261031_01\\ORIGINAL_SOURCE_HASHES.json",
+      "unchanged": true,
+      "bytes": 923,
+      "mtime_ns": 1793438945987098000,
+      "sha256": "12ec252c05236b94aa3e5ee262533a3ea1bbbc17fa427ff826b02b41e57bdc4d"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_validation_seed42_20261031_01\\OUTPUT_SHA256.csv",
+      "unchanged": true,
+      "bytes": 2986,
+      "mtime_ns": 1793439821718335600,
+      "sha256": "2b87218bd8ce2e74bfe09a9795731dcd412c8922416859ec86773b146c52a301"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_validation_seed42_20261031_01\\SMOKE_RUN.log",
+      "unchanged": true,
+      "bytes": 1666,
+      "mtime_ns": 1793439367091862300,
+      "sha256": "d8a9fe361d8b40c869a5306e46aed03f635493b0dd0c4fda1d7c95bb15bdd539"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\ACTUAL_EXECUTION_STATUS.json",
+      "unchanged": true,
+      "bytes": 1845,
+      "mtime_ns": 1793439733679209200,
+      "sha256": "4b9d027edc5ab47428111e9358aa84f9f18c961ee5b142be6e463234c207a5d0"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\BATCH_SMOKE.json",
+      "unchanged": true,
+      "bytes": 1278,
+      "mtime_ns": 1793439268138758000,
+      "sha256": "bca07ac300d91556f6c6e3783e51003e7f56c678230ce38aca2ecb19a367675b"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\donor_pair_audit.csv",
+      "unchanged": true,
+      "bytes": 727447,
+      "mtime_ns": 1793439256321743600,
+      "sha256": "d472d22f466a7800b8027a7ae1863d7753605dcd3fcffed23de7e0f19b1515a9"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\FAILURE.json",
+      "unchanged": true,
+      "bytes": 1313,
+      "mtime_ns": 1793439367037055600,
+      "sha256": "420ddcedb562fcc7409d60c0d4a483c15f90ad70a97394764ea0a2bdac94e47c"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\run_manifest.json",
+      "unchanged": true,
+      "bytes": 3117,
+      "mtime_ns": 1793439256357687200,
+      "sha256": "971ba1c0f702eed8a3a8522838e4d89622f2665f41f7b5ec9a04e4baf670a5a0"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\smoke_sampling_schedule.npz",
+      "unchanged": true,
+      "bytes": 128162,
+      "mtime_ns": 1793439256272059800,
+      "sha256": "cad6161b5b0703e224e18fea353fcdc37120bb4ba529c78d6b2f5cdf67cf7b49"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\A0\\input_controls.json",
+      "unchanged": true,
+      "bytes": 308366,
+      "mtime_ns": 1793439357141206900,
+      "sha256": "678341e595de2c1f3264eacebda2b7424df71d25167d432a99ec21eec4c01472"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\A0\\result.json",
+      "unchanged": true,
+      "bytes": 1838,
+      "mtime_ns": 1793439357369075700,
+      "sha256": "e20db33174cbbd5b1c5651ae674cc6c07fc509aa5998f7df33d24d091d02542c"
+    },
+    {
+      "path": "D:\\h2t_cross_domain_results\\fish16_smoke_seed42_20261031_01\\A0\\smoke_epoch001.pth",
+      "unchanged": true,
+      "bytes": 188702205,
+      "mtime_ns": 1793439357134448000,
+      "sha256": "a4989aef49cfeb51e8bcb53dc43781fbf4733face96c3898e78834929fd57f43"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\data.py",
+      "unchanged": true,
+      "bytes": 3551,
+      "mtime_ns": 1793438803393589000,
+      "sha256": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\models.py",
+      "unchanged": true,
+      "bytes": 7047,
+      "mtime_ns": 1793439126904062200,
+      "sha256": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py",
+      "unchanged": true,
+      "bytes": 6824,
+      "mtime_ns": 1793438219109962700,
+      "sha256": "1d5f738f6e1ba885997cb71bd8e66ed6a2396935e4f744739e308fd0837398ae"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\README.md",
+      "unchanged": true,
+      "bytes": 6425,
+      "mtime_ns": 1793439418891879900,
+      "sha256": "3d2a008530074984fe7af92665bd6dc42f5d6372dd9c441e1bec200542dea7b2"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py",
+      "unchanged": true,
+      "bytes": 18255,
+      "mtime_ns": 1793439127199775200,
+      "sha256": "cf6dec874bc9bd0fe0cef9020ce489cc1d6f645f3013728b774245ecb9601b97"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\SMOKE_REPORT.md",
+      "unchanged": true,
+      "bytes": 6395,
+      "mtime_ns": 1793439733679718800,
+      "sha256": "2c8382357daf0abd9b2b359b30ad3c8b74a1285b5ce6574db599d534ef38cb90"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_contract.py",
+      "unchanged": true,
+      "bytes": 6675,
+      "mtime_ns": 1793439127055014500,
+      "sha256": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a"
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\VALIDATION_STATUS.json",
+      "unchanged": true,
+      "bytes": 1845,
+      "mtime_ns": 1793439733679209200,
+      "sha256": "4b9d027edc5ab47428111e9358aa84f9f18c961ee5b142be6e463234c207a5d0"
+    }
+  ],
+  "old_external_directories_file_lists_unchanged": [
+    "fish16_preflight_seed42_20261031_01",
+    "fish16_weight_cache_20261031_01",
+    "fish16_validation_seed42_20261031_01",
+    "fish16_smoke_seed42_20261031_01"
+  ],
+  "original_and_smoke_source_checks": {
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py": "1d5f738f6e1ba885997cb71bd8e66ed6a2396935e4f744739e308fd0837398ae",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py": "cf6dec874bc9bd0fe0cef9020ce489cc1d6f645f3013728b774245ecb9601b97",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+    "D:\\xiangmuxunlian\\xin\\H2T_official_clean\\H2T-main\\models\\resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+    "D:\\xiangmuxunlian\\xin\\H2T_official_clean\\H2T-main\\methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "D:\\xiangmuxunlian\\xin\\H2T_official_clean\\H2T-main\\train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "D:\\xiangmuxunlian\\xin\\H2T_official_clean\\H2T-main\\train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "D:\\xiangmuxunlian\\xin\\PI_H2T_review\\H2T-main\\pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+    "D:\\xiangmuxunlian\\xin\\PI_H2T_review\\H2T-main\\methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "D:\\xiangmuxunlian\\xin\\PI_H2T_review\\H2T-main\\models\\resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+    "D:\\xiangmuxunlian\\xin\\PI_H2T_review\\H2T-main\\PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+  },
+  "original_strict_finite_gradient_gate_unchanged": true,
+  "manifest_sha256_verified": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+  "official_weight_sha256_verified": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+  "old_11ad_weight_unchanged_and_unused": true,
+  "historical_environment_record_comparison": {
+    "python_match": true,
+    "torch_match": true,
+    "cuda_build_match": true,
+    "historical_preflight_environment": {
+      "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "python_version": "3.12.12",
+      "os": "Windows-11-10.0.26200-SP0",
+      "torch": "2.14.1+cu132",
+      "torchvision": "0.29.1+cu132",
+      "pillow": "12.3.0",
+      "cuda_build": "13.2"
+    },
+    "current_diagnostic_environment": {
+      "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "torch": "2.14.1+cu132",
+      "cuda": "13.2",
+      "cudnn": 92400,
+      "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+    },
+    "limit": "The old smoke run manifest has no separate cuDNN/GPU fields. Current cuDNN/GPU are recorded; no claim of an independently recorded historical cuDNN/GPU fingerprint."
+  },
+  "reproduction_batches": 7,
+  "successful_sgd_steps_before_failure": 6,
+  "failed_batch_sgd_step_executed": false,
+  "failed_batch_zero_based": 6,
+  "same_batch_counterfactuals": 6,
+  "normal_scaler_disposable_clones": 1,
+  "normal_scaler_actual_optimizer_step_calls": 0,
+  "normal_scaler_post_update_scale": 32768.0,
+  "same_amp_forward_hashes_exactly_equal": true,
+  "all_inputs_exactly_equal": true,
+  "per_parameter_gradient_csv_rows": 4536,
+  "per_parameter_case_count": 14,
+  "gradient_group_csv_rows": 196,
+  "all_reported_parameter_gradients_present": true,
+  "historical_augmented_pixels_mixup_rng_and_lambda_match_every_reproduced_batch": true,
+  "diagnostic_outputs_external": "D:\\h2t_cross_domain_results\\pif_grad_diagnosis_seed42_20261031_01",
+  "formal_training_started": false,
+  "stage2_epochs": 0,
+  "test_evaluations": 0,
+  "seeds_43_44_started": false,
+  "pif_formula_initialization_architecture_changed": false,
+  "committed_or_pushed": false,
+  "next_action": "STOP_FOR_SCIENTIFIC_REVIEW",
+  "root_cause_decision": "CONFIRMED_AMP_FP16_PIF_B_GRADIENT_OVERFLOW_IN_CONTROLLED_REPLAY"
+}

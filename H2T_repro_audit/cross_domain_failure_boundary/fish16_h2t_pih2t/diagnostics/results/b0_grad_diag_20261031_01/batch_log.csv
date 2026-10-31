@@ -1,0 +1,8 @@
+batch,samples,loss,scale_before_unscale,scale_after_unscale,strict_gate_passed,nonfinite_parameters,missing_gradient_parameters,optimizer_step_executed
+0,16,2.7753920555114746,65536.0,65536.0,True,[],[],True
+1,16,2.756178140640259,65536.0,65536.0,True,[],[],True
+2,16,2.6836516857147217,65536.0,65536.0,True,[],[],True
+3,16,2.5797626972198486,65536.0,65536.0,True,[],[],True
+4,16,2.2200326919555664,65536.0,65536.0,True,[],[],True
+5,16,2.2167532444000244,65536.0,65536.0,True,[],[],True
+6,16,1.7094205617904663,65536.0,65536.0,False,['extractor.pif.fuse.weight'],[],False

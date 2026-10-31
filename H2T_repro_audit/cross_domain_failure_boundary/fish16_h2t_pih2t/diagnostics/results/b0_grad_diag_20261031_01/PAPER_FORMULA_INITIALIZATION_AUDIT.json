@@ -1,0 +1,48 @@
+{
+  "primary_url": "https://arxiv.org/html/2506.00625v2",
+  "section": "III-C / 3.3",
+  "pdf_pages": [
+    4,
+    5
+  ],
+  "equations": [
+    3,
+    4,
+    6
+  ],
+  "pdf_path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\research_gap_20261026\\results\\evidence_20261026_01\\paper_cache\\PI_H2T.pdf",
+  "pdf_sha256": "b68e80b98b31ad2a317f6462cab93e59f15ac4f456b5bbd1d23386339f3d5dc8",
+  "tex_cache_path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\pi_h2t_author_audit_20261027\\results\\source_gate_01\\primary_cache\\arxiv_v2_tex_sources.json",
+  "tex_cache_sha256": "ecc474d1f22b97ab6c75738443c62d7d1431db229f73989b739ec6fc0a068184",
+  "verified_paper_facts": [
+    "Channel mean PI feature",
+    "a*(F-mean_channel(F))+b*F",
+    "Conv1D kernel1, input2/output1, two parameters without bias",
+    "Fused map precedes final pooling"
+  ],
+  "local_implementation_choices": [
+    "PyTorch Conv1d default reset_parameters",
+    "seed42 RNG sequence after backbone/head allocation",
+    "ResNet50 ImageNet initialization and Fish16 controlled protocol",
+    "AMP/autocast/GradScaler numeric configuration"
+  ],
+  "author_exact_a_b_initialization": "UNVERIFIED: generic model random initialization in Algorithm1 does not specify the a/b distribution or numeric values",
+  "available_tex_initialization_mentions": [
+    {
+      "file": "Sec/2_RW.tex",
+      "line": 31,
+      "text": "It proposes initializing the classifier with linguistic representation from the text encoder in CLIP and fine-tuning ViT with a few epochs. "
+    },
+    {
+      "file": "tab/algorithm.tex",
+      "line": 9,
+      "text": "\\STATE Initialize the model $\\phi$\\ randomly "
+    }
+  ],
+  "installed_torch_conv_reset_parameters": "    def reset_parameters(self) -> None:\n        # Use torch.no_grad() to allow in-place modification of weights/bias\n        with torch.no_grad():\n            # Check if the weight tensor is in channels_last_3d format to ensure numerical consistency\n            if not self.weight.is_contiguous():\n                # Use an empty contiguous buffer to optimize memory and ensure consistent initialization\n                temp_weight = torch.empty_like(\n                    self.weight, memory_format=torch.contiguous_format\n                )\n                init.kaiming_uniform_(temp_weight, a=math.sqrt(5))\n                # Copy the initialized values back to the original tensor\n                self.weight.copy_(temp_weight)\n            else:\n                # Standard initialization for default contiguous memory format\n                init.kaiming_uniform_(self.weight, a=math.sqrt(5))\n            if self.bias is not None:\n                # Bias initialization remains independent of weight memory format\n                fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight)\n                bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0\n                init.uniform_(self.bias, -bound, bound)\n",
+  "local_conv_initial_bound": [
+    -0.7071067811865475,
+    0.7071067811865475
+  ],
+  "formula_initialization_architecture_changed": false
+}

@@ -1,0 +1,10 @@
+test_finite_statistics_and_l2_use_float64 (test_diagnostic_stats.DiagnosticStatsTests.test_finite_statistics_and_l2_use_float64) ... ok
+test_missing_is_distinct_from_finite_zero (test_diagnostic_stats.DiagnosticStatsTests.test_missing_is_distinct_from_finite_zero) ... ok
+test_nan_inf_not_hidden_by_finite_substatistics (test_diagnostic_stats.DiagnosticStatsTests.test_nan_inf_not_hidden_by_finite_substatistics) ... ok
+test_parameter_group_report_distinguishes_missing_and_inf (test_diagnostic_stats.DiagnosticStatsTests.test_parameter_group_report_distinguishes_missing_and_inf) ... ok
+test_snapshot_is_a_copy (test_diagnostic_stats.DiagnosticStatsTests.test_snapshot_is_a_copy) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.010s
+
+OK

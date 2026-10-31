@@ -1,0 +1,82 @@
+{
+  "classifier.output_scaled_grad": {
+    "is_none": false,
+    "dtype": "torch.float16",
+    "shape": [
+      16,
+      16
+    ],
+    "numel": 256,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 256,
+    "min": -3876.0,
+    "max": 423.25,
+    "max_abs": 3876.0,
+    "l2_norm": 15515.882028208427,
+    "finite_max_abs": 3876.0,
+    "finite_l2_norm": 15515.882028208427
+  },
+  "PIF.output_scaled_grad": {
+    "is_none": false,
+    "dtype": "torch.float16",
+    "shape": [
+      16,
+      2048,
+      7,
+      7
+    ],
+    "numel": 1605632,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 1605632,
+    "min": -2.568359375,
+    "max": 2.455078125,
+    "max_abs": 2.568359375,
+    "l2_norm": 1274.9686651484726,
+    "finite_max_abs": 2.568359375,
+    "finite_l2_norm": 1274.9686651484726
+  },
+  "PIF.Conv1d.output_scaled_grad": {
+    "is_none": false,
+    "dtype": "torch.float16",
+    "shape": [
+      32768,
+      1,
+      49
+    ],
+    "numel": 1605632,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 1605632,
+    "min": -2.568359375,
+    "max": 2.455078125,
+    "max_abs": 2.568359375,
+    "l2_norm": 1274.9686651484726,
+    "finite_max_abs": 2.568359375,
+    "finite_l2_norm": 1274.9686651484726
+  },
+  "PIF.Conv1d.cast_weight_scaled_grad": {
+    "is_none": false,
+    "dtype": "torch.float16",
+    "shape": [
+      1,
+      2,
+      1
+    ],
+    "numel": 2,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 2,
+    "min": -5384.0,
+    "max": 8560.0,
+    "max_abs": 8560.0,
+    "l2_norm": 10112.420877317161,
+    "finite_max_abs": 8560.0,
+    "finite_l2_norm": 10112.420877317161
+  }
+}

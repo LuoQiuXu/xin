@@ -1,0 +1,372 @@
+{
+  "batch": 6,
+  "samples": [
+    {
+      "row_index": 13582,
+      "image_id": "fish_000039059598_05816",
+      "track_id": "track:fish_000039059598",
+      "group_id": "grp_a9cd4f94574150e6",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "b25f37bc9690cf8d2fd6829779dea955743d3f196d014e761eafe129b299a865"
+    },
+    {
+      "row_index": 7987,
+      "image_id": "fish_000038829596_04334",
+      "track_id": "track:fish_000038829596",
+      "group_id": "grp_e6c5d5364aa4ea23",
+      "label": 2,
+      "class_name": "Chromis chrysura",
+      "image_sha256": "a006ca3d41b0dc04a61d4e2f5e8a9dd43ddddc8a910c33890f56291cda1f89bd"
+    },
+    {
+      "row_index": 15285,
+      "image_id": "fish_003387895222_17395",
+      "track_id": "track:fish_003387895222",
+      "group_id": "grp_5266f29c0c5500d2",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "3e0f72695a81082c59ef62cc5e1ba0a5f899204cf10ff51d31fce235ceb787b3"
+    },
+    {
+      "row_index": 17141,
+      "image_id": "fish_003524695417_22032",
+      "track_id": "track:fish_003524695417",
+      "group_id": "grp_d1eb6f4058db8202",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "19952fd47d80f6f94ddd48ecbb4ab06ccf6caf8570b26ceeedd4da6c47f9f534"
+    },
+    {
+      "row_index": 2724,
+      "image_id": "fish_003903856329_20946",
+      "track_id": "track:fish_003903856329",
+      "group_id": "grp_1e853e129f7022da",
+      "label": 3,
+      "class_name": "Amphiprion clarkii",
+      "image_sha256": "523cf6fa86b032ae72113d0ce4b371ae948c3c76b23fb4a0b826585941ce5b1c"
+    },
+    {
+      "row_index": 13480,
+      "image_id": "fish_000034220001_03223",
+      "track_id": "track:fish_000034220001",
+      "group_id": "grp_7ac9955752ad9ee7",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "059f142187906dfd59bb564e3cb6cb640dcc2f7a173ebc72a7c535cefe0bf669"
+    },
+    {
+      "row_index": 16315,
+      "image_id": "fish_003483325358_12025",
+      "track_id": "track:fish_003483325358",
+      "group_id": "grp_a1a910a1d5522357",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "6184b32facc27938d0eda52063e1697b8d5043f4347c0284f0d709afc8155c6a"
+    },
+    {
+      "row_index": 9510,
+      "image_id": "fish_004146596796_14894",
+      "track_id": "track:fish_004146596796",
+      "group_id": "grp_8e83dc9b0ce100e0",
+      "label": 2,
+      "class_name": "Chromis chrysura",
+      "image_sha256": "2dda2cef210c839e81124422b7b7595785070bf2b061eba2b44c9dbdf857eab5"
+    },
+    {
+      "row_index": 1680,
+      "image_id": "fish_000061579598_06166",
+      "track_id": "track:fish_000061579598",
+      "group_id": "grp_efa9cd6876f04b04",
+      "label": 3,
+      "class_name": "Amphiprion clarkii",
+      "image_sha256": "bb1739bb76dc12689ee74e9e6ea2b42f99aaa685606885badf29c1ae95758fb5"
+    },
+    {
+      "row_index": 15366,
+      "image_id": "fish_003397585231_24446",
+      "track_id": "track:fish_003397585231",
+      "group_id": "grp_25229a02357c53ee",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "bb42c9667e8dcd84d653f8fac8e0829fad5c565316a5492bd9d52c30a8285e17"
+    },
+    {
+      "row_index": 1164,
+      "image_id": "fish_000017100001_01534",
+      "track_id": "track:fish_000017100001",
+      "group_id": "grp_54c95ab2d9699914",
+      "label": 3,
+      "class_name": "Amphiprion clarkii",
+      "image_sha256": "d593b025c888ac4142526ba65997e4c4fb0aea5aa00c64bbb2a7f5b0cb15ee37"
+    },
+    {
+      "row_index": 1640,
+      "image_id": "fish_000059159598_06099",
+      "track_id": "track:fish_000059159598",
+      "group_id": "grp_a5363d4284e3785d",
+      "label": 3,
+      "class_name": "Amphiprion clarkii",
+      "image_sha256": "85077fd1b453c976332d2b4322106150438037b1576359b270dfd8ebdca364c4"
+    },
+    {
+      "row_index": 18775,
+      "image_id": "fish_003791346075_22637",
+      "track_id": "track:fish_003791346075",
+      "group_id": "grp_e810f127bf787245",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "5cf53d26dc68d39ebe2e6e203bed35b7a557a1d1927754144a1893d79efaf8ed"
+    },
+    {
+      "row_index": 14261,
+      "image_id": "fish_000099219598_06766",
+      "track_id": "track:fish_000099219598",
+      "group_id": "grp_6fc97b8924edd267",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "b7d950bfd905f99b1cc500a9bf03bea5d740193243eadadb720251407f48978f"
+    },
+    {
+      "row_index": 13777,
+      "image_id": "fish_000067959598_06249",
+      "track_id": "track:fish_000067959598",
+      "group_id": "grp_9ea16b98d36a6a28",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "689e0556a297ee5b214d2bc203a66682d399a60c37d66d7171343f4f1647b1d5"
+    },
+    {
+      "row_index": 19669,
+      "image_id": "fish_003917766356_14169",
+      "track_id": "track:fish_003917766356",
+      "group_id": "grp_f5845b650110138c",
+      "label": 0,
+      "class_name": "Dascyllus reticulatus",
+      "image_sha256": "942e2eea706f7b0c2b5e795930d63f74f745def6dfec6ab56b43813fb418c732"
+    }
+  ],
+  "mixup_lambda": 0.814341567785799,
+  "mixup_permutation": [
+    7,
+    3,
+    1,
+    9,
+    5,
+    11,
+    0,
+    14,
+    13,
+    15,
+    6,
+    10,
+    8,
+    2,
+    12,
+    4
+  ],
+  "labels_a": [
+    0,
+    2,
+    0,
+    0,
+    3,
+    0,
+    0,
+    2,
+    3,
+    0,
+    3,
+    3,
+    0,
+    0,
+    0,
+    0
+  ],
+  "labels_b": [
+    2,
+    0,
+    2,
+    0,
+    0,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    3,
+    3,
+    0,
+    0,
+    3
+  ],
+  "raw_input_sha256": "b9ce6c99dd498e3213ebdff893466bbc365833295904b3b153281965b6c81ad5",
+  "rng_before_mixup_sha256": "78b3dde6c54238603e730541568ea8f2ef9d5b3531fb11562c69ac38c75a19b3",
+  "raw_input_range": {
+    "is_none": false,
+    "dtype": "torch.float32",
+    "shape": [
+      16,
+      3,
+      224,
+      224
+    ],
+    "numel": 2408448,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 2408448,
+    "min": -2.1179039478302,
+    "max": 2.640000104904175,
+    "max_abs": 2.640000104904175,
+    "l2_norm": 2130.057782907448,
+    "finite_max_abs": 2.640000104904175,
+    "finite_l2_norm": 2130.057782907448
+  },
+  "mixed_input_range": {
+    "is_none": false,
+    "dtype": "torch.float32",
+    "shape": [
+      16,
+      3,
+      224,
+      224
+    ],
+    "numel": 2408448,
+    "finite": true,
+    "nan_count": 0,
+    "inf_count": 0,
+    "finite_count": 2408448,
+    "min": -2.1179039478302,
+    "max": 2.640000104904175,
+    "max_abs": 2.640000104904175,
+    "l2_norm": 1837.0168605660976,
+    "finite_max_abs": 2.640000104904175,
+    "finite_l2_norm": 1837.0168605660976
+  },
+  "historical_A0_same_stream_pixel_rng_lambda_matches": true,
+  "scenario": "original_amp_reproduction",
+  "amp": true,
+  "scale_before_unscale": 65536.0,
+  "scale_after_unscale": 65536.0,
+  "strict_gate_passed": false,
+  "gate_error": "Nonfinite/missing gradients",
+  "loss": 1.7094205617904663,
+  "pif_parameters_before": [
+    -0.02449430152773857,
+    -0.6112035512924194
+  ],
+  "pif_gradient_after_unscale": null,
+  "nonfinite_parameters": [
+    "extractor.pif.fuse.weight"
+  ],
+  "missing_gradient_parameters": [],
+  "gradient_groups": {
+    "PIF": {
+      "parameter_tensors": 1,
+      "missing_parameters": [],
+      "nonfinite_parameters": [
+        "extractor.pif.fuse.weight"
+      ],
+      "nan_count": 0,
+      "inf_count": 1,
+      "all_present_and_finite": false,
+      "finite_max_abs": 0.0006914138793945312,
+      "finite_l2_norm": 0.0006914138793945312
+    },
+    "backbone.layer1": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.0664263367652893,
+      "finite_l2_norm": 1.2987889760797382
+    },
+    "backbone.layer2": {
+      "parameter_tensors": 39,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.033125508576631546,
+      "finite_l2_norm": 1.2639148909433304
+    },
+    "backbone.layer3": {
+      "parameter_tensors": 57,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.031511206179857254,
+      "finite_l2_norm": 2.0136160458003958
+    },
+    "backbone.layer4": {
+      "parameter_tensors": 30,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.04142075404524803,
+      "finite_l2_norm": 2.099300758055753
+    },
+    "backbone.stem": {
+      "parameter_tensors": 3,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.09747314453125,
+      "finite_l2_norm": 1.937502360560161
+    },
+    "classifier": {
+      "parameter_tensors": 2,
+      "missing_parameters": [],
+      "nonfinite_parameters": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_present_and_finite": true,
+      "finite_max_abs": 0.349853515625,
+      "finite_l2_norm": 5.580329030011628
+    }
+  },
+  "convolution": {
+    "module_weight_dtype": "torch.float32",
+    "input_dtype": "torch.float16",
+    "saved_weight_dtype": "torch.float16",
+    "saved_weight_shape": [
+      1,
+      2,
+      1
+    ],
+    "backward_node": "ConvolutionBackward0"
+  },
+  "pif_cast_gradient_stats": {
+    "is_none": false,
+    "dtype": "torch.float16",
+    "shape": [
+      1,
+      2,
+      1
+    ],
+    "numel": 2,
+    "finite": false,
+    "nan_count": 0,
+    "inf_count": 1,
+    "finite_count": 1,
+    "min": -45.3125,
+    "max": -45.3125,
+    "max_abs": "Inf",
+    "l2_norm": "Inf",
+    "finite_max_abs": 45.3125,
+    "finite_l2_norm": 45.3125
+  },
+  "actual_reproduction_optimizer_step_skipped_by_strict_gate": true,
+  "successful_optimizer_steps_before_failure": 6
+}

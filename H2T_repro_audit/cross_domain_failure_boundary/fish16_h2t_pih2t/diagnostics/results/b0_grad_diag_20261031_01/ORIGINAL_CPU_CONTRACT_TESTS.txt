@@ -1,0 +1,15 @@
+test_common_backbone_and_classifier_initialization (test_contract.ContractTests.test_common_backbone_and_classifier_initialization) ... ok
+test_matched_real_recipient_view_and_rng_restoration (test_contract.ContractTests.test_matched_real_recipient_view_and_rng_restoration) ... ok
+test_official_weight_identity_and_strict_compatibility (test_contract.ContractTests.test_official_weight_identity_and_strict_compatibility) ... ok
+test_original_backbone_output_shape (test_contract.ContractTests.test_original_backbone_output_shape) ... ok
+test_original_h2t_shared_512_channels_and_unchanged_recipient (test_contract.ContractTests.test_original_h2t_shared_512_channels_and_unchanged_recipient) ... ok
+test_path_escape_masks_and_excluded_classes_rejected (test_contract.ContractTests.test_path_escape_masks_and_excluded_classes_rejected) ... ok
+test_pi_ratio_recipient_donor_mass_and_detach (test_contract.ContractTests.test_pi_ratio_recipient_donor_mass_and_detach) ... ok
+test_pif_formula_two_parameters_and_permutation (test_contract.ContractTests.test_pif_formula_two_parameters_and_permutation) ... ok
+test_schedule_train_only_and_reproducible (test_contract.ContractTests.test_schedule_train_only_and_reproducible) ... ok
+test_stage2_parameter_and_bn_freeze_with_classifier_update (test_contract.ContractTests.test_stage2_parameter_and_bn_freeze_with_classifier_update) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.512s
+
+OK
