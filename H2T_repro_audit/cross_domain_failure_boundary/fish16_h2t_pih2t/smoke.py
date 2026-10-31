@@ -155,7 +155,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     opt.zero_grad(set_to_none=True)
     torch.cuda.reset_peak_memory_stats()
     start = time.perf_counter()
-    loss_sum, updates, samples, finite_checks = 0., 0, 0, 0
+    loss_sum, updates, samples, gradient_audit_windows = 0., 0, 0, 0
     attempted_steps = 0
     overflow_skips = 0
     consecutive_overflow_skips = 0
@@ -208,7 +208,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                 max_consecutive_overflow_skips=2,
             )
             attempted_steps += 1
-            finite_checks += 1
+            gradient_audit_windows += 1
             if outcome.skipped:
                 overflow_skips += 1
                 consecutive_overflow_skips += 1
@@ -276,7 +276,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
               "attempted_optimizer_steps": attempted_steps, "amp_overflow_skips": overflow_skips,
               "max_consecutive_overflow_skips": max_consecutive_overflow_skips,
               "initial_loss_scale": initial_loss_scale, "final_loss_scale": float(scaler.get_scale()),
-              "finite_gradient_checks": finite_checks,
+              "gradient_audit_windows": gradient_audit_windows,
               "lr": lr, "momentum": .9, "weight_decay": wd, "micro_batch": batch,
               "accumulation": accumulation, "effective_batch": 16, "amp": True, "workers": 4,
               "train_loss": loss_sum / samples, "train_seconds": duration,
