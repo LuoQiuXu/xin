@@ -32,7 +32,7 @@ Do not edit H2T_official_clean/ or PI_H2T_review/.
 Use the already validated interpreter:
 D:\app\minicondaaa\envs\xiaoju\python.exe
 
-From repository root, run these four checks. All must pass before CUDA:
+From repository root, run these four checks. All must pass before CUDA. Expected discovery counts: 12 new AMP-policy tests, 10 existing model/data contract tests, and 5 existing numerical-diagnostic tests:
 
 1. Syntax:
 & 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 -m py_compile H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\amp_recovery.py H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_amp_recovery.py H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\b0_recovery_smoke.py H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py
