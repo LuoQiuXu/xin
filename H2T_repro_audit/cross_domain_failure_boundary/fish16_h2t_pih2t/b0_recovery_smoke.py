@@ -454,7 +454,7 @@ def run(output):
         "images_per_second": samples / duration,
         "peak_allocated_mib": torch.cuda.max_memory_allocated() / 1024**2,
         "all_forward_logits_and_losses_finite": True,
-        "only_nonfinite_gradient_allowed": "extractor.pif.fuse.weight[0,1,0]",
+        "only_nonfinite_gradient_allowed": "positive Inf at extractor.pif.fuse.weight[0,1,0]",
         "grad_scaler_native_skip_and_backoff_verified": True,
         "optimizer_step_hook_verified": True,
         "skipped_step_parameter_hash_unchanged": True,
