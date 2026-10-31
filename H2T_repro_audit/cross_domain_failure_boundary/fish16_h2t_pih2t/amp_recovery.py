@@ -170,7 +170,11 @@ def _is_the_one_audited_pif_overflow(named_parameters, diagnostics):
     if parameter is None or tuple(parameter.shape) != PIF_B_SHAPE:
         return False
     positions = diagnostics["nonfinite_positions"].get(PIF_B_PARAMETER, [])
-    return positions == [list(PIF_B_INDEX)]
+    if positions != [list(PIF_B_INDEX)]:
+        return False
+    # The archived exact replay is +Inf at b. Do not broaden this exception
+    # to a sign-flipped or otherwise different non-finite event.
+    return bool(torch.isposinf(parameter.grad[PIF_B_INDEX]).item())
 
 
 def guarded_scaler_step(
