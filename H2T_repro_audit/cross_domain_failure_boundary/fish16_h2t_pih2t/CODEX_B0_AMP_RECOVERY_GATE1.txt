@@ -1,0 +1,129 @@
+# CODEX TASK — Fish16 B0 AMP recovery Gate 1 (100 batches only)
+
+Repository: LuoQiuXu/xin
+Required existing branch: experiment/fish16-h2t-pih2t-cross-domain-20261031
+This is a continuation of the current experiment. Do NOT create or switch to another branch.
+
+## Research decision
+
+The archived controlled replay confirms one recoverable numerical event: on B0 PIF Stage-I, zero-based batch 6 produces exactly one Inf at extractor.pif.fuse.weight[0,1,0] under FP16 GradScaler scale 65536. The finite lower-scale replay and disposable GradScaler clone show that the correct response is the native GradScaler skip + scale backoff, not a PIF formula or initialization change.
+
+Your task is ONLY to execute Gate 1: the first 100 B0 Stage-I batches with the exact replay checks. Do not run the full six-condition smoke, Stage-II, validation/test evaluation, or formal 90+10 training.
+
+## A. Git safety — mandatory
+
+1. Work in the existing local repository for LuoQiuXu/xin.
+2. Run git fetch origin, git status --short, git branch --show-current, git rev-parse HEAD, and git rev-parse origin/experiment/fish16-h2t-pih2t-cross-domain-20261031.
+3. If the worktree is dirty, STOP. Do not stash, reset, clean, checkout another branch, or overwrite anything.
+4. If the branch is not exactly experiment/fish16-h2t-pih2t-cross-domain-20261031, STOP.
+5. If the local branch is behind its matching origin branch and the worktree is clean, fast-forward only with: git pull --ff-only origin experiment/fish16-h2t-pih2t-cross-domain-20261031
+6. Do not force-push. Do not create a branch.
+7. Confirm the only intended code changes relative to base commit a793d718ab345ced65815e794158b990f5de2f91 are:
+   - fish16_h2t_pih2t/amp_recovery.py
+   - fish16_h2t_pih2t/test_amp_recovery.py
+   - fish16_h2t_pih2t/b0_recovery_smoke.py
+   - fish16_h2t_pih2t/smoke.py
+   - fish16_h2t_pih2t/AMP_RECOVERY_GATE1.md
+   - fish16_h2t_pih2t/CODEX_B0_AMP_RECOVERY_GATE1.txt
+Do not edit H2T_official_clean/ or PI_H2T_review/.
+
+## B. CPU checks — no GPU training yet
+
+Use the already validated interpreter:
+D:\app\minicondaaa\envs\xiaoju\python.exe
+
+From repository root, run these four checks. All must pass before CUDA:
+
+1. Syntax:
+& 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 -m py_compile H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\amp_recovery.py H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_amp_recovery.py H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\b0_recovery_smoke.py H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py
+
+2. New strict-policy tests:
+& 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p 'test_amp_recovery.py' -v
+
+3. Existing model/data contract tests:
+& 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p 'test_contract.py' -v
+
+4. Existing numerical-diagnostic tests:
+& 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics -p 'test_*.py' -v
+
+If any check fails, STOP before CUDA. Do not patch code ad hoc; report the traceback and wait for review.
+
+## C. Run Gate 1 — exactly 100 B0 batches
+
+Before running, confirm this output directory does not already exist:
+D:\h2t_cross_domain_results\fish16_b0_amp_recovery_gate1_seed42_20261031_01
+
+If it exists, do not overwrite it; use a new suffix _02 and report that path.
+
+Run exactly:
+& 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -X utf8 H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\b0_recovery_smoke.py --output-dir 'D:\h2t_cross_domain_results\fish16_b0_amp_recovery_gate1_seed42_20261031_01'
+
+The runner itself enforces the known environment (PyTorch 2.14.1+cu132, CUDA build 13.2, cuDNN 92400, RTX 5070 Laptop), locked manifest and pretrained-weight hashes, clean worktree, and unchanged original H2T/PI-H2T source hashes. If any prerequisite differs, it must stop; do not weaken the assertion.
+
+The runner must reproduce the archived batch 6 exactly:
+- row indices: [13582, 7987, 15285, 17141, 2724, 13480, 16315, 9510, 1680, 15366, 1164, 1640, 18775, 14261, 13777, 19669]
+- raw input SHA256: b9ce6c99dd498e3213ebdff893466bbc365833295904b3b153281965b6c81ad5
+- pre-MixUp RNG SHA256: 78b3dde6c54238603e730541568ea8f2ef9d5b3531fb11562c69ac38c75a19b3
+- MixUp lambda: 0.814341567785799
+- PIF a/b immediately before batch 6: [-0.02449430152773857, -0.6112035512924194]
+
+Required recovery evidence:
+- first and expected overflow is zero-based batch 6;
+- only one Inf, at extractor.pif.fuse.weight[0,1,0]; no NaN, no missing gradient, no other nonfinite gradient;
+- scaler.step/update uses native GradScaler behavior;
+- optimizer post-step hook count does not increase on batch 6;
+- scale changes 65536 -> 32768;
+- optimized parameter hash remains unchanged across the skipped step;
+- batch 7 executes a real optimizer step at scale 32768;
+- exactly 100 batches / 1600 samples complete;
+- no more than 3 total overflow skips and no more than 2 consecutive skips;
+- all forward logits/losses remain finite.
+
+The runner intentionally does NOT clamp/replace gradients. BatchNorm running statistics may update in the training forward even when the SGD step is skipped; the report must distinguish this from a parameter update.
+
+If the archived batch-6 replay differs, if another parameter/coordinate is nonfinite, if any NaN/missing gradient occurs, if the scale does not decrease, if optimizer.step fires on the overflow, if batch 7 fails to step, if the environment differs, or if CUDA OOM occurs: STOP. Preserve FAILURE.json and partial CSV traces. Do not change batch size, scale, precision, PIF initialization/formula, optimizer, data schedule, or learning rate to force a pass.
+
+## D. Absolute prohibitions for this task
+
+- Do NOT run smoke.py.
+- Do NOT run A0 or any Stage-II condition.
+- Do NOT run any validation or TEST evaluation.
+- Do NOT run Stage-I 90 epochs or Stage-II 10 epochs.
+- Do NOT start seeds 43/44.
+- Do NOT change PIF, H2T, PI-H2TF, loss, MixUp, initialization, data, sampling, or optimizer.
+- Do NOT upload data, image IDs, image hashes, tensors, checkpoints, pretrained weights, or bulky logs into Git.
+- Do NOT overwrite any prior diagnostic/smoke output directory.
+
+## E. Result packaging and GitHub upload
+
+The external output directory should contain run_manifest.json, batch_log.csv (or batch_log_partial.csv on failure), optimizer_step_events.csv (or partial version on failure), and result.json on pass OR FAILURE.json on failure.
+
+After the run, create a compact Git-tracked report directory:
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/results/amp_recovery_gate1_20261031_01/
+
+Include only:
+- GATE1_RESULT.json: concise machine-readable outcome and environment;
+- GATE1_REPORT.md: exact checks, first overflow batch, scale before/after, actual optimizer updates, skip count, batch-7 behavior, elapsed time, peak allocated memory, all stop conditions, and explicit statement that no validation/test/formal training ran;
+- OUTPUT_SHA256.csv: SHA256 and byte size of the external run_manifest.json, batch_log.csv/partial, optimizer_step_events.csv/partial, result.json/FAILURE.json.
+
+Do not copy raw per-image data, checkpoints, weights, or gradient tensors into Git. Keep all raw logs and any model state external.
+
+Commit and push only the compact Gate 1 report files to the SAME existing branch. If the remote branch advances, fetch and inspect before fast-forwarding; never force-push. If push is unavailable, leave the local report commit intact and provide its commit SHA.
+
+## F. Stop and report
+
+After Gate 1, STOP even if it passes. Do not start Gate 2.
+
+Return:
+1. branch and final commit SHA;
+2. CPU test counts and syntax status;
+3. exact environment;
+4. external output path;
+5. batch-6 replay hashes/row indices/lambda/PIF values and whether they matched;
+6. all optimizer-step events around batches 5, 6, 7, including scale and hook counts;
+7. total attempts, actual updates, total skips, max consecutive skips;
+8. final scale, elapsed time, peak allocated MiB;
+9. result/report Git paths and commit SHA;
+10. confirmation that no Stage-II, validation/test evaluation, formal training, or extra seeds ran.
+
+Do not interpret Gate 1 as an accuracy result or as evidence for/against PI-H2T cross-domain performance. Wait for the next scientific review before any further training.
