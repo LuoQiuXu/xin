@@ -365,6 +365,7 @@ def run(output):
                     f"scale={scaler.get_scale():.0f}",
                     flush=True,
                 )
+        torch.cuda.synchronize()
 
     except Exception:
         if batch_rows:
@@ -394,8 +395,6 @@ def run(output):
         raise
     finally:
         counter.close()
-
-    torch.cuda.synchronize()
 
     duration = time.perf_counter() - started
     write_csv(
