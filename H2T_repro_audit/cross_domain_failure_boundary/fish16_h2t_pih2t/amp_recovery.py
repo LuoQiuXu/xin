@@ -2,7 +2,7 @@
 
 This module does not clamp, replace, or otherwise alter gradients.  It permits
 GradScaler's native skip/backoff path only when the sole non-finite value is
-the already-diagnosed PIF coefficient b at [0, 1, 0].
+the already-diagnosed positive Inf at PIF coefficient b at [0, 1, 0].
 """
 from dataclasses import asdict, dataclass
 import hashlib
@@ -190,7 +190,7 @@ def guarded_scaler_step(
     """Run one optimizer attempt after scaler.unscale_(optimizer).
 
     Finite gradients follow the ordinary GradScaler step/update path.
-    The only permitted non-finite case is one Inf at PIF fuse.weight[0,1,0].
+    The only permitted non-finite case is one positive Inf at PIF fuse.weight[0,1,0].
     In that case GradScaler must skip the optimizer update and lower its scale.
     NaNs, missing gradients, any other Inf, or an unverified skip are fatal.
     """
