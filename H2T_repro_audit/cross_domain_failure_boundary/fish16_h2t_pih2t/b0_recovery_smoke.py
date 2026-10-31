@@ -32,11 +32,13 @@ from preflight import BRANCH, EXPECTED_SHA, MANIFEST
 
 VALIDATION = Path(r"D:\h2t_cross_domain_results\fish16_validation_seed42_20261031_01")
 EXPECTED_ENV = {
+    "python_version": "3.12.12",
     "torch": "2.14.1+cu132",
     "cuda_build": "13.2",
     "cudnn": 92400,
     "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
 }
+EXPECTED_INITIAL_PIF = [-0.027100861072540283, -0.604386568069458]
 EXPECTED_B6 = {
     "batch": 6,
     "row_indices": [13582, 7987, 15285, 17141, 2724, 13480, 16315, 9510,
@@ -95,6 +97,7 @@ def verify_prerequisites():
         "cudnn": torch.backends.cudnn.version(),
         "gpu": torch.cuda.get_device_name(0),
     }
+    assert environment["python_version"] == EXPECTED_ENV["python_version"], environment
     assert environment["torch"] == EXPECTED_ENV["torch"], environment
     assert environment["cuda_build"] == EXPECTED_ENV["cuda_build"], environment
     assert environment["cudnn"] == EXPECTED_ENV["cudnn"], environment
@@ -160,6 +163,10 @@ def run(output):
         float(value)
         for value in model.extractor.pif.fuse.weight.detach().flatten().cpu()
     ]
+    assert all(
+        math.isclose(a, b, rel_tol=0.0, abs_tol=1e-7)
+        for a, b in zip(initial_pif, EXPECTED_INITIAL_PIF)
+    ), f"Initial PIF initialization drift: {initial_pif}"
     dataset = Views(rows, stage1, True)
     batches = loader(dataset, batch=16)
     batch_rows, step_rows = [], []
@@ -279,25 +286,6 @@ def run(output):
                 optimizer_updates += 1
                 consecutive_skips = 0
 
-            if batch_index < EXPECTED_B6["batch"]:
-                assert not outcome.skipped, (
-                    f"Unexpected overflow before archived failing batch: {batch_index}"
-                )
-            if batch_index == EXPECTED_B6["batch"]:
-                assert outcome.skipped, (
-                    "The archived batch-6 PIF b overflow did not recur under the exact replay."
-                )
-                assert outcome.scale_before == 65536.0
-                assert outcome.scale_after == 32768.0
-                assert outcome.optimizer_steps_before == 6
-                assert outcome.optimizer_steps_after == 6
-            if batch_index == EXPECTED_B6["batch"] + 1:
-                assert not outcome.skipped, (
-                    "The first batch after scale backoff did not execute an optimizer step."
-                )
-                assert outcome.scale_before == 32768.0
-                next_batch_after_overflow_stepped = True
-
             attempted_steps += 1
             samples += len(target)
             loss_sum += float(loss.detach()) * len(target)
@@ -326,6 +314,30 @@ def run(output):
                 "scale_before": outcome.scale_before,
                 "scale_after": outcome.scale_after,
             })
+
+            if batch_index < EXPECTED_B6["batch"]:
+                assert not outcome.skipped, (
+                    f"Unexpected overflow before archived failing batch: {batch_index}"
+                )
+            if batch_index == EXPECTED_B6["batch"]:
+                assert math.isclose(
+                    float(loss.detach()), 1.7094205617904663,
+                    rel_tol=0.0, abs_tol=1e-5
+                ), f"Batch-6 loss drift: {float(loss.detach())}"
+                assert outcome.skipped, (
+                    "The archived batch-6 PIF b overflow did not recur under the exact replay."
+                )
+                assert outcome.scale_before == 65536.0
+                assert outcome.scale_after == 32768.0
+                assert outcome.optimizer_steps_before == 6
+                assert outcome.optimizer_steps_after == 6
+            if batch_index == EXPECTED_B6["batch"] + 1:
+                assert not outcome.skipped, (
+                    "The first batch after scale backoff did not execute an optimizer step."
+                )
+                assert outcome.scale_before == 32768.0
+                next_batch_after_overflow_stepped = True
+
             optimizer.zero_grad(set_to_none=True)
 
             if (batch_index + 1) % 10 == 0:
@@ -368,16 +380,6 @@ def run(output):
     torch.cuda.synchronize()
 
     duration = time.perf_counter() - started
-    assert len(batch_rows) == 100, f"Only {len(batch_rows)} batches completed."
-    assert samples == 1600, f"Expected 1600 samples, got {samples}."
-    assert attempted_steps == 100
-    assert optimizer_updates + overflow_skips == attempted_steps
-    assert optimizer_updates == counter.count
-    assert first_overflow_batch == 6, f"Unexpected first overflow batch: {first_overflow_batch}"
-    assert next_batch_after_overflow_stepped, "No successful optimizer step after scale backoff."
-    assert overflow_skips <= 3, f"Too many AMP skips in 100 batches: {overflow_skips}"
-    assert max_consecutive_skips <= 2
-
     write_csv(
         output / "batch_log.csv",
         batch_rows,
@@ -400,6 +402,16 @@ def run(output):
             "extractor_state_sha_after_step",
         ],
     )
+    assert len(batch_rows) == 100, f"Only {len(batch_rows)} batches completed."
+    assert samples == 1600, f"Expected 1600 samples, got {samples}."
+    assert attempted_steps == 100
+    assert optimizer_updates + overflow_skips == attempted_steps
+    assert optimizer_updates == counter.count
+    assert first_overflow_batch == 6, f"Unexpected first overflow batch: {first_overflow_batch}"
+    assert next_batch_after_overflow_stepped, "No successful optimizer step after scale backoff."
+    assert overflow_skips <= 3, f"Too many AMP skips in 100 batches: {overflow_skips}"
+    assert max_consecutive_skips <= 2
+
     final_pif = [
         float(value)
         for value in model.extractor.pif.fuse.weight.detach().flatten().cpu()
