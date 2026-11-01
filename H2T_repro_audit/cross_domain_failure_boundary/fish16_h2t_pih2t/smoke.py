@@ -343,6 +343,8 @@ def run(output, batch):
         "completed_conditions": [],
         "stage1_completed": [],
         "stage2_completed": [],
+        "current_condition": None,
+        "current_stage": None,
         "formal_training_started": False,
         "test_evaluations": 0,
         "additional_seeds_started": [],
@@ -394,13 +396,21 @@ def run(output, batch):
     write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     results, controls = {}, {}
     for name, pif in (("A0", False), ("B0", True)):
+        execution_status["current_condition"] = name
+        execution_status["current_stage"] = "stage1"
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
         results[name], controls[name] = one_epoch(name, models.FishModel(pif), rows, stage1, None, "stage1", 1, batch, groups, val, output)
         execution_status["completed_conditions"].append(name)
         execution_status["stage1_completed"].append(name)
+        execution_status["current_condition"] = None
+        execution_status["current_stage"] = None
         write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     for key in ("recipient_sha256", "mixup_rng_sha256", "mixup_lambda"):
         assert [r[key] for r in controls["A0"]] == [r[key] for r in controls["B0"]], key
     for name, source, mode in (("A1", "A0", "crt"), ("A2", "A0", "h2t"), ("B1", "B0", "crt"), ("B2", "B0", "pi")):
+        execution_status["current_condition"] = name
+        execution_status["current_stage"] = "stage2"
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
         model = models.FishModel(source == "B0")
         state = torch.load(results[source]["checkpoint"], map_location="cpu", weights_only=True)
         assert state["smoke_only"] and state["seed"] == 42
@@ -408,6 +418,8 @@ def run(output, batch):
         results[name], controls[name] = one_epoch(name, model, rows, rec, donors if mode != "crt" else None, mode, 2, batch, groups, val, output)
         execution_status["completed_conditions"].append(name)
         execution_status["stage2_completed"].append(name)
+        execution_status["current_condition"] = None
+        execution_status["current_stage"] = None
         write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     assert all([r["recipient_sha256"] for r in controls[n]] == [r["recipient_sha256"] for r in controls["A1"]] for n in ("A2", "B1", "B2"))
     assert [r["donor_sha256"] for r in controls["A2"]] == [r["donor_sha256"] for r in controls["B2"]]
