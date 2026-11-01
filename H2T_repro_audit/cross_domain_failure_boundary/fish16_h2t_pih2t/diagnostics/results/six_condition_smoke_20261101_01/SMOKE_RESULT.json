@@ -1,0 +1,352 @@
+{
+  "status": "FAILED_STOPPED",
+  "scope": "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
+  "date": "2026-11-01",
+  "timezone": "Asia/Shanghai",
+  "branch": "experiment/fish16-six-condition-smoke-20261101",
+  "execution_commit": "8cbfa69bd194083053917bb0cef615572abdc182",
+  "seed": 42,
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "preflight": {
+    "status": "PASS_CPU_PREFLIGHT",
+    "syntax_files": 7,
+    "syntax_exit_code": 0,
+    "amp_recovery_tests": {
+      "passed": 12,
+      "total": 12,
+      "exit_code": 0
+    },
+    "contract_tests": {
+      "passed": 10,
+      "total": 10,
+      "exit_code": 0
+    },
+    "numerical_diagnostic_tests": {
+      "passed": 5,
+      "total": 5,
+      "exit_code": 0
+    },
+    "cpu_total_passed": 27,
+    "external_log_directory": "D:\\h2t_cross_domain_results\\fish16_smoke_preflight_20261101_01"
+  },
+  "external_output_directory": "D:\\h2t_cross_domain_results\\fish16_six_condition_smoke_seed42_20261101_01",
+  "execution_status_evidence": "ACTUAL_EXECUTION_STATUS.json and existing per-condition result.json; never the run_manifest epoch budgets",
+  "actual_execution_status": {
+    "status": "FAILED_STOPPED",
+    "scope": "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
+    "batch_smoke": "PASS",
+    "completed_conditions": [
+      "A0"
+    ],
+    "stage1_completed": [
+      "A0"
+    ],
+    "stage2_completed": [],
+    "current_condition": "B0",
+    "current_stage": "stage1",
+    "formal_training_started": false,
+    "test_evaluations": 0,
+    "additional_seeds_started": [],
+    "failure_type": "GradientContractError",
+    "failure_message": "Non-finite gradients do not match the single audited PIF b overflow."
+  },
+  "completed_conditions": [
+    "A0"
+  ],
+  "completed_epoch_count": 1,
+  "expected_epoch_conditions": [
+    "A0",
+    "B0",
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+  ],
+  "six_condition_smoke_completed": false,
+  "smoke_summary_exists": false,
+  "process_exit_code": 1,
+  "process_wall_seconds": 155.82235429994762,
+  "runner_elapsed_seconds_until_failure": 153.04400086402893,
+  "micro_batch": 16,
+  "accumulation": 1,
+  "effective_batch": 16,
+  "amp": true,
+  "workers": 4,
+  "numerical_configuration": {
+    "cudnn_deterministic": true,
+    "benchmark": false,
+    "cudnn_tf32": false,
+    "matmul_tf32": false
+  },
+  "batch_smoke": {
+    "status": "PASS",
+    "conditions": [
+      {
+        "condition": "A1",
+        "mode": "crt",
+        "feature_shape": [
+          16,
+          2048,
+          7,
+          7
+        ],
+        "dtype": "torch.float16",
+        "loss": 2.8468017578125,
+        "classifier_updated": true,
+        "extractor_and_bn_unchanged": true,
+        "h2t_channels": null,
+        "ratio_detached": null
+      },
+      {
+        "condition": "A2",
+        "mode": "h2t",
+        "feature_shape": [
+          16,
+          2048,
+          7,
+          7
+        ],
+        "dtype": "torch.float16",
+        "loss": 2.837158203125,
+        "classifier_updated": true,
+        "extractor_and_bn_unchanged": true,
+        "h2t_channels": 512,
+        "ratio_detached": null
+      },
+      {
+        "condition": "B1",
+        "mode": "crt",
+        "feature_shape": [
+          16,
+          2048,
+          7,
+          7
+        ],
+        "dtype": "torch.float16",
+        "loss": 2.773681640625,
+        "classifier_updated": true,
+        "extractor_and_bn_unchanged": true,
+        "h2t_channels": null,
+        "ratio_detached": null
+      },
+      {
+        "condition": "B2",
+        "mode": "pi",
+        "feature_shape": [
+          16,
+          2048,
+          7,
+          7
+        ],
+        "dtype": "torch.float16",
+        "loss": 2.756103515625,
+        "classifier_updated": true,
+        "extractor_and_bn_unchanged": true,
+        "h2t_channels": null,
+        "ratio_detached": true
+      }
+    ],
+    "updates_discarded": true
+  },
+  "conditions": [
+    {
+      "condition": "A0",
+      "status": "COMPLETE_ONE_EPOCH_SMOKE_ONLY",
+      "stage": 1,
+      "result_json_exists": true,
+      "samples": 16269,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_updates": 1017,
+      "amp_overflow_skips": 0,
+      "gradient_audit_windows": 1017,
+      "train_loss": 1.0161615356741573,
+      "train_seconds": 113.09029489988461,
+      "peak_allocated_mib": 995.4462890625,
+      "initial_loss_scale": 65536.0,
+      "final_loss_scale": 65536.0,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "lr": 0.002,
+      "momentum": 0.9,
+      "weight_decay": 0.0001,
+      "validation": {
+        "overall": 95.57079315185547,
+        "macro": 69.88808465003967,
+        "worst_class": 0.0,
+        "per_class": [
+          94.46088409423828,
+          99.45155334472656,
+          99.56331634521484,
+          99.75757598876953,
+          99.45155334472656,
+          0.0,
+          100.0,
+          57.57575607299805,
+          100.0,
+          100.0,
+          0.0,
+          84.61538696289062,
+          100.0,
+          0.0,
+          0.0,
+          83.33332824707031
+        ],
+        "group_image": {
+          "Head": 97.17300415039062,
+          "Medium": 93.04029083251953,
+          "Tail": 22.0
+        },
+        "group_macro": {
+          "Head": 98.78081385294597,
+          "Medium": 88.18181686401367,
+          "Tail": 16.923077392578126
+        }
+      },
+      "checkpoint_sha256": "a4989aef49cfeb51e8bcb53dc43781fbf4733face96c3898e78834929fd57f43",
+      "loss_definition": "Sample-weighted mean of all epoch forward losses; a separate last-batch loss is not persisted."
+    },
+    {
+      "condition": "B0",
+      "status": "FAILED_STAGE1_PARTIAL_COUNTS_UNRECORDED",
+      "stage": 1,
+      "result_json_exists": false,
+      "samples": null,
+      "attempted_optimizer_steps": null,
+      "optimizer_updates": null,
+      "amp_overflow_skips": null,
+      "gradient_audit_windows": null,
+      "train_loss": null,
+      "train_seconds": null,
+      "peak_allocated_mib": null,
+      "initial_loss_scale": 65536.0,
+      "final_loss_scale": null,
+      "validation": null,
+      "unavailable_reason": "Run stopped before B0 result, input controls and optimizer events were persisted. Do not infer zero counts or archived batch index."
+    },
+    {
+      "condition": "A1",
+      "status": "FULL_EPOCH_NOT_STARTED",
+      "stage": 2,
+      "result_json_exists": false,
+      "samples": 0,
+      "attempted_optimizer_steps": 0,
+      "optimizer_updates": 0,
+      "amp_overflow_skips": 0,
+      "gradient_audit_windows": 0,
+      "train_loss": null,
+      "train_seconds": null,
+      "peak_allocated_mib": null,
+      "validation": null,
+      "batch_smoke_only": "One preliminary real-batch test passed; its disposable update is excluded from full-epoch counts."
+    },
+    {
+      "condition": "A2",
+      "status": "FULL_EPOCH_NOT_STARTED",
+      "stage": 2,
+      "result_json_exists": false,
+      "samples": 0,
+      "attempted_optimizer_steps": 0,
+      "optimizer_updates": 0,
+      "amp_overflow_skips": 0,
+      "gradient_audit_windows": 0,
+      "train_loss": null,
+      "train_seconds": null,
+      "peak_allocated_mib": null,
+      "validation": null,
+      "batch_smoke_only": "One preliminary real-batch test passed; its disposable update is excluded from full-epoch counts."
+    },
+    {
+      "condition": "B1",
+      "status": "FULL_EPOCH_NOT_STARTED",
+      "stage": 2,
+      "result_json_exists": false,
+      "samples": 0,
+      "attempted_optimizer_steps": 0,
+      "optimizer_updates": 0,
+      "amp_overflow_skips": 0,
+      "gradient_audit_windows": 0,
+      "train_loss": null,
+      "train_seconds": null,
+      "peak_allocated_mib": null,
+      "validation": null,
+      "batch_smoke_only": "One preliminary real-batch test passed; its disposable update is excluded from full-epoch counts."
+    },
+    {
+      "condition": "B2",
+      "status": "FULL_EPOCH_NOT_STARTED",
+      "stage": 2,
+      "result_json_exists": false,
+      "samples": 0,
+      "attempted_optimizer_steps": 0,
+      "optimizer_updates": 0,
+      "amp_overflow_skips": 0,
+      "gradient_audit_windows": 0,
+      "train_loss": null,
+      "train_seconds": null,
+      "peak_allocated_mib": null,
+      "validation": null,
+      "batch_smoke_only": "One preliminary real-batch test passed; its disposable update is excluded from full-epoch counts."
+    }
+  ],
+  "failure": {
+    "type": "GradientContractError",
+    "message": "Non-finite gradients do not match the single audited PIF b overflow.",
+    "condition": "B0",
+    "stage": 1,
+    "source_file": "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/amp_recovery.py",
+    "line": 208,
+    "caller_file": "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/smoke.py",
+    "caller_line": 214,
+    "genuine_cuda_oom": false,
+    "retry_permitted": false,
+    "retry_started": false,
+    "micro_batch_8_run_started": false,
+    "exact_batch_index": null,
+    "gradient_names_and_nonfinite_counts": null,
+    "current_loss_scale": null,
+    "reason_details_unknown": "The exception records only the unmatched-event message. B0 parameter gradients, batch index and optimizer event list were not persisted. No additional diagnostic replay was run."
+  },
+  "archived_b0_batch6_event": {
+    "status": "UNVERIFIED_IN_THIS_RUN",
+    "observed_65536_to_32768_transition": null,
+    "native_skip_and_next_real_update_verified": null,
+    "note": "Cannot equate the unmatched B0 event with the archived positive Inf at b or claim its absence before failure."
+  },
+  "pairing_and_freeze_evidence": {
+    "cpu_model_data_contracts": "PASS_10_OF_10",
+    "preliminary_four_real_batches_extractor_bn_freeze": "PASS",
+    "full_stage1_views_and_mixup_pairing": "NOT_VERIFIED_B0_INCOMPLETE",
+    "full_stage2_recipient_pairing": "NOT_RUN",
+    "full_fusion_donor_pairing": "NOT_RUN",
+    "full_stage2_extractor_bn_freeze": "NOT_RUN",
+    "matched_method_comparisons_available": false
+  },
+  "protection": {
+    "protected_input_files_unchanged": 24,
+    "original_source_hashes_unchanged": true,
+    "all_7_executed_task_source_hashes_unchanged": true,
+    "historical_cpu_contract_log_unchanged": true,
+    "historical_source_hash_record_unchanged": true,
+    "formulas_initialization_sampling_hyperparameters_modified": false
+  },
+  "formal_training_started": false,
+  "test_images_loaded_or_evaluated": false,
+  "test_evaluations": 0,
+  "additional_seeds_started": [],
+  "limitations": [
+    "Only A0 completed. B0 event details and partial counts are unrecorded.",
+    "Four preliminary Stage-II batch passes do not establish any completed Stage-II epoch.",
+    "A2 vs A1 and B2 vs B1 full-epoch comparisons are unavailable.",
+    "A0 validation metrics are smoke diagnostics and do not establish method performance.",
+    "The archived numerical diagnosis remains historical evidence; this run does not establish the same exact event."
+  ],
+  "decision": "STOP_FOR_SCIENTIFIC_REVIEW_NO_AD_HOC_PATCH_OR_RETRY"
+}
