@@ -264,12 +264,17 @@ def replay_until_failure(rows, order, output):
     model.cuda().train()
     optimizer = fresh_optimizer(model)
     scaler = torch.amp.GradScaler("cuda")
+    step_counter = amp_recovery.OptimizerStepCounter(optimizer)
     optimizer.zero_grad(set_to_none=True)
+    consecutive_overflow_skips = 0
+    optimizer_step_events = []
     batches = data.loader(data.Views(rows, order, True), 16)
     replay = output / "reproduction"
     replay.mkdir()
     with (output / "batch_log.csv").open("x", newline="", encoding="utf-8") as log:
-        fields = ["batch", "samples", "loss", "scale_before_unscale", "scale_after_unscale", "strict_gate_passed", "nonfinite_parameters", "missing_gradient_parameters", "optimizer_step_executed"]
+        fields = ["batch", "samples", "loss", "scale_before_unscale", "scale_after_unscale", "strict_gate_passed",
+                  "nonfinite_parameters", "missing_gradient_parameters", "optimizer_update_executed",
+                  "recoverable_amp_skip", "optimizer_updates_total", "consecutive_overflow_skips"]
         writer = csv.DictWriter(log, fieldnames=fields)
         writer.writeheader()
         for i, item in enumerate(batches):
@@ -307,20 +312,41 @@ def replay_until_failure(rows, order, output):
             trace["historical_A0_same_stream_pixel_rng_lambda_matches"] = True
             save_json(folder / "batch_trace.json", trace)
             summary = forward_backward(model, optimizer, scaler, mixed, a, b, lam, folder, "original_amp_reproduction", i)
-            stepped = False
+            outcome = None
             if summary["strict_gate_passed"]:
-                scaler.step(optimizer)
-                scaler.update()
+                outcome = amp_recovery.guarded_scaler_step(
+                    optimizer=optimizer, scaler=scaler, named_parameters=list(model.named_parameters()),
+                    step_counter=step_counter, allow_pif_b_overflow=True,
+                    consecutive_overflow_skips=consecutive_overflow_skips,
+                    max_consecutive_overflow_skips=2,
+                )
+                if outcome.skipped:
+                    consecutive_overflow_skips += 1
+                else:
+                    consecutive_overflow_skips = 0
+                event = outcome.as_dict()
+                event.update({"batch": i, "optimizer_updates_total": step_counter.count,
+                              "consecutive_overflow_skips": consecutive_overflow_skips})
+                optimizer_step_events.append(event)
                 optimizer.zero_grad(set_to_none=True)
-                stepped = True
+            optimizer_updated = bool(outcome is not None and not outcome.skipped)
+            recoverable_skip = bool(outcome is not None and outcome.skipped)
             writer.writerow({**{k: summary[k] for k in fields if k in summary}, "samples": len(target),
-                             "optimizer_step_executed": stepped})
+                             "optimizer_update_executed": optimizer_updated, "recoverable_amp_skip": recoverable_skip,
+                             "optimizer_updates_total": step_counter.count,
+                             "consecutive_overflow_skips": consecutive_overflow_skips})
             log.flush()
-            print(f"B0 diagnostic batch={i} scale={summary['scale_before_unscale']} gate={summary['strict_gate_passed']} nonfinite={summary['nonfinite_parameters']} missing={summary['missing_gradient_parameters']}", flush=True)
-            if not stepped:
+            print(f"B0 diagnostic batch={i} scale={summary['scale_before_unscale']} gate={summary['strict_gate_passed']} "
+                  f"update={optimizer_updated} recoverable_skip={recoverable_skip} "
+                  f"nonfinite={summary['nonfinite_parameters']} missing={summary['missing_gradient_parameters']}", flush=True)
+            if outcome is None:
                 save_tensor(output / "exact_failed_batch_snapshot.pt", snapshot)
-                save_json(output / "FAILING_BATCH.json", {**trace, **summary, "actual_reproduction_optimizer_step_skipped_by_strict_gate": True,
-                          "successful_optimizer_steps_before_failure": i})
+                save_json(output / "FAILING_BATCH.json", {**trace, **summary,
+                          "actual_reproduction_optimizer_step_skipped_by_strict_gate": True,
+                          "successful_optimizer_steps_before_failure": step_counter.count,
+                          "optimizer_step_events_before_failure": optimizer_step_events,
+                          "consecutive_overflow_skips_before_failure": consecutive_overflow_skips})
+                step_counter.close()
                 model.cpu()
                 del model, optimizer, scaler
                 torch.cuda.empty_cache()
