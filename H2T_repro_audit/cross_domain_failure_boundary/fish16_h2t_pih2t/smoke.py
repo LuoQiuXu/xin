@@ -11,8 +11,10 @@ import json
 import math
 import os
 from pathlib import Path
+import platform
 import random
 import subprocess
+import sys
 import time
 import traceback
 
@@ -383,6 +385,14 @@ def run(output, batch):
     save_json(output / "run_manifest.json", {"scope": "SMOKE_ONLY_NO_FORMAL_TRAINING_AUTHORIZATION", "seed": 42,
               "head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=models.ROOT, text=True).strip(),
               "branch": BRANCH, "manifest_sha256": EXPECTED_SHA, "weight_sha256": models.ORIGINAL_SHA,
+              "environment": {
+                  "python_executable": sys.executable,
+                  "python_version": platform.python_version(),
+                  "torch": torch.__version__,
+                  "cuda_build": torch.version.cuda,
+                  "cudnn": torch.backends.cudnn.version(),
+                  "gpu": torch.cuda.get_device_name(0),
+              },
               "original_source_hashes": original_sources, "new_source_hashes": {p.name: models.sha(p) for p in Path(__file__).parent.glob("*.py")},
               "micro_batch": batch, "effective_batch": 16, "amp": True, "workers": 4,
               "stage1_epoch_budget_per_branch": 1, "stage2_epoch_budget_per_condition": 1,
