@@ -391,6 +391,8 @@ def run(output, batch):
               "train_transform": str(transform(True)), "validation_transform": str(transform(False)),
               "numeric_config": {"cudnn_deterministic": True, "benchmark": False, "cudnn_tf32": False, "matmul_tf32": False},
               "test_model_evaluations": 0, "class_groups": groups, "note": "BN frozen for Stage-II; differs from original shift_bn=True"})
+    execution_status["batch_smoke"] = "RUNNING"
+    write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     batch_smoke(rows, rec, donors, batch, output)
     execution_status["batch_smoke"] = "PASS"
     write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
