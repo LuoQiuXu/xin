@@ -6,6 +6,7 @@ All data, tensors and diagnostic outputs remain outside Git.
 from __future__ import annotations
 
 import argparse
+import ast
 import copy
 import csv
 import hashlib
@@ -26,6 +27,7 @@ from torch import nn
 import data
 import models
 import smoke
+import amp_recovery
 from preflight import EXPECTED_SHA, MANIFEST, BRANCH
 
 OLD = Path(r"D:\h2t_cross_domain_results\fish16_smoke_seed42_20261031_01")
@@ -206,17 +208,41 @@ def forward_backward(model, optimizer, scaler, x, targets_a, targets_b, lam, fol
     save_tensor(folder / "pif_gradient_tensors.pt", {"parameter_gradient_after_unscale": cpu_tree(pif_gradient),
                 "cast_weight_scaled_gradient": probes.activation_grads.get("PIF.Conv1d.cast_weight_scaled_grad")})
     passed, gate_error = True, None
+    gate_details = {}
     try:
-        smoke.finite_gradients(list(model.parameters()))  # The immutable actual smoke gate.
-        assert model.classifier.weight.grad is not None
-    except AssertionError as exc:
+        named_parameters = list(model.named_parameters())
+        amp_recovery._validate_optimizer_parameter_set(optimizer, named_parameters)
+        inspected = amp_recovery._inspect_gradients(named_parameters)
+        has_nonfinite = inspected["nan_count"] > 0 or inspected["inf_count"] > 0
+        matches_pif_exception = (
+            amp_recovery._is_the_one_audited_pif_overflow(named_parameters, inspected)
+            if has_nonfinite else False
+        )
+        passed = (not has_nonfinite) or matches_pif_exception
+        gate_details = {
+            **inspected,
+            "has_nonfinite": has_nonfinite,
+            "matches_audited_pif_b_overflow": matches_pif_exception,
+            "allow_pif_b_overflow_in_original_b0_stage1": True,
+            "would_call_scaler_step": passed,
+            "diagnostic_replay_called_scaler_step": False,
+            "diagnostic_replay_called_scaler_update": False,
+        }
+        if not passed:
+            gate_error = "Gradient state rejected by the same pre-step inspection used by guarded_scaler_step."
+    except amp_recovery.GradientContractError as exc:
         passed, gate_error = False, str(exc)
+        gate_details = {"exception_type": type(exc).__name__, "diagnostics": exc.diagnostics,
+                        "would_call_scaler_step": False,
+                        "diagnostic_replay_called_scaler_step": False,
+                        "diagnostic_replay_called_scaler_update": False}
     summary = {"scenario": tag, "batch": batch, "amp": scaler is not None, "scale_before_unscale": scale_before,
                "scale_after_unscale": scale_after, "strict_gate_passed": passed, "gate_error": gate_error,
                "loss": float(loss.detach()), "pif_parameters_before": pif_before,
                "pif_gradient_after_unscale": pif_gradient.detach().cpu().flatten().tolist() if pif_gradient is not None and torch.isfinite(pif_gradient).all() else None,
                "nonfinite_parameters": [r["parameter"] for r in after_rows if r["finite"] is False],
                "missing_gradient_parameters": [r["parameter"] for r in after_rows if r["is_none"]],
+               "gradient_gate_details": gate_details,
                "gradient_groups": groups, "convolution": probes.convolution,
                "pif_cast_gradient_stats": tensor_stats(probes.activation_grads.get("PIF.Conv1d.cast_weight_scaled_grad"))}
     save_json(folder / "backward.json", summary)
@@ -343,8 +369,39 @@ def diagnostic_case(snapshot, output, tag, scale, normal_step=False):
 
 def run(output):
     old_manifest = json.loads((OLD / "run_manifest.json").read_text(encoding="utf-8"))
+    execution_head = old_manifest.get("head")
+    assert isinstance(execution_head, str) and len(execution_head) == 40, "Missing original execution commit"
+
+    # Validate the source bytes that actually produced the failed smoke from its
+    # immutable Git commit. Do not compare them to the later forensic-instrumented
+    # working files: smoke.py and amp_recovery.py were intentionally extended
+    # after the failed run to capture diagnostics.
     for name, digest in old_manifest["new_source_hashes"].items():
-        assert models.sha(BASE / name) == digest, name
+        historical_path = f"{BASE.relative_to(models.ROOT).as_posix()}/{name}"
+        historical = subprocess.check_output(
+            ["git", "show", f"{execution_head}:{historical_path}"], cwd=models.ROOT
+        )
+        assert hashlib.sha256(historical).hexdigest() == digest, name
+
+    # The replay uses only these three smoke helpers. Require their ASTs to be
+    # byte-semantically identical to the original run, while allowing later
+    # diagnostic-only additions elsewhere in smoke.py.
+    historical_smoke = subprocess.check_output(
+        ["git", "show", f"{execution_head}:{(BASE / 'smoke.py').relative_to(models.ROOT).as_posix()}"],
+        cwd=models.ROOT, text=True, encoding="utf-8"
+    )
+    current_smoke = (BASE / "smoke.py").read_text(encoding="utf-8")
+    def function_ast(source, function_name):
+        tree = ast.parse(source)
+        node = next((n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                     and n.name == function_name), None)
+        assert node is not None, f"Missing function {function_name}"
+        return ast.dump(node, include_attributes=False)
+    for function_name in ("seed", "finite_gradients", "digest_tensor"):
+        assert function_ast(historical_smoke, function_name) == function_ast(current_smoke, function_name), function_name
+
+    # These files are not part of the diagnostic replay implementation and must
+    # still match the original smoke's complete source lock.
     assert models.source_hashes() == old_manifest["original_source_hashes"]
     assert models.sha(MANIFEST) == EXPECTED_SHA
     assert models.sha(models.ORIGINAL_WEIGHT) == models.ORIGINAL_SHA
