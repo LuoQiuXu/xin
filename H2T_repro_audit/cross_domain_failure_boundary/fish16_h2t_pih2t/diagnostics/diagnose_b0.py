@@ -315,9 +315,9 @@ def replay_until_failure(rows, order, output):
             # Freeze the forensic state after forward/backward/unscale and before
             # any optimizer step. BN running buffers have now seen this batch;
             # train-mode replay still uses batch statistics for its forward.
-            snapshot["model"] = cpu_tree(model.state_dict())
-            snapshot["optimizer"] = cpu_tree(optimizer.state_dict())
-            snapshot["scaler"] = cpu_tree(scaler.state_dict())
+            snapshot["model_state_after_forward_before_optimizer_step"] = cpu_tree(model.state_dict())
+            snapshot["optimizer_state_before_failed_step"] = cpu_tree(optimizer.state_dict())
+            snapshot["scaler_state_after_unscale_before_update"] = cpu_tree(scaler.state_dict())
             snapshot["rng_after_backward"] = rng_state()
             outcome, guarded_error = None, None
             if summary["strict_gate_passed"]:
@@ -374,13 +374,13 @@ def diagnostic_case(snapshot, output, tag, scale, normal_step=False):
     folder = output / tag
     folder.mkdir()
     model = models.FishModel(True)
-    model.load_state_dict(snapshot["model"], strict=True)
+    model.load_state_dict(snapshot["model_state_after_forward_before_optimizer_step"], strict=True)
     model.cuda().train()
-    optimizer = fresh_optimizer(model, snapshot["optimizer"])
+    optimizer = fresh_optimizer(model, snapshot["optimizer_state_before_failed_step"])
     optimizer.zero_grad(set_to_none=True)
     scaler = torch.amp.GradScaler("cuda", init_scale=float(scale)) if scale is not None else None
     if scaler:
-        scaler.load_state_dict({**snapshot["scaler"], "scale": float(scale)})
+        scaler.load_state_dict({**snapshot["scaler_state_after_unscale_before_update"], "scale": float(scale)})
     restore_rng(snapshot["rng_before_forward"])
     summary = forward_backward(model, optimizer, scaler, snapshot["mixed"].cuda(), snapshot["targets_a"].cuda(),
                                snapshot["targets_b"].cuda(), snapshot["lam"], folder, tag, snapshot["batch"])
