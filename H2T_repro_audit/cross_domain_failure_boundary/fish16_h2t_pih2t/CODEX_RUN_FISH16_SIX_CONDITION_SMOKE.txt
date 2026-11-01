@@ -92,6 +92,13 @@ SHA256 19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097
 Use the validated interpreter:
 D:\app\minicondaaa\envs\xiaoju\python.exe
 
+Expected validated runtime:
+- Python 3.12.12
+- PyTorch 2.14.1+cu132
+- CUDA build 13.2
+- cuDNN 92400
+- NVIDIA GeForce RTX 5070 Laptop GPU
+
 The runner itself checks the current branch, manifest SHA, official weight SHA,
 original H2T / PI-H2T source hashes, the existing CPU contract-test record, and
 the pinned validation/source-hash record. Do not weaken these checks.
@@ -107,6 +114,13 @@ Set:
 
 Create $TASKLOG only if it does not already exist. If it exists, use a new
 suffix. Keep all logs outside the repository.
+
+First verify the exact validated runtime and CUDA availability:
+
+  & $PY -B -X utf8 -c "import platform, torch; print(platform.python_version(), torch.__version__, torch.version.cuda, torch.backends.cudnn.version(), torch.cuda.get_device_name(0)); assert platform.python_version() == '3.12.12'; assert torch.__version__ == '2.14.1+cu132'; assert torch.version.cuda == '13.2'; assert torch.backends.cudnn.version() == 92400; assert torch.cuda.get_device_name(0) == 'NVIDIA GeForce RTX 5070 Laptop GPU'"
+
+If any assertion fails or CUDA is unavailable, STOP and report the actual
+environment. Do not install, upgrade, or downgrade packages.
 
 A. Syntax:
   & $PY -B -X utf8 -m py_compile \
