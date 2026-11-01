@@ -25,6 +25,11 @@ The code change on this branch adds:
 - B0-only failure JSON and an external tensor snapshot;
 - a bounded B0-only replay mode.
 
+Use ONLY the bounded mode in smoke.py described below. Do NOT run
+diagnostics/diagnose_b0.py: that separate utility includes multi-scale and FP32
+counterfactuals, which are outside this task's authorization. Do not run any
+scale/precision counterfactual, even on a disposable clone.
+
 The exact finite-gradient acceptance rule is NOT relaxed. The runner must still
 stop before optimizer.step for any unmatched NaN/Inf, missing gradient, or
 other contract violation. Do not lower the AMP scale, alter PIF initialization,
@@ -57,6 +62,11 @@ Run syntax checks on:
   H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\amp_recovery.py
   H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py
   H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_amp_recovery.py
+
+Also verify by source inspection that the forensic entry point calls
+save_b0_gradient_failure before re-raising, and that it writes the exact
+post-forward/pre-step model, optimizer, scaler, input, targets and gradient
+snapshot described below. Do not modify this code during the forensic run.
 
 Then run:
   & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
@@ -121,7 +131,10 @@ After the run, report:
 - whether the event is reproducible from the captured snapshot.
 
 If GRADIENT_FAILURE_SNAPSHOT.pt exists, perform exactly one read-only backward
-replay from that snapshot (no dataset access and no optimizer step):
+replay from that snapshot (no dataset access, no optimizer.step, no scaler.step,
+and no scaler.update). This replay must use the saved post-forward model state
+and the same original AMP scale; it is only a determinism check, not a
+counterfactual precision experiment:
 1. Instantiate models.FishModel(True), load
    model_state_after_forward_before_optimizer_step with strict=True, and set
    model.train().
