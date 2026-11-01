@@ -18,7 +18,7 @@ import traceback
 
 
 REPO = Path(__file__).resolve().parents[3]
-BRANCH = "experiment/fish16-h2t-pih2t-cross-domain-20261031"
+BRANCH = "experiment/fish16-six-condition-smoke-20261101"
 MANIFEST = Path(r"D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv")
 IMAGES = REPO / "data/fishRecognition_GT/fish_image"
 EXPECTED_SHA = "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30"
