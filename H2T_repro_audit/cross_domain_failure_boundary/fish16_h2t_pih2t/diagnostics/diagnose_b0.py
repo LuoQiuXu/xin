@@ -312,6 +312,13 @@ def replay_until_failure(rows, order, output):
             trace["historical_A0_same_stream_pixel_rng_lambda_matches"] = True
             save_json(folder / "batch_trace.json", trace)
             summary = forward_backward(model, optimizer, scaler, mixed, a, b, lam, folder, "original_amp_reproduction", i)
+            # Freeze the forensic state after forward/backward/unscale and before
+            # any optimizer step. BN running buffers have now seen this batch;
+            # train-mode replay still uses batch statistics for its forward.
+            snapshot["model"] = cpu_tree(model.state_dict())
+            snapshot["optimizer"] = cpu_tree(optimizer.state_dict())
+            snapshot["scaler"] = cpu_tree(scaler.state_dict())
+            snapshot["rng_after_backward"] = rng_state()
             outcome, guarded_error = None, None
             if summary["strict_gate_passed"]:
                 try:
