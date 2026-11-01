@@ -1,0 +1,209 @@
+{
+  "diagnostic_status": "COMPLETE_FAILURE_CAPTURED_AND_EXACTLY_REPRODUCED",
+  "runner_status": "FAILED_STOPPED",
+  "scope": "B0_ONLY_BOUNDED_FORENSIC_PLUS_ONE_SAVED_SCALE_BACKWARD",
+  "date": "2026-11-01",
+  "timezone": "Asia/Shanghai",
+  "branch": "experiment/fish16-six-condition-smoke-20261101",
+  "execution_commit": "794eabbb55167b616d4562a0d2b7c8e62a006f34",
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "preflight": {
+    "syntax_passed": 3,
+    "syntax_total": 3,
+    "amp_tests_passed": 12,
+    "amp_tests_total": 12,
+    "contract_tests_passed": 10,
+    "contract_tests_total": 10,
+    "diagnostic_tests_passed": 5,
+    "diagnostic_tests_total": 5,
+    "all_command_exit_codes_zero": true,
+    "snapshot_before_reraise_source_inspection": "PASS"
+  },
+  "external_output_directory": "D:\\h2t_cross_domain_results\\fish16_b0_gradient_forensic_seed42_20261101_01",
+  "external_log_directory": "D:\\h2t_cross_domain_results\\fish16_b0_forensic_preflight_20261101_01",
+  "configuration": {
+    "seed": 42,
+    "micro_batch": 16,
+    "effective_batch": 16,
+    "max_batches": 100,
+    "lr": 0.002,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "autocast_dtype": "torch.float16",
+    "initial_gradscaler_scale": 65536.0,
+    "numerical_flags": {
+      "cudnn_deterministic": true,
+      "benchmark": false,
+      "cudnn_tf32": false,
+      "matmul_tf32": false
+    },
+    "sampling_transforms_formula_initialization_unchanged": true
+  },
+  "actual_execution_status": {
+    "status": "FAILED_STOPPED",
+    "scope": "B0_GRADIENT_FORENSIC_ONLY",
+    "batch_smoke": "SKIPPED_FORENSIC_B0_ONLY",
+    "completed_conditions": [],
+    "stage1_completed": [],
+    "stage2_completed": [],
+    "current_condition": "B0",
+    "current_stage": "stage1",
+    "formal_training_started": false,
+    "test_evaluations": 0,
+    "additional_seeds_started": [],
+    "failure_type": "GradientContractError",
+    "failure_message": "Non-finite gradients do not match the single audited PIF b overflow."
+  },
+  "failure": {
+    "condition": "B0",
+    "stage": 1,
+    "batch_index": 13,
+    "batch_samples": 16,
+    "samples_completed_before_failed_batch": 208,
+    "attempted_optimizer_windows_before_failure": 13,
+    "failed_optimizer_window_number": 14,
+    "optimizer_updates_before_failure": 12,
+    "optimizer_updates_at_exception": 12,
+    "failed_optimizer_step_executed": false,
+    "scaler_step_called_for_rejected_window": false,
+    "scaler_update_called_for_rejected_window": false,
+    "loss_scale_before_unscale": 32768.0,
+    "loss_scale_after_unscale": 32768.0,
+    "loss": 2.4193460941314697,
+    "loss_finite": true,
+    "logits_finite": true,
+    "exception_type": "GradientContractError",
+    "exception_message": "Non-finite gradients do not match the single audited PIF b overflow."
+  },
+  "gradient_evidence": {
+    "optimizer_parameter_tensors": 162,
+    "missing_parameters": [],
+    "nonfinite_parameter_tensors": 1,
+    "all_other_parameter_tensors_finite": true,
+    "nonfinite_parameter_details": [
+      {
+        "name": "extractor.pif.fuse.weight",
+        "parameter_shape": [
+          1,
+          2,
+          1
+        ],
+        "gradient_shape": [
+          1,
+          2,
+          1
+        ],
+        "gradient_dtype": "torch.float32",
+        "nan_count": 0,
+        "positive_inf_count": 0,
+        "negative_inf_count": 1,
+        "nonfinite_count": 1,
+        "nonfinite_positions_first_64": [
+          [
+            0,
+            1,
+            0
+          ]
+        ],
+        "positions_truncated": false,
+        "finite_count": 1,
+        "finite_min": 0.03009033203125,
+        "finite_max": 0.03009033203125,
+        "finite_max_abs": 0.03009033203125,
+        "finite_l2": 0.03009033203125
+      }
+    ],
+    "pif_a": -0.02371477521955967,
+    "pif_b": -0.6391047835350037,
+    "full_pif_gradient_tensor_external_only": "B0/GRADIENT_FAILURE_SNAPSHOT.pt:nonfinite_or_pif_gradients",
+    "finite_pif_entries": {
+      "count": 1,
+      "min": 0.03009033203125,
+      "max": 0.03009033203125,
+      "max_abs": 0.03009033203125,
+      "l2_float64": 0.03009033203125
+    },
+    "matches_archived_positive_inf_event": false
+  },
+  "earlier_native_amp_event": {
+    "batch_index": 6,
+    "positive_inf_count": 1,
+    "nan_count": 0,
+    "scale_before": 65536.0,
+    "scale_after": 32768.0,
+    "optimizer_steps_before": 6,
+    "optimizer_steps_after": 6,
+    "parameters_unchanged": true,
+    "following_batch_real_update": 7,
+    "following_batch_scale_before": 32768.0
+  },
+  "rejected_window_native_skip_backoff_invoked": false,
+  "replay": {
+    "status": "EXACT_SAVED_EVENT_REPRODUCED",
+    "backward_invocations": 1,
+    "model_instances": 1,
+    "dataset_access": false,
+    "same_saved_scale": 32768.0,
+    "scale_before_unscale": 32768.0,
+    "scale_after_unscale": 32768.0,
+    "loss": 2.4193460941314697,
+    "loss_bitwise_equal": true,
+    "loss_abs_difference": 0.0,
+    "logits_bitwise_equal": true,
+    "logits_max_abs_difference": 0.0,
+    "exception_reproduced": {
+      "type": "GradientContractError",
+      "message": "Non-finite gradients do not match the single audited PIF b overflow."
+    },
+    "saved_gradient_bitwise_agreement": {
+      "extractor.pif.fuse.weight": {
+        "bitwise_equal": true,
+        "dtype_equal": true,
+        "shape_equal": true
+      }
+    },
+    "optimizer_step_calls": 0,
+    "scaler_step_calls": 0,
+    "scaler_update_calls": 0,
+    "parameters_unchanged": true,
+    "optimizer_state_unchanged": true,
+    "scaler_public_state_unchanged": true,
+    "different_fields": [],
+    "elapsed_seconds": 1.839757400099188,
+    "counterfactuals_run": 0
+  },
+  "snapshot_timing": {
+    "model": "after failed forward, before any failed-window optimizer step",
+    "optimizer": "before failed step",
+    "scaler": "after unscale, before update",
+    "replay_bn_note": "Train replay updates running buffers again; current-batch BN statistics determine its forward. Only parameters, optimizer and public scaler state are claimed unchanged."
+  },
+  "conclusions": {
+    "confirmed": "This B0-only run rejects one negative Inf at PIF b at batch13/scale32768; the saved event and exact exception reproduce in one same-scale backward.",
+    "unresolved": [
+      "The internal operation that first produced negative Inf is not isolated by this task.",
+      "No lower-scale or FP32 counterfactual was authorized, so their outcome for this batch is unknown.",
+      "The prior six-condition run saved no B0 batch/gradient details; its historical batch/sign cannot be backfilled from this later bounded run."
+    ],
+    "method_performance_inference_allowed": false
+  },
+  "protection": {
+    "protected_files_sha_size_mtime_unchanged": 38,
+    "original_source_hashes_unchanged": true,
+    "task_sources_unchanged": true,
+    "previous_six_condition_report_unchanged": true
+  },
+  "other_condition_runs": [],
+  "validation_evaluations": 0,
+  "test_evaluations": 0,
+  "formal_training_started": false,
+  "additional_seeds_started": [],
+  "decision": "STOP_FOR_SCIENTIFIC_REVIEW_NO_REPAIR_OR_ADDITIONAL_EXPERIMENTS"
+}
