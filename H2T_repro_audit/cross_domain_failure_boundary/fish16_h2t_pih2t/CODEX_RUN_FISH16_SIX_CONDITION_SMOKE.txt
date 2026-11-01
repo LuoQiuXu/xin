@@ -1,0 +1,323 @@
+CODEX TASK — RUN THE COMPLETE FISH4KNOWLEDGE-16 SIX-CONDITION SMOKE
+Date: 2026-11-01
+Repository: LuoQiuXu/xin
+Required branch: experiment/fish16-six-condition-smoke-20261101
+Scope: one complete smoke epoch for each of A0/A1/A2/B0/B1/B2; no formal training.
+
+======================================================================
+0. SCIENTIFIC PURPOSE — DO NOT EXPAND THE TASK
+======================================================================
+
+This is a cross-domain validation of the existing H2T / PI-H2T implementation
+on the already-audited Fish4Knowledge-16 primary subset.
+
+The one and only goal is to verify that all six matched conditions can execute
+through their complete one-epoch training paths:
+
+  A0: Plain ResNet50 Stage-I, one epoch
+  B0: PIF-ResNet50 Stage-I, one epoch
+  A1: A0 checkpoint -> cRT Stage-II, one epoch
+  A2: A0 checkpoint -> H2T Stage-II, one epoch
+  B1: B0 checkpoint -> cRT Stage-II, one epoch
+  B2: B0 checkpoint -> PI-H2TF Stage-II, one epoch
+
+The matched comparisons for later scientific analysis are A2 vs A1 and B2 vs B1.
+Do not compare only A2 vs B2 because PIF changes the Stage-I representation.
+
+This is a SMOKE ONLY. It is not a method-performance experiment. Validation
+metrics are diagnostic only. The TEST split must not be loaded or evaluated.
+
+Do not design or add any new loss, donor selector, channel selector, fusion
+rule, backbone, or training stage. Do not create another Gate 1 / Gate 2 / Gate 3.
+The separate 100-batch B0 runner and its instructions have intentionally been
+removed from this branch. The exact numerical diagnosis is already archived.
+
+======================================================================
+1. GIT SAFETY — MANDATORY
+======================================================================
+
+The new implementation branch already exists remotely. Do not create another
+branch and do not work on the previous branch.
+
+From the existing local repository:
+
+  git fetch origin
+  git status --short
+  git branch --show-current
+  git rev-parse HEAD
+  git rev-parse origin/experiment/fish16-six-condition-smoke-20261101
+
+If the worktree is dirty, STOP. Do not stash, reset, clean, overwrite, or
+silently carry unrelated changes.
+
+If clean and not on the required branch:
+- If the local branch exists, switch to it.
+- Otherwise create a local tracking branch from
+  origin/experiment/fish16-six-condition-smoke-20261101.
+
+If local is behind origin and clean, fast-forward only:
+  git pull --ff-only origin experiment/fish16-six-condition-smoke-20261101
+
+Do not force-push. Do not merge this branch into main. Do not modify the
+original H2T or PI-H2T source directories.
+
+Before running, verify:
+  git diff --check
+  git status --short
+
+======================================================================
+2. LOCKED EXPERIMENT INPUTS
+======================================================================
+
+Dataset: Fish4Knowledge FRGT, restricted primary subset only.
+Classes: 16.
+Images: 27,133.
+Independent tracking trajectories: 8,680.
+Train: 16,269 images / 5,208 trajectories.
+Validation: 5,396 images / 1,736 trajectories.
+Test: 5,468 images / 1,736 trajectories — DO NOT TOUCH.
+Train imbalance factor: 253.17.
+Head / Medium / Tail: 6 / 5 / 5 classes by training-frequency tertiles.
+Split seed: 42, trajectory-grouped, fixed manifest.
+
+Manifest path:
+D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv
+
+Image root:
+data\fishRecognition_GT\fish_image
+
+Official ImageNet ResNet50 weights:
+SHA256 19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097
+
+Use the validated interpreter:
+D:\app\minicondaaa\envs\xiaoju\python.exe
+
+The runner itself checks the current branch, manifest SHA, official weight SHA,
+original H2T / PI-H2T source hashes, the existing CPU contract-test record, and
+the pinned validation/source-hash record. Do not weaken these checks.
+
+======================================================================
+3. CPU VALIDATION — RUN BEFORE CUDA
+======================================================================
+
+Set:
+
+  $PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
+  $TASKLOG = "D:\h2t_cross_domain_results\fish16_smoke_preflight_20261101_01"
+
+Create $TASKLOG only if it does not already exist. If it exists, use a new
+suffix. Keep all logs outside the repository.
+
+A. Syntax:
+  & $PY -B -X utf8 -m py_compile \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\amp_recovery.py \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\models.py \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\data.py \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\preflight.py \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_amp_recovery.py \
+    H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_contract.py
+
+B. AMP recovery policy tests — expected 12/12:
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
+
+C. Existing model/data contract tests — expected 10/10:
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_contract.py" -v
+
+D. Existing numerical-diagnostic tests — expected 5/5:
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics -p "test_*.py" -v
+
+Persist the complete console output and exit codes under $TASKLOG. If syntax
+or any test fails, STOP before CUDA. Do not patch code ad hoc; report the exact
+failure for review.
+
+The old 10/10 CPU contract log referenced by smoke.py must remain present and
+unchanged at:
+D:\h2t_cross_domain_results\fish16_validation_seed42_20261031_01\CPU_TEST_RESULTS_FINAL.txt
+
+Also verify that ORIGINAL_SOURCE_HASHES.json exists in that same validation
+directory. Do not regenerate or overwrite either historical file.
+
+======================================================================
+4. RUN THE SIX-CONDITION SMOKE — ONE PASS ONLY
+======================================================================
+
+First use micro-batch 16 and effective batch 16.
+
+Output directory (must not already exist):
+D:\h2t_cross_domain_results\fish16_six_condition_smoke_seed42_20261101_01
+
+Run exactly:
+
+  & $PY -B -X utf8 -u H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py --output-dir "D:\h2t_cross_domain_results\fish16_six_condition_smoke_seed42_20261101_01" --micro-batch 16
+
+The smoke runner executes:
+1. one real Stage-II batch test for A1/A2/B1/B2 (these updates are discarded);
+2. one full Stage-I epoch for A0;
+3. one full Stage-I epoch for B0;
+4. one full Stage-II epoch each for A1/A2/B1/B2, initialized from the exact
+   corresponding A0/B0 smoke checkpoint.
+
+Every full epoch processes all 16,269 training/recipient samples. Stage-I A0
+and B0 must use exactly paired image views and MixUp controls. Stage-II methods
+must use the same recipient schedule; A2 and B2 must use the same donor schedule.
+Only validation is evaluated.
+
+Expected training configuration:
+- seed 42;
+- ResNet50, 224x224 input;
+- micro/effective batch 16;
+- FP16 autocast + GradScaler;
+- SGD momentum 0.9;
+- Stage-I first warmup LR 0.002, weight decay 1e-4;
+- Stage-II first LR 0.01, weight decay 5e-4;
+- 4 data-loader workers;
+- H2T rho=0.25;
+- PI-H2TF paper_theoretical_bounds, ratio_detach=True;
+- Stage-II extractor parameters and BN statistics frozen for all four conditions.
+
+The one-epoch smoke uses the first learning rate of the locked 90-epoch / 10-epoch
+schedule. Do not rescale the schedule to one epoch.
+
+----------------------------------------------------------------------
+4.1 KNOWN B0 AMP EVENT — EXACT HANDLING, NO ALGORITHM CHANGE
+----------------------------------------------------------------------
+
+The archived controlled diagnosis found one positive Inf in B0 Stage-I at:
+  extractor.pif.fuse.weight[0,1,0]
+
+At micro-batch 16, the archived replay is expected at zero-based batch 6:
+- forward logits and loss finite;
+- no missing gradients;
+- no NaNs;
+- exactly one positive Inf at the coordinate above;
+- native GradScaler skips optimizer.step and reduces scale 65536 -> 32768;
+- the next optimizer window performs a real optimizer update at scale 32768.
+
+amp_recovery.py implements this narrow fail-closed rule. It must not clamp,
+replace, clip, or manually zero gradients. It must not skip an arbitrary batch.
+Any other non-finite gradient, missing gradient, or unverified GradScaler event
+must stop the run.
+
+If micro-batch 16 completes without the exact single archived B0 event, the
+runner must fail rather than silently claim the archived replay occurred.
+
+----------------------------------------------------------------------
+4.2 ONLY ALLOWED RETRY
+----------------------------------------------------------------------
+
+If and only if the first run terminates with a genuine CUDA out-of-memory error:
+- preserve the complete first output directory;
+- start a fresh Python process;
+- use a new, nonexistent output directory with suffix _02;
+- rerun all six conditions from the beginning with micro-batch 8 and
+  gradient accumulation 2 (effective batch remains 16).
+
+At micro-batch 8, MixUp grouping differs from the archived batch-16 replay.
+Therefore no batch-6 overflow is required. Zero B0 skips is acceptable. If an
+overflow occurs, it must still be the exact single audited positive Inf at the
+PIF b coordinate, handled by native GradScaler and followed by a real update.
+
+Do not retry for NaN, a different Inf, missing gradients, data errors, assertion
+failures, source-hash mismatches, or any other error. Do not lower LR, change
+precision, change initialization, change sampling, or alter PIF/H2T/PI-H2TF.
+
+======================================================================
+5. PASS / FAIL DECISION
+======================================================================
+
+A PASS requires:
+- batch smoke passes for A1/A2/B1/B2;
+- A0 and B0 each complete one entire Stage-I epoch;
+- A1/A2/B1/B2 each complete one entire Stage-II epoch;
+- all 16,269 samples are processed in each full epoch;
+- actual optimizer update counts are recorded (not inferred from attempted
+  steps or planned epoch budgets);
+- exact recipient, donor, Stage-I view and MixUp pairing checks pass;
+- extractor/BN freeze checks pass for Stage-II;
+- the expected AMP policy is followed;
+- SMOKE_SUMMARY.json exists with PASS_SMOKE_ONLY;
+- ACTUAL_EXECUTION_STATUS.json says COMPLETE_SMOKE_ONLY and lists all six
+  completed conditions.
+
+run_manifest.json contains intended budgets only. It is not proof that any
+condition completed. Use ACTUAL_EXECUTION_STATUS.json, per-condition result.json,
+and SMOKE_SUMMARY.json as the execution evidence.
+
+If execution stops, preserve FAILURE.json and ACTUAL_EXECUTION_STATUS.json.
+Do not continue with the remaining conditions after a failure. Do not interpret
+partial results as a completed six-condition comparison.
+
+======================================================================
+6. COMPACT GITHUB REPORT — NO BULKY ARTIFACTS
+======================================================================
+
+After the smoke completes or stops, create one compact report directory on this
+same branch, matching the actual external run suffix:
+
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/results/six_condition_smoke_20261101_01/
+
+Include only:
+- SMOKE_RESULT.json — status, environment, commit, completed conditions, per-
+  condition samples, attempted optimizer steps, actual optimizer updates,
+  overflow skips, final loss, validation Overall/Macro/Head/Medium/Tail/Worst-
+  class metrics, elapsed time, peak allocated memory, and failure summary if any.
+- SMOKE_REPORT.md — concise protocol, actual execution table, pass/fail reason,
+  limitations, and explicit statement that no TEST or formal training ran.
+- OUTPUT_SHA256.csv — SHA256 and byte size for the external run manifest,
+  actual status, summary or failure JSON, and each per-condition result JSON
+  that exists.
+
+If the external output used suffix _02, use report directory
+six_condition_smoke_20261101_02 instead.
+
+Do NOT commit or upload:
+- images, masks, manifests, image paths, per-image hashes, sample-level IDs;
+- donor_pair_audit.csv, input_controls.json, sampling schedule arrays;
+- checkpoints, pretrained weights, tensors, optimizer/scaler states;
+- raw training logs or bulky outputs.
+
+Do not alter any prior diagnostic or smoke result. Commit and push only the
+compact report files to:
+experiment/fish16-six-condition-smoke-20261101
+
+If the remote branch advances, fetch and inspect before fast-forwarding. Never
+force-push. Do not merge or open a PR unless separately asked.
+
+======================================================================
+7. ABSOLUTE STOP CONDITIONS
+======================================================================
+
+After the six-condition smoke result/report, STOP.
+
+Do NOT:
+- run the formal Stage-I 90 epochs + Stage-II 10 epochs;
+- evaluate any TEST image or report test accuracy;
+- start seed 43 or 44;
+- tune hyperparameters from smoke validation metrics;
+- modify PIF/H2T/PI-H2TF formulas or initialization;
+- add another gate, diagnostic experiment, or module;
+- run the deleted standalone B0 Gate 1 runner;
+- upload data, checkpoints, weights, or raw logs.
+
+A successful smoke only authorizes a scientific review of the run. A separate
+decision is required before the seed-42 formal 90+10 pilot.
+
+======================================================================
+8. FINAL RESPONSE TO THE USER
+======================================================================
+
+Return:
+1. branch name and final commit SHA;
+2. exact Python / PyTorch / CUDA / cuDNN / GPU environment;
+3. syntax and CPU test counts with pass/fail;
+4. external output directory;
+5. ACTUAL_EXECUTION_STATUS.json result;
+6. for A0/B0/A1/A2/B1/B2: samples, attempted steps, actual updates, AMP skips,
+   train loss, validation metrics, runtime, peak allocated MiB;
+7. whether the exact B0 batch-6 AMP event occurred and its scale transition;
+8. path and commit SHA of the compact Git report;
+9. confirmation that no TEST evaluation, formal 90+10 training, or extra seeds ran.
+
+Do not claim success before the output files confirm it. Do not interpret the
+smoke metrics as a method-performance result. Stop for scientific review.
