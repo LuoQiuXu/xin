@@ -105,7 +105,7 @@ def gradient_failure_diagnostics(named_parameters):
         negative_inf_count = int(negative_inf_mask.sum().item())
         if nan_count or positive_inf_count or negative_inf_count:
             finite_values = gradient[finite_mask]
-            bad_positions = torch.nonzero(~finite_mask, as_tuple=False).cpu().tolist()
+            bad_positions = torch.nonzero(~finite_mask, as_tuple=False)[:64].cpu().tolist()
             summaries.append({
                 "name": name,
                 "parameter_shape": list(parameter.shape),
@@ -116,7 +116,7 @@ def gradient_failure_diagnostics(named_parameters):
                 "negative_inf_count": negative_inf_count,
                 "nonfinite_count": nan_count + positive_inf_count + negative_inf_count,
                 "nonfinite_positions_first_64": bad_positions[:64],
-                "positions_truncated": len(bad_positions) > 64,
+                "positions_truncated": nan_count + positive_inf_count + negative_inf_count > 64,
                 "finite_count": int(finite_mask.sum().item()),
                 "finite_min": float(finite_values.min().item()) if finite_values.numel() else None,
                 "finite_max": float(finite_values.max().item()) if finite_values.numel() else None,
@@ -149,8 +149,9 @@ def save_b0_gradient_failure(
         "optimizer_updates_before_failure": int(step_counter.count),
         "optimizer_step_events_before_failure": optimizer_step_events,
         "pif_parameters_at_failure": [
-            float(parameter.detach().cpu().item())
+            float(value)
             for parameter in model.extractor.pif.parameters()
+            for value in parameter.detach().cpu().reshape(-1).tolist()
         ],
         "batch_indices_external_only": item["index"].detach().cpu().tolist(),
         "batch_positions_external_only": item["position"].detach().cpu().tolist(),
@@ -368,6 +369,8 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                         "batch_control": row,
                         "mixup_lambda": mixup_context["lambda"] if mixup_context else None,
                         "pif_parameter_names": [n for n, _ in model.extractor.pif.named_parameters()],
+                        "failed_optimizer_step_executed": False,
+                        "scaler_step_or_update_called_for_rejected_window": False,
                     }
                     save_b0_gradient_failure(
                         folder, model=model, optimizer=opt, scaler=scaler,

@@ -119,6 +119,26 @@ After the run, report:
   for an unmatched event because the strict guard rejects before scaler.step);
 - whether the event is reproducible from the captured snapshot.
 
+If GRADIENT_FAILURE_SNAPSHOT.pt exists, perform exactly one read-only backward
+replay from that snapshot (no dataset access and no optimizer step):
+1. Instantiate models.FishModel(True), load
+   model_state_after_forward_before_optimizer_step with strict=True, and set
+   model.train().
+2. Recreate SGD over model.parameters() with LR 0.002, momentum 0.9,
+   weight_decay 1e-4; load optimizer_state_before_failed_step.
+3. Create the normal GradScaler and load scaler_state_after_unscale_before_update.
+4. Use the saved mixed_input, mixup_target_a, mixup_target_b and mixup_lambda.
+   Under CUDA FP16 autocast, recompute logits and the exact two-target MixUp CE.
+   Call scaler.scale(loss).backward() and scaler.unscale_(optimizer).
+5. Do NOT call scaler.step() or scaler.update(). Record replay loss/logit
+   agreement and all per-parameter missing/nonfinite gradient details.
+6. Compare replay with GRADIENT_FAILURE.json. If not identical, state exactly
+   which fields differ; do not broaden the exception to force agreement.
+
+The model snapshot is taken after the failed forward and before any optimizer
+step. In train mode, BatchNorm uses current-batch statistics, so its saved
+running buffers do not replace the current-batch forward statistics.
+
 Do not infer root cause from the exception message alone.
 
 Create a compact report folder:

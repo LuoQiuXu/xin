@@ -152,15 +152,15 @@ def _inspect_gradients(named_parameters):
         nans = torch.isnan(gradient)
         infs = torch.isinf(gradient)
         n_nan = int(nans.sum().item())
-        positions = torch.nonzero(infs, as_tuple=False).cpu().tolist()
-        n_inf = len(positions)
+        n_inf = int(infs.sum().item())
+        positions = torch.nonzero(infs, as_tuple=False)[:32].cpu().tolist()
         nan_count += n_nan
         inf_count += n_inf
 
         if n_nan or n_inf:
             positive_inf_count = int(torch.isposinf(gradient).sum().item())
             negative_inf_count = int(torch.isneginf(gradient).sum().item())
-            nan_positions = torch.nonzero(nans, as_tuple=False).cpu().tolist()
+            nan_positions = torch.nonzero(nans, as_tuple=False)[:32].cpu().tolist()
             nonfinite_parameters.append(name)
             nonfinite_positions[name] = positions
             if n_nan:
@@ -176,7 +176,7 @@ def _inspect_gradients(named_parameters):
                 "inf_positions": positions[:32],
                 "inf_positions_truncated": len(positions) > 32,
                 "nan_positions": nan_positions[:32],
-                "nan_positions_truncated": len(nan_positions) > 32,
+                "nan_positions_truncated": n_nan > 32,
             })
 
     if not any_nonzero:

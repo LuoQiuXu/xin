@@ -143,7 +143,7 @@ class AmpRecoveryTests(unittest.TestCase):
             )
         self.assertEqual(caught.exception.diagnostics["nan_count"], 1)
         self.assertEqual(caught.exception.diagnostics["inf_count"], 0)
-        self.assertEqual(caught.exception.diagnostics["nonfinite_parameters"], ["extractor.pif.fuse.weight"])
+        self.assertEqual(caught.exception.diagnostics["nonfinite_parameters"], ("extractor.pif.fuse.weight",))
         self.assertEqual(scaler.step_calls, 0)
         self.assertEqual(self.counter.count, 0)
 
@@ -176,7 +176,7 @@ class AmpRecoveryTests(unittest.TestCase):
                 allow_pif_b_overflow=True,
             )
         self.assertEqual(caught.exception.diagnostics["inf_count"], 1)
-        self.assertEqual(caught.exception.diagnostics["nonfinite_parameters"], ["extractor.pif.fuse.weight"])
+        self.assertEqual(caught.exception.diagnostics["nonfinite_parameters"], ("extractor.pif.fuse.weight",))
         self.assertEqual(caught.exception.diagnostics["expected_event"]["index"], [0, 1, 0])
         self.assertEqual(caught.exception.diagnostics["nonfinite_positions"]["extractor.pif.fuse.weight"], [[0, 0, 0]])
         self.assertEqual(scaler.step_calls, 0)
