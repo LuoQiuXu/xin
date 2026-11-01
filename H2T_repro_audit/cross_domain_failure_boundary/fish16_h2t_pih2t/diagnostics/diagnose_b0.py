@@ -312,23 +312,29 @@ def replay_until_failure(rows, order, output):
             trace["historical_A0_same_stream_pixel_rng_lambda_matches"] = True
             save_json(folder / "batch_trace.json", trace)
             summary = forward_backward(model, optimizer, scaler, mixed, a, b, lam, folder, "original_amp_reproduction", i)
-            outcome = None
+            outcome, guarded_error = None, None
             if summary["strict_gate_passed"]:
-                outcome = amp_recovery.guarded_scaler_step(
-                    optimizer=optimizer, scaler=scaler, named_parameters=list(model.named_parameters()),
-                    step_counter=step_counter, allow_pif_b_overflow=True,
-                    consecutive_overflow_skips=consecutive_overflow_skips,
-                    max_consecutive_overflow_skips=2,
-                )
-                if outcome.skipped:
+                try:
+                    outcome = amp_recovery.guarded_scaler_step(
+                        optimizer=optimizer, scaler=scaler, named_parameters=list(model.named_parameters()),
+                        step_counter=step_counter, allow_pif_b_overflow=True,
+                        consecutive_overflow_skips=consecutive_overflow_skips,
+                        max_consecutive_overflow_skips=2,
+                    )
+                except amp_recovery.GradientContractError as exc:
+                    guarded_error = {"type": type(exc).__name__, "message": str(exc),
+                                     "diagnostics": exc.diagnostics}
+                    summary["guarded_step_error"] = guarded_error
+                if outcome is not None and outcome.skipped:
                     consecutive_overflow_skips += 1
-                else:
+                elif outcome is not None:
                     consecutive_overflow_skips = 0
-                event = outcome.as_dict()
-                event.update({"batch": i, "optimizer_updates_total": step_counter.count,
-                              "consecutive_overflow_skips": consecutive_overflow_skips})
-                optimizer_step_events.append(event)
-                optimizer.zero_grad(set_to_none=True)
+                if outcome is not None:
+                    event = outcome.as_dict()
+                    event.update({"batch": i, "optimizer_updates_total": step_counter.count,
+                                  "consecutive_overflow_skips": consecutive_overflow_skips})
+                    optimizer_step_events.append(event)
+                    optimizer.zero_grad(set_to_none=True)
             optimizer_updated = bool(outcome is not None and not outcome.skipped)
             recoverable_skip = bool(outcome is not None and outcome.skipped)
             writer.writerow({**{k: summary[k] for k in fields if k in summary}, "samples": len(target),
@@ -345,12 +351,14 @@ def replay_until_failure(rows, order, output):
                           "actual_reproduction_optimizer_step_skipped_by_strict_gate": True,
                           "successful_optimizer_steps_before_failure": step_counter.count,
                           "optimizer_step_events_before_failure": optimizer_step_events,
-                          "consecutive_overflow_skips_before_failure": consecutive_overflow_skips})
+                          "consecutive_overflow_skips_before_failure": consecutive_overflow_skips,
+                          "guarded_step_error": guarded_error})
                 step_counter.close()
                 model.cpu()
                 del model, optimizer, scaler
                 torch.cuda.empty_cache()
                 return snapshot, summary
+    step_counter.close()
     model.cpu()
     return None, None
 
