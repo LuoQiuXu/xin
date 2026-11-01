@@ -25,7 +25,9 @@ from torch import nn
 import models
 from data import load_rows, schedules, Views, loader, transform
 from preflight import BRANCH, EXPECTED_SHA, MANIFEST
-from amp_recovery import OptimizerStepCounter, guarded_scaler_step, make_grad_scaler
+from amp_recovery import (
+    GradientContractError, OptimizerStepCounter, guarded_scaler_step, make_grad_scaler
+)
 
 VALIDATION = Path(r"D:\h2t_cross_domain_results\fish16_validation_seed42_20261031_01")
 
@@ -67,6 +69,125 @@ def finite_gradients(parameters):
     gradients = [p.grad for p in parameters if p.grad is not None]
     assert gradients and all(torch.isfinite(g).all() for g in gradients), "Nonfinite/missing gradients"
     assert any(g.abs().sum().item() > 0 for g in gradients), "All gradients zero"
+
+
+def cpu_tree(value):
+    """Copy nested optimizer/model state to CPU for a portable failure snapshot."""
+    if torch.is_tensor(value):
+        return value.detach().cpu().clone()
+    if isinstance(value, dict):
+        return {key: cpu_tree(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [cpu_tree(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(cpu_tree(item) for item in value)
+    return value
+
+
+def gradient_failure_diagnostics(named_parameters):
+    """Expensive per-parameter detail, called only after a rejected gradient window."""
+    summaries = []
+    missing = []
+    for name, parameter in named_parameters:
+        gradient = parameter.grad
+        if gradient is None:
+            missing.append(name)
+            continue
+        gradient = gradient.detach()
+        if gradient.is_sparse:
+            gradient = gradient.coalesce().values()
+        finite_mask = torch.isfinite(gradient)
+        nan_mask = torch.isnan(gradient)
+        positive_inf_mask = torch.isposinf(gradient)
+        negative_inf_mask = torch.isneginf(gradient)
+        nan_count = int(nan_mask.sum().item())
+        positive_inf_count = int(positive_inf_mask.sum().item())
+        negative_inf_count = int(negative_inf_mask.sum().item())
+        if nan_count or positive_inf_count or negative_inf_count:
+            finite_values = gradient[finite_mask]
+            bad_positions = torch.nonzero(~finite_mask, as_tuple=False).cpu().tolist()
+            summaries.append({
+                "name": name,
+                "parameter_shape": list(parameter.shape),
+                "gradient_shape": list(gradient.shape),
+                "gradient_dtype": str(gradient.dtype),
+                "nan_count": nan_count,
+                "positive_inf_count": positive_inf_count,
+                "negative_inf_count": negative_inf_count,
+                "nonfinite_count": nan_count + positive_inf_count + negative_inf_count,
+                "nonfinite_positions_first_64": bad_positions[:64],
+                "positions_truncated": len(bad_positions) > 64,
+                "finite_count": int(finite_mask.sum().item()),
+                "finite_min": float(finite_values.min().item()) if finite_values.numel() else None,
+                "finite_max": float(finite_values.max().item()) if finite_values.numel() else None,
+                "finite_max_abs": float(finite_values.abs().max().item()) if finite_values.numel() else None,
+                "finite_l2": float(torch.linalg.vector_norm(finite_values.float()).item()) if finite_values.numel() else None,
+            })
+    return {
+        "optimizer_parameter_count": len(named_parameters),
+        "missing_parameters": missing,
+        "nonfinite_parameters": summaries,
+        "all_present": not missing and len(named_parameters) > 0,
+        "all_finite": not missing and not summaries and len(named_parameters) > 0,
+    }
+
+
+def save_b0_gradient_failure(
+    folder, *, model, optimizer, scaler, named_parameters, step_counter,
+    failure_context, exception, mixed_input, target, logits, loss, mixup_context,
+    item, optimizer_step_events,
+):
+    """Persist the exact rejected B0 window locally before the process exits."""
+    torch.cuda.synchronize()
+    grad_summary = gradient_failure_diagnostics(named_parameters)
+    failure = {
+        **failure_context,
+        "exception_type": type(exception).__name__,
+        "exception_message": str(exception),
+        "guard_diagnostics": getattr(exception, "diagnostics", {}),
+        "gradient_diagnostics": grad_summary,
+        "optimizer_updates_before_failure": int(step_counter.count),
+        "optimizer_step_events_before_failure": optimizer_step_events,
+        "pif_parameters_at_failure": [
+            float(parameter.detach().cpu().item())
+            for parameter in model.extractor.pif.parameters()
+        ],
+        "batch_indices_external_only": item["index"].detach().cpu().tolist(),
+        "batch_positions_external_only": item["position"].detach().cpu().tolist(),
+    }
+    save_json(folder / "GRADIENT_FAILURE.json", failure)
+
+    nonfinite_gradients = {}
+    for name, parameter in named_parameters:
+        gradient = parameter.grad
+        if gradient is None:
+            continue
+        values = gradient.detach()
+        if values.is_sparse:
+            values = values.coalesce().values()
+        if not torch.isfinite(values).all() or name == "extractor.pif.fuse.weight":
+            nonfinite_gradients[name] = values.cpu().clone()
+
+    snapshot = {
+        "scope": "B0_STAGE1_GRADIENT_FAILURE_FORENSICS_ONLY",
+        "batch_index": failure_context["batch_index"],
+        "model_state_after_forward_before_optimizer_step": cpu_tree(model.state_dict()),
+        "optimizer_state_before_failed_step": cpu_tree(optimizer.state_dict()),
+        "scaler_state_after_unscale_before_update": cpu_tree(scaler.state_dict()),
+        "mixed_input": mixed_input.detach().cpu().clone(),
+        "original_target": target.detach().cpu().clone(),
+        "mixup_target_a": cpu_tree(mixup_context["target_a"]) if mixup_context else None,
+        "mixup_target_b": cpu_tree(mixup_context["target_b"]) if mixup_context else None,
+        "mixup_lambda": mixup_context["lambda"] if mixup_context else None,
+        "logits": logits.detach().float().cpu().clone(),
+        "loss": loss.detach().float().cpu().clone(),
+        "nonfinite_or_pif_gradients": nonfinite_gradients,
+        "cpu_rng_state": torch.get_rng_state().clone(),
+        "cuda_rng_states": [state.cpu().clone() for state in torch.cuda.get_rng_state_all()],
+    }
+    with (folder / "GRADIENT_FAILURE_SNAPSHOT.pt").open("xb") as handle:
+        torch.save(snapshot, handle)
+    print("B0_GRADIENT_FAILURE_SNAPSHOT_SAVED", flush=True)
 
 
 def metrics(logits, labels, groups):
@@ -135,7 +256,7 @@ def batch_smoke(rows, rec, donors, batch, output):
     print("REAL_BATCH_SMOKE_PASS_ALL_FOUR_CONDITIONS", flush=True)
 
 
-def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, val, out):
+def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, val, out, max_batches=None):
     seed()
     folder = out / name
     folder.mkdir(exist_ok=False)
@@ -175,13 +296,18 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     max_consecutive_overflow_skips = 0
     optimizer_step_events = []
     for i, item in enumerate(batches):
+        if max_batches is not None and i >= max_batches:
+            break
         target = item["label"].cuda(non_blocking=True)
+        mixup_context = None
         row = {"batch": i, "samples": len(target), "recipient_sha256": digest_tensor(item["recipient"]),
                "donor_sha256": digest_tensor(item["donor"]) if donors is not None else None}
         x = item["recipient"].cuda(non_blocking=True)
         if stage == 1:
             row["mixup_rng_sha256"] = digest_tensor(torch.get_rng_state())
             x, a, b, lam = models.methods.mixup_data(x, target, alpha=1.0)
+            mixup_context = {"target_a": a.detach().cpu().clone(),
+                             "target_b": b.detach().cpu().clone(), "lambda": float(lam)}
             row["mixup_lambda"] = float(lam)
             with torch.amp.autocast("cuda", dtype=torch.float16):
                 logits = model(x)
@@ -207,19 +333,52 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
         group_size = min(16, len(dataset)-group_start)
         scaler.scale(loss * len(target) / group_size).backward()
         if (i+1) % accumulation == 0 or i+1 == len(batches):
-            scaler.unscale_(opt)
-            assert model.classifier.weight.grad is not None
-            if stage == 2:
-                assert all(p.grad is None for p in model.extractor.parameters())
-            outcome = guarded_scaler_step(
-                optimizer=opt,
-                scaler=scaler,
-                named_parameters=named_optimizer_parameters,
-                step_counter=step_counter,
-                allow_pif_b_overflow=(stage == 1 and model.use_pif),
-                consecutive_overflow_skips=consecutive_overflow_skips,
-                max_consecutive_overflow_skips=2,
-            )
+            scale_before_unscale = float(scaler.get_scale())
+            try:
+                scaler.unscale_(opt)
+                assert model.classifier.weight.grad is not None
+                if stage == 2:
+                    assert all(p.grad is None for p in model.extractor.parameters())
+                outcome = guarded_scaler_step(
+                    optimizer=opt,
+                    scaler=scaler,
+                    named_parameters=named_optimizer_parameters,
+                    step_counter=step_counter,
+                    allow_pif_b_overflow=(stage == 1 and model.use_pif),
+                    consecutive_overflow_skips=consecutive_overflow_skips,
+                    max_consecutive_overflow_skips=2,
+                )
+            except GradientContractError as exc:
+                if name == "B0" and stage == 1:
+                    failure_context = {
+                        "condition": name,
+                        "stage": stage,
+                        "batch_index": i,
+                        "batch_start": group_start,
+                        "batch_end": i,
+                        "batch_samples": len(target),
+                        "samples_completed_before_failed_batch": samples,
+                        "attempted_optimizer_windows_before_failure": attempted_steps,
+                        "failed_optimizer_window_number": attempted_steps + 1,
+                        "loss_scale_before_unscale": scale_before_unscale,
+                        "loss_scale_after_unscale": float(scaler.get_scale()),
+                        "loss": float(loss.detach().float().item()),
+                        "loss_finite": bool(torch.isfinite(loss).item()),
+                        "logits_finite": bool(torch.isfinite(logits).all().item()),
+                        "batch_control": row,
+                        "mixup_lambda": mixup_context["lambda"] if mixup_context else None,
+                        "pif_parameter_names": [n for n, _ in model.extractor.pif.named_parameters()],
+                    }
+                    save_b0_gradient_failure(
+                        folder, model=model, optimizer=opt, scaler=scaler,
+                        named_parameters=named_optimizer_parameters, step_counter=step_counter,
+                        failure_context=failure_context, exception=exc,
+                        mixed_input=x, target=target, logits=logits, loss=loss,
+                        mixup_context=mixup_context, item=item,
+                        optimizer_step_events=optimizer_step_events,
+                    )
+                step_counter.close()
+                raise
             attempted_steps += 1
             gradient_audit_windows += 1
             if outcome.skipped:
@@ -250,6 +409,31 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     step_counter.close()
     torch.cuda.synchronize()
     duration = time.perf_counter()-start
+    if max_batches is not None:
+        partial = {
+            "condition": name,
+            "status": "BOUNDED_FORENSIC_WINDOW_COMPLETED_NO_FULL_EPOCH",
+            "stage": stage,
+            "batches_processed": len(controls),
+            "samples": samples,
+            "attempted_optimizer_steps": attempted_steps,
+            "optimizer_updates": updates,
+            "amp_overflow_skips": overflow_skips,
+            "loss_scale_final": float(scaler.get_scale()),
+            "train_loss_so_far": loss_sum / samples if samples else None,
+            "train_seconds": duration,
+            "peak_allocated_mib": torch.cuda.max_memory_allocated()/1024**2,
+            "note": "Partial B0 forensic window only; no validation, checkpoint, or six-condition completion claim.",
+        }
+        save_json(folder / "PARTIAL_FORENSIC_RESULT.json", partial)
+        save_json(folder / "optimizer_step_events.json", optimizer_step_events)
+        save_json(folder / "input_controls.json", controls)
+        cleanup(model)
+        del opt, scaler, model, batches
+        gc.collect()
+        torch.cuda.empty_cache()
+        return partial, controls
+
     expected_attempts = math.ceil(16269 / 16)
     assert samples == 16269 and attempted_steps == expected_attempts
     assert updates + overflow_skips == attempted_steps
@@ -337,10 +521,10 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     return result, controls
 
 
-def run(output, batch):
+def run(output, batch, forensic_b0_only=False, max_batches=100):
     execution_status = {
         "status": "RUNNING",
-        "scope": "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
+        "scope": "B0_GRADIENT_FORENSIC_ONLY" if forensic_b0_only else "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
         "batch_smoke": "NOT_RUN",
         "completed_conditions": [],
         "stage1_completed": [],
@@ -395,17 +579,37 @@ def run(output, batch):
               },
               "original_source_hashes": original_sources, "new_source_hashes": {p.name: models.sha(p) for p in Path(__file__).parent.glob("*.py")},
               "micro_batch": batch, "effective_batch": 16, "amp": True, "workers": 4,
-              "stage1_epoch_budget_per_branch": 1, "stage2_epoch_budget_per_condition": 1,
+              "stage1_epoch_budget_per_branch": 0 if forensic_b0_only else 1,
+              "stage2_epoch_budget_per_condition": 0 if forensic_b0_only else 1,
+              "forensic_b0_only": forensic_b0_only,
+              "forensic_max_batches": max_batches if forensic_b0_only else None,
               "actual_execution_status": "See ACTUAL_EXECUTION_STATUS.json; budgets are not completion evidence",
               "schedule_denominators": [90, 10],
               "train_transform": str(transform(True)), "validation_transform": str(transform(False)),
               "numeric_config": {"cudnn_deterministic": True, "benchmark": False, "cudnn_tf32": False, "matmul_tf32": False},
               "test_model_evaluations": 0, "class_groups": groups, "note": "BN frozen for Stage-II; differs from original shift_bn=True"})
-    execution_status["batch_smoke"] = "RUNNING"
-    write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
-    batch_smoke(rows, rec, donors, batch, output)
-    execution_status["batch_smoke"] = "PASS"
-    write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
+    if not forensic_b0_only:
+        execution_status["batch_smoke"] = "RUNNING"
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
+        batch_smoke(rows, rec, donors, batch, output)
+        execution_status["batch_smoke"] = "PASS"
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
+    else:
+        execution_status["batch_smoke"] = "SKIPPED_FORENSIC_B0_ONLY"
+        execution_status["current_condition"] = "B0"
+        execution_status["current_stage"] = "stage1"
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
+        forensic_result, _ = one_epoch(
+            "B0", models.FishModel(True), rows, stage1, None, "stage1", 1,
+            batch, groups, val, output, max_batches=max_batches,
+        )
+        execution_status["status"] = "B0_FORENSIC_WINDOW_COMPLETED_NO_FAILURE"
+        execution_status["current_condition"] = None
+        execution_status["current_stage"] = None
+        execution_status["forensic_result"] = forensic_result
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
+        return
+
     results, controls = {}, {}
     for name, pif in (("A0", False), ("B0", True)):
         execution_status["current_condition"] = name
@@ -455,13 +659,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--micro-batch", type=int, choices=(16, 8), default=16)
+    parser.add_argument("--forensic-b0-only", action="store_true",
+                        help="Run only a bounded B0 Stage-I gradient-forensics window; never the six-condition smoke.")
+    parser.add_argument("--max-batches", type=int, default=100,
+                        help="Maximum B0 batches for --forensic-b0-only (1..100).")
     args = parser.parse_args()
+    if args.forensic_b0_only:
+        assert args.micro_batch == 16, "B0 forensic replay is locked to micro-batch 16."
+        assert 1 <= args.max_batches <= 100, "--max-batches must be between 1 and 100."
     output = Path(args.output_dir).resolve()
     assert not output.is_relative_to(models.ROOT)
     output.mkdir(parents=True, exist_ok=False)
     started = time.time()
     try:
-        run(output, args.micro_batch)
+        run(output, args.micro_batch, forensic_b0_only=args.forensic_b0_only,
+            max_batches=args.max_batches)
     except Exception as exc:
         status_path = output / "ACTUAL_EXECUTION_STATUS.json"
         if status_path.is_file():
@@ -483,4 +695,7 @@ if __name__ == "__main__":
                   "completed_conditions": execution_status.get("completed_conditions", []),
                   "formal_training_started": False, "test_evaluations": 0})
         raise
-    print(f"SMOKE_COMPLETE_ONLY elapsed_seconds={time.time()-started:.2f}; FORMAL_TRAINING_NOT_STARTED", flush=True)
+    if args.forensic_b0_only:
+        print(f"B0_FORENSIC_WINDOW_COMPLETE elapsed_seconds={time.time()-started:.2f}; NO_FULL_SMOKE_OR_FORMAL_TRAINING", flush=True)
+    else:
+        print(f"SMOKE_COMPLETE_ONLY elapsed_seconds={time.time()-started:.2f}; FORMAL_TRAINING_NOT_STARTED", flush=True)

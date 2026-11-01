@@ -16,7 +16,14 @@ PIF_B_INDEX = (0, 1, 0)
 
 
 class GradientContractError(RuntimeError):
-    """A gradient state is outside the explicitly audited AMP-overflow case."""
+    """A gradient state is outside the explicitly audited AMP-overflow case.
+
+    diagnostics is a small, JSON-serializable description of the rejected state.
+    Attaching it never changes the fail-closed decision.
+    """
+    def __init__(self, message, diagnostics=None):
+        super().__init__(message)
+        self.diagnostics = diagnostics or {}
 
 
 @dataclass(frozen=True)
@@ -117,13 +124,22 @@ def _inspect_gradients(named_parameters):
     missing = [name for name, parameter in named_parameters if parameter.grad is None]
     if missing:
         raise GradientContractError(
-            "Missing gradients are never recoverable: " + ", ".join(missing[:20])
+            "Missing gradients are never recoverable: " + ", ".join(missing[:20]),
+            diagnostics={
+                "missing_parameters": missing,
+                "nan_count": 0,
+                "inf_count": 0,
+                "nonfinite_parameters": [],
+                "nonfinite_positions": {},
+                "nonfinite_details": [],
+            },
         )
 
     nan_count = 0
     inf_count = 0
     nonfinite_positions = {}
     nonfinite_parameters = []
+    nonfinite_details = []
     any_nonzero = False
 
     for name, parameter in named_parameters:
@@ -142,19 +158,47 @@ def _inspect_gradients(named_parameters):
         inf_count += n_inf
 
         if n_nan or n_inf:
+            positive_inf_count = int(torch.isposinf(gradient).sum().item())
+            negative_inf_count = int(torch.isneginf(gradient).sum().item())
+            nan_positions = torch.nonzero(nans, as_tuple=False).cpu().tolist()
             nonfinite_parameters.append(name)
             nonfinite_positions[name] = positions
             if n_nan:
                 nonfinite_positions[name + "::nan_count"] = n_nan
+            nonfinite_details.append({
+                "name": name,
+                "shape": list(parameter.shape),
+                "gradient_dtype": str(gradient.dtype),
+                "nan_count": n_nan,
+                "positive_inf_count": positive_inf_count,
+                "negative_inf_count": negative_inf_count,
+                "inf_count": n_inf,
+                "inf_positions": positions[:32],
+                "inf_positions_truncated": len(positions) > 32,
+                "nan_positions": nan_positions[:32],
+                "nan_positions_truncated": len(nan_positions) > 32,
+            })
 
     if not any_nonzero:
-        raise GradientContractError("All optimizer gradients are zero.")
+        raise GradientContractError(
+            "All optimizer gradients are zero.",
+            diagnostics={
+                "missing_parameters": [],
+                "nan_count": nan_count,
+                "inf_count": inf_count,
+                "nonfinite_parameters": sorted(nonfinite_parameters),
+                "nonfinite_positions": nonfinite_positions,
+                "nonfinite_details": nonfinite_details,
+            },
+        )
 
     return {
+        "missing_parameters": [],
         "nan_count": nan_count,
         "inf_count": inf_count,
         "nonfinite_parameters": tuple(sorted(nonfinite_parameters)),
         "nonfinite_positions": nonfinite_positions,
+        "nonfinite_details": nonfinite_details,
     }
 
 
@@ -206,7 +250,20 @@ def guarded_scaler_step(
             )
         if not _is_the_one_audited_pif_overflow(named_parameters, diagnostics):
             raise GradientContractError(
-                "Non-finite gradients do not match the single audited PIF b overflow."
+                "Non-finite gradients do not match the single audited PIF b overflow.",
+                diagnostics={
+                    **diagnostics,
+                    "expected_event": {
+                        "parameter": PIF_B_PARAMETER,
+                        "shape": list(PIF_B_SHAPE),
+                        "index": list(PIF_B_INDEX),
+                        "sign": "positive_inf",
+                        "nan_count": 0,
+                        "inf_count": 1,
+                    },
+                    "allow_pif_b_overflow": True,
+                    "matches_audited_event": False,
+                },
             )
         if not callable(getattr(scaler, "is_enabled", None)) or not scaler.is_enabled():
             raise GradientContractError(

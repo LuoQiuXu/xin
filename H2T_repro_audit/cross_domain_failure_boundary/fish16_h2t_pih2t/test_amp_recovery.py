@@ -133,7 +133,7 @@ class AmpRecoveryTests(unittest.TestCase):
         model.extractor.pif.fuse.weight.grad[0, 1, 0] = float("nan")
         scaler = FakeScaler()
 
-        with self.assertRaises(GradientContractError):
+        with self.assertRaises(GradientContractError) as caught:
             guarded_scaler_step(
                 optimizer=optimizer,
                 scaler=scaler,
@@ -141,6 +141,9 @@ class AmpRecoveryTests(unittest.TestCase):
                 step_counter=self.counter,
                 allow_pif_b_overflow=True,
             )
+        self.assertEqual(caught.exception.diagnostics["nan_count"], 1)
+        self.assertEqual(caught.exception.diagnostics["inf_count"], 0)
+        self.assertEqual(caught.exception.diagnostics["nonfinite_parameters"], ["extractor.pif.fuse.weight"])
         self.assertEqual(scaler.step_calls, 0)
         self.assertEqual(self.counter.count, 0)
 
@@ -164,7 +167,7 @@ class AmpRecoveryTests(unittest.TestCase):
         model.extractor.pif.fuse.weight.grad[0, 0, 0] = float("inf")
         scaler = FakeScaler()
 
-        with self.assertRaises(GradientContractError):
+        with self.assertRaises(GradientContractError) as caught:
             guarded_scaler_step(
                 optimizer=optimizer,
                 scaler=scaler,
@@ -172,6 +175,10 @@ class AmpRecoveryTests(unittest.TestCase):
                 step_counter=self.counter,
                 allow_pif_b_overflow=True,
             )
+        self.assertEqual(caught.exception.diagnostics["inf_count"], 1)
+        self.assertEqual(caught.exception.diagnostics["nonfinite_parameters"], ["extractor.pif.fuse.weight"])
+        self.assertEqual(caught.exception.diagnostics["expected_event"]["index"], [0, 1, 0])
+        self.assertEqual(caught.exception.diagnostics["nonfinite_positions"]["extractor.pif.fuse.weight"], [[0, 0, 0]])
         self.assertEqual(scaler.step_calls, 0)
 
     def test_negative_inf_at_pif_b_is_not_the_archived_event(self):

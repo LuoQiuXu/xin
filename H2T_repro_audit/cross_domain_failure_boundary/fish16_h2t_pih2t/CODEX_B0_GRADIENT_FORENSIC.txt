@@ -1,0 +1,152 @@
+CODEX TASK — B0 GRADIENT FORENSICS ONLY (NO SIX-CONDITION RERUN)
+Date: 2026-11-01
+Repository: LuoQiuXu/xin
+Required branch: experiment/fish16-six-condition-smoke-20261101
+Purpose: capture the exact B0 gradient event that stopped the prior smoke.
+This task is diagnostic only. It does not authorize the full smoke or formal training.
+
+======================================================================
+0. SCIENTIFIC DECISION — DO NOT CHANGE THE ALGORITHM
+======================================================================
+
+The previous six-condition smoke completed A0 only. B0 stopped with:
+
+  GradientContractError:
+  Non-finite gradients do not match the single audited PIF b overflow.
+
+The previous controlled diagnosis established one specific event at zero-based
+batch 6: one positive Inf at extractor.pif.fuse.weight[0,1,0] under AMP scale
+65536, with finite gradients at lower scales. However, the latest full smoke
+did not persist the actual rejected gradient pattern, batch index, or scale.
+Do NOT assume that the latest event was the same historical event.
+
+The code change on this branch adds:
+- structured diagnostics to GradientContractError;
+- B0-only failure JSON and an external tensor snapshot;
+- a bounded B0-only replay mode.
+
+The exact finite-gradient acceptance rule is NOT relaxed. The runner must still
+stop before optimizer.step for any unmatched NaN/Inf, missing gradient, or
+other contract violation. Do not lower the AMP scale, alter PIF initialization,
+change formulas, cast modules to FP32, clip/replace gradients, or skip batches.
+
+======================================================================
+1. GIT SAFETY
+======================================================================
+
+Run:
+  git fetch origin
+  git status --short
+  git branch --show-current
+  git rev-parse HEAD
+  git rev-parse origin/experiment/fish16-six-condition-smoke-20261101
+
+The worktree must be clean. Use exactly the required branch. If clean and
+behind, fast-forward only. Never reset, stash, clean, force-push, or create a
+different branch. Do not modify the original H2T/PI-H2T source directories.
+Do not overwrite the previous smoke result directory or compact Git report.
+
+======================================================================
+2. CPU VALIDATION BEFORE CUDA
+======================================================================
+
+Use:
+  $PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
+
+Run syntax checks on:
+  H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\amp_recovery.py
+  H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py
+  H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_amp_recovery.py
+
+Then run:
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_contract.py" -v
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics -p "test_*.py" -v
+
+Expected: AMP recovery tests 12/12, model/data contract 10/10, diagnostic tests 5/5.
+All commands must exit 0. Preserve complete logs and exit codes in a NEW directory
+under D:\h2t_cross_domain_results. If any check fails, stop before CUDA.
+
+Verify the exact previously validated Python/PyTorch/CUDA/cuDNN/GPU environment
+as recorded in the prior smoke report. Do not install or change packages.
+
+======================================================================
+3. ONE B0-ONLY FORENSIC WINDOW
+======================================================================
+
+Use a new, nonexistent external output directory:
+  D:\h2t_cross_domain_results\fish16_b0_gradient_forensic_seed42_20261101_01
+
+Run exactly:
+  & $PY -B -X utf8 -u H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py --output-dir "D:\h2t_cross_domain_results\fish16_b0_gradient_forensic_seed42_20261101_01" --micro-batch 16 --forensic-b0-only --max-batches 100
+
+This path must:
+- use seed 42, the locked Fish16 manifest/schedule, the official 19c8e357 weights;
+- instantiate only the PIF Stage-I B0 model;
+- reproduce the Stage-I first-warmup configuration (LR 0.002, SGD momentum 0.9,
+  weight decay 1e-4, AMP FP16, GradScaler initial scale 65536, micro/effective batch 16);
+- process at most the first 100 B0 training batches;
+- stop at the first rejected gradient window;
+- persist GRADIENT_FAILURE.json and GRADIENT_FAILURE_SNAPSHOT.pt before exit;
+- if no failure occurs in 100 batches, persist PARTIAL_FORENSIC_RESULT.json and stop.
+
+The snapshot is local/external only. It should include the post-forward model
+state before the failed optimizer update, optimizer/scaler state, exact mixed
+input and targets, logits/loss, CPU/CUDA RNG states, the nonfinite gradient
+tensors, gradient summaries, scale before/after unscale, batch index, actual
+optimizer updates before failure, and prior optimizer-step events.
+
+This run is NOT a six-condition smoke. Do not run A0, A1, A2, B1, or B2.
+Do not run validation or TEST. Do not start the remaining epoch conditions.
+Do not retry at micro-batch 8. If this forensic run fails for any other reason,
+preserve the evidence and stop.
+
+======================================================================
+4. REQUIRED ANALYSIS OUTPUT
+======================================================================
+
+After the run, report:
+- exact failing batch index and samples completed before it;
+- GradScaler scale before and after unscale;
+- optimizer updates before failure and whether the failed step executed;
+- every missing-gradient parameter;
+- every nonfinite-gradient parameter, shape, dtype, NaN count, +Inf count,
+  -Inf count, and coordinates;
+- PIF a/b values and PIF gradient tensor;
+- finite-gradient ranges/norms for the PIF tensor's finite entries;
+- whether the event exactly matches the archived positive Inf at PIF b;
+- whether the actual GradScaler skip/backoff was invoked (it should NOT be invoked
+  for an unmatched event because the strict guard rejects before scaler.step);
+- whether the event is reproducible from the captured snapshot.
+
+Do not infer root cause from the exception message alone.
+
+Create a compact report folder:
+  H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics\results\b0_failure_forensic_20261101_01
+
+Commit only:
+- B0_FORENSIC_RESULT.json (compact summary, no sample IDs or raw tensor data);
+- B0_FORENSIC_REPORT.md (findings, exact evidence, unknowns, and decision);
+- OUTPUT_SHA256.csv (hash/size of external forensic JSON and snapshot files).
+
+Never commit GRADIENT_FAILURE_SNAPSHOT.pt, checkpoints, images, sample IDs,
+raw logs, optimizer states, full gradients, manifests, or any data-derived
+per-image artifacts. Preserve the prior six-condition report unchanged.
+
+After the compact report is committed, stop and wait for scientific review.
+
+======================================================================
+5. ABSOLUTE PROHIBITIONS
+======================================================================
+
+Do NOT:
+- rerun the six-condition smoke;
+- lower the GradScaler scale or change precision;
+- loosen the finite-gradient gate or accept other Inf/NaN patterns;
+- alter PIF/H2T/PI-H2TF formulas, initialization, sampler, donor schedule,
+  backbone, loss, optimizer, learning rate, or data transforms;
+- run full 90+10 training, validation comparisons, TEST, or seeds 43/44;
+- create another branch or change the required branch;
+- overwrite historical results or upload raw/bulky artifacts.
+
+The only purpose is to establish what the latest B0 run actually encountered.
