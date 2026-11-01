@@ -33,6 +33,17 @@ def save_json(path, value):
         json.dump(value, f, ensure_ascii=False, indent=2)
 
 
+def write_json(path, value):
+    """Atomically update the small execution-status record in a fresh run dir."""
+    path = Path(path)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("w", encoding="utf-8") as f:
+        json.dump(value, f, ensure_ascii=False, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    temporary.replace(path)
+
+
 def digest_tensor(tensor):
     return hashlib.sha256(tensor.detach().cpu().contiguous().numpy().tobytes()).hexdigest()
 
@@ -245,20 +256,32 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     if not (stage == 1 and model.use_pif):
         assert overflow_skips == 0, "Unexpected AMP overflow outside B0 PIF Stage-I"
     else:
-        first_skip_index = next(
-            (i for i, row in enumerate(optimizer_step_events)
-             if row["kind"] == "recoverable_pif_b_overflow_skip"),
-            None,
-        )
-        assert first_skip_index is not None, "Expected B0 PIF overflow was not reproduced"
-        first_skip = optimizer_step_events[first_skip_index]
+        skip_indices = [
+            i for i, row in enumerate(optimizer_step_events)
+            if row["kind"] == "recoverable_pif_b_overflow_skip"
+        ]
+        # At micro-batch 16, the archived deterministic replay is exact:
+        # one positive Inf at batch 6, native GradScaler backoff, then batch 7 steps.
         if batch == 16:
+            assert len(skip_indices) == 1, (
+                f"Expected exactly one archived B0 overflow, observed {len(skip_indices)}"
+            )
+            first_skip = optimizer_step_events[skip_indices[0]]
             assert first_skip["batch_end"] == 6, "B0 overflow moved away from archived batch 6"
             assert first_skip["scale_before"] == 65536.0 and first_skip["scale_after"] == 32768.0
-        assert first_skip_index + 1 < len(optimizer_step_events), "No optimizer window after the overflow"
-        next_step = optimizer_step_events[first_skip_index + 1]
-        assert next_step["kind"] == "optimizer_step", "No successful optimizer step after overflow"
-        assert next_step["scale_before"] == first_skip["scale_after"]
+        # At micro-batch 8 with accumulation=2, MixUp grouping differs from the
+        # archived batch-16 replay. No overflow is required; any observed skip
+        # must still be the exact audited PIF-b event and must be followed by
+        # a real optimizer update at the reduced scale.
+        for skip_index in skip_indices:
+            assert skip_index + 1 < len(optimizer_step_events), (
+                "No optimizer window after a recoverable B0 overflow"
+            )
+            next_step = optimizer_step_events[skip_index + 1]
+            assert next_step["kind"] == "optimizer_step", (
+                "No successful optimizer step after the B0 overflow"
+            )
+            assert next_step["scale_before"] == optimizer_step_events[skip_index]["scale_after"]
     save_json(folder / "optimizer_step_events.json", optimizer_step_events)
     if stage == 2:
         assert before_extractor == models.state_sha(model.extractor), "Extractor or BN mutated"
@@ -313,6 +336,18 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
 
 
 def run(output, batch):
+    execution_status = {
+        "status": "RUNNING",
+        "scope": "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
+        "batch_smoke": "NOT_RUN",
+        "completed_conditions": [],
+        "stage1_completed": [],
+        "stage2_completed": [],
+        "formal_training_started": False,
+        "test_evaluations": 0,
+        "additional_seeds_started": [],
+    }
+    write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     assert torch.cuda.is_available()
     assert models.sha(models.ORIGINAL_WEIGHT) == models.ORIGINAL_SHA
     assert subprocess.check_output(["git", "branch", "--show-current"], cwd=models.ROOT, text=True).strip() == BRANCH
@@ -348,14 +383,21 @@ def run(output, batch):
               "branch": BRANCH, "manifest_sha256": EXPECTED_SHA, "weight_sha256": models.ORIGINAL_SHA,
               "original_source_hashes": original_sources, "new_source_hashes": {p.name: models.sha(p) for p in Path(__file__).parent.glob("*.py")},
               "micro_batch": batch, "effective_batch": 16, "amp": True, "workers": 4,
-              "stage1_epochs_executed": 1, "stage2_epochs_executed": 1, "schedule_denominators": [90, 10],
+              "stage1_epoch_budget_per_branch": 1, "stage2_epoch_budget_per_condition": 1,
+              "actual_execution_status": "See ACTUAL_EXECUTION_STATUS.json; budgets are not completion evidence",
+              "schedule_denominators": [90, 10],
               "train_transform": str(transform(True)), "validation_transform": str(transform(False)),
               "numeric_config": {"cudnn_deterministic": True, "benchmark": False, "cudnn_tf32": False, "matmul_tf32": False},
               "test_model_evaluations": 0, "class_groups": groups, "note": "BN frozen for Stage-II; differs from original shift_bn=True"})
     batch_smoke(rows, rec, donors, batch, output)
+    execution_status["batch_smoke"] = "PASS"
+    write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     results, controls = {}, {}
     for name, pif in (("A0", False), ("B0", True)):
         results[name], controls[name] = one_epoch(name, models.FishModel(pif), rows, stage1, None, "stage1", 1, batch, groups, val, output)
+        execution_status["completed_conditions"].append(name)
+        execution_status["stage1_completed"].append(name)
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     for key in ("recipient_sha256", "mixup_rng_sha256", "mixup_lambda"):
         assert [r[key] for r in controls["A0"]] == [r[key] for r in controls["B0"]], key
     for name, source, mode in (("A1", "A0", "crt"), ("A2", "A0", "h2t"), ("B1", "B0", "crt"), ("B2", "B0", "pi")):
@@ -364,6 +406,9 @@ def run(output, batch):
         assert state["smoke_only"] and state["seed"] == 42
         model.load_state_dict(state["model"], strict=True)
         results[name], controls[name] = one_epoch(name, model, rows, rec, donors if mode != "crt" else None, mode, 2, batch, groups, val, output)
+        execution_status["completed_conditions"].append(name)
+        execution_status["stage2_completed"].append(name)
+        write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     assert all([r["recipient_sha256"] for r in controls[n]] == [r["recipient_sha256"] for r in controls["A1"]] for n in ("A2", "B1", "B2"))
     assert [r["donor_sha256"] for r in controls["A2"]] == [r["donor_sha256"] for r in controls["B2"]]
     assert results["A1"]["extractor_initial_sha256"] == results["A2"]["extractor_initial_sha256"]
@@ -375,7 +420,11 @@ def run(output, batch):
     save_json(output / "SMOKE_SUMMARY.json", {"status": "PASS_SMOKE_ONLY", "results": results,
               "all_recipient_views_exactly_paired": True, "fusion_donor_views_exactly_paired": True,
               "stage1_mixup_and_views_exactly_paired": True, "source_initializations_matched": True,
+              "completed_conditions": execution_status["completed_conditions"],
               "formal_training_started": False, "test_evaluations": 0, "additional_seeds": []})
+    execution_status["status"] = "COMPLETE_SMOKE_ONLY"
+    execution_status["completed_conditions"] = list(execution_status["completed_conditions"])
+    write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
 
 
 if __name__ == "__main__":
@@ -390,7 +439,24 @@ if __name__ == "__main__":
     try:
         run(output, args.micro_batch)
     except Exception as exc:
-        save_json(output / "FAILURE.json", {"error_type": type(exc).__name__, "traceback": traceback.format_exc(),
-                  "scope": "SMOKE_ONLY", "elapsed_seconds": time.time()-started, "formal_training_started": False})
+        status_path = output / "ACTUAL_EXECUTION_STATUS.json"
+        if status_path.is_file():
+            execution_status = json.loads(status_path.read_text(encoding="utf-8"))
+        else:
+            execution_status = {
+                "scope": "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
+                "completed_conditions": [],
+                "stage1_completed": [],
+                "stage2_completed": [],
+            }
+        execution_status["status"] = "FAILED_STOPPED"
+        execution_status["failure_type"] = type(exc).__name__
+        execution_status["failure_message"] = str(exc)
+        write_json(status_path, execution_status)
+        save_json(output / "FAILURE.json", {"error_type": type(exc).__name__, "error": str(exc),
+                  "traceback": traceback.format_exc(), "scope": "SMOKE_ONLY",
+                  "elapsed_seconds": time.time()-started,
+                  "completed_conditions": execution_status.get("completed_conditions", []),
+                  "formal_training_started": False, "test_evaluations": 0})
         raise
     print(f"SMOKE_COMPLETE_ONLY elapsed_seconds={time.time()-started:.2f}; FORMAL_TRAINING_NOT_STARTED", flush=True)
