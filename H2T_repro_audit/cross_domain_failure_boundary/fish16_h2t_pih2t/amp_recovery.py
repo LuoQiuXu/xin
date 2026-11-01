@@ -132,6 +132,8 @@ def _inspect_gradients(named_parameters):
                 "nonfinite_parameters": [],
                 "nonfinite_positions": {},
                 "nonfinite_details": [],
+                "scaler_step_called": False,
+                "scaler_update_called": False,
             },
         )
 
@@ -189,6 +191,8 @@ def _inspect_gradients(named_parameters):
                 "nonfinite_parameters": sorted(nonfinite_parameters),
                 "nonfinite_positions": nonfinite_positions,
                 "nonfinite_details": nonfinite_details,
+                "scaler_step_called": False,
+                "scaler_update_called": False,
             },
         )
 
@@ -246,7 +250,8 @@ def guarded_scaler_step(
         if not allow_pif_b_overflow:
             raise GradientContractError(
                 "Non-finite gradients are not permitted for this condition: "
-                + ", ".join(diagnostics["nonfinite_parameters"])
+                + ", ".join(diagnostics["nonfinite_parameters"]),
+                diagnostics={**diagnostics, "scaler_step_called": False, "scaler_update_called": False},
             )
         if not _is_the_one_audited_pif_overflow(named_parameters, diagnostics):
             raise GradientContractError(
@@ -263,20 +268,27 @@ def guarded_scaler_step(
                     },
                     "allow_pif_b_overflow": True,
                     "matches_audited_event": False,
+                    "scaler_step_called": False,
+                    "scaler_update_called": False,
                 },
             )
         if not callable(getattr(scaler, "is_enabled", None)) or not scaler.is_enabled():
             raise GradientContractError(
-                "The audited PIF overflow can only be handled by an enabled GradScaler."
+                "The audited PIF overflow can only be handled by an enabled GradScaler.",
+                diagnostics={**diagnostics, "scaler_step_called": False, "scaler_update_called": False},
             )
         if consecutive_overflow_skips >= max_consecutive_overflow_skips:
             raise GradientContractError(
-                "Maximum consecutive recoverable AMP overflow skips exceeded."
+                "Maximum consecutive recoverable AMP overflow skips exceeded.",
+                diagnostics={**diagnostics, "scaler_step_called": False, "scaler_update_called": False},
             )
 
     scale_before = float(scaler.get_scale())
     if not math.isfinite(scale_before) or scale_before <= 0:
-        raise GradientContractError(f"Invalid GradScaler scale before step: {scale_before}")
+        raise GradientContractError(
+            f"Invalid GradScaler scale before step: {scale_before}",
+            diagnostics={**diagnostics, "scaler_step_called": False, "scaler_update_called": False},
+        )
 
     steps_before = int(step_counter.count)
     parameter_before = parameter_sha(named_parameters) if has_nonfinite else None
@@ -289,21 +301,27 @@ def guarded_scaler_step(
     steps_after = int(step_counter.count)
     scale_after = float(scaler.get_scale())
     if not math.isfinite(scale_after) or scale_after <= 0:
-        raise GradientContractError(f"Invalid GradScaler scale after step: {scale_after}")
+        raise GradientContractError(
+            f"Invalid GradScaler scale after step: {scale_after}",
+            diagnostics={**diagnostics, "scaler_step_called": True, "scaler_update_called": True},
+        )
 
     if has_nonfinite:
         parameter_after = parameter_sha(named_parameters)
         if steps_after != steps_before:
             raise GradientContractError(
-                "GradScaler called optimizer.step() despite the diagnosed Inf."
+                "GradScaler called optimizer.step() despite the diagnosed Inf.",
+                diagnostics={**diagnostics, "scaler_step_called": True, "scaler_update_called": True},
             )
         if not scale_after < scale_before:
             raise GradientContractError(
-                "GradScaler did not lower its scale after the diagnosed Inf."
+                "GradScaler did not lower its scale after the diagnosed Inf.",
+                diagnostics={**diagnostics, "scaler_step_called": True, "scaler_update_called": True},
             )
         if parameter_after != parameter_before:
             raise GradientContractError(
-                "Model parameters changed during a supposedly skipped optimizer step."
+                "Model parameters changed during a supposedly skipped optimizer step.",
+                diagnostics={**diagnostics, "scaler_step_called": True, "scaler_update_called": True},
             )
         return StepOutcome(
             kind="recoverable_pif_b_overflow_skip",
@@ -321,11 +339,13 @@ def guarded_scaler_step(
 
     if steps_after != steps_before + 1:
         raise GradientContractError(
-            "GradScaler skipped an optimizer update although the gradient audit was finite."
+            "GradScaler skipped an optimizer update although the gradient audit was finite.",
+            diagnostics={**diagnostics, "scaler_step_called": True, "scaler_update_called": True},
         )
     if scale_after < scale_before:
         raise GradientContractError(
-            "GradScaler lowered its scale although the gradient audit found no non-finite values."
+            "GradScaler lowered its scale although the gradient audit found no non-finite values.",
+            diagnostics={**diagnostics, "scaler_step_called": True, "scaler_update_called": True},
         )
 
     return StepOutcome(

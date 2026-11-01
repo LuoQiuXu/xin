@@ -109,6 +109,7 @@ After the run, report:
 - exact failing batch index and samples completed before it;
 - GradScaler scale before and after unscale;
 - optimizer updates before failure and whether the failed step executed;
+- whether GradScaler.step and GradScaler.update were called for the rejected window;
 - every missing-gradient parameter;
 - every nonfinite-gradient parameter, shape, dtype, NaN count, +Inf count,
   -Inf count, and coordinates;

@@ -142,6 +142,7 @@ def save_b0_gradient_failure(
     grad_summary = gradient_failure_diagnostics(named_parameters)
     failure = {
         **failure_context,
+        "optimizer_updates_at_exception": int(step_counter.count),
         "exception_type": type(exception).__name__,
         "exception_message": str(exception),
         "guard_diagnostics": getattr(exception, "diagnostics", {}),
@@ -335,6 +336,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
         scaler.scale(loss * len(target) / group_size).backward()
         if (i+1) % accumulation == 0 or i+1 == len(batches):
             scale_before_unscale = float(scaler.get_scale())
+            optimizer_updates_before_window = int(step_counter.count)
             try:
                 scaler.unscale_(opt)
                 assert model.classifier.weight.grad is not None
@@ -369,8 +371,10 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                         "batch_control": row,
                         "mixup_lambda": mixup_context["lambda"] if mixup_context else None,
                         "pif_parameter_names": [n for n, _ in model.extractor.pif.named_parameters()],
-                        "failed_optimizer_step_executed": False,
-                        "scaler_step_or_update_called_for_rejected_window": False,
+                        "optimizer_updates_before_failed_window": optimizer_updates_before_window,
+                        "failed_optimizer_step_executed": int(step_counter.count) > optimizer_updates_before_window,
+                        "scaler_step_called_for_rejected_window": bool(getattr(exc, "diagnostics", {}).get("scaler_step_called", False)),
+                        "scaler_update_called_for_rejected_window": bool(getattr(exc, "diagnostics", {}).get("scaler_update_called", False)),
                     }
                     save_b0_gradient_failure(
                         folder, model=model, optimizer=opt, scaler=scaler,
@@ -426,6 +430,12 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
             "train_loss_so_far": loss_sum / samples if samples else None,
             "train_seconds": duration,
             "peak_allocated_mib": torch.cuda.max_memory_allocated()/1024**2,
+            "pif_parameters_initial": before_pif,
+            "pif_parameters_after_window": [
+                float(value)
+                for parameter in model.extractor.pif.parameters()
+                for value in parameter.detach().cpu().reshape(-1).tolist()
+            ],
             "note": "Partial B0 forensic window only; no validation, checkpoint, or six-condition completion claim.",
         }
         save_json(folder / "PARTIAL_FORENSIC_RESULT.json", partial)
