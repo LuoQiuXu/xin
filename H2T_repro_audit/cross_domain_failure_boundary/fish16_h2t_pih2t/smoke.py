@@ -147,7 +147,9 @@ def save_b0_gradient_failure(
         "exception_message": str(exception),
         "guard_diagnostics": getattr(exception, "diagnostics", {}),
         "gradient_diagnostics": grad_summary,
-        "optimizer_updates_before_failure": int(step_counter.count),
+        "optimizer_updates_before_failure": int(
+            failure_context.get("optimizer_updates_before_failed_window", step_counter.count)
+        ),
         "optimizer_step_events_before_failure": optimizer_step_events,
         "pif_parameters_at_failure": [
             float(value)

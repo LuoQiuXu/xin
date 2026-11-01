@@ -176,7 +176,7 @@ def _inspect_gradients(named_parameters):
                 "negative_inf_count": negative_inf_count,
                 "inf_count": n_inf,
                 "inf_positions": positions[:32],
-                "inf_positions_truncated": len(positions) > 32,
+                "inf_positions_truncated": n_inf > 32,
                 "nan_positions": nan_positions[:32],
                 "nan_positions_truncated": n_nan > 32,
             })
