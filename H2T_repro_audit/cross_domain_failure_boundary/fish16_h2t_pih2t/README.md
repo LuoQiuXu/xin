@@ -45,13 +45,13 @@ At micro-batch 16, the archived deterministic replay must occur exactly once at 
 Use the validated interpreter:
 
 ```powershell
-$PY = "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe"
+$PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
 
-& $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
-& $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t -p "test_contract.py" -v
-& $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\diagnostics -p "test_*.py" -v
+& $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
+& $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_contract.py" -v
+& $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics -p "test_*.py" -v
 
-& $PY -B -X utf8 -u H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py --output-dir "D:\\h2t_cross_domain_results\\fish16_six_condition_smoke_seed42_20261101_01" --micro-batch 16
+& $PY -B -X utf8 -u H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py --output-dir "D:\h2t_cross_domain_results\fish16_six_condition_smoke_seed42_20261101_01" --micro-batch 16
 ```
 
 All output directories must be new and outside the repository. If the first run fails specifically with CUDA OOM, preserve it and retry the entire six-condition smoke in a fresh process and a new output directory with `--micro-batch 8`. Do not retry other errors by changing settings.
