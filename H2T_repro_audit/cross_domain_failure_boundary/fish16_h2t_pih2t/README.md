@@ -14,6 +14,43 @@ Stop for scientific review. The following protocol is historical context, not cu
 
 ---
 
+# CURRENT CORRECTION PLAN — 2026-11-02
+
+The first formal attempt remains preserved as `FAILED_STOPPED` on
+`experiment/fish16-formal-90x10-20261102`. Its A0 failure occurred at epoch 4,
+batch 976, with one negative Inf at `classifier.bias[0]` after GradScaler
+automatically grew to 262,144. The loss and logits were finite; no optimizer
+step was submitted for the failed window.
+
+A correction branch has been created:
+`experiment/fish16-amp-scale-stability-20261102`.
+
+The formal runner now has a separate scaler policy: FP16 autocast remains
+unchanged, initial scale remains 65,536, but the growth interval is 100,000
+updates. This exceeds the maximum 91,530 attempted windows in a 90-epoch
+Stage-I condition, preventing automatic scale escalation during a condition.
+Native backoff remains active for the one previously diagnosed and permitted
+B0 PIF-b overflow. The original `amp_recovery.py` and smoke scaler are
+unchanged.
+
+The runner also normalizes tuple/list representations when comparing restored
+epoch records with JSON metric files, fixing a documented resume edge case.
+
+**Next action:** run one no-optimizer-step replay of the exact saved A0 failure
+snapshot at scales 65,536 and 262,144 (optionally 131,072 for the threshold
+check). If the recorded signature is reproduced—finite gradients at 65,536
+and the same classifier-bias Inf at 262,144—run the corrected six-condition
+formal pilot from fresh initialization in a new output directory ending
+`_02`. Do not resume the failed run or reuse its partial checkpoint. If the
+exact replay does not reproduce, stop and report; do not guess another scale.
+
+No new smoke, no additional mechanism audit, no TEST access, and no seed 43/44
+are authorized. See `CODEX_FISH16_AMP_SCALE_STABILITY.txt` for the execution
+instructions. The earlier failure report remains historical evidence and must
+not be overwritten.
+
+---
+
 # Fish4Knowledge-16: H2T / PI-H2T six-condition smoke
 
 Current implementation branch: `experiment/fish16-six-condition-smoke-20261101`.
