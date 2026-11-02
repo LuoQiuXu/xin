@@ -1,5 +1,6 @@
 import argparse
 import copy
+import json
 import math
 from pathlib import Path
 import random
@@ -81,7 +82,7 @@ class FormalTests(unittest.TestCase):
                 "nonfinite_positions": {"extractor.pif.fuse.weight": [[0, 1, 0]]},
             }]},
         )
-        self.assertEqual(restored, __import__("json").loads(__import__("json").dumps(record)))
+        self.assertEqual(restored, json.loads(json.dumps(record)))
 
     def test_routing_uses_one_final_source_per_pair(self):
         self.assertEqual([f.stage2_source(c) for c in ["A1","A2","B1","B2"]],["A0","A0","B0","B0"])
