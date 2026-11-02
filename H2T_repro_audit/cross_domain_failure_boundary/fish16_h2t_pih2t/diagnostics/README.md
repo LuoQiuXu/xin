@@ -1,9 +1,10 @@
 # B0 PIF Stage-I gradient diagnosis
 
-Completed diagnosis, seed 42, micro/effective batch 16, official
-`resnet50-19c8e357.pth` initialization. This directory adds instrumentation and
-reporting without changing `models.py`, `data.py`, `smoke.py`, upstream H2T/PIF
-sources, or the strict finite-gradient gate.
+Historical diagnosis, seed 42, micro/effective batch 16, official
+`resnet50-19c8e357.pth` initialization. The original forensic report and
+captured evidence remain immutable. A subsequent review identified that the
+recovery gate incorrectly distinguished +Inf from -Inf at the same PIF-b
+coordinate; the source-level correction is documented below.
 
 The controlled replay fails at zero-based batch 6. Loss scaling by 65536
 overflows the FP16 Conv1d gradient for the shared PIF coefficient b. All
@@ -50,3 +51,29 @@ original outputs remain under
 `D:\h2t_cross_domain_results\pif_grad_diagnosis_seed42_20261031_01\`.
 The existing repository `.gitignore` excludes model tensors, raw logs and
 Python caches.
+
+
+## 2026-11-02 AMP recovery-contract correction
+
+The 2026-11-01 forensic report remains the historical record of the observed
+negative Inf at `extractor.pif.fuse.weight[0,1,0]`, batch 13, scale 32768.
+The correction does **not** claim that the negative Inf's first internal
+producer has been isolated. It corrects only the recovery contract:
+
+- one and only one Inf (either sign) at the exact PIF-b parameter coordinate
+  may be passed to an enabled native GradScaler skip/backoff path;
+- NaN, missing gradients, any other non-finite parameter/coordinate, multiple
+  Inf values, disabled GradScaler, and exceeded consecutive-skip limits remain
+  fail-closed;
+- the guard still verifies that the optimizer did not execute, model
+  parameters did not change, and GradScaler reduced its scale;
+- the full B0 Stage-I one-epoch runner is separately selectable with
+  `--b0-stage1-only`; it skips A0, all Stage-II conditions, and TEST.
+
+The smoke invariant now preserves the historically observed first overflow at
+batch 6 while allowing further individually audited PIF-b signed overflow
+events within the existing total/consecutive skip limits. The historical
+forensic report is not rewritten.
+
+Codex execution instructions:
+[`CODEX_B0_AMP_RECOVERY_VALIDATION.txt`](../CODEX_B0_AMP_RECOVERY_VALIDATION.txt).
