@@ -1,0 +1,298 @@
+CODEX TASK — FISH16 FORMAL RUN: TARGETED AMP SCALE CORRECTION
+Date: 2026-11-02
+Repository: LuoQiuXu/xin
+Work branch: experiment/fish16-amp-scale-stability-20261102
+Base: failed formal-run commit e962a51f65917b7acceab8612d09dfb431ff46f3
+Purpose: correct the demonstrated AMP scale-growth failure, then continue the
+same six-condition seed-42 formal 90+10 pilot. This is not a new method study.
+
+======================================================================
+0. DECISION — NO MORE BROAD AUDITS
+======================================================================
+
+The first formal run is preserved unchanged at:
+  D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261102_01
+
+It completed A0 epochs 1-3 and stopped in A0 epoch 4, zero-based batch 976:
+  one negative Inf at classifier.bias[0]
+  no NaN, no missing gradients
+  finite logits and loss (loss=0.962948381901)
+  GradScaler scale=262144
+  no scaler.step/update and no SGD update for the rejected window
+  4,027 actual optimizer.step calls observed in the process
+
+The default GradScaler doubled its scale after approximately 2,000 successful
+updates: 65,536 -> 131,072 -> 262,144. The failure occurred after the second
+growth. The earlier controlled B0 forensic report already proves that this
+training stack can overflow an FP16 backward intermediate at excessive loss
+scale while forward tensors remain finite. The exact internal source of the
+A0 classifier.bias Inf was not directly instrumented; do not claim the A0 and
+B0 overflows are the same internal operator.
+
+The code correction is intentionally narrow:
+  - retain FP16 autocast;
+  - retain initial scale 65,536;
+  - retain native GradScaler step/skip/backoff behavior;
+  - set growth_interval=100,000 for the formal runner only;
+  - leave amp_recovery.py and the smoke runner's scaler unchanged.
+A 90-epoch Stage-I condition has at most 91,530 attempted windows
+(90 * 1,017), so the scale cannot automatically grow during a condition.
+If the allowed B0 PIF-b Inf occurs at 65,536, native GradScaler may back off to
+32,768. The scale then remains there for the rest of that condition.
+
+The correction branch also fixes a documented resume comparison defect:
+JSON converts tuples in overflow records to lists. Epoch-record comparisons
+must normalize both representations before comparison.
+
+Do not add losses, clipping, gradient clamping, gradient replacement, lower
+learning rates, different batch sizes, accumulation, BF16, FP32, a new backbone,
+new data, or any H2T/PI-H2T algorithm changes.
+
+======================================================================
+1. GIT AND PRESERVATION
+======================================================================
+
+Work only on:
+  experiment/fish16-amp-scale-stability-20261102
+
+This branch is based on the failed formal run and contains the targeted code
+correction. Start with:
+  git fetch origin
+  git status --short
+  git branch --show-current
+  git rev-parse HEAD
+  git rev-parse origin/experiment/fish16-amp-scale-stability-20261102
+
+If the worktree is dirty, stop. Do not stash, reset, clean, overwrite, or
+silently carry unrelated changes. Fast-forward only if clean and behind.
+
+Do not modify the failed branch, main, original H2T source, PI_H2T_review,
+models.py formulas, data.py schedules, or amp_recovery.py.
+Do not force-push or merge to main.
+
+Preserve the entire _01 failed run directory, including FAILURE_SNAPSHOT.pt,
+FAILURE.json, all A0 epoch checkpoints, attempt JSONL logs and hashes.
+Do not rename, delete, repair in place, or use the old partial checkpoint as
+the initialization for the corrected formal run.
+
+All images, manifest, weights, checkpoints, raw logs, snapshots and runtime
+outputs remain outside Git. Commit only code, compact reports and instructions.
+
+======================================================================
+2. REVIEW THE COMMITTED CORRECTION
+======================================================================
+
+Read:
+  formal_train.py
+  amp_recovery.py
+  test_formal_train.py
+  FORMAL_PROTOCOL.md
+  diagnostics/results/formal_seed42_90x10_20261102_01/FORMAL_RUN_REPORT.md
+  diagnostics/results/formal_seed42_90x10_20261102_01/FORMAL_RUN_RESULT.json
+  diagnostics/results/b0_grad_diag_20261031_01/PIF_GRAD_DIAG_REPORT.md
+  diagnostics/results/b0_grad_diag_20261031_01/ROOT_CAUSE_EVIDENCE.json
+
+Verify:
+  - formal_train.py calls make_formal_grad_scaler(), not the old default helper;
+  - policy is init_scale=65,536, growth_interval=100,000,
+    growth_factor=2.0, backoff_factor=0.5, enabled=True;
+  - policy is included in the protocol hash and run manifest;
+  - growth_interval exceeds 90*1,017=91,530;
+  - native B0 PIF-b exception still goes through guarded_scaler_step and
+    native GradScaler skip/backoff; no manual gradient edits;
+  - amp_recovery.py remains byte-for-byte unchanged from the failed run;
+  - the code uses json_normalize() when comparing persisted JSON metrics with
+    checkpoint records, so tuple/list conversion cannot cause false mismatch;
+  - branch constant matches this correction branch.
+
+If any of these conditions is false, stop and report the exact discrepancy.
+
+======================================================================
+3. REQUIRED CPU CHECKS
+======================================================================
+
+Use:
+  D:\app\minicondaaa\envs\xiaoju\python.exe
+
+Run py_compile for:
+  formal_train.py
+  models.py
+  data.py
+  amp_recovery.py
+  test_formal_train.py
+
+Run all three:
+  python -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
+  python -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_contract.py" -v
+  python -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_formal_train.py" -v
+
+The new tests must establish:
+  - formal GradScaler starts at 65,536;
+  - growth interval is 100,000 and exceeds the full condition attempt budget;
+  - native GradScaler remains enabled;
+  - tuple/list JSON normalization behaves as intended.
+
+Create a fresh CPU_VALIDATION.json outside Git containing PASS, exact test
+commands/exit codes, and SHA256 hashes of formal_train.py, models.py, data.py,
+and amp_recovery.py. This record must match the code present at execution.
+Do not reuse the old preflight CPU record because formal_train.py changed.
+
+Do not run a new GPU smoke, a new dataset audit, or a new general gradient
+audit.
+
+======================================================================
+4. ONE TARGETED REPLAY OF THE EXISTING FAILED A0 BATCH
+======================================================================
+
+This is the only GPU diagnostic allowed. It reuses the saved failure snapshot;
+it must not load a DataLoader, read new images, run an epoch, or call an
+optimizer update.
+
+Snapshot:
+  D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261102_01\FAILURE_SNAPSHOT.pt
+
+Use disposable in-memory model copies. Do not modify the snapshot or any
+checkpoint. Verify snapshot existence and SHA256 before reading. If missing or
+unreadable, stop and report; do not reconstruct the batch from the dataset.
+
+Snapshot fields saved by the runner include:
+  model, mixed_input, targets, target_a, target_b, mixup_lambda,
+  logits, loss, parameter_gradients and failure context.
+
+Recreate the exact A0 forward/backward using:
+  models.FishModel(use_pif=False)
+  strict load of snapshot["model"]
+  model.train()
+  the exact saved mixed_input and target_a/target_b/lambda
+  existing MixUp two-target CE expression
+  torch.amp.autocast("cuda", dtype=torch.float16)
+  exact batch multiplier len(targets)/16 (the failed batch is full size)
+
+For each scale, construct a fresh enabled torch.amp.GradScaler and a fresh
+optimizer over the model parameters. Run forward, loss, scaler.scale(loss *
+len(targets)/16).backward(), then scaler.unscale_(optimizer). Inspect all
+parameter gradients. Do NOT call scaler.step(), scaler.update(), or
+optimizer.step() in this replay. The replay must not mutate any saved file.
+
+Run the same snapshot at:
+  65,536
+  131,072
+  262,144
+
+Report for each:
+  forward logits/loss finiteness and closeness to saved values;
+  all missing gradients, NaN/Inf counts and exact parameter/index;
+  classifier.bias[0] gradient;
+  maximum finite absolute gradient by parameter group;
+  scale used;
+  explicit optimizer_step_calls=0 and scaler_step_update_calls=0.
+
+Expected evidence:
+  - at 65,536: all gradients finite;
+  - at 131,072: record actual result, do not assume;
+  - at 262,144: reproduce the same single negative Inf at classifier.bias[0].
+The saved loss/logits should match the replay within deterministic floating
+point tolerance. If the expected 65,536 finite / 262,144 Inf boundary does not
+reproduce, STOP. Do not select another scale, change precision, or continue
+training based on a guess. Report the evidence for scientific review.
+
+This is a same-snapshot numerical replay, not a new smoke or training run.
+
+======================================================================
+5. CORRECTED FORMAL RUN — FRESH INITIALIZATION
+======================================================================
+
+Only if Sections 2-4 pass, start the corrected formal run.
+
+Use a NEW output directory:
+  D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261102_02
+
+Refuse to overwrite an existing directory.
+
+Do NOT pass --resume.
+Do NOT reuse A0\last.pth, A0\best_validation.pth, A0 epoch checkpoints,
+FAILURE_SNAPSHOT.pt, or any _01 checkpoint as training initialization.
+The corrected run must restart A0 and B0 from the locked common official
+ImageNet initialization, so all 90 epochs of each condition use one fixed
+AMP policy. The old three completed A0 epochs are preserved as failure
+evidence, not promoted into the new run.
+
+Run exactly:
+  A0: Plain ResNet50 Stage-I, 90 epochs
+  A1: A0 epoch-90 checkpoint -> cRT Stage-II, 10 epochs
+  A2: A0 epoch-90 checkpoint -> H2T Stage-II, 10 epochs
+  B0: PIF-ResNet50 Stage-I, 90 epochs
+  B1: B0 epoch-90 checkpoint -> cRT Stage-II, 10 epochs
+  B2: B0 epoch-90 checkpoint -> PI-H2TF Stage-II, 10 epochs
+
+Keep all original scientific settings unchanged:
+  seed 42; 224x224; micro/effective batch 16; accumulation 1; workers 4;
+  SGD momentum 0.9; original epoch learning-rate schedules;
+  Stage-I MixUp CE alpha 1; Stage-II CE;
+  Stage-I weight decay 1e-4; Stage-II weight decay 5e-4;
+  H2T rho 0.25; PI-H2TF mode paper_theoretical_bounds;
+  ratio_detach=True; original recipients/donors and group definitions.
+Do not alter source algorithms, initialization, dataset, split or loss.
+
+The only numeric-policy change is the formal GradScaler growth interval:
+  initial scale 65,536;
+  growth interval 100,000;
+  native backoff factor 0.5;
+  native GradScaler enabled.
+This prevents scale growth during any single condition. If B0 encounters
+the specifically allowed PIF-b single-Inf event, native GradScaler must skip
+the optimizer update, lower the scale to 32,768, and the next window must make
+a real update at the reduced scale. Any other Inf/NaN/missing gradient,
+nonfinite forward, unverified skip or OOM is fatal; preserve and stop.
+
+The 6-condition ordering, paired source checkpoint SHA, exact data-control
+hashes, epoch-90 Stage-II source rule, BN/extractor freeze, and TEST exclusion
+remain unchanged.
+
+Use the same validated runtime:
+  D:\app\minicondaaa\envs\xiaoju\python.exe
+
+The command must be:
+  & $PY -B -X utf8 -u H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\formal_train.py --output-dir "D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261102_02" --cpu-validation-record "D:\h2t_cross_domain_results\fish16_formal_preflight_ampfix_20261102_01\CPU_VALIDATION.json"
+
+Print the exact command before execution. Keep stdout/stderr outside Git.
+Do not stop after writing a plan; start the formal run if the replay passes.
+
+======================================================================
+6. OUTPUT AND REPORTING
+======================================================================
+
+Preserve the _01 failed run and all prior audit/smoke artifacts.
+
+For _02, record:
+  FORMAL_RUN_MANIFEST.json
+  ACTUAL_EXECUTION_STATUS.json
+  per-condition per-epoch metrics/checkpoints
+  RESULTS_SUMMARY.csv / .md
+  OUTPUT_SHA256.csv
+  FAILURE.json if stopped
+
+Record exact AMP scale transitions, all B0 native skips, actual optimizer
+updates, and the condition's initial/final scale each epoch. Keep every raw
+attempt log and checkpoint outside Git.
+
+Commit only:
+  - code changes already made in this branch;
+  - updated protocol/tests;
+  - compact replay report with hashes;
+  - final compact formal run report and result JSON.
+
+At the end report:
+  - branch and code/report commit SHA;
+  - exact CPU checks and exit codes;
+  - failed-snapshot SHA and replay result at all three scales;
+  - formal run output directory;
+  - A0/B0/A1/A2/B1/B2 actual completed epochs;
+  - per-condition validation overall/macro/tail and optimizer update counts;
+  - A2-A1 and B2-B1 only if both matched conditions completed;
+  - all AMP skips and scale transitions;
+  - confirmation TEST accesses=0 and seeds43/44=0.
+
+Do not claim formal completion until the _02 ACTUAL_EXECUTION_STATUS.json
+and all required outputs confirm it. No broad audits, no extra seeds, no
+algorithm modifications, and no automatic retry after a new failure.
