@@ -1,8 +1,9 @@
 """Fail-closed handling for the one diagnosed PIF AMP overflow.
 
-This module does not clamp, replace, or otherwise alter gradients.  It permits
+This module does not clamp, replace, or otherwise alter gradients. It permits
 GradScaler's native skip/backoff path only when the sole non-finite value is
-the already-diagnosed positive or negative Inf at PIF coefficient b at [0, 1, 0].
+one positive or negative Inf at PIF coefficient b at [0, 1, 0]. All other
+non-finite patterns remain fail-closed.
 """
 from dataclasses import asdict, dataclass
 import hashlib
