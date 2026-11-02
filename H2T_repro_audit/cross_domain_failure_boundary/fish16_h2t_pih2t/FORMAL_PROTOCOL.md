@@ -29,8 +29,16 @@ approximately 0.0002447174. Scheduling occurs once per epoch, never per batch.
 The entire explicit LR table is stored in the run and condition manifests.
 
 Both stages use native FP16 autocast/GradScaler, micro/effective batch 16,
-one optimizer window per batch, four workers and SGD momentum 0.9. Stage-I
-weight decay is 1e-4; Stage-II is 5e-4. Stage-I reuses the exact existing
+one optimizer window per batch, four workers and SGD momentum 0.9. The formal
+runner uses init_scale=65,536, growth_factor=2.0, backoff_factor=0.5 and
+growth_interval=100,000. This exceeds the maximum 91,530 attempted windows in
+a 90-epoch Stage-I condition, so automatic scale growth cannot occur during a
+condition. Native backoff remains enabled: if the permitted B0 PIF-b Inf occurs,
+GradScaler must skip the update and lower the scale to 32,768; the scale then
+remains at that value for the rest of that condition. The generic
+amp_recovery.make_grad_scaler() and smoke-runner policy are unchanged.
+
+Stage-I weight decay is 1e-4; Stage-II is 5e-4. Stage-I reuses the exact existing
 two-target MixUp CE and alpha1; Stage-II reuses ordinary CE. The original
 sample-count multiplication/division of the scaled objective is retained,
 including the final partial batch. Only classifier parameters are optimized
@@ -99,7 +107,15 @@ learning rate, batch size, model, loss, data or transfer methods. A0 is
 restarted from the locked initialization in a new run directory so all 90
 epochs use one numerical policy; the prior partial run is retained as evidence.
 The exact failed A0 batch must be replayed from the preserved failure snapshot
-at scales 65,536 and 262,144 without calling optimizer.step(), before the new
-formal run begins. The expected signature is finite gradients at 65,536 and
-the recorded classifier.bias[0] Inf at 262,144; if that does not reproduce,
-stop rather than guessing another setting. No GPU resume was executed. The execution version compares restored epoch records directly to JSON metric files; records containing overflow dataclass tuples can compare differently after JSON list conversion. That unexecuted resume case is not the A0 numerical failure and was not patched or exercised after the stop. Full saved state is preserved, but CPU metadata/RNG tests alone do not establish all GPU resume cases.
+at scales 65,536, 131,072 and 262,144 without calling optimizer.step(), before
+the corrected formal run begins. Expected evidence is finite gradients at
+65,536 and the recorded classifier.bias[0] Inf at 262,144; record the actual
+131,072 result without assuming it. If the expected boundary does not
+reproduce, stop rather than guessing another setting.
+
+The first implementation also compared checkpoint records containing tuples
+directly with JSON records containing lists. The corrected runner normalizes
+both representations before comparison. This CPU-tested code fix does not
+establish GPU resume correctness by itself. The failed _01 run and all its
+checkpoints remain preserved; the corrected run starts fresh in a new _02
+output directory so one AMP policy is used throughout all 90 epochs.
