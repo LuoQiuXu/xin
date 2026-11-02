@@ -24,14 +24,43 @@ from torch import nn
 
 import data
 import models
-from amp_recovery import OptimizerStepCounter, guarded_scaler_step, make_grad_scaler
+from amp_recovery import OptimizerStepCounter, guarded_scaler_step
 
-BRANCH = "experiment/fish16-formal-90x10-20261102"
+BRANCH = "experiment/fish16-amp-scale-stability-20261102"
 SEED = 42
 ORDER = ("A0", "B0", "A1", "A2", "B1", "B2")
 ROUTES = {"A1": ("A0", "crt"), "A2": ("A0", "h2t"),
           "B1": ("B0", "crt"), "B2": ("B0", "pi")}
 SCHEMA = 1
+
+# The previous formal run let the default GradScaler double its scale every
+# 2,000 successful updates. A0 then failed at scale 262,144. Keep the original
+# 65,536 starting scale, but prevent automatic growth during any one condition.
+# The interval exceeds the maximum 90-epoch Stage-I attempts (90 * 1,017).
+FORMAL_AMP_POLICY = {
+    "device": "cuda",
+    "enabled": True,
+    "init_scale": 65536.0,
+    "growth_factor": 2.0,
+    "backoff_factor": 0.5,
+    "growth_interval": 100000,
+    "stage1_max_attempts": 90 * 1017,
+    "stage2_max_attempts": 10 * 1017,
+    "automatic_growth_during_condition": False,
+}
+
+
+def make_formal_grad_scaler():
+    if not torch.cuda.is_available():
+        raise RuntimeError("The Fish16 formal AMP policy requires CUDA.")
+    return torch.amp.GradScaler(
+        FORMAL_AMP_POLICY["device"],
+        init_scale=FORMAL_AMP_POLICY["init_scale"],
+        growth_factor=FORMAL_AMP_POLICY["growth_factor"],
+        backoff_factor=FORMAL_AMP_POLICY["backoff_factor"],
+        growth_interval=FORMAL_AMP_POLICY["growth_interval"],
+        enabled=FORMAL_AMP_POLICY["enabled"],
+    )
 
 
 def stage_of(condition):
@@ -94,6 +123,11 @@ class EpochSchedule:
 
 def tensor_sha(tensor):
     return hashlib.sha256(tensor.detach().cpu().contiguous().numpy().tobytes()).hexdigest()
+
+
+def json_normalize(value):
+    """Normalize tuple/list and other JSON round-trip representations."""
+    return json.loads(json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False))
 
 
 def json_bytes(value):
@@ -351,8 +385,7 @@ class FormalRun:
                     "stage2_lrs": [epoch_lr(2,e) for e in range(10)],
                     "source_hashes": self.hashes, "original_sources": expected,
                     "manifest_sha256": data.EXPECTED_SHA, "official_weight_sha256": models.ORIGINAL_SHA,
-                    "numeric_flags": {"deterministic": True, "benchmark": False,
-                                      "cudnn_tf32": False, "matmul_tf32": False},
+                    "numeric_flags": {"deterministic": True, "benchmark": False,\n                                      "cudnn_tf32": False, "matmul_tf32": False},\n                    "amp_scaler": FORMAL_AMP_POLICY,
                     "stage2_source_policy": "final_formal_stage1_epoch90",
                     "best_selection_metric": "validation_overall", "environment": environment}
         self.protocol = hashlib.sha256(json_bytes(protocol)).hexdigest()
@@ -583,7 +616,7 @@ class FormalRun:
         model.train() if stage==1 else model.freeze()
         parameters = list(model.parameters()) if stage==1 else list(model.classifier.parameters())
         optimizer = torch.optim.SGD(parameters,lr=epoch_lr(stage,0),momentum=.9,weight_decay=1e-4 if stage==1 else 5e-4)
-        scaler, scheduler = make_grad_scaler(), EpochSchedule(stage)
+        scaler, scheduler = make_formal_grad_scaler(), EpochSchedule(stage)
         records, pending, consecutive, best = [], None, 0, {"overall":-1.,"epoch":None}
         update_offset = 0
         last = folder/"last.pth"
@@ -595,6 +628,8 @@ class FormalRun:
             model.load_state_dict(cp["model"],strict=True)
             optimizer.load_state_dict(cp["optimizer"])
             scaler.load_state_dict(cp["scaler"])
+            if scaler.get_growth_interval() != FORMAL_AMP_POLICY["growth_interval"]:
+                raise ValueError("Resume checkpoint uses a different formal AMP growth policy")
             scheduler.load_state_dict(cp["scheduler"])
             records,pending,consecutive,best = cp["records"],cp["pending_overflow"],cp["consecutive_skips"],cp["best"]
             update_offset=cp["actual_updates_total"]
@@ -629,7 +664,7 @@ class FormalRun:
         for record in records:
             path=folder/f"epoch_{record['epoch']:03d}_metrics.json"
             if path.exists():
-                if json.loads(path.read_text(encoding="utf-8"))!=record:
+                if json.loads(path.read_text(encoding="utf-8")) != json_normalize(record):
                     raise ValueError("Committed epoch metric differs from resume checkpoint")
             else:
                 atomic_json(path,record)
