@@ -1,0 +1,840 @@
+{
+  "overall_decision": "AUDIT_PASS_WITH_DOCUMENTED_OPTIMIZER_STEP_ASYMMETRY",
+  "independent_decisions": {
+    "STAGE1_SAMPLING_PAIRING": "PASS",
+    "STAGE1_RECIPIENT_VIEW_PAIRING": "PASS",
+    "STAGE1_MIXUP_RNG_PAIRING": "PASS",
+    "STAGE1_INITIALIZATION_COMPATIBILITY": "PASS",
+    "SOURCE_EQUIVALENCE": "PASS",
+    "CHECKPOINT_INTEGRITY": "PASS",
+    "STAGE2_SAMPLING_READINESS": "PASS",
+    "OPTIMIZER_UPDATE_MATCHING": "DOCUMENTED_DIFFERENCE"
+  },
+  "branch": "experiment/fish16-six-condition-smoke-20261101",
+  "audit_start_head": "de82e100e200de575380feba540a62ff9e94eca6",
+  "actual_execution_commits": {
+    "A0": "8cbfa69bd194083053917bb0cef615572abdc182",
+    "B0": "d47cbd7293402fd02634c176d7e16db288b936b9"
+  },
+  "report_publication_commits": {
+    "A0": "52c8bf00d55966d0fa7d02fe52f788736083a02c",
+    "B0": "de82e100e200de575380feba540a62ff9e94eca6"
+  },
+  "runs": {
+    "A0": "D:\\h2t_cross_domain_results\\fish16_six_condition_smoke_seed42_20261101_01",
+    "B0": "D:\\h2t_cross_domain_results\\fish16_b0_amp_recovery_validation_20261102_01\\b0_stage1_one_epoch"
+  },
+  "array_comparisons": {
+    "stage1": {
+      "a0_shape": [
+        16269
+      ],
+      "b0_shape": [
+        16269
+      ],
+      "a0_dtype": "int64",
+      "b0_dtype": "int64",
+      "shape_equal": true,
+      "dtype_equal": true,
+      "all_elements_equal": true,
+      "elements_compared": 16269,
+      "mismatch_count": 0,
+      "first_mismatch_position": null,
+      "a0_payload_sha256": "bb49e02a1d4d626d7e661b1c0d876c236aac39f37eaba36ee59f3dea02a76c40",
+      "b0_payload_sha256": "bb49e02a1d4d626d7e661b1c0d876c236aac39f37eaba36ee59f3dea02a76c40"
+    },
+    "recipients": {
+      "a0_shape": [
+        16269
+      ],
+      "b0_shape": [
+        16269
+      ],
+      "a0_dtype": "int64",
+      "b0_dtype": "int64",
+      "shape_equal": true,
+      "dtype_equal": true,
+      "all_elements_equal": true,
+      "elements_compared": 16269,
+      "mismatch_count": 0,
+      "first_mismatch_position": null,
+      "a0_payload_sha256": "49b04634d5799f096e0105749b480d7dca456d97f506d218f66f913a97a0e29f",
+      "b0_payload_sha256": "49b04634d5799f096e0105749b480d7dca456d97f506d218f66f913a97a0e29f"
+    },
+    "donors": {
+      "a0_shape": [
+        16269
+      ],
+      "b0_shape": [
+        16269
+      ],
+      "a0_dtype": "int64",
+      "b0_dtype": "int64",
+      "shape_equal": true,
+      "dtype_equal": true,
+      "all_elements_equal": true,
+      "elements_compared": 16269,
+      "mismatch_count": 0,
+      "first_mismatch_position": null,
+      "a0_payload_sha256": "f18013f638137b5d50ed1d05242bef60df99be8cc50ab41ced4df71756f4ec26",
+      "b0_payload_sha256": "f18013f638137b5d50ed1d05242bef60df99be8cc50ab41ced4df71756f4ec26"
+    }
+  },
+  "sampling_container_sha256": {
+    "A0": "cad6161b5b0703e224e18fea353fcdc37120bb4ba529c78d6b2f5cdf67cf7b49",
+    "B0": "cad6161b5b0703e224e18fea353fcdc37120bb4ba529c78d6b2f5cdf67cf7b49"
+  },
+  "sampling_validity": {
+    "A0": {
+      "stage1_exact_train_permutation": true,
+      "recipients_train_only": true,
+      "donors_train_only": true,
+      "all_three_lengths_16269": true,
+      "all_16_recipient_classes_present": true
+    },
+    "B0": {
+      "stage1_exact_train_permutation": true,
+      "recipients_train_only": true,
+      "donors_train_only": true,
+      "all_three_lengths_16269": true,
+      "all_16_recipient_classes_present": true
+    }
+  },
+  "donor_csv_comparisons": {
+    "all_rows_equal": true,
+    "checks": {
+      "A0": {
+        "rows": 16269,
+        "matches_saved_arrays_and_manifest": true,
+        "mismatching_rows": 0
+      },
+      "B0": {
+        "rows": 16269,
+        "matches_saved_arrays_and_manifest": true,
+        "mismatching_rows": 0
+      }
+    }
+  },
+  "input_control_structure": {
+    "A0": {
+      "record_count": 1017,
+      "batch_sequence_exact": true,
+      "sample_sizes_exact": true,
+      "sample_sum": 16269,
+      "stage1_donors_all_null": true
+    },
+    "B0": {
+      "record_count": 1017,
+      "batch_sequence_exact": true,
+      "sample_sizes_exact": true,
+      "sample_sum": 16269,
+      "stage1_donors_all_null": true
+    }
+  },
+  "input_control_field_comparisons": {
+    "batch": {
+      "equal_records": 1017,
+      "required_records": 1017,
+      "missing_field_records": 0,
+      "all_records_equal": true,
+      "null_counts": {
+        "A0": 0,
+        "B0": 0
+      }
+    },
+    "samples": {
+      "equal_records": 1017,
+      "required_records": 1017,
+      "missing_field_records": 0,
+      "all_records_equal": true,
+      "null_counts": {
+        "A0": 0,
+        "B0": 0
+      }
+    },
+    "recipient_sha256": {
+      "equal_records": 1017,
+      "required_records": 1017,
+      "missing_field_records": 0,
+      "all_records_equal": true,
+      "null_counts": {
+        "A0": 0,
+        "B0": 0
+      }
+    },
+    "mixup_rng_sha256": {
+      "equal_records": 1017,
+      "required_records": 1017,
+      "missing_field_records": 0,
+      "all_records_equal": true,
+      "null_counts": {
+        "A0": 0,
+        "B0": 0
+      }
+    },
+    "mixup_lambda": {
+      "equal_records": 1017,
+      "required_records": 1017,
+      "missing_field_records": 0,
+      "all_records_equal": true,
+      "null_counts": {
+        "A0": 0,
+        "B0": 0
+      }
+    },
+    "donor_sha256": {
+      "equal_records": 1017,
+      "required_records": 1017,
+      "missing_field_records": 0,
+      "all_records_equal": true,
+      "null_counts": {
+        "A0": 1017,
+        "B0": 1017
+      }
+    }
+  },
+  "first_input_mismatch": null,
+  "input_control_sha256": {
+    "A0": "678341e595de2c1f3264eacebda2b7424df71d25167d432a99ec21eec4c01472",
+    "B0": "678341e595de2c1f3264eacebda2b7424df71d25167d432a99ec21eec4c01472"
+  },
+  "locked_inputs": {
+    "seed": {
+      "equal": true,
+      "a0": 42,
+      "b0": 42
+    },
+    "manifest_sha256": {
+      "equal": true,
+      "a0": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+      "b0": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30"
+    },
+    "weight_sha256": {
+      "equal": true,
+      "a0": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+      "b0": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097"
+    },
+    "environment": {
+      "equal": true,
+      "a0": {
+        "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "python_version": "3.12.12",
+        "torch": "2.14.1+cu132",
+        "cuda_build": "13.2",
+        "cudnn": 92400,
+        "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+      },
+      "b0": {
+        "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "python_version": "3.12.12",
+        "torch": "2.14.1+cu132",
+        "cuda_build": "13.2",
+        "cudnn": 92400,
+        "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+      }
+    },
+    "micro_batch": {
+      "equal": true,
+      "a0": 16,
+      "b0": 16
+    },
+    "effective_batch": {
+      "equal": true,
+      "a0": 16,
+      "b0": 16
+    },
+    "amp": {
+      "equal": true,
+      "a0": true,
+      "b0": true
+    },
+    "workers": {
+      "equal": true,
+      "a0": 4,
+      "b0": 4
+    },
+    "schedule_denominators": {
+      "equal": true,
+      "a0": [
+        90,
+        10
+      ],
+      "b0": [
+        90,
+        10
+      ]
+    },
+    "train_transform": {
+      "equal": true,
+      "a0": "Compose(\n    RandomResizedCrop(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bilinear, antialias=True)\n    RandomHorizontalFlip(p=0.5)\n    ColorJitter(brightness=(0.6, 1.4), contrast=None, saturation=None, hue=None)\n    ToTensor()\n    Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))\n)",
+      "b0": "Compose(\n    RandomResizedCrop(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bilinear, antialias=True)\n    RandomHorizontalFlip(p=0.5)\n    ColorJitter(brightness=(0.6, 1.4), contrast=None, saturation=None, hue=None)\n    ToTensor()\n    Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))\n)"
+    },
+    "validation_transform": {
+      "equal": true,
+      "a0": "Compose(\n    Resize(size=256, interpolation=bilinear, max_size=None, antialias=True)\n    CenterCrop(size=(224, 224))\n    ToTensor()\n    Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))\n)",
+      "b0": "Compose(\n    Resize(size=256, interpolation=bilinear, max_size=None, antialias=True)\n    CenterCrop(size=(224, 224))\n    ToTensor()\n    Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))\n)"
+    },
+    "numeric_config": {
+      "equal": true,
+      "a0": {
+        "cudnn_deterministic": true,
+        "benchmark": false,
+        "cudnn_tf32": false,
+        "matmul_tf32": false
+      },
+      "b0": {
+        "cudnn_deterministic": true,
+        "benchmark": false,
+        "cudnn_tf32": false,
+        "matmul_tf32": false
+      }
+    },
+    "class_groups": {
+      "equal": true,
+      "a0": {
+        "Head": [
+          0,
+          3,
+          2,
+          1,
+          4,
+          9
+        ],
+        "Medium": [
+          6,
+          15,
+          7,
+          8,
+          12
+        ],
+        "Tail": [
+          5,
+          11,
+          10,
+          13,
+          14
+        ]
+      },
+      "b0": {
+        "Head": [
+          0,
+          3,
+          2,
+          1,
+          4,
+          9
+        ],
+        "Medium": [
+          6,
+          15,
+          7,
+          8,
+          12
+        ],
+        "Tail": [
+          5,
+          11,
+          10,
+          13,
+          14
+        ]
+      }
+    }
+  },
+  "split_metadata_audit": {
+    "manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+    "images": 27133,
+    "train_images": 16269,
+    "validation_images": 5396,
+    "train_trajectories": 5208,
+    "validation_trajectories": 1736,
+    "train_validation_index_overlap": 0,
+    "train_validation_group_overlap": 0,
+    "class_groups_recomputed_match_both": true,
+    "groups": {
+      "Head": [
+        0,
+        3,
+        2,
+        1,
+        4,
+        9
+      ],
+      "Medium": [
+        6,
+        15,
+        7,
+        8,
+        12
+      ],
+      "Tail": [
+        5,
+        11,
+        10,
+        13,
+        14
+      ]
+    },
+    "image_files_opened": 0,
+    "test_image_access": false
+  },
+  "source_file_comparisons": {
+    "models.py": {
+      "git_blobs_equal": true,
+      "records": {
+        "A0": {
+          "git_blob_sha256": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+          "recorded_execution_source_sha256": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+          "record_matches_git_with_line_ending": "LF_GIT_BLOB"
+        },
+        "B0": {
+          "git_blob_sha256": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+          "recorded_execution_source_sha256": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+          "record_matches_git_with_line_ending": "LF_GIT_BLOB"
+        }
+      }
+    },
+    "data.py": {
+      "git_blobs_equal": true,
+      "records": {
+        "A0": {
+          "git_blob_sha256": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+          "recorded_execution_source_sha256": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+          "record_matches_git_with_line_ending": "LF_GIT_BLOB"
+        },
+        "B0": {
+          "git_blob_sha256": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+          "recorded_execution_source_sha256": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+          "record_matches_git_with_line_ending": "LF_GIT_BLOB"
+        }
+      }
+    },
+    "preflight.py": {
+      "git_blobs_equal": true,
+      "records": {
+        "A0": {
+          "git_blob_sha256": "46fbea5e97089d5fb702d812c61def34054984ff0d02f6fb15afabb34dc74e01",
+          "recorded_execution_source_sha256": "cc40fbc3a9d2effa5975912d97f4e40abbb6ede1c236b68ad5055a12f29c389b",
+          "record_matches_git_with_line_ending": "CRLF_WORKTREE"
+        },
+        "B0": {
+          "git_blob_sha256": "46fbea5e97089d5fb702d812c61def34054984ff0d02f6fb15afabb34dc74e01",
+          "recorded_execution_source_sha256": "cc40fbc3a9d2effa5975912d97f4e40abbb6ede1c236b68ad5055a12f29c389b",
+          "record_matches_git_with_line_ending": "CRLF_WORKTREE"
+        }
+      }
+    },
+    "amp_recovery.py": {
+      "git_blobs_equal": false,
+      "records": {
+        "A0": {
+          "git_blob_sha256": "e04c17ef06e0bc71d34d3f33329e0e830b9b7e68a1b61c90cfed364e9cc300ff",
+          "recorded_execution_source_sha256": "c39a7ddc5f71d88c072b60ea83e4180f7f1611cd816d2147905217e8bdf61090",
+          "record_matches_git_with_line_ending": "CRLF_WORKTREE"
+        },
+        "B0": {
+          "git_blob_sha256": "d4ee06b9da27f1df85558c0ff8bfba121a4ba8b3c77e1318e2df8e90d6e4aab5",
+          "recorded_execution_source_sha256": "21448931b545323015d36ba64a10b76a0b15dbf6290512d577b28c1bcf8ac75a",
+          "record_matches_git_with_line_ending": "CRLF_WORKTREE"
+        }
+      }
+    },
+    "smoke.py": {
+      "git_blobs_equal": false,
+      "records": {
+        "A0": {
+          "git_blob_sha256": "e31a33d3e83d820b449e1f67cac7f7675009cd16b8c37c06ae01f612857cc0fa",
+          "recorded_execution_source_sha256": "8ac36910f17fa9784f91eb5e6d4c2a70073767a82cffe7bfc89d3759033ef0c2",
+          "record_matches_git_with_line_ending": "CRLF_WORKTREE"
+        },
+        "B0": {
+          "git_blob_sha256": "79b698163830482517697c8be67aab4382da8fc3b88d2b9c170e982f06fe4443",
+          "recorded_execution_source_sha256": "326cf4813c58d379b12de35f4e24e3fb29eebd032186e91fea48b9d74ec35b61",
+          "record_matches_git_with_line_ending": "CRLF_WORKTREE"
+        }
+      }
+    }
+  },
+  "upstream_source_comparisons": {
+    "H2T_official_clean/H2T-main/models/resnet.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4"
+    },
+    "H2T_official_clean/H2T-main/methods.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1"
+    },
+    "H2T_official_clean/H2T-main/train_stage1.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1"
+    },
+    "H2T_official_clean/H2T-main/train_stage2.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614"
+    },
+    "PI_H2T_review/H2T-main/pi_h2t.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3"
+    },
+    "PI_H2T_review/H2T-main/methods.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1"
+    },
+    "PI_H2T_review/H2T-main/models/resnet_cifar.py": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d"
+    },
+    "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": {
+      "a0_b0_recorded_hash_equal": true,
+      "current_matches_recorded": true,
+      "git_source_equal": true,
+      "sha256": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+    }
+  },
+  "static_ast_checks": {
+    "seed_function_ast_equal": true,
+    "metrics_function_ast_equal": true,
+    "validation_function_ast_equal": true,
+    "gradscaler_constructor_ast_equal": true,
+    "stage_mode_parameters_lr_wd_ast_equal": true,
+    "assignment_opt_ast_equal": true,
+    "assignment_scaler_ast_equal": true,
+    "assignment_step_counter_ast_equal": true,
+    "assignment_optimizer_ids_ast_equal": true,
+    "assignment_named_optimizer_parameters_ast_equal": true,
+    "assignment_initial_loss_scale_ast_equal": true,
+    "assignment_accumulation_ast_equal": true,
+    "assignment_dataset_ast_equal": true,
+    "assignment_batches_ast_equal": true,
+    "stage1_mixup_forward_loss_ast_equal_excluding_readonly_context_copy": true,
+    "loop_assignment_target_ast_equal": true,
+    "loop_assignment_row_ast_equal": true,
+    "loop_assignment_x_ast_equal": true,
+    "loop_assignment_group_start_ast_equal": true,
+    "loop_assignment_group_size_ast_equal": true,
+    "backward_calls_ast_equal": true,
+    "unscale__calls_ast_equal": true,
+    "zero_grad_calls_ast_equal": true,
+    "guard_call_arguments_ast_equal": true,
+    "stage2_routing_loop_ast_equal": true
+  },
+  "source_line_evidence": {
+    "A0": {
+      "seed": {
+        "line": 53,
+        "end_line": 57
+      },
+      "one_epoch": {
+        "line": 138,
+        "end_line": 337
+      },
+      "stage1_parameters_lr_wd": {
+        "line": 143,
+        "end_line": 150
+      },
+      "stage1_forward_mixup_loss": {
+        "line": 182,
+        "end_line": 204
+      },
+      "stage2_checkpoint_routing": {
+        "line": 422,
+        "end_line": 435
+      }
+    },
+    "B0": {
+      "seed": {
+        "line": 57,
+        "end_line": 61
+      },
+      "one_epoch": {
+        "line": 265,
+        "end_line": 538
+      },
+      "stage1_parameters_lr_wd": {
+        "line": 270,
+        "end_line": 277
+      },
+      "stage1_forward_mixup_loss": {
+        "line": 312,
+        "end_line": 336
+      },
+      "stage2_checkpoint_routing": {
+        "line": 675,
+        "end_line": 688
+      }
+    }
+  },
+  "initialization": {
+    "common_backbone_state_tensors_equal": true,
+    "common_backbone_state_tensor_count": 318,
+    "common_initial_classifier_tensors_equal": true,
+    "reconstructed_initial_classifier_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+    "a0_recorded_classifier_initial_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+    "b0_recorded_classifier_initial_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+    "classifier_record_and_cpu_reconstruction_agree": true,
+    "additional_b0_learnable_values": 2,
+    "b0_pif_initialization_matches_record": true,
+    "extractor_hashes_not_required_equal_due_to_extra_pif": true,
+    "cpu_only": true,
+    "author_initialization_claim": "Local preserved initialization; no new claim of author protocol parity"
+  },
+  "checkpoint_audit": {
+    "A0": {
+      "status": "PASS",
+      "expected_sha256": "a4989aef49cfeb51e8bcb53dc43781fbf4733face96c3898e78834929fd57f43",
+      "actual_sha256": "a4989aef49cfeb51e8bcb53dc43781fbf4733face96c3898e78834929fd57f43",
+      "bytes": 188702205,
+      "metadata_checks": {
+        "smoke_only": true,
+        "condition": true,
+        "seed_42": true,
+        "epoch_1": true
+      },
+      "model_state_entries": 320,
+      "floating_state_entries": 267,
+      "nonfinite_floating_state_names": [],
+      "map_location": "cpu",
+      "weights_only": true,
+      "strict_load": {
+        "missing_keys": [],
+        "unexpected_keys": []
+      },
+      "all_model_tensors_cpu": true,
+      "full_extractor_hash_matches_record": true,
+      "optimizer_configuration_matches_stage1": true,
+      "scaler_final_scale_matches_result": true,
+      "validation_matches_result": true,
+      "final_classifier_sha256": "4dd6f1b456a5faebfbd8ba61cd6ad7ff49ef4bb5918f8c4ba6f95cf5e95f143d"
+    },
+    "B0": {
+      "status": "PASS",
+      "expected_sha256": "231295f0c7e9a7c7621f80ab698637bf67cef1c489eb4fbebf275f866745c817",
+      "actual_sha256": "231295f0c7e9a7c7621f80ab698637bf67cef1c489eb4fbebf275f866745c817",
+      "bytes": 188702905,
+      "metadata_checks": {
+        "smoke_only": true,
+        "condition": true,
+        "seed_42": true,
+        "epoch_1": true
+      },
+      "model_state_entries": 321,
+      "floating_state_entries": 268,
+      "nonfinite_floating_state_names": [],
+      "map_location": "cpu",
+      "weights_only": true,
+      "strict_load": {
+        "missing_keys": [],
+        "unexpected_keys": []
+      },
+      "all_model_tensors_cpu": true,
+      "full_extractor_hash_matches_record": true,
+      "optimizer_configuration_matches_stage1": true,
+      "scaler_final_scale_matches_result": true,
+      "validation_matches_result": true,
+      "final_classifier_sha256": "8b8cbce79eaabdc6fba89bd11919ca49c35d380d5b1e192849036bbd8e6f6a20"
+    }
+  },
+  "stage2_static_readiness": {
+    "scope": "STATIC_ONLY_NO_STAGE2_EXECUTION",
+    "routing": [
+      {
+        "condition": "A1",
+        "source_checkpoint": "A0",
+        "method": "crt",
+        "initial_classifier_sha256": "4dd6f1b456a5faebfbd8ba61cd6ad7ff49ef4bb5918f8c4ba6f95cf5e95f143d"
+      },
+      {
+        "condition": "A2",
+        "source_checkpoint": "A0",
+        "method": "h2t",
+        "initial_classifier_sha256": "4dd6f1b456a5faebfbd8ba61cd6ad7ff49ef4bb5918f8c4ba6f95cf5e95f143d"
+      },
+      {
+        "condition": "B1",
+        "source_checkpoint": "B0",
+        "method": "crt",
+        "initial_classifier_sha256": "8b8cbce79eaabdc6fba89bd11919ca49c35d380d5b1e192849036bbd8e6f6a20"
+      },
+      {
+        "condition": "B2",
+        "source_checkpoint": "B0",
+        "method": "pi",
+        "initial_classifier_sha256": "8b8cbce79eaabdc6fba89bd11919ca49c35d380d5b1e192849036bbd8e6f6a20"
+      }
+    ],
+    "same_a0_checkpoint_for_a1_a2": true,
+    "same_b0_checkpoint_for_b1_b2": true,
+    "all_four_common_recipient_array": true,
+    "a2_b2_common_donor_array": true,
+    "extractor_parameters_frozen_by_source": true,
+    "bn_frozen_by_eval": true,
+    "classifier_requires_grad_and_train": true,
+    "optimizer_uses_classifier_only": true,
+    "freeze_source": {
+      "file": "models.py",
+      "line": 124,
+      "end_line": 129
+    },
+    "routing_source": {
+      "line": 675,
+      "end_line": 688
+    },
+    "stage2_execution_count": 0,
+    "current_cli_flags": [
+      "--output-dir",
+      "--micro-batch",
+      "--forensic-b0-only",
+      "--b0-stage1-only",
+      "--max-batches"
+    ],
+    "standalone_existing_checkpoint_stage2_cli_present": false,
+    "limitation": "Current default smoke constructs/trains Stage-I before its Stage-II loop. Static pairing and checkpoint readiness are not authorization or proof of a standalone checkpoint-reuse invocation."
+  },
+  "optimizer_accounting": {
+    "A0": {
+      "samples": 16269,
+      "attempted_windows": 1017,
+      "actual_optimizer_updates": 1017,
+      "native_amp_skips": 0,
+      "counts_match_saved_result_and_events": true,
+      "no_audit_compensating_updates": true
+    },
+    "B0": {
+      "samples": 16269,
+      "attempted_windows": 1017,
+      "actual_optimizer_updates": 1015,
+      "native_amp_skips": 2,
+      "counts_match_saved_result_and_events": true,
+      "no_audit_compensating_updates": true
+    }
+  },
+  "b0_overflows": [
+    {
+      "batch_index": 6,
+      "parameter": "extractor.pif.fuse.weight",
+      "coordinate": [
+        0,
+        1,
+        0
+      ],
+      "scale_before": 65536.0,
+      "scale_after": 32768.0,
+      "parameters_unchanged": true,
+      "actual_steps_before": 6,
+      "actual_steps_after": 6,
+      "next_batch_real_update": 7,
+      "direct_sign_in_epoch_log": null,
+      "sign_not_directly_persisted": true
+    },
+    {
+      "batch_index": 13,
+      "parameter": "extractor.pif.fuse.weight",
+      "coordinate": [
+        0,
+        1,
+        0
+      ],
+      "scale_before": 32768.0,
+      "scale_after": 16384.0,
+      "parameters_unchanged": true,
+      "actual_steps_before": 12,
+      "actual_steps_after": 12,
+      "next_batch_real_update": 14,
+      "direct_sign_in_epoch_log": null,
+      "sign_not_directly_persisted": true
+    }
+  ],
+  "historical_execution_status": {
+    "A0": {
+      "status": "FAILED_STOPPED",
+      "completed_conditions": [
+        "A0"
+      ],
+      "stage1_completed": [
+        "A0"
+      ],
+      "stage2_completed": []
+    },
+    "B0": {
+      "status": "COMPLETE_B0_STAGE1_ONE_EPOCH_ONLY",
+      "completed_conditions": [
+        "B0"
+      ],
+      "stage1_completed": [
+        "B0"
+      ],
+      "stage2_completed": []
+    }
+  },
+  "validation_metrics": {
+    "A0": {
+      "overall": 95.57079315185547,
+      "macro": 69.88808465003967,
+      "tail_image_weighted": 22.0,
+      "tail_class_macro": 16.923077392578126,
+      "worst_class": 0.0
+    },
+    "B0": {
+      "overall": 97.4981460571289,
+      "macro": 73.35607147216797,
+      "tail_image_weighted": 37.0,
+      "tail_class_macro": 28.46153869628906,
+      "worst_class": 0.0
+    }
+  },
+  "mixup_claim_scope": "Exact stored augmented tensor hashes, CPU RNG hashes and float64 lambdas plus identical CPU randperm MixUp source and aligned schedules provide deterministic operation evidence. No stored mixed tensor/permutation was directly compared.",
+  "cpu_runtime": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_visible_devices": "",
+    "cuda_initialized_after_audit": false,
+    "model_forward_calls": 0,
+    "model_training_calls": 0,
+    "dataset_image_opens": 0
+  },
+  "source_review_notes": [
+    "Only gate sign acceptance, structured diagnostics, B0/forensic entries and execution-status bookkeeping changed. Stage-I numerical core AST projections match.",
+    "Default six-condition path removed its batch_smoke PASS status write between commits; this is a status-reporting difference, not a Stage-I forward/loss/sampling change, and default execution was not used here.",
+    "No existing standalone Stage-II checkpoint-reuse CLI was found. Stage-II readiness is static protocol/data/checkpoint readiness, not an executable authorization."
+  ],
+  "date": "2026-11-02",
+  "timezone": "Asia/Shanghai",
+  "task_type": "CPU_ONLY_READ_ONLY_SCIENTIFIC_AUDIT_WITH_AUTHORIZED_README_HEADER_UPDATE",
+  "source_equivalence_scope": "Unchanged Stage-I forward/loss/optimizer/sampling/transforms and preserved initialization. Numeric recovery policies and diagnostic/entry/status bookkeeping differences are explicitly documented; not a claim that entire files are byte-identical.",
+  "mixup_evidence_limits": [
+    "Only pre-MixUp CPU Torch RNG digest is saved, not all NumPy/CUDA RNG states. Lambda itself matches bit-for-bit in every batch.",
+    "No per-batch permutation or mixed tensor was saved, so neither was directly compared.",
+    "Identical CPU Torch RNG state, batch size, ordered input/target mapping, torch runtime and unchanged CPU randperm MixUp code support deterministic MixUp operation pairing."
+  ],
+  "stage2_readiness_scope": "Sampling/checkpoint/static protocol readiness only; no standalone existing-checkpoint Stage-II CLI or GPU execution authorization is asserted.",
+  "gpu_experiment_authorized": false,
+  "new_model_forward_calls": 0,
+  "new_backward_calls": 0,
+  "new_optimizer_updates": 0,
+  "new_gpu_runs": 0,
+  "new_stage2_runs": 0,
+  "new_test_evaluations": 0,
+  "new_seeds": [],
+  "limitations": [
+    "A0 has 1017 actual updates and B0 has 1015. Data/randomness pairing does not erase this optimizer-step asymmetry.",
+    "B0 epoch signs were not directly persisted; historical forensic signs remain reference evidence only.",
+    "Current default six-condition CLI would retrain Stage-I; do not use it as a checkpoint-reuse Stage-II launcher.",
+    "The default path also lost its batch_smoke=PASS write between source commits. This bookkeeping difference does not affect the audited Stage-I numerical core.",
+    "One-epoch validation diagnostics cannot establish PIF benefit, PI-H2T superiority, cross-domain generalization or solved tail recognition."
+  ]
+}

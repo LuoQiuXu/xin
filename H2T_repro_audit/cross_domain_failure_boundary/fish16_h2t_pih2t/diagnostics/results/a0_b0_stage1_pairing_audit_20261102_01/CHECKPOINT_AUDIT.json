@@ -1,0 +1,76 @@
+{
+  "status": "PASS",
+  "cpu_only": true,
+  "cuda_initialized": false,
+  "forward_calls": 0,
+  "checkpoint_checks": {
+    "A0": {
+      "status": "PASS",
+      "expected_sha256": "a4989aef49cfeb51e8bcb53dc43781fbf4733face96c3898e78834929fd57f43",
+      "actual_sha256": "a4989aef49cfeb51e8bcb53dc43781fbf4733face96c3898e78834929fd57f43",
+      "bytes": 188702205,
+      "metadata_checks": {
+        "smoke_only": true,
+        "condition": true,
+        "seed_42": true,
+        "epoch_1": true
+      },
+      "model_state_entries": 320,
+      "floating_state_entries": 267,
+      "nonfinite_floating_state_names": [],
+      "map_location": "cpu",
+      "weights_only": true,
+      "strict_load": {
+        "missing_keys": [],
+        "unexpected_keys": []
+      },
+      "all_model_tensors_cpu": true,
+      "full_extractor_hash_matches_record": true,
+      "optimizer_configuration_matches_stage1": true,
+      "scaler_final_scale_matches_result": true,
+      "validation_matches_result": true,
+      "final_classifier_sha256": "4dd6f1b456a5faebfbd8ba61cd6ad7ff49ef4bb5918f8c4ba6f95cf5e95f143d"
+    },
+    "B0": {
+      "status": "PASS",
+      "expected_sha256": "231295f0c7e9a7c7621f80ab698637bf67cef1c489eb4fbebf275f866745c817",
+      "actual_sha256": "231295f0c7e9a7c7621f80ab698637bf67cef1c489eb4fbebf275f866745c817",
+      "bytes": 188702905,
+      "metadata_checks": {
+        "smoke_only": true,
+        "condition": true,
+        "seed_42": true,
+        "epoch_1": true
+      },
+      "model_state_entries": 321,
+      "floating_state_entries": 268,
+      "nonfinite_floating_state_names": [],
+      "map_location": "cpu",
+      "weights_only": true,
+      "strict_load": {
+        "missing_keys": [],
+        "unexpected_keys": []
+      },
+      "all_model_tensors_cpu": true,
+      "full_extractor_hash_matches_record": true,
+      "optimizer_configuration_matches_stage1": true,
+      "scaler_final_scale_matches_result": true,
+      "validation_matches_result": true,
+      "final_classifier_sha256": "8b8cbce79eaabdc6fba89bd11919ca49c35d380d5b1e192849036bbd8e6f6a20"
+    }
+  },
+  "initialization_protocol_checks": {
+    "common_backbone_state_tensors_equal": true,
+    "common_backbone_state_tensor_count": 318,
+    "common_initial_classifier_tensors_equal": true,
+    "reconstructed_initial_classifier_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+    "a0_recorded_classifier_initial_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+    "b0_recorded_classifier_initial_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+    "classifier_record_and_cpu_reconstruction_agree": true,
+    "additional_b0_learnable_values": 2,
+    "b0_pif_initialization_matches_record": true,
+    "extractor_hashes_not_required_equal_due_to_extra_pif": true,
+    "cpu_only": true,
+    "author_initialization_claim": "Local preserved initialization; no new claim of author protocol parity"
+  }
+}
