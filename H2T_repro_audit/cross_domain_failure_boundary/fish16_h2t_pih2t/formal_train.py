@@ -385,7 +385,9 @@ class FormalRun:
                     "stage2_lrs": [epoch_lr(2,e) for e in range(10)],
                     "source_hashes": self.hashes, "original_sources": expected,
                     "manifest_sha256": data.EXPECTED_SHA, "official_weight_sha256": models.ORIGINAL_SHA,
-                    "numeric_flags": {"deterministic": True, "benchmark": False,\n                                      "cudnn_tf32": False, "matmul_tf32": False},\n                    "amp_scaler": FORMAL_AMP_POLICY,
+                    "numeric_flags": {"deterministic": True, "benchmark": False,
+                                      "cudnn_tf32": False, "matmul_tf32": False},
+                    "amp_scaler": FORMAL_AMP_POLICY,
                     "stage2_source_policy": "final_formal_stage1_epoch90",
                     "best_selection_metric": "validation_overall", "environment": environment}
         self.protocol = hashlib.sha256(json_bytes(protocol)).hexdigest()
