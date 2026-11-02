@@ -1,3 +1,19 @@
+# CURRENT EXECUTION STATUS — 2026-11-02
+
+**This section supersedes the older run authorization below.** The previous six-condition smoke stopped in B0 Stage-I. The Batch-13 negative-Inf event has been captured and exactly replayed; the sign-specific AMP recovery gate has now been corrected narrowly.
+
+The only next authorized GPU work is:
+1. Replay the saved Batch-13 snapshot once with the real GradScaler and updated guard.
+2. Only if that replay passes, run one full B0 Stage-I epoch plus validation using `--b0-stage1-only`.
+
+Do not run A0, A1, A2, B1, B2, the six-condition smoke, Stage-II, TEST, formal 90+10 training, or seeds 43/44 under this authorization. The six-condition design below remains the planned comparison, not the currently authorized run.
+
+The updated gate permits exactly one Inf of either sign at `extractor.pif.fuse.weight[0,1,0]` during the explicitly authorized B0 Stage-I condition. NaN, missing gradients, other coordinates/parameters, multiple Inf values, disabled GradScaler, and skip-limit violations remain fatal. The first archived overflow is expected at batch 6; later individually audited PIF-b overflows are not hard-coded away. Total skips remain capped at 3 and consecutive skips at 2.
+
+Follow `CODEX_B0_AMP_RECOVERY_VALIDATION.txt` for the complete preflight, snapshot replay, B0-only command, and output protocol.
+
+---
+
 # Fish4Knowledge-16: H2T / PI-H2T six-condition smoke
 
 Current implementation branch: `experiment/fish16-six-condition-smoke-20261101`.
