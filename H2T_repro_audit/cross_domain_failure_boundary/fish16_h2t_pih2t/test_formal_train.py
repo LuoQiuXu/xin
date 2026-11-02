@@ -51,6 +51,38 @@ class FormalTests(unittest.TestCase):
         with self.assertRaises(ValueError):restored.apply(optimizer,4)
         with self.assertRaises(ValueError):f.EpochSchedule(2).load_state_dict(schedule.state_dict())
 
+    def test_formal_amp_policy_prevents_growth_during_one_condition(self):
+        policy = f.FORMAL_AMP_POLICY
+        self.assertEqual(policy["init_scale"], 65536.0)
+        self.assertEqual(policy["growth_interval"], 100000)
+        self.assertGreater(policy["growth_interval"], policy["stage1_max_attempts"])
+        self.assertGreater(policy["growth_interval"], policy["stage2_max_attempts"])
+        self.assertFalse(policy["automatic_growth_during_condition"])
+        # GradScaler construction is lazy; this checks its configuration without
+        # executing a CUDA kernel or a GPU smoke run.
+        with patch("torch.cuda.is_available", return_value=True):
+            scaler = f.make_formal_grad_scaler()
+        self.assertTrue(scaler.is_enabled())
+        self.assertEqual(scaler.get_scale(), 65536.0)
+        self.assertEqual(scaler.get_growth_interval(), 100000)
+
+    def test_json_normalize_handles_tuple_list_resume_roundtrip(self):
+        record = {
+            "overflow_events": [{
+                "nonfinite_parameters": ("extractor.pif.fuse.weight",),
+                "nonfinite_positions": {"extractor.pif.fuse.weight": ((0, 1, 0),)},
+            }]
+        }
+        restored = f.json_normalize(record)
+        self.assertEqual(
+            restored,
+            {"overflow_events": [{
+                "nonfinite_parameters": ["extractor.pif.fuse.weight"],
+                "nonfinite_positions": {"extractor.pif.fuse.weight": [[0, 1, 0]]},
+            }]},
+        )
+        self.assertEqual(restored, __import__("json").loads(__import__("json").dumps(record)))
+
     def test_routing_uses_one_final_source_per_pair(self):
         self.assertEqual([f.stage2_source(c) for c in ["A1","A2","B1","B2"]],["A0","A0","B0","B0"])
         self.assertEqual([f.ROUTES[c][1] for c in ["A1","A2","B1","B2"]],["crt","h2t","crt","pi"])
