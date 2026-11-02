@@ -1,0 +1,239 @@
+{
+  "status": "PASS_NATIVE_RECOVERY_AND_COMPLETE_B0_STAGE1",
+  "decision": "STOP_FOR_SCIENTIFIC_REVIEW",
+  "date": "2026-11-02",
+  "timezone": "Asia/Shanghai",
+  "branch": "experiment/fish16-six-condition-smoke-20261101",
+  "execution_commit": "d47cbd7293402fd02634c176d7e16db288b936b9",
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "external_validation_directory": "D:\\h2t_cross_domain_results\\fish16_b0_amp_recovery_validation_20261102_01",
+  "external_training_directory": "D:\\h2t_cross_domain_results\\fish16_b0_amp_recovery_validation_20261102_01\\b0_stage1_one_epoch",
+  "input_forensic_directory": "D:\\h2t_cross_domain_results\\fish16_b0_gradient_forensic_seed42_20261101_01",
+  "input_snapshot_sha256": "428be9c2db422ed1fcb2e5a1a440c803764a6fd8729914c1401ee16be0bb4b65",
+  "stage_order_verified": true,
+  "preflight": {
+    "syntax_passed": 3,
+    "syntax_total": 3,
+    "amp_tests_passed": 12,
+    "amp_tests_total": 12,
+    "contract_tests_passed": 10,
+    "contract_tests_total": 10,
+    "diagnostic_tests_passed": 5,
+    "diagnostic_tests_total": 5,
+    "all_exit_codes_zero": true
+  },
+  "snapshot_replay": {
+    "status": "PASS_EXACT_NEGATIVE_INF_NATIVE_RECOVERY",
+    "scope": "ONE_DISPOSABLE_SAVED_BATCH13_REPLAY",
+    "starting_scale": 32768.0,
+    "scale_after_unscale": 32768.0,
+    "scale_after_native_update": 16384.0,
+    "loss": 2.4193460941314697,
+    "loss_bitwise_equal": true,
+    "logits_bitwise_equal": true,
+    "pif_gradient_bitwise_equal": true,
+    "pif_differing_elements": [],
+    "gradient_diagnostics_equal": true,
+    "missing_gradient_parameters": [],
+    "nan_count": 0,
+    "positive_inf_count": 0,
+    "negative_inf_count": 1,
+    "nonfinite_parameter": "extractor.pif.fuse.weight",
+    "nonfinite_coordinate": [
+      0,
+      1,
+      0
+    ],
+    "native_guard_outcome": {
+      "kind": "recoverable_pif_b_overflow_skip",
+      "scale_before": 32768.0,
+      "scale_after": 16384.0,
+      "optimizer_steps_before": 0,
+      "optimizer_steps_after": 0,
+      "nan_count": 0,
+      "inf_count": 1,
+      "nonfinite_parameters": [
+        "extractor.pif.fuse.weight"
+      ],
+      "nonfinite_positions": {
+        "extractor.pif.fuse.weight": [
+          [
+            0,
+            1,
+            0
+          ]
+        ]
+      },
+      "parameter_sha_before": "0169c02534127a83aff1c42bb1f02e5b4fe65f20601d2f57ddba31737a3e41f0",
+      "parameter_sha_after": "0169c02534127a83aff1c42bb1f02e5b4fe65f20601d2f57ddba31737a3e41f0"
+    },
+    "actual_optimizer_step_calls": 0,
+    "parameters_unchanged": true,
+    "optimizer_state_unchanged": true,
+    "original_snapshot_unchanged": true,
+    "original_snapshot_sha256": "428be9c2db422ed1fcb2e5a1a440c803764a6fd8729914c1401ee16be0bb4b65",
+    "backward_invocations": 1,
+    "guarded_attempts": 1,
+    "dataset_access": false,
+    "counterfactuals": 0,
+    "bn_note": "Train replay may update clone BN running buffers. Only model parameters and optimizer state are claimed unchanged.",
+    "disposable_not_reused_for_training": true,
+    "elapsed_seconds": 2.3649436000268906
+  },
+  "actual_execution_status": {
+    "status": "COMPLETE_B0_STAGE1_ONE_EPOCH_ONLY",
+    "scope": "B0_STAGE1_ONE_EPOCH_ONLY",
+    "completed_conditions": [
+      "B0"
+    ],
+    "stage1_completed": [
+      "B0"
+    ],
+    "stage2_completed": [],
+    "batch_smoke": "SKIPPED_B0_STAGE1_ONLY",
+    "formal_training_started": false,
+    "test_evaluations": 0,
+    "additional_seeds_started": []
+  },
+  "b0_stage1": {
+    "samples": 16269,
+    "attempted_optimizer_steps": 1017,
+    "optimizer_updates": 1015,
+    "amp_overflow_skips": 2,
+    "max_consecutive_overflow_skips": 1,
+    "initial_loss_scale": 65536.0,
+    "final_loss_scale": 16384.0,
+    "gradient_audit_windows": 1017,
+    "lr": 0.002,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "micro_batch": 16,
+    "accumulation": 1,
+    "effective_batch": 16,
+    "amp": true,
+    "workers": 4,
+    "train_loss": 1.0153886602121123,
+    "train_seconds": 128.016362400027,
+    "train_images_per_second": 127.08531702504125,
+    "peak_allocated_mib": 1040.353515625,
+    "pif_before": [
+      -0.027100861072540283,
+      -0.604386568069458
+    ],
+    "pif_after": [
+      -0.6486831307411194,
+      -0.41493043303489685
+    ]
+  },
+  "validation": {
+    "overall": 97.4981460571289,
+    "macro": 73.35607147216797,
+    "worst_class": 0.0,
+    "group_image": {
+      "Head": 98.96475982666016,
+      "Medium": 92.67399597167969,
+      "Tail": 37.0
+    },
+    "group_macro": {
+      "Head": 98.86793899536133,
+      "Medium": 87.63636322021485,
+      "Tail": 28.46153869628906
+    }
+  },
+  "validation_images": 5396,
+  "validation_metric_units": "percent",
+  "train_loss_definition": "Sample-weighted mean across all 16269 forward samples, including the two native skipped optimizer windows. A separate last-batch loss is not persisted.",
+  "process_wall_seconds": 147.29092289996333,
+  "native_overflow_events": [
+    {
+      "batch_index": 6,
+      "parameter": "extractor.pif.fuse.weight",
+      "coordinate": [
+        0,
+        1,
+        0
+      ],
+      "inf_count": 1,
+      "nan_count": 0,
+      "direct_epoch_inf_sign": null,
+      "sign_persisted_in_epoch_event": false,
+      "corresponding_reference_sign": "positive_inf",
+      "reference_evidence": "2026-11-01 accepted positive-only forensic event plus archived exact Batch6 trace",
+      "pre_guard_parameter_sha_matches_reference": true,
+      "recipient_view_rng_and_mixup_controls_match_reference": true,
+      "scale_before": 65536.0,
+      "scale_after": 32768.0,
+      "actual_optimizer_steps_before": 6,
+      "actual_optimizer_steps_after": 6,
+      "parameters_unchanged_during_skip": true,
+      "following_batch": 7,
+      "following_window_actual_update": true,
+      "following_scale": 32768.0
+    },
+    {
+      "batch_index": 13,
+      "parameter": "extractor.pif.fuse.weight",
+      "coordinate": [
+        0,
+        1,
+        0
+      ],
+      "inf_count": 1,
+      "nan_count": 0,
+      "direct_epoch_inf_sign": null,
+      "sign_persisted_in_epoch_event": false,
+      "corresponding_reference_sign": "negative_inf",
+      "reference_evidence": "2026-11-01 saved negative-Inf snapshot and this task exact CUDA replay",
+      "pre_guard_parameter_sha_matches_reference": true,
+      "recipient_view_rng_and_mixup_controls_match_reference": true,
+      "scale_before": 32768.0,
+      "scale_after": 16384.0,
+      "actual_optimizer_steps_before": 12,
+      "actual_optimizer_steps_after": 12,
+      "parameters_unchanged_during_skip": true,
+      "following_batch": 14,
+      "following_window_actual_update": true,
+      "following_scale": 16384.0
+    }
+  ],
+  "overflow_contract_checks": {
+    "total_skips_within_limit_3": true,
+    "maximum_consecutive_within_limit_2": true,
+    "every_skip_exact_single_pif_b_inf_no_nan": true,
+    "each_skip_no_actual_update_and_unchanged_parameters": true,
+    "next_window_real_update_at_reduced_scale": true
+  },
+  "checkpoint": {
+    "relative_file": "b0_stage1_one_epoch/B0/smoke_epoch001.pth",
+    "bytes": 188702905,
+    "sha256": "231295f0c7e9a7c7621f80ab698637bf67cef1c489eb4fbebf275f866745c817",
+    "local_only": true,
+    "selection": "Only epoch1, no TEST selection"
+  },
+  "protection": {
+    "protected_files_sha_size_mtime_unchanged": 52,
+    "original_upstream_sources_unchanged": true,
+    "task_sources_unchanged_during_execution": true,
+    "previous_forensic_and_smoke_outputs_unchanged": true,
+    "manifest_official_weights_unchanged": true,
+    "original_snapshot_byte_identical": true
+  },
+  "limitations": [
+    "This validates native skip/backoff for the narrowly defined PIF-b Inf signature; the internal operation first producing negative Inf remains unproven.",
+    "The full-epoch runner records coordinates/counts but not Inf signs. Signs in reference evidence are not relabeled as directly logged full-epoch signs.",
+    "A single B0 Stage-I epoch with validation does not establish method performance, six-condition completion, Stage-II efficacy or cross-domain generalization."
+  ],
+  "other_conditions_executed": [],
+  "stage2_epochs": 0,
+  "test_evaluations": 0,
+  "formal_90_plus_10_started": false,
+  "extra_seeds": [],
+  "retries": 0
+}
