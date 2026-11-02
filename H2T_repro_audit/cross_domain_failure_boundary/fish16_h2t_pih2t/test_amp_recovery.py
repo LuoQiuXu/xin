@@ -68,7 +68,7 @@ class AmpRecoveryTests(unittest.TestCase):
         if hasattr(self, "counter"):
             self.counter.close()
 
-    def test_exact_pif_b_inf_is_skipped_and_scale_is_reduced(self):
+    def test_positive_inf_at_pif_b_is_skipped_and_scale_is_reduced(self):
         model, optimizer, self.counter, named = make_case()
         model_before = parameter_sha(named)
         model.extractor.pif.fuse.weight.grad[0, 1, 0] = float("inf")
@@ -86,6 +86,7 @@ class AmpRecoveryTests(unittest.TestCase):
         self.assertEqual(result.kind, "recoverable_pif_b_overflow_skip")
         self.assertEqual(result.inf_count, 1)
         self.assertEqual(result.nan_count, 0)
+        self.assertTrue(torch.isposinf(model.extractor.pif.fuse.weight.grad[0, 1, 0]))
         self.assertEqual(result.scale_before, 65536.0)
         self.assertEqual(result.scale_after, 32768.0)
         self.assertEqual(self.counter.count, 0)
@@ -181,20 +182,31 @@ class AmpRecoveryTests(unittest.TestCase):
         self.assertEqual(caught.exception.diagnostics["nonfinite_positions"]["extractor.pif.fuse.weight"], [[0, 0, 0]])
         self.assertEqual(scaler.step_calls, 0)
 
-    def test_negative_inf_at_pif_b_is_not_the_archived_event(self):
+    def test_negative_inf_at_pif_b_is_also_skipped_and_scale_is_reduced(self):
         model, optimizer, self.counter, named = make_case()
+        model_before = parameter_sha(named)
         model.extractor.pif.fuse.weight.grad[0, 1, 0] = float("-inf")
         scaler = FakeScaler()
 
-        with self.assertRaises(GradientContractError):
-            guarded_scaler_step(
-                optimizer=optimizer,
-                scaler=scaler,
-                named_parameters=named,
-                step_counter=self.counter,
-                allow_pif_b_overflow=True,
-            )
-        self.assertEqual(scaler.step_calls, 0)
+        result = guarded_scaler_step(
+            optimizer=optimizer,
+            scaler=scaler,
+            named_parameters=named,
+            step_counter=self.counter,
+            allow_pif_b_overflow=True,
+        )
+
+        self.assertTrue(result.skipped)
+        self.assertEqual(result.kind, "recoverable_pif_b_overflow_skip")
+        self.assertEqual(result.inf_count, 1)
+        self.assertEqual(result.nan_count, 0)
+        self.assertTrue(torch.isneginf(model.extractor.pif.fuse.weight.grad[0, 1, 0]))
+        self.assertEqual(result.scale_before, 65536.0)
+        self.assertEqual(result.scale_after, 32768.0)
+        self.assertEqual(self.counter.count, 0)
+        self.assertEqual(scaler.step_calls, 1)
+        self.assertEqual(scaler.update_calls, 1)
+        self.assertEqual(parameter_sha(named), model_before)
 
     def test_multiple_inf_values_are_fatal(self):
         model, optimizer, self.counter, named = make_case()
