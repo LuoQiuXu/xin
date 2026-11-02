@@ -1,6 +1,6 @@
 # CURRENT EXECUTION STATUS — 2026-11-02
 
-**The first formal seed-42 pilot was started and is now FAILED_STOPPED. Do not automatically resume or start further GPU work. This status supersedes historical smoke authorizations below.**
+**Historical execution record: the first formal seed-42 pilot is FAILED_STOPPED. Do not resume the _01 run or continue on its original branch. The correction branch and its exact-snapshot replay gate below define the only next step.**
 
 Execution code: c6805db4b1a806b2a7830a48d131f9d1acfa617e on experiment/fish16-formal-90x10-20261102. Two syntax checks and 34 CPU tests passed, then the formal runner started directly without another GPU smoke.
 
@@ -10,7 +10,7 @@ B0, A1, A2, B1 and B2 were not started. The 90+10 pilot is incomplete, and neith
 
 See [the formal run report](diagnostics/results/formal_seed42_90x10_20261102_01/FORMAL_RUN_REPORT.md). Runtime failure evidence and implementation/resume limits are explicit there. No numerical workaround, modified setting, extra diagnostic or automatic retry followed this failure.
 
-Stop for scientific review. The following protocol is historical context, not current permission for smoke or formal continuation.
+The failure record above is immutable historical evidence. The corrected plan below supersedes the old stop instruction: run only the exact saved-batch AMP replay on the correction branch, and start a fresh formal run only if the expected scale-dependent failure is reproduced. Do not use the old partial checkpoint or old output directory for continuation.
 
 ---
 
