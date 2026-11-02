@@ -1,0 +1,255 @@
+CODEX TASK — B0 AMP SIGN-AGNOSTIC RECOVERY VALIDATION
+Date: 2026-11-02
+Repository: LuoQiuXu/xin
+Required branch: experiment/fish16-six-condition-smoke-20261101
+
+PURPOSE
+-------
+Validate the narrow correction to the PIF-b AMP recovery contract using the
+saved Batch-13 negative-Inf snapshot, then run exactly one full B0 Stage-I
+epoch. Do not run the six-condition smoke or any Stage-II condition.
+
+The source correction has already been committed to the required branch:
+- amp_recovery.py accepts exactly one +Inf OR -Inf at
+  extractor.pif.fuse.weight[0,1,0] when B0 permission is enabled;
+- NaN, missing gradients, other parameters/coordinates, multiple Inf values,
+  disabled GradScaler, and skip-limit violations remain fail-closed;
+- smoke.py has a dedicated --b0-stage1-only entry point;
+- the full-epoch invariant still expects the historically observed first
+  overflow at batch 6 but no longer assumes that it is the only possible
+  individually audited PIF-b overflow.
+
+This change does NOT establish the first internal operation that produced the
+negative Inf. It only validates whether native GradScaler can safely skip the
+optimizer update and back off for this exact narrowly permitted gradient
+signature. Do not claim a numerical root cause unless new direct evidence
+supports it.
+
+======================================================================
+0. ABSOLUTE SCIENTIFIC SCOPE
+======================================================================
+
+Allowed:
+1. CPU syntax/unit tests.
+2. Exactly one disposable replay of the saved Batch-13 failure snapshot,
+   using the real CUDA GradScaler and the updated guard.
+3. If and only if the replay passes all required assertions, one full B0
+   Stage-I epoch with validation, using --b0-stage1-only.
+
+Not allowed:
+- no A0, A1, A2, B1, or B2 execution;
+- no six-condition smoke;
+- no Stage-II training;
+- no formal 90+10 epoch training;
+- no TEST evaluation;
+- no seed 43/44;
+- no change to PIF/H2T/PI-H2TF formula, initialization, architecture,
+  optimizer, learning rate, sampling, donor schedule, transforms, or data;
+- no lowering the scale manually, no FP32 counterfactual, no gradient
+  clipping/replacement, no skipped data batches, no retry with micro-batch 8;
+- no edits to original upstream H2T/PI-H2T source files;
+- no new branch, no force push, no reset/stash/clean.
+
+======================================================================
+1. GIT SAFETY AND SOURCE AUDIT
+======================================================================
+
+Run:
+  git fetch origin
+  git status --short
+  git branch --show-current
+  git rev-parse HEAD
+  git rev-parse origin/experiment/fish16-six-condition-smoke-20261101
+
+The current branch must be exactly:
+  experiment/fish16-six-condition-smoke-20261101
+
+If the worktree is dirty, STOP and report. Do not discard user changes.
+If the local branch is behind origin and clean, fast-forward only:
+  git merge --ff-only origin/experiment/fish16-six-condition-smoke-20261101
+
+Do not create or switch to another branch. Confirm the source correction is
+present in amp_recovery.py, test_amp_recovery.py, and smoke.py. Inspect the
+diff and verify that the original upstream H2T/PI-H2T files and locked
+manifest/official weights are unchanged.
+
+======================================================================
+2. CPU VALIDATION — BEFORE CUDA
+======================================================================
+
+Use the established environment:
+  $PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
+
+From the repository root, run syntax checks:
+  & $PY -B -X utf8 -m py_compile H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\amp_recovery.py
+  & $PY -B -X utf8 -m py_compile H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py
+  & $PY -B -X utf8 -m py_compile H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\test_amp_recovery.py
+
+Run:
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_amp_recovery.py" -v
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t -p "test_contract.py" -v
+  & $PY -B -X utf8 -m unittest discover -s H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics -p "test_*.py" -v
+
+Expected:
+- AMP recovery: 12/12, including both positive-Inf and negative-Inf PIF-b
+  skip/backoff tests;
+- model/data contract: 10/10;
+- diagnostic statistics: 5/5;
+- all syntax checks and commands exit 0.
+
+Preserve full logs and exit codes in a NEW external directory:
+  D:\h2t_cross_domain_results\fish16_b0_amp_recovery_validation_20261102_01\preflight
+
+If any CPU check fails, STOP before CUDA. Do not modify tests merely to make
+them pass.
+
+======================================================================
+3. REAL GRADSCALER REPLAY OF THE SAVED NEGATIVE-INF SNAPSHOT
+======================================================================
+
+Required input snapshot:
+  D:\h2t_cross_domain_results\fish16_b0_gradient_forensic_seed42_20261101_01\B0\GRADIENT_FAILURE_SNAPSHOT.pt
+
+Required compact failure record:
+  D:\h2t_cross_domain_results\fish16_b0_gradient_forensic_seed42_20261101_01\B0\GRADIENT_FAILURE.json
+
+If either file is missing, STOP and report. Do not fabricate or approximate
+the snapshot.
+
+Create a temporary replay script and all logs under the external validation
+directory, not in the repository. Inspect the snapshot keys before use. The
+snapshot is expected to contain:
+- model_state_after_forward_before_optimizer_step;
+- optimizer_state_before_failed_step;
+- scaler_state_after_unscale_before_update;
+- mixed_input;
+- mixup_target_a, mixup_target_b, mixup_lambda;
+- nonfinite_or_pif_gradients;
+- CPU/CUDA RNG states.
+
+Use the exact existing replay procedure from the 2026-11-01 forensic work if
+its script is available. Otherwise reconstruct it from the saved snapshot and
+the current source, without changing the snapshot or training source.
+
+Replay requirements:
+1. Instantiate models.FishModel(True), load the saved model state with
+   strict=True, and use a disposable model instance only.
+2. Set model.train(); recreate SGD over model.parameters() with LR 0.002,
+   momentum 0.9, weight_decay 1e-4; load the saved optimizer state.
+3. Create make_grad_scaler() and load the saved scaler state. The starting
+   scale must be exactly 32768.
+4. Restore the saved RNG state in the same way as the prior exact replay.
+5. Recompute the exact two-target MixUp forward on the saved mixed_input:
+   under CUDA FP16 autocast, compute logits=model(mixed_input), then
+   loss=lambda*CE(logits,target_a)+(1-lambda)*CE(logits,target_b).
+6. Call scaler.scale(loss).backward(), then scaler.unscale_(optimizer).
+   Do not manually edit or replace any gradient.
+7. Audit every optimizer parameter gradient before the guard:
+   - no missing gradients;
+   - zero NaNs;
+   - exactly one Inf total;
+   - the only nonfinite value is -Inf at
+     extractor.pif.fuse.weight[0,1,0];
+   - all other parameter gradients are finite;
+   - compare the PIF gradient against the saved PIF gradient tensor and
+     report exact agreement or every differing element.
+8. Create OptimizerStepCounter(optimizer), record parameter_sha and optimizer
+   state before the guarded attempt, then call:
+     guarded_scaler_step(
+       optimizer=optimizer,
+       scaler=scaler,
+       named_parameters=named_optimizer_parameters,
+       step_counter=step_counter,
+       allow_pif_b_overflow=True,
+       consecutive_overflow_skips=0,
+       max_consecutive_overflow_skips=2,
+     )
+9. Required result:
+   - result.skipped is True;
+   - result.kind == "recoverable_pif_b_overflow_skip";
+   - scale changes exactly 32768 -> 16384 under the configured 0.5 backoff;
+   - actual optimizer-step counter remains 0;
+   - model parameter SHA is unchanged;
+   - optimizer state is unchanged;
+   - no parameter update occurred.
+10. This is a disposable replay. Do not use its model, optimizer, or scaler
+    for training. BatchNorm running buffers may be updated by the replay
+    forward; do not claim buffers are unchanged. The original snapshot must
+    remain byte-for-byte unchanged.
+
+If the gradient replay is not exact, or any required condition fails, preserve
+all logs and STOP. Do not run B0 Stage-I.
+
+Save a compact replay result JSON and a readable report under the external
+validation directory. Do not upload the snapshot or raw tensors.
+
+======================================================================
+4. ONE FULL B0 STAGE-I EPOCH ONLY
+======================================================================
+
+Only after Sections 2 and 3 pass, run exactly:
+  & $PY -B -X utf8 -u H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py --output-dir "D:\h2t_cross_domain_results\fish16_b0_amp_recovery_validation_20261102_01\b0_stage1_one_epoch" --micro-batch 16 --b0-stage1-only
+
+This new mode must execute:
+- B0 only;
+- one complete Stage-I epoch over all 16,269 training samples;
+- seed 42;
+- official 19c8e357 ResNet50 initialization;
+- PIF original formula and initialization;
+- SGD LR 0.002, momentum 0.9, weight decay 1e-4;
+- FP16 autocast and the configured native GradScaler;
+- micro/effective batch 16;
+- existing locked sampler, MixUp, transforms, and manifest.
+
+It must NOT execute A0, A1, A2, B1, B2, Stage-II, or TEST.
+The existing one-epoch validation pass is allowed and must be reported as
+validation, never TEST.
+
+Recovery accounting:
+- every accepted overflow must still be exactly one Inf at the exact PIF-b
+  coordinate, either sign, with no NaN or other nonfinite gradient;
+- every accepted overflow must be a native GradScaler skip/backoff;
+- the guard must verify no optimizer update and unchanged model parameters;
+- retain the existing maximum of 3 total overflow skips and at most 2
+  consecutive skips;
+- after each skip, the next optimizer window must execute a real update at
+  the reduced scale;
+- at micro-batch 16, the first archived overflow is expected at batch 6,
+  scale 65536 -> 32768. Do not assume this must be the only overflow.
+
+If the run stops, preserve the failure snapshot/logs and do not retry with
+modified precision, scale, batch size, or algorithm.
+
+======================================================================
+5. REQUIRED OUTPUTS AND GIT PUBLICATION
+======================================================================
+
+Keep all full run data, checkpoints, logs, snapshots, and tensor artifacts in
+the external output directory. Do not commit bulky or data-derived artifacts.
+
+Create a compact result folder:
+  H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\diagnostics\results\b0_amp_recovery_validation_20261102_01
+
+Commit only:
+- B0_AMP_RECOVERY_RESULT.json;
+- B0_AMP_RECOVERY_REPORT.md;
+- OUTPUT_SHA256.csv (hashes/sizes for the external replay and B0 run outputs).
+
+The report must distinguish:
+- CPU unit-test evidence;
+- exact saved-snapshot replay evidence;
+- full B0 Stage-I one-epoch evidence;
+- number/sign/location of overflow skips and scale transitions;
+- actual optimizer updates versus attempted windows;
+- training metrics versus validation metrics;
+- any failure or unresolved question.
+
+Do not claim formal training, six-condition completion, Stage-II efficacy,
+cross-domain generalization, or TEST performance.
+
+Do not overwrite:
+- the 2026-11-01 forensic report/result;
+- the previous six-condition smoke report/results;
+- any protected original source, manifest, or official weight.
+
+After committing the compact result, stop and wait for scientific review.
