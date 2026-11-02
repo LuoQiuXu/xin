@@ -1,3 +1,17 @@
+# CURRENT EXECUTION STATUS — 2026-11-03
+
+**Corrected formal attempt _02 is FAILED_STOPPED. Do not automatically resume, replay the new failure, or start further conditions. The older plans below are historical context.**
+
+Branch: experiment/fish16-amp-scale-stability-20261102. Execution code: 7e2b42a085a5840ab94dc9e8604ce3ff62beb821. Required syntax5 plus replay syntax1 and all36 CPU tests passed. One backward per scale on the old A0 snapshot confirmed finite gradients at65536/131072 and the exact classifier.bias[0] negative Inf at262144; every replay made zero optimizer/scaler updates.
+
+A fresh common-ImageNet formal attempt then completed65/90 A0 epochs, and stopped at epoch66, zero-based batch955, scale65536: conv1.weight has147 NaNs; bn1.weight[32] and bn1.bias[32] each have one negative Inf. The rejected window called no scaler.step/update. Actual SGD updates=67060 (66105 committed plus955 partial); native skips=0; scale-growth events=0.
+
+B0 and A1/A2/B1/B2 were not started. No epoch90 source exists and neither paired method effect can be calculated. The new failure's internal cause remains undetermined; no new replay, numerical workaround, changed setting or retry followed it. TEST images=0, seeds43/44=0. All checkpoints, complete logs and snapshots remain outside Git; the entire old _01 scene is preserved.
+
+See [the corrected formal report](diagnostics/results/formal_seed42_90x10_20261102_02/FORMAL_RUN_REPORT.md) and [the exact saved-batch replay report](diagnostics/results/a0_amp_scale_replay_20261102_01/AMP_SCALE_REPLAY_REPORT.md). Stop for scientific review.
+
+---
+
 # CURRENT EXECUTION STATUS — 2026-11-02
 
 **Historical execution record: the first formal seed-42 pilot is FAILED_STOPPED. Do not resume the _01 run or continue on its original branch. The correction branch and its exact-snapshot replay gate below define the only next step.**

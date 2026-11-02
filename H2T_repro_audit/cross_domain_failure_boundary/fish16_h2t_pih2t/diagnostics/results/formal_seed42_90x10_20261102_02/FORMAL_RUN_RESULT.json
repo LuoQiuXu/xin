@@ -1,0 +1,725 @@
+{
+  "status": "FAILED_STOPPED",
+  "scope": "CORRECTED_FORMAL_SEED42_90_PLUS_10_PILOT",
+  "branch": "experiment/fish16-amp-scale-stability-20261102",
+  "code_commit": "7e2b42a085a5840ab94dc9e8604ce3ff62beb821",
+  "protocol_sha256": "cc26fc7a8b63284a7e49acfba4246e28bfa6f3013fce4e0a7993fc564a7de95a",
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "amp_policy": {
+    "device": "cuda",
+    "enabled": true,
+    "init_scale": 65536.0,
+    "growth_factor": 2.0,
+    "backoff_factor": 0.5,
+    "growth_interval": 100000,
+    "stage1_max_attempts": 91530,
+    "stage2_max_attempts": 10170,
+    "automatic_growth_during_condition": false
+  },
+  "cpu_validation": {
+    "status": "PASS",
+    "initial_worktree_clean_before_replay_implementation": true,
+    "branch": "experiment/fish16-amp-scale-stability-20261102",
+    "git_head_before_replay_commit": "399991cc0cea22cd58c5161b8a0145c8c8efe6cc",
+    "checks": [
+      {
+        "name": "SYNTAX",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "py_compile",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\formal_train.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\models.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\data.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\amp_recovery.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_formal_train.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\replay_a0_amp_scales.py"
+        ],
+        "exit_code": 0,
+        "expected_tests": null,
+        "wall_seconds": 0.21384410001337528,
+        "log": "SYNTAX.txt"
+      },
+      {
+        "name": "AMP_RECOVERY_TESTS",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+          "-p",
+          "test_amp_recovery.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_tests": 12,
+        "wall_seconds": 11.359726400114596,
+        "log": "AMP_RECOVERY_TESTS.txt"
+      },
+      {
+        "name": "CONTRACT_TESTS",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+          "-p",
+          "test_contract.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_tests": 10,
+        "wall_seconds": 12.20353340008296,
+        "log": "CONTRACT_TESTS.txt"
+      },
+      {
+        "name": "FORMAL_CPU_TESTS",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+          "-p",
+          "test_formal_train.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_tests": 14,
+        "wall_seconds": 9.009921199874952,
+        "log": "FORMAL_CPU_TESTS.txt"
+      }
+    ],
+    "source_hashes": {
+      "formal_train.py": "f2642f514fa937a687b06b43b8f85585a4526935bb85a0d2f2ca4a2bb8f07ec3",
+      "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+      "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+      "amp_recovery.py": "21448931b545323015d36ba64a10b76a0b15dbf6290512d577b28c1bcf8ac75a"
+    },
+    "replay_script_sha256": "5a0deb0bb112055d3b0aff1cad531ea7203c8a596a7450be1bfd55871815bab1",
+    "syntax_files": 6,
+    "required_syntax_files": 5,
+    "cpu_tests_passed": 36,
+    "gpu_smoke_runs": 0,
+    "formal_training_started": false,
+    "amp_recovery_byte_unchanged_from_failed_run": true
+  },
+  "replay": {
+    "status": "PASS",
+    "snapshot_sha256": "e07a48ec6a6cd95cc47b5c7875d6736e6c6f656fa65c05fb62c8505ac192400c",
+    "saved_forward_matches": true,
+    "scales": [
+      {
+        "scale": 65536,
+        "all_gradients_finite": true,
+        "missing_gradients": [],
+        "nan_count": 0,
+        "inf_count": 0,
+        "classifier_bias_0_gradient": -0.271240234375,
+        "logits_equal": true,
+        "loss_equal": true,
+        "optimizer_step_calls": 0,
+        "scaler_step_calls": 0,
+        "scaler_update_calls": 0
+      },
+      {
+        "scale": 131072,
+        "all_gradients_finite": true,
+        "missing_gradients": [],
+        "nan_count": 0,
+        "inf_count": 0,
+        "classifier_bias_0_gradient": -0.271240234375,
+        "logits_equal": true,
+        "loss_equal": true,
+        "optimizer_step_calls": 0,
+        "scaler_step_calls": 0,
+        "scaler_update_calls": 0
+      },
+      {
+        "scale": 262144,
+        "all_gradients_finite": false,
+        "missing_gradients": [],
+        "nan_count": 0,
+        "inf_count": 1,
+        "classifier_bias_0_gradient": "-Inf",
+        "logits_equal": true,
+        "loss_equal": true,
+        "optimizer_step_calls": 0,
+        "scaler_step_calls": 0,
+        "scaler_update_calls": 0
+      }
+    ]
+  },
+  "external_output_directory": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261102_02",
+  "preflight_directory": "D:\\h2t_cross_domain_results\\fish16_formal_preflight_ampfix_20261102_01",
+  "external_replay_directory": "D:\\h2t_cross_domain_results\\fish16_a0_amp_scale_replay_20261102_01",
+  "process_exit": {
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-X",
+      "utf8",
+      "-u",
+      "H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\formal_train.py",
+      "--output-dir",
+      "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261102_02",
+      "--cpu-validation-record",
+      "D:\\h2t_cross_domain_results\\fish16_formal_preflight_ampfix_20261102_01\\CPU_VALIDATION.json"
+    ],
+    "pid": 25624,
+    "exit_code": 1,
+    "wall_seconds": 11638.167360600084,
+    "code_commit": "7e2b42a085a5840ab94dc9e8604ce3ff62beb821",
+    "formal_invocations": 1,
+    "automatic_retry": false
+  },
+  "conditions": {
+    "A0": {
+      "actual_status": "FAILED_PARTIAL",
+      "runner_condition_status": "RUNNING",
+      "completed_epochs": 65,
+      "required_epochs": 90,
+      "committed_actual_updates": 66105,
+      "partial_epoch_actual_updates": 955,
+      "total_observed_actual_updates": 67060,
+      "committed_attempted_windows": 66105,
+      "total_observed_attempted_windows": 67061,
+      "native_amp_skips": 0,
+      "last_completed_epoch_metrics": {
+        "epoch": 65,
+        "lr": 0.0019868268181037186,
+        "samples": 16269,
+        "attempted_optimizer_windows": 1017,
+        "actual_optimizer_updates": 1017,
+        "amp_skips": 0,
+        "gradient_audits": 1017,
+        "max_consecutive_skips": 0,
+        "loss_scale_final": 65536.0,
+        "loss_scale_initial": 65536.0,
+        "train_loss": 0.49579440305035016,
+        "train_seconds": 171.9895234000869,
+        "images_per_second": 94.59297100413838,
+        "recipient_control_sha256": "4e16a7c55b0eda791ccf6c8007a3a44241b35a0f48f060e28437a3f7ad24840a",
+        "mixup_control_sha256": "e9a8df21a70e1b4837aa6f8bd382a526fa36b5491612d36ceba7d89fc3544493",
+        "donor_control_sha256": null,
+        "attempt_log": "epoch_065_attempt_001.jsonl",
+        "overflow_events": [],
+        "validation": {
+          "overall": 99.53668975830078,
+          "macro": 97.84933471679688,
+          "per_class": [
+            99.66172790527344,
+            99.26873779296875,
+            99.56331634521484,
+            100.0,
+            100.0,
+            100.0,
+            100.0,
+            78.78787994384766,
+            100.0,
+            100.0,
+            100.0,
+            92.30769348144531,
+            100.0,
+            96.0,
+            100.0,
+            100.0
+          ],
+          "worst_class": 78.78787994384766,
+          "group_image": {
+            "Head": 99.70137786865234,
+            "Medium": 97.43589782714844,
+            "Tail": 97.0
+          },
+          "group_macro": {
+            "Head": 99.7489636739095,
+            "Medium": 95.75757598876953,
+            "Tail": 97.66153869628906
+          }
+        },
+        "validation_seconds": 13.722201999975368,
+        "peak_allocated_mib": 995.4462890625,
+        "pif_values": [],
+        "epoch_seconds": 185.71956130000763
+      },
+      "source_checkpoint_sha256": null,
+      "final_checkpoint_sha256": null,
+      "best_validation_selection": {
+        "overall": 99.59229278564453,
+        "epoch": 63
+      }
+    },
+    "B0": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 90,
+      "committed_actual_updates": 0,
+      "partial_epoch_actual_updates": 0,
+      "total_observed_actual_updates": 0,
+      "committed_attempted_windows": 0,
+      "total_observed_attempted_windows": 0,
+      "native_amp_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "source_checkpoint_sha256": null,
+      "final_checkpoint_sha256": null,
+      "best_validation_selection": null
+    },
+    "A1": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_actual_updates": 0,
+      "partial_epoch_actual_updates": 0,
+      "total_observed_actual_updates": 0,
+      "committed_attempted_windows": 0,
+      "total_observed_attempted_windows": 0,
+      "native_amp_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "source_checkpoint_sha256": null,
+      "final_checkpoint_sha256": null,
+      "best_validation_selection": null
+    },
+    "A2": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_actual_updates": 0,
+      "partial_epoch_actual_updates": 0,
+      "total_observed_actual_updates": 0,
+      "committed_attempted_windows": 0,
+      "total_observed_attempted_windows": 0,
+      "native_amp_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "source_checkpoint_sha256": null,
+      "final_checkpoint_sha256": null,
+      "best_validation_selection": null
+    },
+    "B1": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_actual_updates": 0,
+      "partial_epoch_actual_updates": 0,
+      "total_observed_actual_updates": 0,
+      "committed_attempted_windows": 0,
+      "total_observed_attempted_windows": 0,
+      "native_amp_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "source_checkpoint_sha256": null,
+      "final_checkpoint_sha256": null,
+      "best_validation_selection": null
+    },
+    "B2": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_actual_updates": 0,
+      "partial_epoch_actual_updates": 0,
+      "total_observed_actual_updates": 0,
+      "committed_attempted_windows": 0,
+      "total_observed_attempted_windows": 0,
+      "native_amp_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "source_checkpoint_sha256": null,
+      "final_checkpoint_sha256": null,
+      "best_validation_selection": null
+    }
+  },
+  "completed_conditions": [],
+  "groups": {
+    "Head": [
+      0,
+      3,
+      2,
+      1,
+      4,
+      9
+    ],
+    "Medium": [
+      6,
+      15,
+      7,
+      8,
+      12
+    ],
+    "Tail": [
+      5,
+      11,
+      10,
+      13,
+      14
+    ]
+  },
+  "comparisons": {
+    "A2-A1": null,
+    "B2-B1": null
+  },
+  "native_amp_skips": [],
+  "scale_transitions": [],
+  "failure": {
+    "type": "GradientContractError",
+    "message": "Non-finite gradients are not permitted for this condition: extractor.backbone.bn1.bias, extractor.backbone.bn1.weight, extractor.backbone.conv1.weight",
+    "context": {
+      "condition": "A0",
+      "epoch": 66,
+      "batch": 955,
+      "samples_before_window": 15280,
+      "attempted_before_window": 955,
+      "actual_epoch_updates_before_window": 955,
+      "process_optimizer_calls_before_window": 67060,
+      "scale_before_unscale": 65536.0
+    },
+    "gradient_diagnostics": {
+      "missing_parameters": [],
+      "nan_count": 147,
+      "inf_count": 2,
+      "nonfinite_parameters": [
+        "extractor.backbone.bn1.bias",
+        "extractor.backbone.bn1.weight",
+        "extractor.backbone.conv1.weight"
+      ],
+      "nonfinite_positions": {
+        "extractor.backbone.conv1.weight": [],
+        "extractor.backbone.conv1.weight::nan_count": 147,
+        "extractor.backbone.bn1.weight": [
+          [
+            32
+          ]
+        ],
+        "extractor.backbone.bn1.bias": [
+          [
+            32
+          ]
+        ]
+      },
+      "nonfinite_details": [
+        {
+          "name": "extractor.backbone.conv1.weight",
+          "shape": [
+            64,
+            3,
+            7,
+            7
+          ],
+          "gradient_dtype": "torch.float32",
+          "nan_count": 147,
+          "positive_inf_count": 0,
+          "negative_inf_count": 0,
+          "inf_count": 0,
+          "inf_positions": [],
+          "inf_positions_truncated": false,
+          "nan_positions": [
+            [
+              32,
+              0,
+              0,
+              0
+            ],
+            [
+              32,
+              0,
+              0,
+              1
+            ],
+            [
+              32,
+              0,
+              0,
+              2
+            ],
+            [
+              32,
+              0,
+              0,
+              3
+            ],
+            [
+              32,
+              0,
+              0,
+              4
+            ],
+            [
+              32,
+              0,
+              0,
+              5
+            ],
+            [
+              32,
+              0,
+              0,
+              6
+            ],
+            [
+              32,
+              0,
+              1,
+              0
+            ],
+            [
+              32,
+              0,
+              1,
+              1
+            ],
+            [
+              32,
+              0,
+              1,
+              2
+            ],
+            [
+              32,
+              0,
+              1,
+              3
+            ],
+            [
+              32,
+              0,
+              1,
+              4
+            ],
+            [
+              32,
+              0,
+              1,
+              5
+            ],
+            [
+              32,
+              0,
+              1,
+              6
+            ],
+            [
+              32,
+              0,
+              2,
+              0
+            ],
+            [
+              32,
+              0,
+              2,
+              1
+            ],
+            [
+              32,
+              0,
+              2,
+              2
+            ],
+            [
+              32,
+              0,
+              2,
+              3
+            ],
+            [
+              32,
+              0,
+              2,
+              4
+            ],
+            [
+              32,
+              0,
+              2,
+              5
+            ],
+            [
+              32,
+              0,
+              2,
+              6
+            ],
+            [
+              32,
+              0,
+              3,
+              0
+            ],
+            [
+              32,
+              0,
+              3,
+              1
+            ],
+            [
+              32,
+              0,
+              3,
+              2
+            ],
+            [
+              32,
+              0,
+              3,
+              3
+            ],
+            [
+              32,
+              0,
+              3,
+              4
+            ],
+            [
+              32,
+              0,
+              3,
+              5
+            ],
+            [
+              32,
+              0,
+              3,
+              6
+            ],
+            [
+              32,
+              0,
+              4,
+              0
+            ],
+            [
+              32,
+              0,
+              4,
+              1
+            ],
+            [
+              32,
+              0,
+              4,
+              2
+            ],
+            [
+              32,
+              0,
+              4,
+              3
+            ]
+          ],
+          "nan_positions_truncated": true
+        },
+        {
+          "name": "extractor.backbone.bn1.weight",
+          "shape": [
+            64
+          ],
+          "gradient_dtype": "torch.float32",
+          "nan_count": 0,
+          "positive_inf_count": 0,
+          "negative_inf_count": 1,
+          "inf_count": 1,
+          "inf_positions": [
+            [
+              32
+            ]
+          ],
+          "inf_positions_truncated": false,
+          "nan_positions": [],
+          "nan_positions_truncated": false
+        },
+        {
+          "name": "extractor.backbone.bn1.bias",
+          "shape": [
+            64
+          ],
+          "gradient_dtype": "torch.float32",
+          "nan_count": 0,
+          "positive_inf_count": 0,
+          "negative_inf_count": 1,
+          "inf_count": 1,
+          "inf_positions": [
+            [
+              32
+            ]
+          ],
+          "inf_positions_truncated": false,
+          "nan_positions": [],
+          "nan_positions_truncated": false
+        }
+      ],
+      "scaler_step_called": false,
+      "scaler_update_called": false
+    },
+    "snapshot_error": null,
+    "snapshot_sha256": "de6f9b717e2dc334fe9b80492a64ef12945fdf3d12d2970b5abd7dfaaf431a82",
+    "failed_window": {
+      "loss": 0.3762158751487732,
+      "loss_finite": true,
+      "logits_finite": true,
+      "scale_before_unscale": 65536.0,
+      "scale_after_unscale_before_update": 65536.0,
+      "optimizer_calls_at_failure": 67060,
+      "optimizer_step_executed": false,
+      "scaler_step_called": false,
+      "scaler_update_called": false
+    }
+  },
+  "artifact_integrity": {
+    "status": "PASS_ARTIFACT_INTEGRITY",
+    "executed_source_hashes_unchanged": true,
+    "historical_formal_01_index_unchanged": true,
+    "historical_formal_01_verified_files": 20,
+    "historical_snapshot_sha256": "e07a48ec6a6cd95cc47b5c7875d6736e6c6f656fa65c05fb62c8505ac192400c",
+    "current_failure_snapshot_sha256": "de6f9b717e2dc334fe9b80492a64ef12945fdf3d12d2970b5abd7dfaaf431a82",
+    "last_checkpoint_sha256": "c6a03c7c33d4251fca056fde322dc0d52bd7e2fcb205b3689763c0f5aca6ee19",
+    "best_checkpoint_sha256": "b008763e3e866e1eefa5a38faf469a00a112f104484d4dd8e6f62f31f8a125da",
+    "last_checkpoint_completed_epochs": 65,
+    "checkpoint_record_state_agreement": true,
+    "cpu_only_checkpoint_read": true,
+    "cuda_initialized_for_reporting": false,
+    "formal_invocations": 1,
+    "replay_backward_invocations": 3,
+    "post_failure_training_or_replay": 0,
+    "automatic_retries": 0,
+    "test_accesses": 0,
+    "additional_seeds": []
+  },
+  "test_accesses": 0,
+  "additional_seeds": [],
+  "gpu_smoke_runs": 0,
+  "formal_invocations": 1,
+  "automatic_retries": 0,
+  "post_failure_gpu_or_inference_work": 0,
+  "scientific_limits": [
+    "Old A0 epoch4 snapshot scale boundary is confirmed for that exact snapshot; it does not establish all future batches safe at65536.",
+    "New A0 epoch66 backbone NaN/Inf is directly observed, but its first internal origin and scale dependence were not diagnosed or replayed.",
+    "No completed formal Stage-I epoch90 or Stage-II conditions exist; no paired H2T or PI-H2TF effect can be calculated.",
+    "No GPU resume was executed. CPU normalization tests do not establish all GPU resume behavior.",
+    "Raw root status is FAILED_STOPPED while interrupted condition cursor remains RUNNING; compact status is explicitly FAILED_PARTIAL."
+  ]
+}

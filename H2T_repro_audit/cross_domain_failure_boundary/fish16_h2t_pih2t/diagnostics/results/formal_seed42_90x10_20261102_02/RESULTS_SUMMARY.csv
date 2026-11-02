@@ -1,0 +1,7 @@
+condition,status,completed_epochs,required_epochs,validation_overall,validation_macro,validation_tail_image,validation_tail_macro,committed_actual_updates,partial_epoch_actual_updates,total_observed_actual_updates,total_observed_attempted_windows,native_amp_skips,source_checkpoint_sha256
+A0,FAILED_PARTIAL,65,90,99.53668975830078,97.84933471679688,97.0,97.66153869628906,66105,955,67060,67061,0,
+B0,NOT_STARTED,0,90,,,,,0,0,0,0,0,
+A1,NOT_STARTED,0,10,,,,,0,0,0,0,0,
+A2,NOT_STARTED,0,10,,,,,0,0,0,0,0,
+B1,NOT_STARTED,0,10,,,,,0,0,0,0,0,
+B2,NOT_STARTED,0,10,,,,,0,0,0,0,0,

@@ -1,0 +1,505 @@
+{
+  "status": "PASS",
+  "snapshot": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261102_01\\FAILURE_SNAPSHOT.pt",
+  "snapshot_sha256": "e07a48ec6a6cd95cc47b5c7875d6736e6c6f656fa65c05fb62c8505ac192400c",
+  "code_commit": "7e2b42a085a5840ab94dc9e8604ce3ff62beb821",
+  "replay_script_sha256": "5a0deb0bb112055d3b0aff1cad531ea7203c8a596a7450be1bfd55871815bab1",
+  "expected_boundary_reproduced": true,
+  "saved_forward_matches": true,
+  "formal_training_authorized": true,
+  "separate_process_per_scale": true,
+  "scales": [
+    {
+      "scale": 65536,
+      "snapshot_sha256": "e07a48ec6a6cd95cc47b5c7875d6736e6c6f656fa65c05fb62c8505ac192400c",
+      "context": {
+        "condition": "A0",
+        "epoch": 4,
+        "batch": 976,
+        "samples_before_window": 15616,
+        "attempted_before_window": 976,
+        "actual_epoch_updates_before_window": 976,
+        "process_optimizer_calls_before_window": 4027,
+        "scale_before_unscale": 262144.0
+      },
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "input_dtype": "torch.float32",
+      "mixup_lambda": 0.6132571757269774,
+      "saved_loss": 0.9629483819007874,
+      "actual_loss": 0.9629483819007874,
+      "logits": {
+        "shape": [
+          16,
+          16
+        ],
+        "dtype": "torch.float32",
+        "actual_finite": true,
+        "saved_finite": true,
+        "equal": true,
+        "max_abs_error": 0.0,
+        "max_relative_error": 0.0,
+        "atol": 1e-06,
+        "rtol": 1e-05,
+        "allclose": true
+      },
+      "loss": {
+        "shape": [],
+        "dtype": "torch.float32",
+        "actual_finite": true,
+        "saved_finite": true,
+        "equal": true,
+        "max_abs_error": 0.0,
+        "max_relative_error": 0.0,
+        "atol": 1e-06,
+        "rtol": 1e-05,
+        "allclose": true
+      },
+      "missing_gradients": [],
+      "nonfinite_gradients": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_gradients_finite": true,
+      "classifier_bias_0_gradient": -0.271240234375,
+      "maximum_finite_gradient_by_group": {
+        "backbone_stem": {
+          "max_finite_abs": 0.09492012858390808,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer1": {
+          "max_finite_abs": 0.12548276782035828,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer2": {
+          "max_finite_abs": 0.0899207815527916,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer3": {
+          "max_finite_abs": 0.11020636558532715,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer4": {
+          "max_finite_abs": 0.08547777682542801,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "classifier": {
+          "max_finite_abs": 0.271240234375,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      },
+      "optimizer_step_calls": 0,
+      "scaler_step_calls": 0,
+      "scaler_update_calls": 0,
+      "actual_optimizer_post_hook_count": 0,
+      "parameters_unchanged": true,
+      "parameter_sha_before": "f02db4fa3bbfa402df4b08f97fca491e69b8ed80dc6c80aaf08441b9443ccd83",
+      "parameter_sha_after": "f02db4fa3bbfa402df4b08f97fca491e69b8ed80dc6c80aaf08441b9443ccd83",
+      "scale_after_unscale": 65536.0,
+      "native_scaler_state": {
+        "scale": 65536.0,
+        "growth_factor": 2.0,
+        "backoff_factor": 0.5,
+        "growth_interval": 100000,
+        "_growth_tracker": 0
+      },
+      "numeric_flags": {
+        "cudnn_deterministic": true,
+        "cudnn_benchmark": false,
+        "cudnn_allow_tf32": false,
+        "matmul_allow_tf32": false
+      },
+      "environment": {
+        "python": "3.12.12",
+        "torch": "2.14.1+cu132",
+        "cuda": "13.2",
+        "cudnn": 92400,
+        "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+      },
+      "data_loaders": 0,
+      "image_reads": 0,
+      "test_accesses": 0
+    },
+    {
+      "scale": 131072,
+      "snapshot_sha256": "e07a48ec6a6cd95cc47b5c7875d6736e6c6f656fa65c05fb62c8505ac192400c",
+      "context": {
+        "condition": "A0",
+        "epoch": 4,
+        "batch": 976,
+        "samples_before_window": 15616,
+        "attempted_before_window": 976,
+        "actual_epoch_updates_before_window": 976,
+        "process_optimizer_calls_before_window": 4027,
+        "scale_before_unscale": 262144.0
+      },
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "input_dtype": "torch.float32",
+      "mixup_lambda": 0.6132571757269774,
+      "saved_loss": 0.9629483819007874,
+      "actual_loss": 0.9629483819007874,
+      "logits": {
+        "shape": [
+          16,
+          16
+        ],
+        "dtype": "torch.float32",
+        "actual_finite": true,
+        "saved_finite": true,
+        "equal": true,
+        "max_abs_error": 0.0,
+        "max_relative_error": 0.0,
+        "atol": 1e-06,
+        "rtol": 1e-05,
+        "allclose": true
+      },
+      "loss": {
+        "shape": [],
+        "dtype": "torch.float32",
+        "actual_finite": true,
+        "saved_finite": true,
+        "equal": true,
+        "max_abs_error": 0.0,
+        "max_relative_error": 0.0,
+        "atol": 1e-06,
+        "rtol": 1e-05,
+        "allclose": true
+      },
+      "missing_gradients": [],
+      "nonfinite_gradients": [],
+      "nan_count": 0,
+      "inf_count": 0,
+      "all_gradients_finite": true,
+      "classifier_bias_0_gradient": -0.271240234375,
+      "maximum_finite_gradient_by_group": {
+        "backbone_stem": {
+          "max_finite_abs": 0.09498971700668335,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer1": {
+          "max_finite_abs": 0.1255166083574295,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer2": {
+          "max_finite_abs": 0.08989757299423218,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer3": {
+          "max_finite_abs": 0.11020636558532715,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer4": {
+          "max_finite_abs": 0.08547777682542801,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "classifier": {
+          "max_finite_abs": 0.271240234375,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      },
+      "optimizer_step_calls": 0,
+      "scaler_step_calls": 0,
+      "scaler_update_calls": 0,
+      "actual_optimizer_post_hook_count": 0,
+      "parameters_unchanged": true,
+      "parameter_sha_before": "f02db4fa3bbfa402df4b08f97fca491e69b8ed80dc6c80aaf08441b9443ccd83",
+      "parameter_sha_after": "f02db4fa3bbfa402df4b08f97fca491e69b8ed80dc6c80aaf08441b9443ccd83",
+      "scale_after_unscale": 131072.0,
+      "native_scaler_state": {
+        "scale": 131072.0,
+        "growth_factor": 2.0,
+        "backoff_factor": 0.5,
+        "growth_interval": 100000,
+        "_growth_tracker": 0
+      },
+      "numeric_flags": {
+        "cudnn_deterministic": true,
+        "cudnn_benchmark": false,
+        "cudnn_allow_tf32": false,
+        "matmul_allow_tf32": false
+      },
+      "environment": {
+        "python": "3.12.12",
+        "torch": "2.14.1+cu132",
+        "cuda": "13.2",
+        "cudnn": 92400,
+        "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+      },
+      "data_loaders": 0,
+      "image_reads": 0,
+      "test_accesses": 0
+    },
+    {
+      "scale": 262144,
+      "snapshot_sha256": "e07a48ec6a6cd95cc47b5c7875d6736e6c6f656fa65c05fb62c8505ac192400c",
+      "context": {
+        "condition": "A0",
+        "epoch": 4,
+        "batch": 976,
+        "samples_before_window": 15616,
+        "attempted_before_window": 976,
+        "actual_epoch_updates_before_window": 976,
+        "process_optimizer_calls_before_window": 4027,
+        "scale_before_unscale": 262144.0
+      },
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "input_dtype": "torch.float32",
+      "mixup_lambda": 0.6132571757269774,
+      "saved_loss": 0.9629483819007874,
+      "actual_loss": 0.9629483819007874,
+      "logits": {
+        "shape": [
+          16,
+          16
+        ],
+        "dtype": "torch.float32",
+        "actual_finite": true,
+        "saved_finite": true,
+        "equal": true,
+        "max_abs_error": 0.0,
+        "max_relative_error": 0.0,
+        "atol": 1e-06,
+        "rtol": 1e-05,
+        "allclose": true
+      },
+      "loss": {
+        "shape": [],
+        "dtype": "torch.float32",
+        "actual_finite": true,
+        "saved_finite": true,
+        "equal": true,
+        "max_abs_error": 0.0,
+        "max_relative_error": 0.0,
+        "atol": 1e-06,
+        "rtol": 1e-05,
+        "allclose": true
+      },
+      "missing_gradients": [],
+      "nonfinite_gradients": [
+        {
+          "name": "classifier.bias",
+          "group": "classifier",
+          "shape": [
+            16
+          ],
+          "missing": false,
+          "dtype": "torch.float32",
+          "finite": false,
+          "nan_count": 0,
+          "positive_inf_count": 0,
+          "negative_inf_count": 1,
+          "inf_count": 1,
+          "nonfinite_positions": [
+            [
+              0
+            ]
+          ],
+          "max_finite_abs": 0.167236328125,
+          "finite_l2": 0.18426279037617507
+        }
+      ],
+      "nan_count": 0,
+      "inf_count": 1,
+      "all_gradients_finite": false,
+      "classifier_bias_0_gradient": "-Inf",
+      "maximum_finite_gradient_by_group": {
+        "backbone_stem": {
+          "max_finite_abs": 0.09494321048259735,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer1": {
+          "max_finite_abs": 0.12548625469207764,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer2": {
+          "max_finite_abs": 0.08992107957601547,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer3": {
+          "max_finite_abs": 0.11020636558532715,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "backbone_layer4": {
+          "max_finite_abs": 0.08547777682542801,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "classifier": {
+          "max_finite_abs": 0.208740234375,
+          "nan_count": 0,
+          "inf_count": 1
+        }
+      },
+      "optimizer_step_calls": 0,
+      "scaler_step_calls": 0,
+      "scaler_update_calls": 0,
+      "actual_optimizer_post_hook_count": 0,
+      "parameters_unchanged": true,
+      "parameter_sha_before": "f02db4fa3bbfa402df4b08f97fca491e69b8ed80dc6c80aaf08441b9443ccd83",
+      "parameter_sha_after": "f02db4fa3bbfa402df4b08f97fca491e69b8ed80dc6c80aaf08441b9443ccd83",
+      "scale_after_unscale": 262144.0,
+      "native_scaler_state": {
+        "scale": 262144.0,
+        "growth_factor": 2.0,
+        "backoff_factor": 0.5,
+        "growth_interval": 100000,
+        "_growth_tracker": 0
+      },
+      "numeric_flags": {
+        "cudnn_deterministic": true,
+        "cudnn_benchmark": false,
+        "cudnn_allow_tf32": false,
+        "matmul_allow_tf32": false
+      },
+      "environment": {
+        "python": "3.12.12",
+        "torch": "2.14.1+cu132",
+        "cuda": "13.2",
+        "cudnn": 92400,
+        "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+      },
+      "data_loaders": 0,
+      "image_reads": 0,
+      "test_accesses": 0
+    }
+  ],
+  "optimizer_step_calls": 0,
+  "scaler_step_update_calls": 0,
+  "test_accesses": 0,
+  "additional_seeds": [],
+  "cpu_validation": {
+    "status": "PASS",
+    "initial_worktree_clean_before_replay_implementation": true,
+    "branch": "experiment/fish16-amp-scale-stability-20261102",
+    "git_head_before_replay_commit": "399991cc0cea22cd58c5161b8a0145c8c8efe6cc",
+    "checks": [
+      {
+        "name": "SYNTAX",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "py_compile",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\formal_train.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\models.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\data.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\amp_recovery.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_formal_train.py",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\replay_a0_amp_scales.py"
+        ],
+        "exit_code": 0,
+        "expected_tests": null,
+        "wall_seconds": 0.21384410001337528,
+        "log": "SYNTAX.txt"
+      },
+      {
+        "name": "AMP_RECOVERY_TESTS",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+          "-p",
+          "test_amp_recovery.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_tests": 12,
+        "wall_seconds": 11.359726400114596,
+        "log": "AMP_RECOVERY_TESTS.txt"
+      },
+      {
+        "name": "CONTRACT_TESTS",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+          "-p",
+          "test_contract.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_tests": 10,
+        "wall_seconds": 12.20353340008296,
+        "log": "CONTRACT_TESTS.txt"
+      },
+      {
+        "name": "FORMAL_CPU_TESTS",
+        "command": [
+          "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+          "-B",
+          "-X",
+          "utf8",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+          "-p",
+          "test_formal_train.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "expected_tests": 14,
+        "wall_seconds": 9.009921199874952,
+        "log": "FORMAL_CPU_TESTS.txt"
+      }
+    ],
+    "source_hashes": {
+      "formal_train.py": "f2642f514fa937a687b06b43b8f85585a4526935bb85a0d2f2ca4a2bb8f07ec3",
+      "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+      "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+      "amp_recovery.py": "21448931b545323015d36ba64a10b76a0b15dbf6290512d577b28c1bcf8ac75a"
+    },
+    "replay_script_sha256": "5a0deb0bb112055d3b0aff1cad531ea7203c8a596a7450be1bfd55871815bab1",
+    "syntax_files": 6,
+    "required_syntax_files": 5,
+    "cpu_tests_passed": 36,
+    "gpu_smoke_runs": 0,
+    "formal_training_started": false,
+    "amp_recovery_byte_unchanged_from_failed_run": true
+  },
+  "numerical_conclusion": "Same saved A0 model/input and identical AMP forward: scales65536 and131072 give finite gradients; scale262144 alone reproduces the unique classifier.bias[0] negative Inf. This confirms scale-dependent backward overflow for this snapshot, without identifying its first internal operator or proving all future batches safe."
+}
