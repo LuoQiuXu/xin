@@ -1,0 +1,342 @@
+CODEX TASK — FORMAL FISH16 SEED-42 TRAINING (90 + 10 EPOCHS)
+Date: 2026-11-02
+Repository: LuoQiuXu/xin
+Work branch: experiment/fish16-formal-90x10-20261102
+Base commit: 05b65931423c70c2622578e70e50af07e5b326df
+Scope: implement and run the first formal seed-42 pilot. Do not run another smoke/audit cycle.
+
+======================================================================
+0. DECISION AND SCIENTIFIC QUESTION
+======================================================================
+
+The user has now asked to move from repeated audits to formal training.
+
+The purpose is to compare the existing H2T and PI-H2T transfer mechanisms on
+the locked real Fish4Knowledge-16 long-tailed subset. Do not introduce a new
+method, loss, donor selector, channel selector, fusion rule, backbone, dataset,
+or extra experiment.
+
+Run exactly these six conditions:
+
+  A0: Plain ResNet50 Stage-I, 90 epochs
+  A1: A0 Stage-I epoch-90 checkpoint -> cRT Stage-II, 10 epochs
+  A2: A0 Stage-I epoch-90 checkpoint -> H2T Stage-II, 10 epochs
+  B0: PIF-ResNet50 Stage-I, 90 epochs
+  B1: B0 Stage-I epoch-90 checkpoint -> cRT Stage-II, 10 epochs
+  B2: B0 Stage-I epoch-90 checkpoint -> PI-H2TF Stage-II, 10 epochs
+
+Matched scientific comparisons:
+  H2T effect: A2 versus A1
+  PI-H2T effect: B2 versus B1
+
+Do not interpret A2 versus B2 as an isolated method comparison because their
+Stage-I representations differ.
+
+This is the first formal pilot only: seed 42. Do not start seeds 43/44.
+
+======================================================================
+1. GIT SAFETY
+======================================================================
+
+Work only on:
+  experiment/fish16-formal-90x10-20261102
+
+This branch was created from the latest audited branch at base commit:
+  05b65931423c70c2622578e70e50af07e5b326df
+
+Start with:
+  git fetch origin
+  git status --short
+  git branch --show-current
+  git rev-parse HEAD
+  git rev-parse origin/experiment/fish16-formal-90x10-20261102
+
+If the worktree is dirty, STOP. Do not stash, reset, clean, overwrite, or
+silently carry unrelated changes. Fast-forward only if local is clean and behind.
+
+Do not modify the existing audit branch, main, the original H2T source directory,
+or the PI_H2T_review source directory. Do not force-push or merge to main.
+
+Keep all images, manifest, downloaded weights, checkpoints, raw logs and run
+outputs outside Git. Commit only code, compact protocol documentation and
+small aggregate reports.
+
+======================================================================
+2. LOCKED DATA AND MODEL
+======================================================================
+
+Dataset: Fish4Knowledge FRGT, primary 16-class subset only.
+Manifest:
+  D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv
+Manifest SHA256:
+  62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30
+
+Image root:
+  data\fishRecognition_GT\fish_image
+
+Locked counts:
+  27,133 images; 16 classes; 8,680 tracking trajectories.
+  Train:      16,269 images / 5,208 trajectories.
+  Validation:  5,396 images / 1,736 trajectories.
+  Test:        5,468 images / 1,736 trajectories.
+
+Train imbalance factor: 253.17.
+Head / Medium / Tail: 6 / 5 / 5 classes by training-frequency tertiles.
+Split is trajectory-grouped, seed 42. The manifest is immutable.
+
+IMPORTANT: use train and validation only. Do not load, inspect, predict on, or
+evaluate any TEST image in this task. Test evaluation requires a later separate
+scientific decision.
+
+Model: original H2T ResNet50 feature extractor adapter with official ImageNet
+weights, plus 16-way linear classifier.
+Official weights:
+  resnet50-19c8e357.pth
+SHA256:
+  19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097
+
+Use the existing adapter in models.py. Do not redownload or substitute weights.
+A0 is Plain ResNet50. B0 is the existing PIF-ResNet50 implementation.
+Do not change PIF initialization or its two-parameter formula.
+
+Use the validated interpreter:
+  D:\app\minicondaaa\envs\xiaoju\python.exe
+
+The existing smoke checkpoints are explicitly smoke_only. Do not promote them,
+resume from them, or use them as formal Stage-I checkpoints. Preserve them as
+diagnostic artifacts. Formal A0 and B0 must each start from the locked common
+ImageNet initialization and train the full 90-epoch Stage-I schedule.
+
+======================================================================
+3. FORMAL TRAINING CONFIGURATION
+======================================================================
+
+Use the already smoke-exercised Fish16 implementation settings as the formal
+pilot configuration. Do not tune them from smoke validation metrics.
+
+Shared:
+  seed: 42
+  input: 224 x 224
+  micro-batch: 16
+  effective batch: 16
+  gradient accumulation: 1
+  AMP: FP16 autocast + enabled native torch.amp.GradScaler
+  workers: 4
+  optimizer: SGD
+  momentum: 0.9
+  deterministic cuDNN: True
+  cuDNN benchmark: False
+  cuDNN TF32: False
+  matmul TF32: False
+
+Stage-I (A0/B0):
+  epochs: 90
+  loss: existing MixUp cross-entropy, alpha=1.0
+  base learning rate: 0.01
+  first-epoch learning rate: 0.002 (the existing 5-epoch warmup convention)
+  warmup: 5 epochs, linear from 0.002 to 0.01
+  after warmup: cosine decay over the remaining Stage-I epochs
+  weight decay: 1e-4
+  SGD momentum: 0.9
+  trainable: full model (backbone + classifier; PIF in B0)
+
+Stage-II (A1/A2/B1/B2):
+  epochs: 10
+  loss: ordinary cross-entropy (no MixUp)
+  first-epoch learning rate: 0.01
+  scheduler: cosine over the fixed 10-epoch Stage-II schedule
+  weight decay: 5e-4
+  SGD momentum: 0.9
+  trainable: classifier only
+  extractor parameters: frozen
+  extractor mode: eval
+  all BatchNorm running statistics: frozen
+  classifier: train mode
+
+The schedule must be epoch-based and must not be rescaled to a smoke epoch.
+Persist the exact per-epoch learning rate in every epoch record and the run
+manifest. Do not step the scheduler per batch.
+
+Checkpoint policy:
+  - Save every epoch's compact metrics.
+  - Save a resumable last checkpoint each epoch.
+  - Save a separate best-validation checkpoint for reporting.
+  - Initialize Stage-II from the final Stage-I epoch-90 checkpoint (not a
+    one-epoch smoke checkpoint). Record the exact SHA256 of this checkpoint.
+  - A1 and A2 must load the exact same A0 epoch-90 model state.
+  - B1 and B2 must load the exact same B0 epoch-90 model state.
+  - Save the selected source checkpoint SHA in every Stage-II run manifest.
+
+The final-epoch Stage-I checkpoint policy is fixed for this pilot so the
+Stage-II initialization is unambiguous and not silently selected per method.
+Keep best-validation checkpoints for analysis, but do not substitute them for
+the epoch-90 checkpoint.
+
+======================================================================
+4. SIX-CONDITION DATA AND METHOD ROUTING
+======================================================================
+
+Use existing data.py and schedules(rows):
+
+  - Stage-I A0/B0: the same instance-balanced stage1 permutation.
+  - Stage-II A1/A2/B1/B2: the same class-balanced recipient schedule.
+  - A2 and B2: the same donor schedule, element for element.
+  - A1 and B1: cRT, no donor branch.
+  - A2: existing H2T with rho=0.25.
+  - B2: existing PI-H2TF with mode="paper_theoretical_bounds" and
+    ratio_detach=True.
+
+For all Stage-II conditions:
+  - recipient augmentation views must be identical at the same epoch/position;
+  - A2/B2 donor views must be identical at the same epoch/position;
+  - A1/A2 share A0 initialization;
+  - B1/B2 share B0 initialization.
+
+For A0/B0, initialize the common backbone and classifier identically using
+FishModel's existing seed-isolated initialization. Reset the run seed to 42
+before each Stage-I condition so the paired MixUp lambda/permutation stream is
+reproducible. Keep the existing per-epoch/position deterministic image-view
+construction. Record the input-control hashes and actual optimizer updates.
+
+Do not alter H2T methods.py, PI-H2T source files, models.py formulas, rho,
+PI-H2TF mode, ratio_detach, recipient schedule, donor schedule, or class groups.
+
+======================================================================
+5. AMP AND OPTIMIZER-STEP ACCOUNTING
+======================================================================
+
+Reuse amp_recovery.py and its fail-closed behavior. Do not replace it.
+
+The only recoverable non-finite gradient event is exactly one positive or
+negative Inf at:
+  extractor.pif.fuse.weight[0,1,0]
+
+The event must:
+  - contain no NaN;
+  - contain exactly one Inf in the entire optimizer parameter set;
+  - occur only in B0 Stage-I;
+  - be handled by native enabled GradScaler;
+  - cause a real skipped optimizer update and a scale backoff;
+  - be followed by a successful real optimizer update at the reduced scale.
+
+Never clamp, clip, zero, replace, or manually discard gradients to bypass the
+gate. Missing gradients, NaNs, any other Inf, unverified scaler skips, or
+non-finite forward values are fatal.
+
+Count actual optimizer.step calls with OptimizerStepCounter. Do not infer
+updates from attempted windows. Record, per epoch and per condition:
+  attempted optimizer windows, actual optimizer updates, AMP skips, scaler
+  scale transitions, consecutive skips, samples processed, and gradient audits.
+
+The previous B0 one-epoch smoke had two native skips and 1,015 actual updates
+from 1,017 attempted windows. Preserve this fact in the historical audit. Do
+not compensate for those skips and do not require later epochs to reproduce
+the same skip count or batch positions. Apply the same narrow event-level gate
+to future B0 Stage-I epochs and fail closed on anything else.
+
+A0/A1/A2/B1/B2 must not silently skip optimizer updates. Stage-II extractor
+parameters and BN buffers must remain unchanged.
+
+If a fatal numerical event or CUDA OOM occurs, preserve the partial run,
+write FAILURE.json and stop. Do not automatically lower LR, change precision,
+change batch size, change accumulation, or retry with altered settings.
+
+======================================================================
+6. RUNNER IMPLEMENTATION — NO MORE AUDIT CYCLES
+======================================================================
+
+The current smoke.py is smoke-only and has no formal-training or independent
+Stage-II checkpoint-reuse entry point. Do not invoke its default six-condition
+path. Do not expand smoke.py into a fragile mixture of smoke and formal modes.
+
+Add a separate, explicit formal runner, e.g. formal_train.py, that:
+  1. Runs A0 Stage-I for 90 epochs from fresh locked initialization.
+  2. Runs B0 Stage-I for 90 epochs from the same common initialization protocol.
+  3. Loads A0 epoch-90 checkpoint once and creates A1/A2 from that exact state.
+  4. Loads B0 epoch-90 checkpoint once and creates B1/B2 from that exact state.
+  5. Runs each Stage-II condition for 10 epochs.
+  6. Writes atomic ACTUAL_EXECUTION_STATUS.json after every epoch/condition.
+  7. Supports exact resume after interruption by saving/restoring model,
+     optimizer, scaler, scheduler, epoch, Python RNG, NumPy RNG, CPU Torch RNG,
+     and all CUDA RNG states. Resume must not silently restart or skip epochs.
+  8. Verifies checkpoint metadata and strict-loads every Stage-II model.
+  9. Verifies paired source checkpoint hashes before Stage-II starts.
+ 10. Keeps the TEST split completely inaccessible to the runner.
+
+Do not run another one-epoch smoke or additional diagnostic experiment. The
+existing audit and one-epoch smoke evidence are sufficient. Before GPU training,
+perform only:
+  - py_compile of the new runner and touched files;
+  - existing CPU unit tests (test_amp_recovery.py and test_contract.py);
+  - new CPU-only tests for scheduler values, resume metadata, Stage-II routing,
+    checkpoint hash equality, and TEST exclusion.
+Do not add a new GPU smoke gate. Once these minimal checks pass, start the
+formal seed-42 run.
+
+If implementation reveals a true blocker, stop and report only that blocker;
+do not create another broad audit or add speculative checks.
+
+======================================================================
+7. OUTPUTS AND EVALUATION
+======================================================================
+
+All runtime outputs must be outside the repository, in a new directory:
+  D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261102_01
+
+Refuse to overwrite an existing output directory.
+
+Required output:
+  FORMAL_RUN_MANIFEST.json
+  ACTUAL_EXECUTION_STATUS.json
+  A0/epoch_metrics.csv, last checkpoints, best-validation checkpoint
+  B0/epoch_metrics.csv, last checkpoints, best-validation checkpoint
+  A1/epoch_metrics.csv, last checkpoints, best-validation checkpoint
+  A2/epoch_metrics.csv, last checkpoints, best-validation checkpoint
+  B1/epoch_metrics.csv, last checkpoints, best-validation checkpoint
+  B2/epoch_metrics.csv, last checkpoints, best-validation checkpoint
+  RESULTS_SUMMARY.csv
+  RESULTS_SUMMARY.md
+  OUTPUT_SHA256.csv
+  FAILURE.json only if the run fails/stops
+
+For each epoch, record:
+  train loss, validation overall, macro, per-class accuracy,
+  Head/Medium/Tail image-weighted accuracy, Head/Medium/Tail class-macro,
+  worst-class accuracy, LR, samples, attempted windows, actual updates,
+  AMP skips, scaler scale, epoch time, throughput, peak allocated MiB.
+
+Validation must use only the 5,396 locked validation images. Do not compute
+test accuracy. Report the 16 per-class accuracies and 6/5/5 class groups.
+
+The final comparison table must emphasize:
+  A2 - A1 (H2T incremental effect on Plain Stage-I)
+  B2 - B1 (PI-H2TF incremental effect on PIF Stage-I)
+
+Do not claim cross-domain generalization from one seed. This is a seed-42
+formal pilot, not a final multi-seed paper result.
+
+======================================================================
+8. EXECUTION AND REPORTING
+======================================================================
+
+After implementing the runner and CPU checks, run the formal training directly.
+Do not stop after merely writing a plan or another audit report.
+
+Use the validated interpreter and print the exact command before execution.
+Keep stdout/stderr logs outside Git.
+
+At completion or failure, report:
+  - branch and final commit SHA;
+  - exact environment (Python, PyTorch, CUDA, cuDNN, GPU);
+  - CPU test counts;
+  - output directory;
+  - actual completion status for A0/B0/A1/A2/B1/B2;
+  - per-condition completed epochs, validation results and actual optimizer updates;
+  - A2-A1 and B2-B1 deltas;
+  - all failures/AMP skips with exact counts and scale transitions;
+  - confirmation that no TEST images and no seeds 43/44 were run;
+  - code/report commit SHA.
+
+Do not claim completion until ACTUAL_EXECUTION_STATUS.json and output files
+confirm it. No more audit loops. The deliverable is the formal seed-42
+90-epoch Stage-I / 10-epoch Stage-II pilot and its scientific results.
