@@ -1,8 +1,10 @@
 # Fish16 seed-42 formal 90+10 pilot
 
-Authorization: `CODEX_FISH16_FORMAL_90X10_TRAINING.txt` on
-`experiment/fish16-formal-90x10-20261102`. This runner has no smoke mode and
-does not call the smoke runner. Only the mandated CPU checks precede training.
+Original authorization: `CODEX_FISH16_FORMAL_90X10_TRAINING.txt`.
+Numerical-stability correction: `CODEX_FISH16_AMP_SCALE_STABILITY.txt` on
+`experiment/fish16-amp-scale-stability-20261102`. The failed first run is
+preserved unchanged; the corrected run uses a new output directory. This runner
+has no smoke mode and does not call the smoke runner.
 
 `formal_train.py` defaults to A0, B0, A1, A2, B1, B2, in that order. A0/B0
 each start from the unchanged official 19c8e357 adapter initialization and run
@@ -84,6 +86,20 @@ All runtime files remain outside Git. Summary comparisons emphasize final
 A2-A1 and B2-B1; best-validation metrics are separate reporting information.
 One seed does not establish generalization, and no TEST result is produced.
 
-## Recorded execution limit
+## Recorded execution limit and numerical correction
 
-The first attempt stopped at A0 epoch4/batch976 because of a classifier.bias negative Inf outside the permitted recovery signature. See the compact formal report. No GPU resume was executed. The execution version compares restored epoch records directly to JSON metric files; records containing overflow dataclass tuples can compare differently after JSON list conversion. That unexecuted resume case is not the A0 numerical failure and was not patched or exercised after the stop. Full saved state is preserved, but CPU metadata/RNG tests alone do not establish all GPU resume cases.
+The first attempt stopped at A0 epoch4/batch976 because of one negative Inf at
+classifier.bias[0] when the default GradScaler had grown from 65,536 to 131,072
+to 262,144 at approximately 2,000-update intervals. The loss and logits were
+finite, and the failed update was not submitted to the optimizer. See the
+compact formal report. The correction retains FP16 autocast and the original
+65,536 initial scale, but raises the growth interval above the maximum number
+of attempted updates in a 90-epoch condition. It does not alter the optimizer,
+learning rate, batch size, model, loss, data or transfer methods. A0 is
+restarted from the locked initialization in a new run directory so all 90
+epochs use one numerical policy; the prior partial run is retained as evidence.
+The exact failed A0 batch must be replayed from the preserved failure snapshot
+at scales 65,536 and 262,144 without calling optimizer.step(), before the new
+formal run begins. The expected signature is finite gradients at 65,536 and
+the recorded classifier.bias[0] Inf at 262,144; if that does not reproduce,
+stop rather than guessing another setting. No GPU resume was executed. The execution version compares restored epoch records directly to JSON metric files; records containing overflow dataclass tuples can compare differently after JSON list conversion. That unexecuted resume case is not the A0 numerical failure and was not patched or exercised after the stop. Full saved state is preserved, but CPU metadata/RNG tests alone do not establish all GPU resume cases.
