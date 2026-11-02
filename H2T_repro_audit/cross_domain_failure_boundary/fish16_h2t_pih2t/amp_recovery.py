@@ -2,7 +2,7 @@
 
 This module does not clamp, replace, or otherwise alter gradients.  It permits
 GradScaler's native skip/backoff path only when the sole non-finite value is
-the already-diagnosed positive Inf at PIF coefficient b at [0, 1, 0].
+the already-diagnosed positive or negative Inf at PIF coefficient b at [0, 1, 0].
 """
 from dataclasses import asdict, dataclass
 import hashlib
@@ -220,9 +220,10 @@ def _is_the_one_audited_pif_overflow(named_parameters, diagnostics):
     positions = diagnostics["nonfinite_positions"].get(PIF_B_PARAMETER, [])
     if positions != [list(PIF_B_INDEX)]:
         return False
-    # The archived exact replay is +Inf at b. Do not broaden this exception
-    # to a sign-flipped or otherwise different non-finite event.
-    return bool(torch.isposinf(parameter.grad[PIF_B_INDEX]).item())
+    # GradScaler's overflow detector is sign-agnostic: both +Inf and -Inf
+    # are non-finite. Keep the exception narrow in parameter, coordinate,
+    # count, and absence of NaNs; do not accept any other non-finite pattern.
+    return bool(torch.isinf(parameter.grad[PIF_B_INDEX]).item())
 
 
 def guarded_scaler_step(
@@ -238,8 +239,9 @@ def guarded_scaler_step(
     """Run one optimizer attempt after scaler.unscale_(optimizer).
 
     Finite gradients follow the ordinary GradScaler step/update path.
-    The only permitted non-finite case is one positive Inf at PIF fuse.weight[0,1,0].
-    In that case GradScaler must skip the optimizer update and lower its scale.
+    The only permitted non-finite case is one +Inf or -Inf at
+    PIF fuse.weight[0,1,0]. In that case GradScaler must skip the optimizer
+    update and lower its scale.
     NaNs, missing gradients, any other Inf, or an unverified skip are fatal.
     """
     _validate_optimizer_parameter_set(optimizer, named_parameters)
@@ -262,7 +264,7 @@ def guarded_scaler_step(
                         "parameter": PIF_B_PARAMETER,
                         "shape": list(PIF_B_SHAPE),
                         "index": list(PIF_B_INDEX),
-                        "sign": "positive_inf",
+                        "sign": "positive_or_negative_inf",
                         "nan_count": 0,
                         "inf_count": 1,
                     },
