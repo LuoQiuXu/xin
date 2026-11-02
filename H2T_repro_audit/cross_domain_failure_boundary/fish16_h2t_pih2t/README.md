@@ -1,16 +1,16 @@
 # CURRENT EXECUTION STATUS — 2026-11-02
 
-**This section supersedes all historical execution authorizations below. There is currently no new GPU experiment authorization.**
+**This section supersedes the historical smoke authorizations below. The user has authorized the first formal seed-42 90+10 pilot on `experiment/fish16-formal-90x10-20261102`.**
 
 Completed: A0 and B0 each processed one full Stage-I smoke epoch (16,269 samples). The Batch-13 negative-Inf native GradScaler replay and isolated B0 epoch are complete. A0 performed 1,017 actual updates with zero skips; B0 performed 1,015 actual updates with two native AMP skips, each followed by a real update. No compensating updates were run.
 
 The CPU-only A0/B0 pairing audit returned **AUDIT_PASS_WITH_DOCUMENTED_OPTIMIZER_STEP_ASYMMETRY**. Saved sampling arrays and all 1,017 batch controls match; common backbone/classifier initialization and both checkpoint CPU strict-load checks pass. This supports data/input/initialization pairing, while retaining the real two-update asymmetry.
 
-Stage-II sampling and branchwise checkpoint routing were reviewed statically only. No Stage-II condition or GPU batch was run. The current CLI has no independent existing-checkpoint Stage-II reuse mode; its default six-condition path would retrain Stage-I and must not be invoked under the current authorization.
+`formal_train.py` independently implements the fixed A0/B0 90-epoch Stage-I and A1/A2/B1/B2 10-epoch Stage-II routes, reusing the original models/data/AMP guard. Stage-II uses the final formal epoch-90 source checkpoint, never a smoke checkpoint. See `FORMAL_PROTOCOL.md` and `CODEX_FISH16_FORMAL_90X10_TRAINING.txt`.
 
 See [the pairing audit](diagnostics/results/a0_b0_stage1_pairing_audit_20261102_01/PAIRING_AUDIT_REPORT.md). One-epoch validation metrics do not establish PIF benefit, PI-H2T superiority, cross-domain generalization or TEST performance.
 
-Stop for scientific analysis. No A0/B0 retraining, A1/A2/B1/B2, six-condition smoke, Stage-II, TEST, formal 90+10 training or seed 43/44 is authorized now. The protocol below is retained as historical context.
+Only the required syntax/CPU tests precede this formal run; no new GPU smoke or mechanism audit is authorized. Do not invoke the default smoke runner. No TEST images, seed 43/44, algorithm change, or altered-setting retry is authorized. Actual formal progress is reported in the external run's `ACTUAL_EXECUTION_STATUS.json`; the historical protocol below is retained unchanged as context.
 
 ---
 
