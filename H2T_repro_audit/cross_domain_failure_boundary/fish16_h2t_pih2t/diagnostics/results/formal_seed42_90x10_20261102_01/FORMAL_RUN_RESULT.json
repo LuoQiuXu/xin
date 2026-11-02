@@ -1,0 +1,452 @@
+{
+  "status": "FAILED_STOPPED",
+  "scope": "FIRST_FORMAL_SEED42_90_PLUS_10_PILOT",
+  "code_commit": "c6805db4b1a806b2a7830a48d131f9d1acfa617e",
+  "branch": "experiment/fish16-formal-90x10-20261102",
+  "protocol_sha256": "17e76ca80348c877b7d2f9bfe7e765db18b8b7fb05adce5d3f77b628227fb2c8",
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "cpu_checks": {
+    "syntax_files": 2,
+    "tests_passed": 34,
+    "all_exit_codes_zero": true
+  },
+  "external_output_directory": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261102_01",
+  "preflight_directory": "D:\\h2t_cross_domain_results\\fish16_formal_preflight_20261102_01",
+  "process_exit": {
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-X",
+      "utf8",
+      "-u",
+      "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\formal_train.py",
+      "--output-dir",
+      "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261102_01",
+      "--cpu-validation-record",
+      "D:\\h2t_cross_domain_results\\fish16_formal_preflight_20261102_01\\CPU_VALIDATION.json"
+    ],
+    "pid": 15136,
+    "exit_code": 1,
+    "wall_seconds": 732.6274056001566,
+    "code_commit": "c6805db4b1a806b2a7830a48d131f9d1acfa617e",
+    "formal_invocations": 1,
+    "automatic_retry": false
+  },
+  "completed_conditions": [],
+  "conditions": {
+    "A0": {
+      "actual_status": "FAILED_PARTIAL",
+      "runner_condition_status": "RUNNING",
+      "completed_epochs": 3,
+      "required_epochs": 90,
+      "committed_training_samples": 48807,
+      "committed_attempted_windows": 3051,
+      "committed_actual_updates": 3051,
+      "committed_amp_skips": 0,
+      "partial_epoch": {
+        "recorded_accepted_windows": 976,
+        "recorded_samples": 15616,
+        "accepted_actual_updates": 976,
+        "amp_skips": 0,
+        "rejected_windows": 1,
+        "failed_window_actual_updates": 0,
+        "attempt_file": "epoch_004_attempt_001.jsonl"
+      },
+      "total_observed_actual_updates": 4027,
+      "total_observed_attempted_windows": 4028,
+      "total_observed_native_skips": 0,
+      "last_completed_epoch_metrics": {
+        "epoch": 3,
+        "lr": 0.006,
+        "samples": 16269,
+        "attempted_optimizer_windows": 1017,
+        "actual_optimizer_updates": 1017,
+        "amp_skips": 0,
+        "gradient_audits": 1017,
+        "max_consecutive_skips": 0,
+        "loss_scale_final": 131072.0,
+        "loss_scale_initial": 131072.0,
+        "train_loss": 0.8453117022539842,
+        "train_seconds": 177.86668870016,
+        "images_per_second": 91.46737997369242,
+        "recipient_control_sha256": "69932b0436e99e55faec8c8d70767cfc529d1e31e4d941e8f16a1d224d118f50",
+        "mixup_control_sha256": "af6d51fab6d71c5596d9ae77582e76e8fa39e359dc2054f376f87bb2560ef194",
+        "donor_control_sha256": null,
+        "attempt_log": "epoch_003_attempt_001.jsonl",
+        "overflow_events": [],
+        "validation": {
+          "overall": 68.8658218383789,
+          "macro": 80.57879281044006,
+          "per_class": [
+            32.60042190551758,
+            99.08592224121094,
+            99.70887756347656,
+            96.12120819091797,
+            99.63436889648438,
+            65.38461303710938,
+            100.0,
+            66.66667175292969,
+            100.0,
+            100.0,
+            78.57142639160156,
+            96.15384674072266,
+            100.0,
+            72.0,
+            0.0,
+            83.33332824707031
+          ],
+          "worst_class": 0.0,
+          "group_image": {
+            "Head": 67.4497299194336,
+            "Medium": 94.13919067382812,
+            "Tail": 71.0
+          },
+          "group_macro": {
+            "Head": 87.8584664662679,
+            "Medium": 90.0,
+            "Tail": 62.42197723388672
+          }
+        },
+        "validation_seconds": 13.808841000078246,
+        "peak_allocated_mib": 995.4462890625,
+        "pif_values": [],
+        "epoch_seconds": 191.68308120011352
+      },
+      "best_validation": {
+        "epoch": 2,
+        "validation": {
+          "overall": 96.20088958740234,
+          "macro": 82.9119063615799,
+          "per_class": [
+            94.12262725830078,
+            98.72029113769531,
+            99.56331634521484,
+            100.0,
+            99.63436889648438,
+            96.15384674072266,
+            100.0,
+            60.60606384277344,
+            100.0,
+            100.0,
+            64.28571319580078,
+            84.61538696289062,
+            100.0,
+            20.0,
+            22.22222328186035,
+            86.66666412353516
+          ],
+          "worst_class": 20.0,
+          "group_image": {
+            "Head": 96.99382781982422,
+            "Medium": 93.77289581298828,
+            "Tail": 63.0
+          },
+          "group_macro": {
+            "Head": 98.67343393961589,
+            "Medium": 89.45454559326171,
+            "Tail": 57.455434036254886
+          }
+        }
+      },
+      "source_checkpoint_sha256": null,
+      "last_checkpoint_audit": {
+        "epoch_completed": 3,
+        "records_equal_status": true,
+        "sha256": "8c207bc1a7112aac29e371fa3d348e37618d3861d0a0a9681da177a04c6b7219",
+        "formal_run": true,
+        "smoke_only": false,
+        "weights_only_cpu_load": true
+      },
+      "final_checkpoint_sha256": null
+    },
+    "B0": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 90,
+      "committed_training_samples": 0,
+      "committed_attempted_windows": 0,
+      "committed_actual_updates": 0,
+      "committed_amp_skips": 0,
+      "partial_epoch": {
+        "recorded_accepted_windows": 0,
+        "recorded_samples": 0,
+        "accepted_actual_updates": 0,
+        "amp_skips": 0,
+        "rejected_windows": 0,
+        "failed_window_actual_updates": 0,
+        "attempt_file": null
+      },
+      "total_observed_actual_updates": 0,
+      "total_observed_attempted_windows": 0,
+      "total_observed_native_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "best_validation": {
+        "epoch": null,
+        "validation": null
+      },
+      "source_checkpoint_sha256": null,
+      "last_checkpoint_audit": null,
+      "final_checkpoint_sha256": null
+    },
+    "A1": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_training_samples": 0,
+      "committed_attempted_windows": 0,
+      "committed_actual_updates": 0,
+      "committed_amp_skips": 0,
+      "partial_epoch": {
+        "recorded_accepted_windows": 0,
+        "recorded_samples": 0,
+        "accepted_actual_updates": 0,
+        "amp_skips": 0,
+        "rejected_windows": 0,
+        "failed_window_actual_updates": 0,
+        "attempt_file": null
+      },
+      "total_observed_actual_updates": 0,
+      "total_observed_attempted_windows": 0,
+      "total_observed_native_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "best_validation": {
+        "epoch": null,
+        "validation": null
+      },
+      "source_checkpoint_sha256": null,
+      "last_checkpoint_audit": null,
+      "final_checkpoint_sha256": null
+    },
+    "A2": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_training_samples": 0,
+      "committed_attempted_windows": 0,
+      "committed_actual_updates": 0,
+      "committed_amp_skips": 0,
+      "partial_epoch": {
+        "recorded_accepted_windows": 0,
+        "recorded_samples": 0,
+        "accepted_actual_updates": 0,
+        "amp_skips": 0,
+        "rejected_windows": 0,
+        "failed_window_actual_updates": 0,
+        "attempt_file": null
+      },
+      "total_observed_actual_updates": 0,
+      "total_observed_attempted_windows": 0,
+      "total_observed_native_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "best_validation": {
+        "epoch": null,
+        "validation": null
+      },
+      "source_checkpoint_sha256": null,
+      "last_checkpoint_audit": null,
+      "final_checkpoint_sha256": null
+    },
+    "B1": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_training_samples": 0,
+      "committed_attempted_windows": 0,
+      "committed_actual_updates": 0,
+      "committed_amp_skips": 0,
+      "partial_epoch": {
+        "recorded_accepted_windows": 0,
+        "recorded_samples": 0,
+        "accepted_actual_updates": 0,
+        "amp_skips": 0,
+        "rejected_windows": 0,
+        "failed_window_actual_updates": 0,
+        "attempt_file": null
+      },
+      "total_observed_actual_updates": 0,
+      "total_observed_attempted_windows": 0,
+      "total_observed_native_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "best_validation": {
+        "epoch": null,
+        "validation": null
+      },
+      "source_checkpoint_sha256": null,
+      "last_checkpoint_audit": null,
+      "final_checkpoint_sha256": null
+    },
+    "B2": {
+      "actual_status": "NOT_STARTED",
+      "runner_condition_status": "NOT_STARTED",
+      "completed_epochs": 0,
+      "required_epochs": 10,
+      "committed_training_samples": 0,
+      "committed_attempted_windows": 0,
+      "committed_actual_updates": 0,
+      "committed_amp_skips": 0,
+      "partial_epoch": {
+        "recorded_accepted_windows": 0,
+        "recorded_samples": 0,
+        "accepted_actual_updates": 0,
+        "amp_skips": 0,
+        "rejected_windows": 0,
+        "failed_window_actual_updates": 0,
+        "attempt_file": null
+      },
+      "total_observed_actual_updates": 0,
+      "total_observed_attempted_windows": 0,
+      "total_observed_native_skips": 0,
+      "last_completed_epoch_metrics": null,
+      "best_validation": {
+        "epoch": null,
+        "validation": null
+      },
+      "source_checkpoint_sha256": null,
+      "last_checkpoint_audit": null,
+      "final_checkpoint_sha256": null
+    }
+  },
+  "comparisons": {
+    "A2-A1": null,
+    "B2-B1": null
+  },
+  "native_overflow_events": [],
+  "failure": {
+    "type": "GradientContractError",
+    "message": "Non-finite gradients are not permitted for this condition: classifier.bias",
+    "context": {
+      "condition": "A0",
+      "epoch": 4,
+      "batch": 976,
+      "samples_before_window": 15616,
+      "attempted_before_window": 976,
+      "actual_epoch_updates_before_window": 976,
+      "process_optimizer_calls_before_window": 4027,
+      "scale_before_unscale": 262144.0
+    },
+    "gradient_diagnostics": {
+      "missing_parameters": [],
+      "nan_count": 0,
+      "inf_count": 1,
+      "nonfinite_parameters": [
+        "classifier.bias"
+      ],
+      "nonfinite_positions": {
+        "classifier.bias": [
+          [
+            0
+          ]
+        ]
+      },
+      "nonfinite_details": [
+        {
+          "name": "classifier.bias",
+          "shape": [
+            16
+          ],
+          "gradient_dtype": "torch.float32",
+          "nan_count": 0,
+          "positive_inf_count": 0,
+          "negative_inf_count": 1,
+          "inf_count": 1,
+          "inf_positions": [
+            [
+              0
+            ]
+          ],
+          "inf_positions_truncated": false,
+          "nan_positions": [],
+          "nan_positions_truncated": false
+        }
+      ],
+      "scaler_step_called": false,
+      "scaler_update_called": false
+    },
+    "automatic_retry": false,
+    "snapshot_saved": true,
+    "snapshot_read_error": null,
+    "process_optimizer_calls_at_failure": 4027,
+    "snapshot_error": null
+  },
+  "groups": {
+    "Head": [
+      0,
+      3,
+      2,
+      1,
+      4,
+      9
+    ],
+    "Medium": [
+      6,
+      15,
+      7,
+      8,
+      12
+    ],
+    "Tail": [
+      5,
+      11,
+      10,
+      13,
+      14
+    ]
+  },
+  "test_evaluations": 0,
+  "additional_seeds": [],
+  "gpu_smoke_runs": 0,
+  "formal_invocations": 1,
+  "actual_automatic_retries": 0,
+  "source_checkpoint_policy": "Only final formal Stage-I epoch90; smoke and best-before90 are rejected.",
+  "count_scope": "Committed checkpoint lineage plus latest partial attempt; all physical attempt logs remain local. No restart or retry occurred.",
+  "scientific_limit": "Incomplete conditions cannot support paired method effects. One seed cannot establish cross-domain generalization.",
+  "no_post_failure_algorithm_or_hyperparameter_change": true,
+  "new_gpu_or_inference_work_for_report": false,
+  "implementation_limits": [
+    "No GPU resume experiment was run; CPU checks cover metadata, scheduler and RNG restoration.",
+    "The execution version compares per-epoch JSON directly against restored records. Overflow dataclass tuples become JSON lists, so resume with such records can reject semantically identical metadata. This unexecuted B0 resume path was not the current A0 failure; training source was preserved unchanged."
+  ],
+  "scale_transitions": [
+    {
+      "condition": "A0",
+      "epoch": 2,
+      "batch": 982,
+      "kind": "optimizer_step",
+      "scale_before": 65536.0,
+      "scale_after": 131072.0,
+      "optimizer_steps_before": 1999,
+      "optimizer_steps_after": 2000
+    },
+    {
+      "condition": "A0",
+      "epoch": 4,
+      "batch": 948,
+      "kind": "optimizer_step",
+      "scale_before": 131072.0,
+      "scale_after": 262144.0,
+      "optimizer_steps_before": 3999,
+      "optimizer_steps_after": 4000
+    }
+  ],
+  "failed_window": {
+    "scale_before_unscale": 262144.0,
+    "scale_after_unscale_before_update": 262144.0,
+    "loss": 0.9629483819007874,
+    "loss_finite": true,
+    "logits_finite": true,
+    "optimizer_calls_before": 4027,
+    "optimizer_calls_at_failure": 4027,
+    "optimizer_step_executed": false
+  }
+}

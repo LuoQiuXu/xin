@@ -1,16 +1,16 @@
 # CURRENT EXECUTION STATUS — 2026-11-02
 
-**This section supersedes the historical smoke authorizations below. The user has authorized the first formal seed-42 90+10 pilot on `experiment/fish16-formal-90x10-20261102`.**
+**The first formal seed-42 pilot was started and is now FAILED_STOPPED. Do not automatically resume or start further GPU work. This status supersedes historical smoke authorizations below.**
 
-Completed: A0 and B0 each processed one full Stage-I smoke epoch (16,269 samples). The Batch-13 negative-Inf native GradScaler replay and isolated B0 epoch are complete. A0 performed 1,017 actual updates with zero skips; B0 performed 1,015 actual updates with two native AMP skips, each followed by a real update. No compensating updates were run.
+Execution code: c6805db4b1a806b2a7830a48d131f9d1acfa617e on experiment/fish16-formal-90x10-20261102. Two syntax checks and 34 CPU tests passed, then the formal runner started directly without another GPU smoke.
 
-The CPU-only A0/B0 pairing audit returned **AUDIT_PASS_WITH_DOCUMENTED_OPTIMIZER_STEP_ASYMMETRY**. Saved sampling arrays and all 1,017 batch controls match; common backbone/classifier initialization and both checkpoint CPU strict-load checks pass. This supports data/input/initialization pairing, while retaining the real two-update asymmetry.
+A0 completed 3 of 90 epochs, then stopped in epoch4 at zero-based batch976: one negative Inf at classifier.bias[0], scale262144, no NaN or missing gradients. This is outside the allowed B0-only PIF-b recovery signature. The failed window called no scaler.step/update; observed actual SGD calls=4027. There were zero native AMP skips.
 
-`formal_train.py` independently implements the fixed A0/B0 90-epoch Stage-I and A1/A2/B1/B2 10-epoch Stage-II routes, reusing the original models/data/AMP guard. Stage-II uses the final formal epoch-90 source checkpoint, never a smoke checkpoint. See `FORMAL_PROTOCOL.md` and `CODEX_FISH16_FORMAL_90X10_TRAINING.txt`.
+B0, A1, A2, B1 and B2 were not started. The 90+10 pilot is incomplete, and neither A2-A1 nor B2-B1 can be calculated. Checkpoints, per-epoch metrics, partial batch journals and the complete failure snapshot remain outside Git. No TEST image or seed43/44 ran.
 
-See [the pairing audit](diagnostics/results/a0_b0_stage1_pairing_audit_20261102_01/PAIRING_AUDIT_REPORT.md). One-epoch validation metrics do not establish PIF benefit, PI-H2T superiority, cross-domain generalization or TEST performance.
+See [the formal run report](diagnostics/results/formal_seed42_90x10_20261102_01/FORMAL_RUN_REPORT.md). Runtime failure evidence and implementation/resume limits are explicit there. No numerical workaround, modified setting, extra diagnostic or automatic retry followed this failure.
 
-Only the required syntax/CPU tests precede this formal run; no new GPU smoke or mechanism audit is authorized. Do not invoke the default smoke runner. No TEST images, seed 43/44, algorithm change, or altered-setting retry is authorized. Actual formal progress is reported in the external run's `ACTUAL_EXECUTION_STATUS.json`; the historical protocol below is retained unchanged as context.
+Stop for scientific review. The following protocol is historical context, not current permission for smoke or formal continuation.
 
 ---
 

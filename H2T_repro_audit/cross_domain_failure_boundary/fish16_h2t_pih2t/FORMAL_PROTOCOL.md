@@ -83,3 +83,7 @@ is attempted after a true runtime failure.
 All runtime files remain outside Git. Summary comparisons emphasize final
 A2-A1 and B2-B1; best-validation metrics are separate reporting information.
 One seed does not establish generalization, and no TEST result is produced.
+
+## Recorded execution limit
+
+The first attempt stopped at A0 epoch4/batch976 because of a classifier.bias negative Inf outside the permitted recovery signature. See the compact formal report. No GPU resume was executed. The execution version compares restored epoch records directly to JSON metric files; records containing overflow dataclass tuples can compare differently after JSON list conversion. That unexecuted resume case is not the A0 numerical failure and was not patched or exercised after the stop. Full saved state is preserved, but CPU metadata/RNG tests alone do not establish all GPU resume cases.
