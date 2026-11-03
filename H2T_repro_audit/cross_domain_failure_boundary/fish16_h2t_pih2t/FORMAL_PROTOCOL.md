@@ -24,7 +24,7 @@ Every run manifest must record `NUMERIC_MODE=float32_no_autocast_no_grad_scaler`
 
 ## Data and split isolation
 
-The locked manifest is `D:\\h2t_cross_domain_audit\\fish4knowledge\\manifest_primary.csv`
+The locked manifest is `D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv`
 with SHA256
 `62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30`.
 
