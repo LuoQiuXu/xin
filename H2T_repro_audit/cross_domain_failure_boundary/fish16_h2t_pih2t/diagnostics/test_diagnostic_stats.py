@@ -1,7 +1,7 @@
 import unittest
 import torch
 from torch import nn
-from diagnose_b0 import tensor_stats, gradient_records, gradient_groups, cpu_tree
+from .diagnose_b0 import tensor_stats, gradient_records, gradient_groups, cpu_tree
 
 
 class DiagnosticStatsTests(unittest.TestCase):
