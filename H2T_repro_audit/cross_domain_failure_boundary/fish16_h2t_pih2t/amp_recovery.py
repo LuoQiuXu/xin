@@ -73,17 +73,10 @@ class OptimizerStepCounter:
 
 
 def make_grad_scaler():
-    """Spell out the historical PyTorch defaults so the numeric protocol is locked."""
+    """No-op scaler adapter; Fish16 clean-launch uses full FP32."""
     if not torch.cuda.is_available():
-        raise RuntimeError("The Fish16 AMP recovery gate requires CUDA.")
-    return torch.amp.GradScaler(
-        "cuda",
-        init_scale=65536.0,
-        growth_factor=2.0,
-        backoff_factor=0.5,
-        growth_interval=2000,
-        enabled=True,
-    )
+        raise RuntimeError("The Fish16 runner requires CUDA.")
+    return torch.amp.GradScaler("cuda", init_scale=1.0, enabled=False)
 
 
 def parameter_sha(named_parameters):
