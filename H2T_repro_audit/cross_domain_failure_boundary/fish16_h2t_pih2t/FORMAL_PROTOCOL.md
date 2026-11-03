@@ -1,10 +1,13 @@
 # Fish16 seed-42 formal 90+10 pilot
 
 Original authorization: `CODEX_FISH16_FORMAL_90X10_TRAINING.txt`.
-Numerical-stability correction: `CODEX_FISH16_AMP_SCALE_STABILITY.txt` on
-`experiment/fish16-amp-scale-stability-20261102`. The failed first run is
-preserved unchanged; the corrected run uses a new output directory. This runner
-has no smoke mode and does not call the smoke runner.
+Clean-launch branch: `experiment/fish16-clean-launch-20261103`. The earlier
+FP16 attempts and their failures are preserved unchanged. Because FP16 produced
+non-finite gradients at A0 epoch 66 even with scale growth disabled, this branch
+uses full FP32 for every condition: autocast is disabled and GradScaler is a
+no-op. This is an explicit numerical-protocol change, not a claim that FP16 was
+fixed. All six conditions use the same FP32 policy. This runner has no smoke mode
+and does not call the smoke runner.
 
 `formal_train.py` defaults to A0, B0, A1, A2, B1, B2, in that order. A0/B0
 each start from the unchanged official 19c8e357 adapter initialization and run
@@ -28,7 +31,7 @@ ending at zero in epoch 90. Stage-II uses
 approximately 0.0002447174. Scheduling occurs once per epoch, never per batch.
 The entire explicit LR table is stored in the run and condition manifests.
 
-Both stages use native FP16 autocast/GradScaler, micro/effective batch 16,
+Both stages use full FP32 (no autocast, no gradient scaling), micro/effective batch 16,
 one optimizer window per batch, four workers and SGD momentum 0.9. The formal
 runner uses init_scale=65,536, growth_factor=2.0, backoff_factor=0.5 and
 growth_interval=100,000. This exceeds the maximum 91,530 attempted windows in
@@ -113,9 +116,6 @@ the corrected formal run begins. Expected evidence is finite gradients at
 131,072 result without assuming it. If the expected boundary does not
 reproduce, stop rather than guessing another setting.
 
-The first implementation also compared checkpoint records containing tuples
-directly with JSON records containing lists. The corrected runner normalizes
-both representations before comparison. This CPU-tested code fix does not
-establish GPU resume correctness by itself. The failed _01 run and all its
+The runner normalizes checkpoint records containing tuples and JSON records containing lists before comparison. CPU tests do not establish GPU resume correctness by themselves. The failed _01 run and all its
 checkpoints remain preserved; the corrected run starts fresh in a new _02
 output directory so one AMP policy is used throughout all 90 epochs.
