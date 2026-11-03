@@ -69,7 +69,7 @@ Acceptance:
 - source hashes before/after identical
 - all 8 locked upstream H2T/PI-H2T hashes match
 - branch and HEAD unchanged; worktree clean
-- `gpu_started=false`, `dataset_images_opened=0`
+- `gpu_started=false`, `test_image_access=0`, `test_image_bytes_read=0`
 
 Do not manually rerun unittest with a different import context. The helper contains the canonical command and correct package import.
 
