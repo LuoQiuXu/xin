@@ -94,7 +94,7 @@ def main() -> int:
         }
         violations = {name: tokens for name, tokens in violations.items() if tokens}
         autocast_calls = {
-            name: re.findall(r"torch\\.amp\\.autocast\\([^\\n]*\\)", source)
+            name: re.findall(r"torch\.amp\.autocast\([^\n]*\)", source)
             for name, source in (("smoke.py", smoke_source), ("formal_train.py", formal_source))
         }
         invalid_autocast = {
