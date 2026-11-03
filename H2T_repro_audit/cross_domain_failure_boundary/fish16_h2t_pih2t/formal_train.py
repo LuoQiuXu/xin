@@ -363,6 +363,12 @@ class FormalRun:
             raise ValueError("Required CPU checks did not pass")
         if cpu.get("branch") != BRANCH:
             raise ValueError("CPU validation record belongs to a different branch")
+        if cpu.get("worktree_clean_before") is not True or cpu.get("worktree_clean_after") is not True:
+            raise ValueError("CPU validation record does not prove a clean worktree")
+        if cpu.get("test_methods_run") != 41:
+            raise ValueError("CPU validation record does not contain all 41 CPU test methods")
+        if cpu.get("upstream_source_sha256") != LOCKED_UPSTREAM_SOURCE_HASHES:
+            raise ValueError("CPU validation record has different upstream source fingerprints")
         if cpu["source_hashes"] != self.hashes:
             raise ValueError("Runner sources changed after CPU validation")
         if not torch.cuda.is_available():
