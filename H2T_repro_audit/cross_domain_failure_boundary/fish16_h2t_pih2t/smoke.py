@@ -95,11 +95,16 @@ def verify_gate_records(preflight_record, cpu_validation_record):
     assert preflight.get("worktree_clean") is True
     assert cpu.get("worktree_clean_before") is True and cpu.get("worktree_clean_after") is True
     assert preflight["data_gate"]["manifest_sha256"] == EXPECTED_SHA
+    assert preflight["data_gate"]["train_val_image_sha256_verified"] == 21665
+    assert preflight["data_gate"]["test_rows_metadata_only"] == 5468
     assert preflight["data_gate"]["test_image_bytes_read"] == 0
     assert preflight.get("test_image_bytes_read") == 0
     assert preflight["model_gate"]["status"] == "PASS"
     assert preflight["model_gate"]["official_weight_sha256"] == models.ORIGINAL_SHA
+    assert preflight["model_gate"]["converted_adapter_sha256"] == models.sha(models.SAFE_WEIGHT)
+    assert preflight["model_gate"]["network_weight_downloads"] == 0
     assert preflight["model_gate"]["upstream_source_hashes"] == LOCKED_UPSTREAM_SOURCE_HASHES
+    assert cpu.get("upstream_source_sha256") == LOCKED_UPSTREAM_SOURCE_HASHES
     assert models.source_hashes() == LOCKED_UPSTREAM_SOURCE_HASHES
 
     current_source_hashes = {
