@@ -17,7 +17,7 @@ import traceback
 
 from protocol_config import (
     BRANCH, CPU_VALIDATION_SOURCE_FILES, EXPECTED_CPU_TEST_METHODS,
-    FORMAL_RUNNER_SOURCE_FILES, LOCKED_UPSTREAM_SOURCE_HASHES,
+    FORMAL_RUNNER_SOURCE_FILES, LOCKED_UPSTREAM_SOURCE_HASHES, NUMERIC_MODE,
 )
 
 BASE = Path(__file__).resolve().parent
@@ -66,6 +66,43 @@ def main() -> int:
             raise RuntimeError(f"Wrong branch: {result['branch']} != {BRANCH}")
         if not result["worktree_clean_before"]:
             raise RuntimeError("Git worktree must be clean before CPU validation")
+
+        # Static protocol checks catch stale AMP metadata and obsolete external gates
+        # before any preflight or GPU operation can begin.
+        smoke_source = (BASE / "smoke.py").read_text(encoding="utf-8")
+        formal_source = (BASE / "formal_train.py").read_text(encoding="utf-8")
+        preflight_source = (BASE / "preflight.py").read_text(encoding="utf-8")
+        forbidden_tokens = {
+            "smoke.py": ("dtype=torch.float16", "dtype=torch.bfloat16", '"amp": True',
+                         "CPU_TEST_RESULTS_FINAL.txt", "ORIGINAL_SOURCE_HASHES.json",
+                         "Expected the archived first B0 PIF-b overflow"),
+            "formal_train.py": ("dtype=torch.float16", "dtype=torch.bfloat16",
+                                "ORIGINAL_SOURCE_HASHES.json"),
+            "preflight.py": ("pretrained=True", "ResNet50_FE("),
+        }
+        sources = {
+            "smoke.py": smoke_source,
+            "formal_train.py": formal_source,
+            "preflight.py": preflight_source,
+        }
+        violations = {
+            name: [token for token in tokens if token in sources[name]]
+            for name, tokens in forbidden_tokens.items()
+        }
+        violations = {name: tokens for name, tokens in violations.items() if tokens}
+        if NUMERIC_MODE != "float32_no_autocast_no_grad_scaler" or violations:
+            raise RuntimeError(
+                "Static numeric/protocol contract failed: "
+                + json.dumps({"numeric_mode": NUMERIC_MODE, "violations": violations})
+            )
+        result["checks"].append({
+            "name": "STATIC_PROTOCOL",
+            "exit_code": 0,
+            "numeric_mode": NUMERIC_MODE,
+            "active_fp16_or_bf16_autocast_paths": 0,
+            "stale_external_validation_gates": 0,
+            "legacy_pretrained_loader_calls": 0,
+        })
 
         result["source_sha256_before"] = {
             name: sha(BASE / name) for name in CPU_VALIDATION_SOURCE_FILES
