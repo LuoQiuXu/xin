@@ -54,18 +54,20 @@ class FormalTests(unittest.TestCase):
 
     def test_formal_amp_policy_prevents_growth_during_one_condition(self):
         policy = f.FORMAL_AMP_POLICY
-        self.assertEqual(policy["init_scale"], 65536.0)
+        self.assertEqual(policy["init_scale"], 1.0)
         self.assertEqual(policy["growth_interval"], 100000)
         self.assertGreater(policy["growth_interval"], policy["stage1_max_attempts"])
         self.assertGreater(policy["growth_interval"], policy["stage2_max_attempts"])
+        self.assertFalse(policy["enabled"])
+        self.assertEqual(policy["precision"], f.NUMERIC_MODE)
         self.assertFalse(policy["automatic_growth_during_condition"])
         # GradScaler construction is lazy; this checks its configuration without
         # executing a CUDA kernel or a GPU smoke run.
         with patch("torch.cuda.is_available", return_value=True):
             scaler = f.make_formal_grad_scaler()
         self.assertTrue(scaler.is_enabled())
-        self.assertEqual(scaler.get_scale(), 65536.0)
-        self.assertEqual(scaler.get_growth_interval(), 100000)
+        self.assertEqual(scaler.get_scale(), 1.0)
+        self.assertFalse(scaler.is_enabled())
 
     def test_json_normalize_handles_tuple_list_resume_roundtrip(self):
         record = {
