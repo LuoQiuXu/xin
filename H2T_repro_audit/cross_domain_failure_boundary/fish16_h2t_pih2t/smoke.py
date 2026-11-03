@@ -26,7 +26,8 @@ from torch import nn
 
 import models
 from data import load_rows, schedules, Views, loader, transform
-from preflight import BRANCH, EXPECTED_SHA, MANIFEST
+from preflight import EXPECTED_SHA, MANIFEST
+from protocol_config import (BRANCH, NUMERIC_MODE, CPU_VALIDATION_SOURCE_FILES, FORMAL_RUNNER_SOURCE_FILES, LOCKED_UPSTREAM_SOURCE_HASHES, EXPECTED_CPU_TEST_METHODS)
 from amp_recovery import (
     GradientContractError, OptimizerStepCounter, guarded_scaler_step, make_grad_scaler
 )
@@ -65,6 +66,73 @@ def cleanup(model):
     model.cpu()
     gc.collect()
     torch.cuda.empty_cache()
+
+
+def verify_gate_records(preflight_record, cpu_validation_record):
+    """Bind Smoke to successful CPU/preflight gates on this exact source tree."""
+    preflight_path = Path(preflight_record).resolve()
+    cpu_path = Path(cpu_validation_record).resolve()
+    assert preflight_path.is_file(), f"Missing preflight record: {preflight_path}"
+    assert cpu_path.is_file(), f"Missing CPU validation record: {cpu_path}"
+    preflight = json.loads(preflight_path.read_text(encoding="utf-8"))
+    cpu = json.loads(cpu_path.read_text(encoding="utf-8"))
+
+    branch = subprocess.check_output(
+        ["git", "branch", "--show-current"], cwd=models.ROOT, text=True
+    ).strip()
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=models.ROOT, text=True
+    ).strip()
+    assert branch == BRANCH, f"Wrong Smoke branch: {branch}"
+    assert preflight.get("status") == "PASS_PREFLIGHT_ONLY", "Preflight did not pass"
+    assert cpu.get("status") == "PASS", "CPU validation did not pass"
+    assert preflight.get("branch") == branch and cpu.get("branch") == branch
+    assert preflight.get("head") == head and cpu.get("head") == head, (
+        "CPU/preflight records do not match the current HEAD"
+    )
+    assert preflight.get("worktree_clean") is True
+    assert cpu.get("worktree_clean_before") is True and cpu.get("worktree_clean_after") is True
+    assert preflight["data_gate"]["manifest_sha256"] == EXPECTED_SHA
+    assert preflight["data_gate"]["test_image_bytes_read"] == 0
+    assert preflight.get("test_image_bytes_read") == 0
+    assert preflight["model_gate"]["status"] == "PASS"
+    assert preflight["model_gate"]["official_weight_sha256"] == models.ORIGINAL_SHA
+    assert preflight["model_gate"]["upstream_source_hashes"] == LOCKED_UPSTREAM_SOURCE_HASHES
+    assert models.source_hashes() == LOCKED_UPSTREAM_SOURCE_HASHES
+
+    current_source_hashes = {
+        name: models.sha(Path(__file__).parent / name)
+        for name in CPU_VALIDATION_SOURCE_FILES
+    }
+    assert cpu.get("source_sha256") == current_source_hashes, (
+        "Source tree changed after CPU validation"
+    )
+    assert preflight.get("source_sha256") == current_source_hashes, (
+        "Source tree changed after preflight"
+    )
+    runner_hashes = {
+        name: current_source_hashes[name]
+        for name in FORMAL_RUNNER_SOURCE_FILES
+    }
+    assert cpu.get("source_hashes") == runner_hashes, (
+        "CPU validation record is incompatible with the formal runner"
+    )
+    assert cpu.get("test_methods_run") == EXPECTED_CPU_TEST_METHODS
+    checks = {item["name"]: item for item in cpu.get("checks", [])}
+    assert checks.get("SYNTAX", {}).get("exit_code") == 0
+    assert checks.get("CPU_ALL_SUITES", {}).get("exit_code") == 0
+    assert checks.get("CPU_ALL_SUITES", {}).get("test_methods_run") == EXPECTED_CPU_TEST_METHODS
+
+    return {
+        "cpu_validation_record": str(cpu_path),
+        "cpu_validation_sha256": models.sha(cpu_path),
+        "cpu_test_methods": cpu["test_methods_run"],
+        "preflight_record": str(preflight_path),
+        "preflight_record_sha256": models.sha(preflight_path),
+        "preflight_status": preflight["status"],
+        "test_image_bytes_read": 0,
+        "source_sha256": current_source_hashes,
+    }
 
 
 def finite_gradients(parameters):
@@ -407,8 +475,8 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                 "batch_start": group_start,
                 "batch_end": i,
                 "optimizer_updates_total": updates,
-                "overflow_skips_total": overflow_skips,
-                "consecutive_overflow_skips": consecutive_overflow_skips,
+                "optimizer_skips_total": overflow_skips,
+                "consecutive_optimizer_skips": consecutive_overflow_skips,
             })
             optimizer_step_events.append(event)
             opt.zero_grad(set_to_none=True)
@@ -429,7 +497,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
             "samples": samples,
             "attempted_optimizer_steps": attempted_steps,
             "optimizer_updates": updates,
-            "amp_overflow_skips": overflow_skips,
+            "optimizer_skips": overflow_skips,
             "loss_scale_final": float(scaler.get_scale()),
             "train_loss_so_far": loss_sum / samples if samples else None,
             "train_seconds": duration,
@@ -463,28 +531,9 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
             i for i, row in enumerate(optimizer_step_events)
             if row["kind"] == "recoverable_pif_b_overflow_skip"
         ]
-        # At micro-batch 16, the first archived deterministic B0 overflow is
-        # expected at batch 6 (scale 65536 -> 32768). Later single-coordinate
-        # PIF-b +/-Inf events may also be recovered by the same native AMP path;
-        # do not hard-code the total skip count to one.
-        if batch == 16:
-            assert skip_indices, "Expected the archived first B0 PIF-b overflow at batch 6"
-            first_skip = optimizer_step_events[skip_indices[0]]
-            assert first_skip["batch_end"] == 6, "First B0 overflow moved away from archived batch 6"
-            assert first_skip["scale_before"] == 65536.0 and first_skip["scale_after"] == 32768.0
-        # At micro-batch 8 with accumulation=2, MixUp grouping differs from the
-        # archived batch-16 replay. No overflow is required; any observed skip
-        # must still be the exact audited PIF-b event and must be followed by
-        # a real optimizer update at the reduced scale.
-        for skip_index in skip_indices:
-            assert skip_index + 1 < len(optimizer_step_events), (
-                "No optimizer window after a recoverable B0 overflow"
-            )
-            next_step = optimizer_step_events[skip_index + 1]
-            assert next_step["kind"] == "optimizer_step", (
-                "No successful optimizer step after the B0 overflow"
-            )
-            assert next_step["scale_before"] == optimizer_step_events[skip_index]["scale_after"]
+        # The clean-launch protocol is full FP32: every non-finite gradient is
+        # fatal, and no GradScaler skip/recovery is permitted in any condition.
+        assert overflow_skips == 0
     save_json(folder / "optimizer_step_events.json", optimizer_step_events)
     if stage == 2:
         assert before_extractor == models.state_sha(model.extractor), "Extractor or BN mutated"
@@ -500,7 +549,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     result = {"condition": name, "scope": "ONE_EPOCH_SMOKE_ONLY", "stage": stage,
               "samples": samples, "optimizer_updates": updates,
               "attempted_optimizer_steps": attempted_steps, "amp_overflow_skips": overflow_skips,
-              "max_consecutive_overflow_skips": max_consecutive_overflow_skips,
+              "max_consecutive_optimizer_skips": max_consecutive_overflow_skips,
               "initial_loss_scale": initial_loss_scale, "final_loss_scale": float(scaler.get_scale()),
               "gradient_audit_windows": gradient_audit_windows,
               "lr": lr, "momentum": .9, "weight_decay": wd, "micro_batch": batch,
@@ -538,8 +587,9 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     return result, controls
 
 
-def run(output, batch, forensic_b0_only=False, max_batches=100, b0_stage1_only=False):
+def run(output, batch, preflight_record, cpu_validation_record, forensic_b0_only=False, max_batches=100, b0_stage1_only=False):
     assert not (forensic_b0_only and b0_stage1_only)
+    gate_evidence = verify_gate_records(preflight_record, cpu_validation_record)
     execution_status = {
         "status": "RUNNING",
         "scope": (
@@ -560,11 +610,8 @@ def run(output, batch, forensic_b0_only=False, max_batches=100, b0_stage1_only=F
     write_json(output / "ACTUAL_EXECUTION_STATUS.json", execution_status)
     assert torch.cuda.is_available()
     assert models.sha(models.ORIGINAL_WEIGHT) == models.ORIGINAL_SHA
-    assert subprocess.check_output(["git", "branch", "--show-current"], cwd=models.ROOT, text=True).strip() == BRANCH
-    original_sources = json.loads((VALIDATION / "ORIGINAL_SOURCE_HASHES.json").read_text(encoding="utf-8"))
+    original_sources = LOCKED_UPSTREAM_SOURCE_HASHES
     assert models.source_hashes() == original_sources
-    log = (VALIDATION / "CPU_TEST_RESULTS_FINAL.txt").read_text(encoding="utf-8-sig")
-    assert "Ran 10 tests" in log and "OK" in log
     assert models.sha(MANIFEST) == EXPECTED_SHA
     torch.set_num_threads(4)
     torch.backends.cudnn.benchmark = False
@@ -599,8 +646,10 @@ def run(output, batch, forensic_b0_only=False, max_batches=100, b0_stage1_only=F
                   "cudnn": torch.backends.cudnn.version(),
                   "gpu": torch.cuda.get_device_name(0),
               },
-              "original_source_hashes": original_sources, "new_source_hashes": {p.name: models.sha(p) for p in Path(__file__).parent.glob("*.py")},
-              "micro_batch": batch, "effective_batch": 16, "amp": True, "workers": 4,
+              "original_source_hashes": original_sources, "new_source_hashes": gate_evidence["source_sha256"],
+              "gate_evidence": gate_evidence,
+              "micro_batch": batch, "effective_batch": 16, "amp": False, "workers": 4,
+              "numerical_mode": NUMERIC_MODE, "autocast_enabled": False, "grad_scaler_enabled": False,
               "stage1_epoch_budget_per_branch": 0 if forensic_b0_only else 1,
               "stage2_epoch_budget_per_condition": 0 if (forensic_b0_only or b0_stage1_only) else 1,
               "forensic_b0_only": forensic_b0_only,
@@ -610,7 +659,8 @@ def run(output, batch, forensic_b0_only=False, max_batches=100, b0_stage1_only=F
               "actual_execution_status": "See ACTUAL_EXECUTION_STATUS.json; budgets are not completion evidence",
               "schedule_denominators": [90, 10],
               "train_transform": str(transform(True)), "validation_transform": str(transform(False)),
-              "numeric_config": {"cudnn_deterministic": True, "benchmark": False, "cudnn_tf32": False, "matmul_tf32": False},
+              "numeric_config": {"precision": NUMERIC_MODE, "autocast_enabled": False, "grad_scaler_enabled": False,
+                                 "cudnn_deterministic": True, "benchmark": False, "cudnn_tf32": False, "matmul_tf32": False},
               "test_model_evaluations": 0, "class_groups": groups, "note": "BN frozen for Stage-II; differs from original shift_bn=True"})
     if forensic_b0_only:
         execution_status["batch_smoke"] = "SKIPPED_FORENSIC_B0_ONLY"
@@ -707,6 +757,8 @@ def run(output, batch, forensic_b0_only=False, max_batches=100, b0_stage1_only=F
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--preflight-record", required=True)
+    parser.add_argument("--cpu-validation-record", required=True)
     parser.add_argument("--micro-batch", type=int, choices=(16, 8), default=16)
     run_mode = parser.add_mutually_exclusive_group()
     run_mode.add_argument("--forensic-b0-only", action="store_true",
@@ -725,7 +777,8 @@ if __name__ == "__main__":
     output.mkdir(parents=True, exist_ok=False)
     started = time.time()
     try:
-        run(output, args.micro_batch, forensic_b0_only=args.forensic_b0_only,
+        run(output, args.micro_batch, args.preflight_record, args.cpu_validation_record,
+            forensic_b0_only=args.forensic_b0_only,
             max_batches=args.max_batches, b0_stage1_only=args.b0_stage1_only)
     except Exception as exc:
         status_path = output / "ACTUAL_EXECUTION_STATUS.json"
