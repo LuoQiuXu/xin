@@ -1,21 +1,25 @@
 {
-  "status": "CODE_PREPARED_GPU_VALIDATION_PENDING",
-  "branch": "experiment/fish16-clean-launch-20261103",
+  "status": "FIXES_PREPARED_GPU_VALIDATION_PENDING",
+  "branch": "experiment/fish16-clean-launch-fix-20261103",
+  "parent_execution_branch": "experiment/fish16-clean-launch-20261103",
+  "parent_execution_head": "9f1a7ac8373f087274b6f919b048c45a14b46e2e",
+  "parent_execution_result": "STOPPED_CPU_IMPORT_GATE",
   "scope": "CLEAN_FP32_SIX_CONDITION_ONE_EPOCH_SMOKE",
   "numeric_mode": "float32_no_autocast_no_grad_scaler",
-  "prior_fp16_failure": "A0 epoch 66: 147 NaNs in conv1 gradients and 2 Infs in BN1 gradients at fixed loss scale 65536; prior failure artifacts preserved on parent branch",
-  "source_changes": [
-    "protocol_config.py added as branch identity/protocol source of truth",
-    "preflight.py imports centralized BRANCH",
-    "formal_train.py uses centralized branch and FP32-only execution",
-    "smoke.py uses FP32-only execution",
-    "amp_recovery.py returns disabled no-op GradScaler for interface compatibility",
-    "FORMAL_PROTOCOL.md documents explicit FP32 protocol change"
+  "fixes": [
+    "Use package-relative import for diagnostics.test_diagnostic_stats and add diagnostics package marker.",
+    "Add validate_cpu.py to run syntax and the complete 41-method CPU suite, recording exact HEAD and source fingerprints.",
+    "Replace stale ResNet50_FE/pretrained=True probe with the approved local 19c8e357 strict adapter check; prohibit network weight downloads.",
+    "Preflight hashes TRAIN and VAL image bytes only; TEST rows are metadata-only and no TEST path is resolved/stat'ed/opened.",
+    "Remove smoke dependency on stale CPU_TEST_RESULTS_FINAL.txt and ORIGINAL_SOURCE_HASHES.json; bind it to current CPU/preflight JSON records and source hashes.",
+    "Remove stale B0 FP16 overflow expectation; all FP32 conditions require finite gradients and zero optimizer skips.",
+    "Set Smoke manifest amp=false and record explicit FP32 numerical mode.",
+    "Align formal runner source validation and disabled GradScaler resume checks with the same CPU validation record."
   ],
-  "cpu_tests": "NOT_RUN_IN_THIS_ENVIRONMENT",
-  "syntax": "NOT_RUN_IN_THIS_ENVIRONMENT",
+  "syntax_and_cpu_tests": "NOT_RUN_IN_THIS_ENVIRONMENT",
+  "preflight": "NOT_RUN",
   "gpu_smoke": "NOT_RUN",
   "formal_training_started": false,
-  "acceptance": "Pending local Codex execution using CODEX_CLEAN_LAUNCH_SMOKE_20261103.txt",
-  "note": "Do not infer validation PASS from source preparation. The FP32 protocol is an explicit change from previous FP16 runs."
+  "next_action": "Run CODEX_CLEAN_LAUNCH_SMOKE_FIX_20261103.txt exactly once. Stop on any failed gate; do not patch or retry during execution.",
+  "note": "Code preparation is not a validation PASS. GPU training has not yet started."
 }
