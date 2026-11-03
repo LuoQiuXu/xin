@@ -1,0 +1,155 @@
+# Codex one-shot execution — Fish16 clean-launch fix (2026-11-03)
+
+## Purpose
+
+The previous clean-launch attempt stopped before preflight/Smoke because the CPU test command could not import `diagnose_b0`. A source audit then found additional latent blockers: a stale `ResNet50_FE` preflight probe, TEST-image byte hashing, obsolete external validation-file dependencies, a stale B0 FP16-overflow expectation, and an incorrect `amp=True` manifest flag.
+
+Those issues have been corrected on the branch below. This is now an **execution-only** task. Do not edit source, configuration, tests, data, weights, manifest, or this instruction. Do not patch and rerun if anything fails. Preserve the exact first failure and stop.
+
+## Immutable identity
+
+- Repository: `LuoQiuXu/xin`
+- Required branch: `experiment/fish16-clean-launch-fix-20261103`
+- Experiment directory: `H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t`
+- Python: `D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe`
+- Seed: 42
+- Conditions/order: A0, B0, A1, A2, B1, B2
+- Stage-I: A0 and B0, one complete epoch each
+- Stage-II: A1, A2, B1 and B2, one complete epoch each
+- Micro/effective batch: 16
+- Numeric mode: `float32_no_autocast_no_grad_scaler`
+- No formal 90+10 training in this task.
+
+The prior failed run and its archived evidence on `experiment/fish16-clean-launch-20261103` are immutable. Do not overwrite or rewrite that report.
+
+## Why the new source is different
+
+1. `diagnostics/test_diagnostic_stats.py` now imports `.diagnose_b0` as a package-relative sibling, and `diagnostics/__init__.py` declares the package.
+2. `validate_cpu.py` is the single CPU gate. It performs static protocol checks, py_compile of the complete source set, and all 41 CPU test methods; it writes `CPU_VALIDATION.json` and exact source fingerprints.
+3. `preflight.py` checks the actual approved `models.FishModel` local 19c8e357 strict adapter. It does not call `ResNet50_FE`, does not call `pretrained=True`, and forbids `torch.hub.load_state_dict_from_url` during the adapter check.
+4. Preflight verifies image bytes only for TRAIN and VAL (16,269 + 5,396 = 21,665). TEST rows are metadata-only: no TEST path resolution, stat, open or image-byte hashing. The report must show `test_image_bytes_read=0`.
+5. Smoke no longer reads `CPU_TEST_RESULTS_FINAL.txt` or `ORIGINAL_SOURCE_HASHES.json`. It requires the current CPU/preflight JSON records, checks their HEAD/source fingerprints, and rejects dirty source.
+6. The stale B0 expectation for an FP16 GradScaler overflow at batch 6 has been removed. In FP32 every non-finite gradient is fatal and optimizer skips must be zero.
+7. Smoke manifests now explicitly record `amp=false`, `autocast_enabled=false`, `grad_scaler_enabled=false`, and the FP32 numeric mode.
+
+## Execution rules
+
+- First switch/update to the exact required branch and verify the worktree is clean.
+- Record branch, HEAD, Python/PyTorch/CUDA/cuDNN/GPU inventory and source hashes.
+- Use the three new output directories below. They must not already exist. If any exists, stop and report; do not overwrite or silently choose another path.
+- Run the gates in the exact order: CPU validation → data/model preflight → six-condition GPU Smoke.
+- Only proceed to the next gate if the prior command exits 0 and its JSON status is PASS.
+- Do not call TEST image files or evaluate TEST.
+- Do not run `--forensic-b0-only`, `--b0-stage1-only`, `--max-batches`, or any single-condition shortcut.
+- Do not change batch size, transforms, optimizer, learning rate, loss, model, sampling, precision, or condition order.
+- Do not run the formal 90+10 pilot.
+- If a gate fails, stop immediately. No source fix, alternate command, automatic retry, or rerun in this task.
+
+## Exact output directories
+
+- CPU: `D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02`
+- Preflight: `D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02`
+- Smoke: `D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02`
+
+## Step 1 — CPU validation
+
+From repository root, run:
+
+```powershell
+$PY = 'D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe'
+& $PY -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\validate_cpu.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02'
+if ($LASTEXITCODE -ne 0) { throw "CPU validation failed; stop here." }
+```
+
+Acceptance:
+- `CPU_VALIDATION.json.status == PASS`
+- `STATIC_PROTOCOL` exit code 0
+- `SYNTAX` exit code 0, all 14 declared Python files compile
+- `CPU_ALL_SUITES` exit code 0 and exactly 41 real test methods run
+- source hashes before/after identical
+- all 8 locked upstream H2T/PI-H2T hashes match
+- branch and HEAD unchanged; worktree clean
+- `gpu_started=false`, `dataset_images_opened=0`
+
+Do not manually rerun unittest with a different import context. The helper contains the canonical command and correct package import.
+
+## Step 2 — full data/model preflight
+
+Only after Step 1 passes:
+
+```powershell
+& $PY -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02'
+if ($LASTEXITCODE -ne 0) { throw "Preflight failed; stop here." }
+```
+
+Acceptance:
+- `preflight.json.status == PASS_PREFLIGHT_ONLY`
+- locked manifest SHA and all split/group counts match
+- exactly 21,665 TRAIN/VAL image bytes verified
+- exactly 5,468 TEST rows treated as metadata-only
+- `test_image_bytes_read == 0` at both top level and data gate
+- approved official 19c8e357 weight SHA and converted adapter provenance pass
+- upstream H2T/PI-H2T source hashes match
+- no network weight download, no training, no TEST path access
+- preflight source fingerprints match `CPU_VALIDATION.json`
+
+## Step 3 — six-condition real-data GPU Smoke, exactly once
+
+Only after both prior steps pass:
+
+```powershell
+& $PY -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02' --preflight-record 'D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02\\preflight.json' --cpu-validation-record 'D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\CPU_VALIDATION.json' --micro-batch 16
+if ($LASTEXITCODE -ne 0) { throw "GPU Smoke failed; preserve outputs and stop." }
+```
+
+The Smoke code independently revalidates CPU/preflight statuses, exact branch/HEAD, clean worktree, source hashes, official weight identity, and TEST-image-byte count before training.
+
+## Smoke acceptance criteria
+
+- All six conditions complete exactly one full epoch, in fixed order.
+- A0/B0: 16,269 TRAIN samples and 1,017 attempted optimizer windows each.
+- A1/A2/B1/B2: 16,269 TRAIN samples and 1,017 attempted optimizer windows each.
+- Actual optimizer updates equal attempted windows; optimizer skips are exactly zero.
+- All forward losses/logits and all audited gradients are finite.
+- Each condition completes VAL evaluation on exactly 5,396 samples.
+- A0/B0 Stage-I recipient order and MixUp random controls are paired.
+- A1/A2 and B1/B2 recipient view hashes match; A2/B2 donor hashes match.
+- Stage-II extractor parameters and all BN buffers remain unchanged.
+- TEST image-byte reads and TEST model evaluations are both exactly zero.
+- Run manifest records branch, HEAD, exact source hashes, official weight and data manifest hashes, environment, LR, and explicit FP32/no-AMP settings.
+- Runtime artifacts remain outside Git while training is running.
+
+Any OOM, non-finite value, pairing mismatch, source mismatch, incomplete epoch, validation mismatch or other exception is a real failure. Do not retry or alter settings.
+
+## Reporting and GitHub archive
+
+After the one-shot execution has stopped (PASS or FAIL), prepare a compact archive under:
+
+`H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/results/clean_launch_smoke_fix_20261103_01/`
+
+Include:
+- CPU_VALIDATION.json and CPU_ALL_SUITES.log
+- preflight.json
+- run_manifest.json
+- ACTUAL_EXECUTION_STATUS.json
+- SMOKE_SUMMARY.json if present
+- per-condition result.json, optimizer_step_events.json and input_controls.json if present
+- donor_pair_audit.csv
+- FAILURE.json and full traceback/snapshot locator if failed
+- OUTPUT_SHA256.csv
+- concise CLEAN_LAUNCH_REPORT.md with actual statuses and exact commands/exit codes
+
+Do not commit model weights, checkpoints, datasets, raw image data, or large tensor snapshots. Preserve full large artifacts in the external output directories and record their exact paths and hashes. Do not modify any experiment source after execution. Commit/push only the compact execution evidence and report.
+
+## Final deliverables
+
+Report:
+1. Branch/HEAD, clean state and runtime environment.
+2. CPU validation: static, syntax, each test suite and 41-method total.
+3. Preflight: TRAIN/VAL hashes, TEST=0, adapter/weight/source hashes.
+4. All six conditions: completed epochs, samples, attempted windows, actual updates, loss, VAL Overall/Macro/Worst-class, peak VRAM, wall time.
+5. Pairing hash checks and Stage-II extractor/BN freeze checks.
+6. Exact failure evidence if any gate stopped.
+7. SHA256 output index and a single PASS/FAIL conclusion.
+
+**Stop after Smoke. Do not start formal 90+10 training.**
