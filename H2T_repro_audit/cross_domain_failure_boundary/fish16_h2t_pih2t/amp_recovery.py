@@ -1,9 +1,9 @@
-"""Fail-closed handling for the one diagnosed PIF AMP overflow.
+"""Gradient auditing and exact optimizer-step accounting.
 
-This module does not clamp, replace, or otherwise alter gradients. It permits
-GradScaler's native skip/backoff path only when the sole non-finite value is
-one positive or negative Inf at PIF coefficient b at [0, 1, 0]. All other
-non-finite patterns remain fail-closed.
+The narrow PIF AMP-overflow diagnostic path is retained for historical,
+disposable forensic tools. The clean-launch Smoke and formal runner use full
+FP32, construct a disabled/no-op GradScaler, and never permit that recovery:
+all non-finite gradients are fatal. No gradient is clamped or replaced.
 """
 from dataclasses import asdict, dataclass
 import hashlib
