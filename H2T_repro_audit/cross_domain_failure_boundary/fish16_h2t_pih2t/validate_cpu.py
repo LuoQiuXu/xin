@@ -74,6 +74,7 @@ def main() -> int:
         smoke_source = (BASE / "smoke.py").read_text(encoding="utf-8")
         formal_source = (BASE / "formal_train.py").read_text(encoding="utf-8")
         preflight_source = (BASE / "preflight.py").read_text(encoding="utf-8")
+        amp_source = (BASE / "amp_recovery.py").read_text(encoding="utf-8")
         forbidden_tokens = {
             "smoke.py": ("dtype=torch.float16", "dtype=torch.bfloat16", '"amp": True',
                          "CPU_TEST_RESULTS_FINAL.txt", "ORIGINAL_SOURCE_HASHES.json",
@@ -92,16 +93,37 @@ def main() -> int:
             for name, tokens in forbidden_tokens.items()
         }
         violations = {name: tokens for name, tokens in violations.items() if tokens}
-        if NUMERIC_MODE != "float32_no_autocast_no_grad_scaler" or violations:
+        autocast_calls = {
+            name: re.findall(r"torch\\.amp\\.autocast\\([^\\n]*\\)", source)
+            for name, source in (("smoke.py", smoke_source), ("formal_train.py", formal_source))
+        }
+        invalid_autocast = {
+            name: [call for call in calls if "enabled=False" not in call]
+            for name, calls in autocast_calls.items()
+        }
+        invalid_autocast = {name: calls for name, calls in invalid_autocast.items() if calls}
+        if (
+            NUMERIC_MODE != "float32_no_autocast_no_grad_scaler"
+            or violations
+            or invalid_autocast
+            or '"enabled": False' not in formal_source
+            or "enabled=False" not in amp_source
+        ):
             raise RuntimeError(
                 "Static numeric/protocol contract failed: "
-                + json.dumps({"numeric_mode": NUMERIC_MODE, "violations": violations})
+                + json.dumps({
+                    "numeric_mode": NUMERIC_MODE,
+                    "violations": violations,
+                    "invalid_autocast": invalid_autocast,
+                })
             )
         result["checks"].append({
             "name": "STATIC_PROTOCOL",
             "exit_code": 0,
             "numeric_mode": NUMERIC_MODE,
             "active_fp16_or_bf16_autocast_paths": 0,
+            "autocast_calls_all_explicitly_disabled": True,
+            "grad_scaler_disabled_in_smoke_formal_and_adapter": True,
             "stale_external_validation_gates": 0,
             "legacy_pretrained_loader_calls": 0,
         })
