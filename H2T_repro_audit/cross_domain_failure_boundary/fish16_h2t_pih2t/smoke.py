@@ -121,6 +121,7 @@ def verify_gate_records(preflight_record, cpu_validation_record):
     )
     assert cpu.get("test_methods_run") == EXPECTED_CPU_TEST_METHODS
     checks = {item["name"]: item for item in cpu.get("checks", [])}
+    assert checks.get("STATIC_PROTOCOL", {}).get("exit_code") == 0
     assert checks.get("SYNTAX", {}).get("exit_code") == 0
     assert checks.get("CPU_ALL_SUITES", {}).get("exit_code") == 0
     assert checks.get("CPU_ALL_SUITES", {}).get("test_methods_run") == EXPECTED_CPU_TEST_METHODS
