@@ -267,7 +267,7 @@ def evaluate(model, rows, val, groups, epoch):
     model.eval()
     outputs, targets = [], []
     for item in data.loader(SafeViews(rows, val, False, epoch), 16):
-        with torch.amp.autocast("cuda", dtype=torch.float32, enabled=False):
+        with torch.amp.autocast("cuda", enabled=False):
             logits = model(item["recipient"].cuda(non_blocking=True))
         if not torch.isfinite(logits).all():
             raise FloatingPointError("Nonfinite validation logits")
