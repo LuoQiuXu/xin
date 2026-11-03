@@ -32,8 +32,6 @@ from amp_recovery import (
     GradientContractError, OptimizerStepCounter, guarded_scaler_step, make_grad_scaler
 )
 
-VALIDATION = Path(r"D:\h2t_cross_domain_results\fish16_validation_seed42_20261031_01")
-
 
 def save_json(path, value):
     with Path(path).open("x", encoding="utf-8") as f:
@@ -523,17 +521,8 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     assert samples == 16269 and attempted_steps == expected_attempts
     assert updates + overflow_skips == attempted_steps
     assert updates == step_counter.count
-    assert overflow_skips <= 3 and max_consecutive_overflow_skips <= 2
-    if not (stage == 1 and model.use_pif):
-        assert overflow_skips == 0, "Unexpected AMP overflow outside B0 PIF Stage-I"
-    else:
-        skip_indices = [
-            i for i, row in enumerate(optimizer_step_events)
-            if row["kind"] == "recoverable_pif_b_overflow_skip"
-        ]
-        # The clean-launch protocol is full FP32: every non-finite gradient is
-        # fatal, and no GradScaler skip/recovery is permitted in any condition.
-        assert overflow_skips == 0
+    assert overflow_skips == 0, "FP32 protocol permits no optimizer skip or AMP recovery"
+    assert max_consecutive_overflow_skips == 0
     save_json(folder / "optimizer_step_events.json", optimizer_step_events)
     if stage == 2:
         assert before_extractor == models.state_sha(model.extractor), "Extractor or BN mutated"
@@ -548,12 +537,13 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     save_json(folder / "input_controls.json", controls)
     result = {"condition": name, "scope": "ONE_EPOCH_SMOKE_ONLY", "stage": stage,
               "samples": samples, "optimizer_updates": updates,
-              "attempted_optimizer_steps": attempted_steps, "amp_overflow_skips": overflow_skips,
+              "attempted_optimizer_steps": attempted_steps, "optimizer_skips": overflow_skips,
               "max_consecutive_optimizer_skips": max_consecutive_overflow_skips,
-              "initial_loss_scale": initial_loss_scale, "final_loss_scale": float(scaler.get_scale()),
+              "grad_scaler_enabled": scaler.is_enabled(), "numerical_mode": NUMERIC_MODE,
               "gradient_audit_windows": gradient_audit_windows,
               "lr": lr, "momentum": .9, "weight_decay": wd, "micro_batch": batch,
-              "accumulation": accumulation, "effective_batch": 16, "amp": True, "workers": 4,
+              "accumulation": accumulation, "effective_batch": 16, "amp": False,
+              "autocast_enabled": False, "workers": 4,
               "train_loss": loss_sum / samples, "train_seconds": duration,
               "train_images_per_second": samples / duration,
               "peak_allocated_mib": torch.cuda.max_memory_allocated()/1024**2,
