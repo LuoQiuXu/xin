@@ -65,9 +65,8 @@ class FormalTests(unittest.TestCase):
         # executing a CUDA kernel or a GPU smoke run.
         with patch("torch.cuda.is_available", return_value=True):
             scaler = f.make_formal_grad_scaler()
-        self.assertTrue(scaler.is_enabled())
-        self.assertEqual(scaler.get_scale(), 1.0)
         self.assertFalse(scaler.is_enabled())
+        self.assertEqual(scaler.get_scale(), 1.0)
 
     def test_json_normalize_handles_tuple_list_resume_roundtrip(self):
         record = {
