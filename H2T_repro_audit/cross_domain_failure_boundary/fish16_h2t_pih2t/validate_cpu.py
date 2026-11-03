@@ -168,6 +168,10 @@ def main() -> int:
             name: result["source_sha256_after"][name]
             for name in FORMAL_RUNNER_SOURCE_FILES
         }
+        result["branch_after"] = git_text("branch", "--show-current")
+        result["head_after"] = git_text("rev-parse", "HEAD")
+        if result["branch_after"] != result["branch"] or result["head_after"] != result["head"]:
+            raise RuntimeError("Branch or HEAD changed during CPU validation")
         result["worktree_clean_after"] = not bool(git_text("status", "--porcelain"))
         if not result["worktree_clean_after"]:
             raise RuntimeError("Git worktree became dirty during CPU validation")
