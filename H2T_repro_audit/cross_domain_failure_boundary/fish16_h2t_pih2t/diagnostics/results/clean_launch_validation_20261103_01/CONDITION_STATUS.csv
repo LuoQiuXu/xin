@@ -1,0 +1,7 @@
+condition,status,completed_epochs,required_smoke_epochs,attempted_training_windows,actual_optimizer_updates,loss,validation_overall,validation_macro,validation_tail,peak_vram_mib,gpu_training_wall_seconds
+A0,NOT_STARTED,0,1,0,0,,,,,,0.0
+B0,NOT_STARTED,0,1,0,0,,,,,,0.0
+A1,NOT_STARTED,0,1,0,0,,,,,,0.0
+A2,NOT_STARTED,0,1,0,0,,,,,,0.0
+B1,NOT_STARTED,0,1,0,0,,,,,,0.0
+B2,NOT_STARTED,0,1,0,0,,,,,,0.0

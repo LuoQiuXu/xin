@@ -1,0 +1,15 @@
+{
+  "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "python": "3.12.12",
+  "torch": "2.14.1+cu132",
+  "cuda_build": "13.2",
+  "cudnn": 92400,
+  "gpu_inventory_command": [
+    "nvidia-smi",
+    "--query-gpu=name,driver_version,memory.total",
+    "--format=csv,noheader"
+  ],
+  "gpu_inventory": "NVIDIA GeForce RTX 5070 Laptop GPU, 591.74, 8151 MiB",
+  "cuda_initialized_after_environment_query": true,
+  "environment_query_is_not_model_forward_backward_or_training": true
+}

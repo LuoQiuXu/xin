@@ -1,0 +1,29 @@
+{
+  "source_sha256": {
+    "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/amp_recovery.py": "38d1c54e3baffbb36a9dfff3880208793fcd41d185741a3bc8cff56e06118326",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/diagnose_b0.py": "23eade7c885d3324bac2b4237aac57087bc334df584609af08b1d1baf9dcdfda",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/summarize_b0.py": "2f0d5a3eb732c5310d960e3eaa403e7dbb5f0be0508334f0e4d445323e0b685d",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/test_diagnostic_stats.py": "5dc676aee1f675df8c64601e6924972c6d8a4f704c977691723a3d90f7b59e4a",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/formal_train.py": "e1cd1a3d799f7ef0de443c2bfc6d300e7d6229395e0f66f4fabcbb4a06f8fd85",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/preflight.py": "30d9363577be8f5b4d132b5c178a620d7fee00e683e2b77f41adc395310fcab3",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/protocol_config.py": "d69863f760127edfe457de71965b7becef4c00c108705250bdd74f85c03cc8d9",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/replay_a0_amp_scales.py": "5a0deb0bb112055d3b0aff1cad531ea7203c8a596a7450be1bfd55871815bab1",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/smoke.py": "7c1caf02bb761a9098c8c49757914723d42c146382b02061707460048aed20d7",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/test_amp_recovery.py": "cc13fd54a8656eac97848661b98f682dfa9d4f75e5eeae6ba0a28d71c29eca6d",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+    "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/test_formal_train.py": "3fadba0dbb2356cf3a48e4882ff1508b2a6230b3040b63ffa7697993d8e5137f",
+    "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+    "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+    "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+  },
+  "all_equal_before": true,
+  "git_head_unchanged": true,
+  "worktree_clean": true
+}

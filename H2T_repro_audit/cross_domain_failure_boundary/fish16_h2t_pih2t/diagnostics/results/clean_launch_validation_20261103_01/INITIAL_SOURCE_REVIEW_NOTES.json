@@ -1,0 +1,18 @@
+{
+  "scope": "Previously observed initial source-read notes, not additional executed tests or preflight results",
+  "smoke_manifest_precision": {
+    "source": "smoke.py",
+    "observation": "run_manifest.json still sets amp=True. numeric_config contains cuDNN/TF32 flags without explicit NUMERIC_MODE, while the inspected active autocast contexts use enabled=False.",
+    "status": "UNVERIFIED_BY_RUNTIME_NO_GPU_LAUNCH"
+  },
+  "preflight_image_hash_scope": {
+    "source": "preflight.py",
+    "observation": "check_data iterates all manifest rows and hashes image bytes, including the declared5468 TEST rows. This path was not invoked.",
+    "status": "NOT_EXECUTED"
+  },
+  "preflight_legacy_loader": {
+    "source": "preflight.py",
+    "observation": "Status depends on requested_ResNet50_FE_exists and original resnet50_fe(pretrained=True) factory probe; this is distinct from the approved adapter contract. No actual preflight result was produced.",
+    "status": "NOT_EXECUTED"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "gate": "CPU_UNIT_TEST_SUITE_IMPORT",
+  "error_type": "ModuleNotFoundError",
+  "message": "No module named 'diagnose_b0'",
+  "test_module": "diagnostics.test_diagnostic_stats",
+  "source_file": "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/test_diagnostic_stats.py",
+  "source_line": 4,
+  "source_import": "from diagnose_b0 import tensor_stats, gradient_records, gradient_groups, cpu_tree",
+  "traceback": "ImportError: Failed to import test module: test_diagnostic_stats\nTraceback (most recent call last):\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\unittest\\loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\diagnostics\\test_diagnostic_stats.py\", line 4, in <module>\n    from diagnose_b0 import tensor_stats, gradient_records, gradient_groups, cpu_tree\nModuleNotFoundError: No module named 'diagnose_b0'\n\n\n----------------------------------------------------------------------\nRan 37 tests in 2.839s\n\nFAILED (errors=1)\n",
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-m",
+    "unittest",
+    "test_amp_recovery",
+    "test_contract",
+    "test_formal_train",
+    "diagnostics.test_diagnostic_stats",
+    "-v"
+  ],
+  "cwd": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+  "exit_code": 1,
+  "interpretation": "Package-style unittest invocation cannot resolve the top-level sibling import in this launch context. Five diagnostic test methods were not loaded; no assertion failure or GPU numerical failure was established. No alternate invocation, source fix, environment patch, or test rerun was attempted.",
+  "gpu_failure_snapshot": "NOT_APPLICABLE_NO_GPU_RUN"
+}

@@ -1,0 +1,232 @@
+{
+  "actual_execution_status": {
+    "status": "STOPPED_CPU_IMPORT_GATE",
+    "scope": "CLEAN_LAUNCH_EXECUTION_ONLY",
+    "branch": "experiment/fish16-clean-launch-20261103",
+    "head": "9f1a7ac8373f087274b6f919b048c45a14b46e2e",
+    "worktree_clean": true,
+    "conditions": {
+      "A0": {
+        "status": "NOT_STARTED",
+        "completed_epochs": 0,
+        "required_smoke_epochs": 1,
+        "attempted_training_windows": 0,
+        "actual_optimizer_updates": 0,
+        "loss": null,
+        "validation_overall": null,
+        "validation_macro": null,
+        "validation_tail": null,
+        "peak_vram_mib": null,
+        "gpu_training_wall_seconds": 0.0
+      },
+      "B0": {
+        "status": "NOT_STARTED",
+        "completed_epochs": 0,
+        "required_smoke_epochs": 1,
+        "attempted_training_windows": 0,
+        "actual_optimizer_updates": 0,
+        "loss": null,
+        "validation_overall": null,
+        "validation_macro": null,
+        "validation_tail": null,
+        "peak_vram_mib": null,
+        "gpu_training_wall_seconds": 0.0
+      },
+      "A1": {
+        "status": "NOT_STARTED",
+        "completed_epochs": 0,
+        "required_smoke_epochs": 1,
+        "attempted_training_windows": 0,
+        "actual_optimizer_updates": 0,
+        "loss": null,
+        "validation_overall": null,
+        "validation_macro": null,
+        "validation_tail": null,
+        "peak_vram_mib": null,
+        "gpu_training_wall_seconds": 0.0
+      },
+      "A2": {
+        "status": "NOT_STARTED",
+        "completed_epochs": 0,
+        "required_smoke_epochs": 1,
+        "attempted_training_windows": 0,
+        "actual_optimizer_updates": 0,
+        "loss": null,
+        "validation_overall": null,
+        "validation_macro": null,
+        "validation_tail": null,
+        "peak_vram_mib": null,
+        "gpu_training_wall_seconds": 0.0
+      },
+      "B1": {
+        "status": "NOT_STARTED",
+        "completed_epochs": 0,
+        "required_smoke_epochs": 1,
+        "attempted_training_windows": 0,
+        "actual_optimizer_updates": 0,
+        "loss": null,
+        "validation_overall": null,
+        "validation_macro": null,
+        "validation_tail": null,
+        "peak_vram_mib": null,
+        "gpu_training_wall_seconds": 0.0
+      },
+      "B2": {
+        "status": "NOT_STARTED",
+        "completed_epochs": 0,
+        "required_smoke_epochs": 1,
+        "attempted_training_windows": 0,
+        "actual_optimizer_updates": 0,
+        "loss": null,
+        "validation_overall": null,
+        "validation_macro": null,
+        "validation_tail": null,
+        "peak_vram_mib": null,
+        "gpu_training_wall_seconds": 0.0
+      }
+    },
+    "completed_conditions": [],
+    "preflight_executions": 0,
+    "gpu_smoke_executions": 0,
+    "formal_training_started": false,
+    "test_model_evaluations": 0,
+    "test_image_bytes_read_by_preflight": 0,
+    "additional_seeds": [],
+    "automatic_retries": 0,
+    "code_changes": 0,
+    "failure_gate": "CPU_UNIT_TEST_SUITE_IMPORT"
+  },
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "gpu_inventory_command": [
+      "nvidia-smi",
+      "--query-gpu=name,driver_version,memory.total",
+      "--format=csv,noheader"
+    ],
+    "gpu_inventory": "NVIDIA GeForce RTX 5070 Laptop GPU, 591.74, 8151 MiB",
+    "cuda_initialized_after_environment_query": true,
+    "environment_query_is_not_model_forward_backward_or_training": true
+  },
+  "source_fingerprint_files": 22,
+  "original_upstream_hash_gate": "PASS",
+  "original_upstream_files": 8,
+  "syntax": {
+    "status": "PASS",
+    "files": 11,
+    "exit_code": 0
+  },
+  "cpu_tests": {
+    "command_exit_code": 1,
+    "unittest_reported_records": 37,
+    "actual_test_methods_passed": 36,
+    "import_errors": 1,
+    "suites": {
+      "test_amp_recovery": {
+        "passed": 12,
+        "status": "PASS"
+      },
+      "test_contract": {
+        "passed": 10,
+        "status": "PASS"
+      },
+      "test_formal_train": {
+        "passed": 14,
+        "status": "PASS"
+      },
+      "diagnostics.test_diagnostic_stats": {
+        "passed": 0,
+        "test_methods_not_loaded": 5,
+        "status": "MODULE_IMPORT_ERROR"
+      }
+    }
+  },
+  "exact_checks": [
+    {
+      "name": "SYNTAX",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "py_compile",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\protocol_config.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\data.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\models.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\amp_recovery.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\formal_train.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_amp_recovery.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_contract.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\test_formal_train.py",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\diagnostics\\test_diagnostic_stats.py"
+      ],
+      "cwd": "D:\\xiangmuxunlian\\xin",
+      "exit_code": 0,
+      "wall_seconds": 0.18929189979098737,
+      "log": "SYNTAX.log"
+    },
+    {
+      "name": "CPU_ALL_SUITES",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "unittest",
+        "test_amp_recovery",
+        "test_contract",
+        "test_formal_train",
+        "diagnostics.test_diagnostic_stats",
+        "-v"
+      ],
+      "cwd": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+      "exit_code": 1,
+      "wall_seconds": 14.480918899876997,
+      "log": "CPU_ALL_SUITES.log"
+    }
+  ],
+  "failure": {
+    "gate": "CPU_UNIT_TEST_SUITE_IMPORT",
+    "error_type": "ModuleNotFoundError",
+    "message": "No module named 'diagnose_b0'",
+    "test_module": "diagnostics.test_diagnostic_stats",
+    "source_file": "H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/test_diagnostic_stats.py",
+    "source_line": 4,
+    "source_import": "from diagnose_b0 import tensor_stats, gradient_records, gradient_groups, cpu_tree",
+    "traceback": "ImportError: Failed to import test module: test_diagnostic_stats\nTraceback (most recent call last):\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\unittest\\loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\diagnostics\\test_diagnostic_stats.py\", line 4, in <module>\n    from diagnose_b0 import tensor_stats, gradient_records, gradient_groups, cpu_tree\nModuleNotFoundError: No module named 'diagnose_b0'\n\n\n----------------------------------------------------------------------\nRan 37 tests in 2.839s\n\nFAILED (errors=1)\n",
+    "command": [
+      "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "-B",
+      "-X",
+      "utf8",
+      "-m",
+      "unittest",
+      "test_amp_recovery",
+      "test_contract",
+      "test_formal_train",
+      "diagnostics.test_diagnostic_stats",
+      "-v"
+    ],
+    "cwd": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t",
+    "exit_code": 1,
+    "interpretation": "Package-style unittest invocation cannot resolve the top-level sibling import in this launch context. Five diagnostic test methods were not loaded; no assertion failure or GPU numerical failure was established. No alternate invocation, source fix, environment patch, or test rerun was attempted.",
+    "gpu_failure_snapshot": "NOT_APPLICABLE_NO_GPU_RUN"
+  },
+  "data_weight_full_preflight": "NOT_RUN_AFTER_CPU_GATE_FAILURE",
+  "cpu_model_compatibility_contract": "PASS_IN_test_contract; does not replace full preflight",
+  "fp32_gpu_stability": "NOT_TESTED",
+  "gpu_pairing_and_stage2_bn_checks": "NOT_RUN",
+  "preflight_output_directory_requested": "D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_01",
+  "smoke_output_directory_requested": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_01",
+  "requested_gpu_directories_created": false,
+  "source_unchanged": true,
+  "git_worktree_clean": true,
+  "stop_rule": "Handoff requires stop on any failed gate; no patch-and-rerun."
+}
