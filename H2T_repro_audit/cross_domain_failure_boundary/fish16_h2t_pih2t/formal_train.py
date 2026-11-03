@@ -25,10 +25,9 @@ from torch import nn
 import data
 import models
 from amp_recovery import OptimizerStepCounter, guarded_scaler_step
+from protocol_config import BRANCH, SEED, CONDITIONS, STAGE1_EPOCHS, STAGE2_EPOCHS, BATCH_SIZE, NUM_WORKERS, NUMERIC_MODE
 
-BRANCH = "experiment/fish16-amp-scale-stability-20261102"
-SEED = 42
-ORDER = ("A0", "B0", "A1", "A2", "B1", "B2")
+ORDER = CONDITIONS
 ROUTES = {"A1": ("A0", "crt"), "A2": ("A0", "h2t"),
           "B1": ("B0", "crt"), "B2": ("B0", "pi")}
 SCHEMA = 1
@@ -39,8 +38,9 @@ SCHEMA = 1
 # The interval exceeds the maximum 90-epoch Stage-I attempts (90 * 1,017).
 FORMAL_AMP_POLICY = {
     "device": "cuda",
-    "enabled": True,
-    "init_scale": 65536.0,
+    "enabled": False,
+    "init_scale": 1.0,
+    "precision": NUMERIC_MODE,
     "growth_factor": 2.0,
     "backoff_factor": 0.5,
     "growth_interval": 100000,
@@ -268,7 +268,7 @@ def evaluate(model, rows, val, groups, epoch):
     model.eval()
     outputs, targets = [], []
     for item in data.loader(SafeViews(rows, val, False, epoch), 16):
-        with torch.amp.autocast("cuda", dtype=torch.float16):
+        with torch.amp.autocast("cuda", dtype=torch.float32, enabled=False):
             logits = model(item["recipient"].cuda(non_blocking=True))
         if not torch.isfinite(logits).all():
             raise FloatingPointError("Nonfinite validation logits")
