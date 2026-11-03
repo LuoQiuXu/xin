@@ -235,12 +235,12 @@ def batch_smoke(rows, rec, donors, batch, output):
         opt = torch.optim.SGD(model.classifier.parameters(), lr=.01, momentum=.9, weight_decay=5e-4)
         opt.zero_grad(set_to_none=True)
         scaler = make_grad_scaler()
-        with torch.no_grad(), torch.amp.autocast("cuda", dtype=torch.float16):
+        with torch.no_grad(), torch.amp.autocast("cuda", enabled=False):
             r = model.extractor(one["recipient"].cuda())
             d = model.extractor(one["donor"].cuda()) if mode != "crt" else None
             assert r.shape == (batch, 2048, 7, 7)
             fused, extra = models.stage2_features(r, d, one["label"].cuda(), model.classifier, mode)
-        with torch.amp.autocast("cuda", dtype=torch.float16):
+        with torch.amp.autocast("cuda", enabled=False):
             loss = nn.functional.cross_entropy(model.classifier(fused), one["label"].cuda())
         assert torch.isfinite(loss)
         scaler.scale(loss).backward()
@@ -315,11 +315,11 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
             mixup_context = {"target_a": a.detach().cpu().clone(),
                              "target_b": b.detach().cpu().clone(), "lambda": float(lam)}
             row["mixup_lambda"] = float(lam)
-            with torch.amp.autocast("cuda", dtype=torch.float16):
+            with torch.amp.autocast("cuda", enabled=False):
                 logits = model(x)
                 loss = lam * nn.functional.cross_entropy(logits, a) + (1-lam) * nn.functional.cross_entropy(logits, b)
         else:
-            with torch.no_grad(), torch.amp.autocast("cuda", dtype=torch.float16):
+            with torch.no_grad(), torch.amp.autocast("cuda", enabled=False):
                 r = model.extractor(x)
                 d = model.extractor(item["donor"].cuda(non_blocking=True)) if donors is not None else None
                 features, extra = models.stage2_features(r, d, target, model.classifier, mode)
@@ -331,7 +331,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                     assert (extra >= 0).all() and (extra <= 1).all()
                     ratios.append(extra.float().cpu().numpy())
                     ratio_labels.append(item["label"].numpy())
-            with torch.amp.autocast("cuda", dtype=torch.float16):
+            with torch.amp.autocast("cuda", enabled=False):
                 logits = model.classifier(features)
                 loss = nn.functional.cross_entropy(logits, target)
         assert torch.isfinite(loss) and torch.isfinite(logits).all(), "Nonfinite forward"
@@ -351,7 +351,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
                     scaler=scaler,
                     named_parameters=named_optimizer_parameters,
                     step_counter=step_counter,
-                    allow_pif_b_overflow=(stage == 1 and model.use_pif),
+                    allow_pif_b_overflow=False,
                     consecutive_overflow_skips=consecutive_overflow_skips,
                     max_consecutive_overflow_skips=2,
                 )
