@@ -17,9 +17,9 @@ import subprocess
 import traceback
 
 REPO = Path(__file__).resolve().parents[3]
-from protocol_config import BRANCH, LOCKED_UPSTREAM_SOURCE_HASHES
+from protocol_config import BRANCH, CPU_VALIDATION_SOURCE_FILES, LOCKED_UPSTREAM_SOURCE_HASHES
 
-MANIFEST = Path(r"D:\\h2t_cross_domain_audit\\fish4knowledge\\manifest_primary.csv")
+MANIFEST = Path(r"D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv")
 IMAGES = REPO / "data/fishRecognition_GT/fish_image"
 EXPECTED_SHA = "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30"
 EXPECTED_SPLITS = {"train": (16269, 5208), "val": (5396, 1736), "test": (5468, 1736)}
@@ -222,6 +222,10 @@ def main():
         "weights_downloaded": False,
         "original_sources_modified": False,
         "test_image_bytes_read": 0,
+        "source_sha256": {
+            name: sha(Path(__file__).parent / name)
+            for name in CPU_VALIDATION_SOURCE_FILES
+        },
     }
     try:
         result["data_gate"] = check_data()
