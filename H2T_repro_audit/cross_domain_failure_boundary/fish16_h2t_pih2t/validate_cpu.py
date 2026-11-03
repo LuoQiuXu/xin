@@ -2,7 +2,7 @@
 
 Runs syntax compilation and the complete CPU unittest suite, then records the
 exact source fingerprints required by Smoke and the later formal runner.
-No dataset image is opened and no CUDA/model training operation is performed.
+No TEST image is opened and no CUDA/model training operation is performed. Contract tests may read a bounded number of TRAIN images.
 """
 from __future__ import annotations
 
@@ -59,7 +59,9 @@ def main() -> int:
         "test_methods_expected": EXPECTED_CPU_TEST_METHODS,
         "test_methods_run": None,
         "gpu_started": False,
-        "dataset_images_opened": 0,
+        "test_image_access": 0,
+        "test_image_bytes_read": 0,
+        "cpu_test_train_image_access": "bounded matched-view contract test only",
     }
     try:
         if result["branch"] != BRANCH:
