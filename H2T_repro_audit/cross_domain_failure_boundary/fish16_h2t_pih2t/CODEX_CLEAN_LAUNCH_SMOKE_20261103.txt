@@ -1,0 +1,87 @@
+# Codex execution handoff — Fish16 clean launch (2026-11-03)
+
+## Mission
+
+Execute validation and the six-condition one-epoch real-data Smoke on the already-prepared branch. This is an execution task, **not a code-editing task**. Do not modify source, configuration, upstream H2T/PI-H2T files, weights, manifests, or this handoff. If any gate fails, stop and report the first failure with exact evidence; do not patch-and-rerun.
+
+## Immutable execution identity
+
+- Repository: `LuoQiuXu/xin`
+- Required branch: `experiment/fish16-clean-launch-20261103`
+- Experiment directory: `H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t`
+- Seed: 42
+- Conditions, in required order: A0, B0, A1, A2, B1, B2
+- Stage-I: 1 epoch per condition in Smoke
+- Stage-II: 1 epoch per condition in Smoke
+- Micro/effective batch: 16
+- Dataset, manifest, source weights, split rules, model architecture, optimizer, learning-rate schedule, loss, samplers, transforms and transfer methods remain as defined by the existing source and locked manifest.
+
+## Critical numerical-protocol decision
+
+The preceding FP16 runs failed in backward even after the scaler growth interval was disabled: A0 epoch 66 produced 147 NaNs in backbone conv1 gradients and two Infs in BN1 gradients while logits/loss were finite. The earlier A0 epoch-4 failure also showed a scale-dependent Inf. This branch intentionally uses **full FP32** for all six conditions: autocast disabled and GradScaler disabled/no-op. This is an explicit numerical-protocol change; do not describe it as an FP16 fix. Do not silently switch back to FP16, BF16, gradient clipping, loss changes, altered learning rates, or a different batch size.
+
+Any non-finite forward or gradient is fatal. No skip, clamp, retry, reduced-scale recovery, or continuation to later conditions is allowed in this FP32 Smoke. Preserve the complete failure snapshot and stop.
+
+## Preflight and validation gates
+
+Use the existing validated environment:
+`D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe`
+
+First verify:
+1. Git working tree is clean and current branch is exactly the required branch.
+2. Record HEAD SHA and SHA256 of every executed Python source before running.
+3. Verify original upstream H2T/PI-H2T source hashes, official 19c8e357 weight SHA, converted adapter tensor state, manifest SHA, image SHA/path checks, split counts, and no leakage using the existing preflight.
+4. Run py_compile on: `protocol_config.py`, `preflight.py`, `data.py`, `models.py`, `amp_recovery.py`, `smoke.py`, `formal_train.py`, `test_amp_recovery.py`, `test_contract.py`, `test_formal_train.py`, and `diagnostics/test_diagnostic_stats.py`.
+5. Run the complete existing CPU test suite: `test_amp_recovery`, `test_contract`, `test_formal_train`, and `diagnostics.test_diagnostic_stats`. Do not treat CPU tests as GPU evidence.
+6. Verify by source inspection that **zero active FP16 autocast paths remain** in smoke/formal execution and that the numerical mode is FP32 in the protocol manifest. No stale branch literal may be used as the active branch identity.
+
+If any check fails, do not launch GPU Smoke.
+
+## GPU Smoke — exactly once
+
+Create new external output directories (never inside the repository; never overwrite existing output):
+
+- Preflight: `D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_01`
+- Smoke: `D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_01`
+
+Run:
+```powershell
+& 'D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe' -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_01'
+```
+Only if preflight exits 0 and reports its full data/source gates PASS, run:
+```powershell
+& 'D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe' -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_01' --micro-batch 16
+```
+
+Do not pass `--b0-stage1-only`, `--forensic-b0-only`, or `--max-batches`. The default Smoke path must execute all six conditions, one epoch each, in the fixed order. Do not start formal 90+10 training in this task.
+
+## Acceptance criteria
+
+Smoke passes only if all of the following are proven by actual execution records, not intended budgets:
+
+- A0 and B0 each complete one full Stage-I epoch and validation.
+- A1, A2, B1 and B2 each complete one full Stage-II epoch and validation.
+- Exactly six completed conditions, in the required order; no condition is silently skipped.
+- Every attempted training window has finite loss/logits/gradients; actual optimizer-step counts match the attempted-window accounting.
+- No AMP skip or scaler transition occurs (FP32/no-op scaler).
+- Paired sampling/control hashes match the existing protocol: A0/B0 Stage-I pairing; A1/A2 recipient pairing; B1/B2 recipient pairing; A2/B2 donor pairing.
+- Stage-II extractor parameters and all BN buffers remain unchanged.
+- TEST image access and TEST evaluation are both exactly zero.
+- The run manifest records FP32 numerical mode, branch, HEAD, source hashes, data manifest hash, environment, and complete LR tables.
+- Output index includes hashes for all outputs. Runtime artifacts stay outside Git.
+
+If any acceptance criterion fails, stop immediately. Do not automatically resume, patch, rerun, or proceed to formal training.
+
+## Deliverables to report back
+
+Return:
+1. Branch, HEAD, clean/dirty status, Python/PyTorch/CUDA/cuDNN/GPU.
+2. Exact commands and exit codes.
+3. py_compile and each CPU test result.
+4. Preflight report and data/weight/source hash gate summary.
+5. Six-condition actual status, per-condition completed epochs, attempted windows, actual optimizer updates, loss, validation Overall/Macro/Tail, peak VRAM and wall time.
+6. All pairing hashes and equality checks.
+7. Full failure snapshot/traceback if failed.
+8. SHA256 output index and a concise PASS/FAIL conclusion.
+
+**Stop after Smoke.** Do not launch the 90+10 formal pilot until these results are reviewed.
