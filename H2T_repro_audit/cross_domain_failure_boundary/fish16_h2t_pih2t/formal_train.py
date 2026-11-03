@@ -32,10 +32,9 @@ ROUTES = {"A1": ("A0", "crt"), "A2": ("A0", "h2t"),
           "B1": ("B0", "crt"), "B2": ("B0", "pi")}
 SCHEMA = 1
 
-# The previous formal run let the default GradScaler double its scale every
-# 2,000 successful updates. A0 then failed at scale 262,144. Keep the original
-# 65,536 starting scale, but prevent automatic growth during any one condition.
-# The interval exceeds the maximum 90-epoch Stage-I attempts (90 * 1,017).
+# Prior FP16 runs failed in backward with NaN/Inf gradients even after scale growth
+# was disabled. The clean-launch protocol therefore uses full FP32 consistently
+# in all six conditions; autocast and gradient scaling are disabled.
 FORMAL_AMP_POLICY = {
     "device": "cuda",
     "enabled": False,
@@ -52,7 +51,7 @@ FORMAL_AMP_POLICY = {
 
 def make_formal_grad_scaler():
     if not torch.cuda.is_available():
-        raise RuntimeError("The Fish16 formal AMP policy requires CUDA.")
+        raise RuntimeError("The Fish16 formal runner requires CUDA.")
     return torch.amp.GradScaler(
         FORMAL_AMP_POLICY["device"],
         init_scale=FORMAL_AMP_POLICY["init_scale"],
