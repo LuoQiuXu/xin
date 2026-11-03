@@ -106,7 +106,7 @@ def main() -> int:
         )
         test_log = test_run.stdout + test_run.stderr
         (output / "CPU_ALL_SUITES.log").write_text(test_log, encoding="utf-8")
-        match = re.search(r"Ran (\\d+) tests?", test_log)
+        match = re.search(r"Ran (\d+) tests?", test_log)
         count = int(match.group(1)) if match else None
         result["test_methods_run"] = count
         result["checks"].append({
