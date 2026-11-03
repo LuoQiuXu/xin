@@ -25,12 +25,12 @@ from torch import nn
 import data
 import models
 from amp_recovery import OptimizerStepCounter, guarded_scaler_step
-from protocol_config import BRANCH, SEED, CONDITIONS, STAGE1_EPOCHS, STAGE2_EPOCHS, BATCH_SIZE, NUM_WORKERS, NUMERIC_MODE
+from protocol_config import (BRANCH, SEED, CONDITIONS, STAGE1_EPOCHS, STAGE2_EPOCHS, BATCH_SIZE, NUM_WORKERS, NUMERIC_MODE, LOCKED_UPSTREAM_SOURCE_HASHES, FORMAL_RUNNER_SOURCE_FILES)
 
 ORDER = CONDITIONS
 ROUTES = {"A1": ("A0", "crt"), "A2": ("A0", "h2t"),
           "B1": ("B0", "crt"), "B2": ("B0", "pi")}
-SCHEMA = 1
+SCHEMA = 2
 
 # Prior FP16 runs failed in backward with NaN/Inf gradients even after scale growth
 # was disabled. The clean-launch protocol therefore uses full FP32 consistently
@@ -329,7 +329,7 @@ class FormalRun:
 
     def current_hashes(self):
         base = Path(__file__).parent
-        return {n: models.sha(base/n) for n in ("formal_train.py", "models.py", "data.py", "amp_recovery.py")}
+        return {name: models.sha(base/name) for name in FORMAL_RUNNER_SOURCE_FILES}
 
     def initialize(self):
         if self.output.is_relative_to(models.ROOT):
@@ -348,7 +348,7 @@ class FormalRun:
             raise ValueError("Wrong formal branch")
         if models.sha(data.MANIFEST) != data.EXPECTED_SHA or models.sha(models.ORIGINAL_WEIGHT) != models.ORIGINAL_SHA:
             raise ValueError("Locked manifest or official initialization hash mismatch")
-        expected = json.loads(Path(r"D:\h2t_cross_domain_results\fish16_validation_seed42_20261031_01\ORIGINAL_SOURCE_HASHES.json").read_text(encoding="utf-8"))
+        expected = LOCKED_UPSTREAM_SOURCE_HASHES
         if models.source_hashes() != expected:
             raise ValueError("Original H2T/PI-H2T source hash changed")
         self.hashes = self.current_hashes()
@@ -361,6 +361,8 @@ class FormalRun:
         cpu = json.loads(cpu_path.read_text(encoding="utf-8"))
         if cpu["status"] != "PASS" or any(s["exit_code"] for s in cpu["checks"]):
             raise ValueError("Required CPU checks did not pass")
+        if cpu.get("branch") != BRANCH:
+            raise ValueError("CPU validation record belongs to a different branch")
         if cpu["source_hashes"] != self.hashes:
             raise ValueError("Runner sources changed after CPU validation")
         if not torch.cuda.is_available():
@@ -629,8 +631,10 @@ class FormalRun:
             model.load_state_dict(cp["model"],strict=True)
             optimizer.load_state_dict(cp["optimizer"])
             scaler.load_state_dict(cp["scaler"])
-            if scaler.get_growth_interval() != FORMAL_AMP_POLICY["growth_interval"]:
-                raise ValueError("Resume checkpoint uses a different formal AMP growth policy")
+            if scaler.is_enabled() != FORMAL_AMP_POLICY["enabled"]:
+                raise ValueError("Resume checkpoint uses a different numeric-scaler policy")
+            if scaler.is_enabled() and scaler.get_growth_interval() != FORMAL_AMP_POLICY["growth_interval"]:
+                raise ValueError("Resume checkpoint uses a different enabled GradScaler policy")
             scheduler.load_state_dict(cp["scheduler"])
             records,pending,consecutive,best = cp["records"],cp["pending_overflow"],cp["consecutive_skips"],cp["best"]
             update_offset=cp["actual_updates_total"]
