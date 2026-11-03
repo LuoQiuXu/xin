@@ -157,6 +157,8 @@ def check_approved_model_adapter():
     assert provenance["strict_load"] is True
     assert provenance["dropped_only"] == ["fc.weight", "fc.bias"]
     assert provenance["learned_or_floating_keys_filled"] == []
+    assert provenance["shape_mismatches"] == []
+    assert provenance["all_265_backbone_weight_and_float_buffer_tensors_exact"] is True
 
     # The approved adapter must load only the already-verified local tensor state.
     # Any attempt to download pretrained weights during this gate is a hard failure.
