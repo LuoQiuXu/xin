@@ -301,6 +301,7 @@ def batch_smoke(rows, rec, donors, batch, output):
         opt = torch.optim.SGD(model.classifier.parameters(), lr=.01, momentum=.9, weight_decay=5e-4)
         opt.zero_grad(set_to_none=True)
         scaler = make_grad_scaler()
+        assert not scaler.is_enabled(), "FP32 batch smoke must not enable GradScaler"
         with torch.no_grad(), torch.amp.autocast("cuda", enabled=False):
             r = model.extractor(one["recipient"].cuda())
             d = model.extractor(one["donor"].cuda()) if mode != "crt" else None
@@ -346,13 +347,13 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
     before_pif = [float(p.detach().flatten()[i]) for p in model.extractor.pif.parameters() for i in range(p.numel())]
     opt = torch.optim.SGD(parameters, lr=lr, momentum=.9, weight_decay=wd)
     scaler = make_grad_scaler()
+    assert not scaler.is_enabled(), "FP32 Smoke must not enable GradScaler"
     step_counter = OptimizerStepCounter(opt)
     optimizer_ids = {id(p) for group in opt.param_groups for p in group["params"]}
     named_optimizer_parameters = [
         (name, p) for name, p in model.named_parameters() if id(p) in optimizer_ids
     ]
     assert len(named_optimizer_parameters) == len(parameters)
-    initial_loss_scale = scaler.get_scale()
     accumulation = 16 // batch
     dataset = Views(rows, indices, True, donors=donors)
     batches = loader(dataset, batch)
@@ -496,7 +497,7 @@ def one_epoch(name, model, rows, indices, donors, mode, stage, batch, groups, va
             "attempted_optimizer_steps": attempted_steps,
             "optimizer_updates": updates,
             "optimizer_skips": overflow_skips,
-            "loss_scale_final": float(scaler.get_scale()),
+            "grad_scaler_enabled": scaler.is_enabled(), "numerical_mode": NUMERIC_MODE,
             "train_loss_so_far": loss_sum / samples if samples else None,
             "train_seconds": duration,
             "peak_allocated_mib": torch.cuda.max_memory_allocated()/1024**2,
