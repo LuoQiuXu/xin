@@ -212,7 +212,7 @@ def evaluate_validation(model, rows, val, groups, batch):
     model.eval()
     outputs, labels = [], []
     for item in loader(Views(rows, val, False), batch):
-        with torch.amp.autocast("cuda", dtype=torch.float16):
+        with torch.amp.autocast("cuda", dtype=torch.float32, enabled=False):
             logits = model(item["recipient"].cuda(non_blocking=True))
         assert torch.isfinite(logits).all()
         outputs.append(logits.float().cpu())
