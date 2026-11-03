@@ -11,7 +11,7 @@ Those issues have been corrected on the branch below. This is now an **execution
 - Repository: `LuoQiuXu/xin`
 - Required branch: `experiment/fish16-clean-launch-fix-20261103`
 - Experiment directory: `H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t`
-- Python: `D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe`
+- Python: `D:\app\minicondaaa\envs\xiaoju\python.exe`
 - Seed: 42
 - Conditions/order: A0, B0, A1, A2, B1, B2
 - Stage-I: A0 and B0, one complete epoch each
@@ -47,17 +47,17 @@ The prior failed run and its archived evidence on `experiment/fish16-clean-launc
 
 ## Exact output directories
 
-- CPU: `D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02`
-- Preflight: `D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02`
-- Smoke: `D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02`
+- CPU: `D:\h2t_cross_domain_results\fish16_clean_launch_cpu_20261103_02`
+- Preflight: `D:\h2t_cross_domain_results\fish16_clean_launch_preflight_20261103_02`
+- Smoke: `D:\h2t_cross_domain_results\fish16_clean_launch_smoke_20261103_02`
 
 ## Step 1 — CPU validation
 
 From repository root, run:
 
 ```powershell
-$PY = 'D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe'
-& $PY -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\validate_cpu.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02'
+$PY = 'D:\app\minicondaaa\envs\xiaoju\python.exe'
+& $PY -B -X utf8 -u 'H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\validate_cpu.py' --output-dir 'D:\h2t_cross_domain_results\fish16_clean_launch_cpu_20261103_02'
 if ($LASTEXITCODE -ne 0) { throw "CPU validation failed; stop here." }
 ```
 
@@ -78,7 +78,7 @@ Do not manually rerun unittest with a different import context. The helper conta
 Only after Step 1 passes:
 
 ```powershell
-& $PY -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02'
+& $PY -B -X utf8 -u 'H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\preflight.py' --output-dir 'D:\h2t_cross_domain_results\fish16_clean_launch_preflight_20261103_02'
 if ($LASTEXITCODE -ne 0) { throw "Preflight failed; stop here." }
 ```
 
@@ -98,7 +98,7 @@ Acceptance:
 Only after both prior steps pass:
 
 ```powershell
-& $PY -B -X utf8 -u 'H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py' --output-dir 'D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02' --preflight-record 'D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02\\preflight.json' --cpu-validation-record 'D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\CPU_VALIDATION.json' --micro-batch 16
+& $PY -B -X utf8 -u 'H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\smoke.py' --output-dir 'D:\h2t_cross_domain_results\fish16_clean_launch_smoke_20261103_02' --preflight-record 'D:\h2t_cross_domain_results\fish16_clean_launch_preflight_20261103_02\preflight.json' --cpu-validation-record 'D:\h2t_cross_domain_results\fish16_clean_launch_cpu_20261103_02\CPU_VALIDATION.json' --micro-batch 16
 if ($LASTEXITCODE -ne 0) { throw "GPU Smoke failed; preserve outputs and stop." }
 ```
 
