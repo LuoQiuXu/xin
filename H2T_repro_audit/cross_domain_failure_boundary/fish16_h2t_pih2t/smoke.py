@@ -81,6 +81,10 @@ def verify_gate_records(preflight_record, cpu_validation_record):
     head = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=models.ROOT, text=True
     ).strip()
+    dirty = subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=models.ROOT, text=True
+    ).strip()
+    assert not dirty, "Git worktree must be clean before Smoke"
     assert branch == BRANCH, f"Wrong Smoke branch: {branch}"
     assert preflight.get("status") == "PASS_PREFLIGHT_ONLY", "Preflight did not pass"
     assert cpu.get("status") == "PASS", "CPU validation did not pass"
