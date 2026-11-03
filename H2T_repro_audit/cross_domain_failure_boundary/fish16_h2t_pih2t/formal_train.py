@@ -509,12 +509,12 @@ class FormalRun:
                     control["mixup_lambda"] = float(lam)
                     mixup_digest.update(json_bytes(control))
                     self.active.update(input=x,targets=targets,target_a=target_a,target_b=target_b,mixup_lambda=lam,control=control)
-                    with torch.amp.autocast("cuda", dtype=torch.float16):
+                    with torch.amp.autocast("cuda", enabled=False):
                         logits = model(x)
                         loss = lam*nn.functional.cross_entropy(logits,target_a)+(1-lam)*nn.functional.cross_entropy(logits,target_b)
                 else:
                     self.active.update(input=x,targets=targets,control=control)
-                    with torch.no_grad(), torch.amp.autocast("cuda", dtype=torch.float16):
+                    with torch.no_grad(), torch.amp.autocast("cuda", enabled=False):
                         r = model.extractor(x)
                         d = model.extractor(item["donor"].cuda(non_blocking=True)) if donors is not None else None
                         features, extra = models.stage2_features(r,d,targets,model.classifier,ROUTES[name][1])
@@ -529,7 +529,7 @@ class FormalRun:
                             if extra.requires_grad or not torch.isfinite(extra).all() or not ((extra>=0)&(extra<=1)).all():
                                 raise ValueError("Invalid detached PI-H2TF recipient mass")
                             control["pi_recipient_mass"] = extra.float().cpu().tolist()
-                    with torch.amp.autocast("cuda", dtype=torch.float16):
+                    with torch.amp.autocast("cuda", enabled=False):
                         logits = model.classifier(features)
                         loss = nn.functional.cross_entropy(logits,targets)
                 self.active.update(input=x,targets=targets,target_a=target_a,target_b=target_b,
@@ -544,7 +544,7 @@ class FormalRun:
                     raise ValueError("Frozen Stage-II extractor received gradients")
                 attempted += 1
                 outcome = guarded_scaler_step(optimizer=optimizer,scaler=scaler,named_parameters=named,
-                    step_counter=counter,allow_pif_b_overflow=(name=="B0"),
+                    step_counter=counter,allow_pif_b_overflow=False,
                     consecutive_overflow_skips=consecutive,max_consecutive_overflow_skips=2)
                 event = {**outcome.as_dict(),"condition":name,"epoch":epoch+1,"batch":batch,
                          "pif_gradient_signature":signature}
