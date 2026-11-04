@@ -53,6 +53,7 @@ def main() -> int:
         "python_executable": sys.executable,
         "source_sha256_before": {},
         "source_sha256_after": {},
+        "source_sha256": {},
         "source_hashes": {},
         "upstream_source_sha256": {},
         "checks": [],
@@ -188,6 +189,8 @@ def main() -> int:
         }
         if result["source_sha256_before"] != result["source_sha256_after"]:
             raise RuntimeError("Source fingerprints changed during CPU validation")
+        # Publish the verified full source set under the key consumed by Smoke.
+        result["source_sha256"] = dict(result["source_sha256_after"])
         result["source_hashes"] = {
             name: result["source_sha256_after"][name]
             for name in FORMAL_RUNNER_SOURCE_FILES
