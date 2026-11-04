@@ -1,0 +1,66 @@
+[
+  {
+    "condition": "A1",
+    "mode": "crt",
+    "feature_shape": [
+      16,
+      2048,
+      7,
+      7
+    ],
+    "dtype": "torch.float32",
+    "loss": 2.847133159637451,
+    "classifier_updated": true,
+    "extractor_and_bn_unchanged": true,
+    "h2t_channels": null,
+    "ratio_detached": null
+  },
+  {
+    "condition": "A2",
+    "mode": "h2t",
+    "feature_shape": [
+      16,
+      2048,
+      7,
+      7
+    ],
+    "dtype": "torch.float32",
+    "loss": 2.8372812271118164,
+    "classifier_updated": true,
+    "extractor_and_bn_unchanged": true,
+    "h2t_channels": 512,
+    "ratio_detached": null
+  },
+  {
+    "condition": "B1",
+    "mode": "crt",
+    "feature_shape": [
+      16,
+      2048,
+      7,
+      7
+    ],
+    "dtype": "torch.float32",
+    "loss": 2.77335262298584,
+    "classifier_updated": true,
+    "extractor_and_bn_unchanged": true,
+    "h2t_channels": null,
+    "ratio_detached": null
+  },
+  {
+    "condition": "B2",
+    "mode": "pi",
+    "feature_shape": [
+      16,
+      2048,
+      7,
+      7
+    ],
+    "dtype": "torch.float32",
+    "loss": 2.755880832672119,
+    "classifier_updated": true,
+    "extractor_and_bn_unchanged": true,
+    "h2t_channels": null,
+    "ratio_detached": true
+  }
+]

@@ -1,0 +1,46 @@
+test_consecutive_skip_limit_is_fail_closed (test_amp_recovery.AmpRecoveryTests.test_consecutive_skip_limit_is_fail_closed) ... ok
+test_exact_pif_inf_is_fatal_without_explicit_b0_permission (test_amp_recovery.AmpRecoveryTests.test_exact_pif_inf_is_fatal_without_explicit_b0_permission) ... ok
+test_finite_gradients_execute_exactly_one_optimizer_step (test_amp_recovery.AmpRecoveryTests.test_finite_gradients_execute_exactly_one_optimizer_step) ... ok
+test_inf_at_wrong_pif_coordinate_is_fatal (test_amp_recovery.AmpRecoveryTests.test_inf_at_wrong_pif_coordinate_is_fatal) ... ok
+test_inf_in_any_other_parameter_is_fatal (test_amp_recovery.AmpRecoveryTests.test_inf_in_any_other_parameter_is_fatal) ... ok
+test_missing_gradient_is_fatal (test_amp_recovery.AmpRecoveryTests.test_missing_gradient_is_fatal) ... ok
+test_multiple_inf_values_are_fatal (test_amp_recovery.AmpRecoveryTests.test_multiple_inf_values_are_fatal) ... ok
+test_nan_is_never_recoverable (test_amp_recovery.AmpRecoveryTests.test_nan_is_never_recoverable) ... ok
+test_negative_inf_at_pif_b_is_also_skipped_and_scale_is_reduced (test_amp_recovery.AmpRecoveryTests.test_negative_inf_at_pif_b_is_also_skipped_and_scale_is_reduced) ... ok
+test_optimizer_parameter_set_must_match_audit (test_amp_recovery.AmpRecoveryTests.test_optimizer_parameter_set_must_match_audit) ... ok
+test_overflow_requires_enabled_scaler (test_amp_recovery.AmpRecoveryTests.test_overflow_requires_enabled_scaler) ... ok
+test_positive_inf_at_pif_b_is_skipped_and_scale_is_reduced (test_amp_recovery.AmpRecoveryTests.test_positive_inf_at_pif_b_is_skipped_and_scale_is_reduced) ... ok
+test_common_backbone_and_classifier_initialization (test_contract.ContractTests.test_common_backbone_and_classifier_initialization) ... ok
+test_matched_real_recipient_view_and_rng_restoration (test_contract.ContractTests.test_matched_real_recipient_view_and_rng_restoration) ... ok
+test_official_weight_identity_and_strict_compatibility (test_contract.ContractTests.test_official_weight_identity_and_strict_compatibility) ... ok
+test_original_backbone_output_shape (test_contract.ContractTests.test_original_backbone_output_shape) ... ok
+test_original_h2t_shared_512_channels_and_unchanged_recipient (test_contract.ContractTests.test_original_h2t_shared_512_channels_and_unchanged_recipient) ... ok
+test_path_escape_masks_and_excluded_classes_rejected (test_contract.ContractTests.test_path_escape_masks_and_excluded_classes_rejected) ... ok
+test_pi_ratio_recipient_donor_mass_and_detach (test_contract.ContractTests.test_pi_ratio_recipient_donor_mass_and_detach) ... ok
+test_pif_formula_two_parameters_and_permutation (test_contract.ContractTests.test_pif_formula_two_parameters_and_permutation) ... ok
+test_schedule_train_only_and_reproducible (test_contract.ContractTests.test_schedule_train_only_and_reproducible) ... ok
+test_stage2_parameter_and_bn_freeze_with_classifier_update (test_contract.ContractTests.test_stage2_parameter_and_bn_freeze_with_classifier_update) ... ok
+test_final_source_rejects_smoke_wrong_seed_and_early_epoch (test_formal_train.FormalTests.test_final_source_rejects_smoke_wrong_seed_and_early_epoch) ... ok
+test_formal_amp_policy_prevents_growth_during_one_condition (test_formal_train.FormalTests.test_formal_amp_policy_prevents_growth_during_one_condition) ... ok
+test_initial_resume_checkpoint_is_valid_but_not_stage2_source (test_formal_train.FormalTests.test_initial_resume_checkpoint_is_valid_but_not_stage2_source) ... ok
+test_json_normalize_handles_tuple_list_resume_roundtrip (test_formal_train.FormalTests.test_json_normalize_handles_tuple_list_resume_roundtrip) ... ok
+test_new_run_refuses_existing_output_without_modifying_it (test_formal_train.FormalTests.test_new_run_refuses_existing_output_without_modifying_it) ... ok
+test_paired_hash_mismatch_is_fatal (test_formal_train.FormalTests.test_paired_hash_mismatch_is_fatal) ... ok
+test_resume_rejects_missing_or_repeated_epoch_history (test_formal_train.FormalTests.test_resume_rejects_missing_or_repeated_epoch_history) ... ok
+test_rng_checkpoint_roundtrip_is_weights_only_safe (test_formal_train.FormalTests.test_rng_checkpoint_roundtrip_is_weights_only_safe) ... ok
+test_routing_uses_one_final_source_per_pair (test_formal_train.FormalTests.test_routing_uses_one_final_source_per_pair) ... ok
+test_scheduler_resume_cannot_repeat_or_skip (test_formal_train.FormalTests.test_scheduler_resume_cannot_repeat_or_skip) ... ok
+test_source_file_hash_checked_before_load (test_formal_train.FormalTests.test_source_file_hash_checked_before_load) ... ok
+test_stage1_fixed_warmup_and_cosine (test_formal_train.FormalTests.test_stage1_fixed_warmup_and_cosine) ... ok
+test_stage2_fixed_cosine_first_epoch_and_budget (test_formal_train.FormalTests.test_stage2_fixed_cosine_first_epoch_and_budget) ... ok
+test_test_split_is_rejected_before_any_image_open (test_formal_train.FormalTests.test_test_split_is_rejected_before_any_image_open) ... ok
+test_finite_statistics_and_l2_use_float64 (diagnostics.test_diagnostic_stats.DiagnosticStatsTests.test_finite_statistics_and_l2_use_float64) ... ok
+test_missing_is_distinct_from_finite_zero (diagnostics.test_diagnostic_stats.DiagnosticStatsTests.test_missing_is_distinct_from_finite_zero) ... ok
+test_nan_inf_not_hidden_by_finite_substatistics (diagnostics.test_diagnostic_stats.DiagnosticStatsTests.test_nan_inf_not_hidden_by_finite_substatistics) ... ok
+test_parameter_group_report_distinguishes_missing_and_inf (diagnostics.test_diagnostic_stats.DiagnosticStatsTests.test_parameter_group_report_distinguishes_missing_and_inf) ... ok
+test_snapshot_is_a_copy (diagnostics.test_diagnostic_stats.DiagnosticStatsTests.test_snapshot_is_a_copy) ... ok
+
+----------------------------------------------------------------------
+Ran 41 tests in 1.754s
+
+OK

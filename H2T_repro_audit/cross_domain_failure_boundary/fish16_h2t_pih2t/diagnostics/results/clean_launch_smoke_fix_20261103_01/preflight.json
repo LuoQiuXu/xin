@@ -1,0 +1,368 @@
+{
+  "branch": "experiment/fish16-clean-launch-fix-20261103",
+  "head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+  "worktree_clean": true,
+  "training_runs": 0,
+  "weights_downloaded": false,
+  "original_sources_modified": false,
+  "test_image_bytes_read": 0,
+  "source_sha256": {
+    "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637",
+    "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+    "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+    "smoke.py": "2be7990689e6740efdc1d4b8d80cd81a282549b06802f62b5a11937cd422bfc6",
+    "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+    "validate_cpu.py": "e367adf93785e33fbda7b0d96c70c8385c482ef83f30b7d908e999911025f062",
+    "test_amp_recovery.py": "cc13fd54a8656eac97848661b98f682dfa9d4f75e5eeae6ba0a28d71c29eca6d",
+    "test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+    "test_formal_train.py": "3fadba0dbb2356cf3a48e4882ff1508b2a6230b3040b63ffa7697993d8e5137f",
+    "diagnostics/__init__.py": "6609f051eb3b123be9dbaf992717bd2344d7856d71b6dc9abe13450fe2b4eedd",
+    "diagnostics/diagnose_b0.py": "23eade7c885d3324bac2b4237aac57087bc334df584609af08b1d1baf9dcdfda",
+    "diagnostics/test_diagnostic_stats.py": "c88089dad741088735239952aba25ece2e27ebf2ac3243fe102bc0883c8bd918"
+  },
+  "data_gate": {
+    "status": "PASS",
+    "manifest": "D:\\h2t_cross_domain_audit\\fish4knowledge\\manifest_primary.csv",
+    "manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+    "headers": [
+      "image_id",
+      "relative_path",
+      "label",
+      "group_id",
+      "base_group",
+      "group_source",
+      "group_size",
+      "image_sha256",
+      "width",
+      "height",
+      "split_all",
+      "split_primary"
+    ],
+    "rows": 27133,
+    "classes": [
+      {
+        "class_id": 1,
+        "label": "Dascyllus reticulatus",
+        "train": {
+          "images": 7342,
+          "groups": 2544
+        },
+        "val": {
+          "images": 2365,
+          "groups": 848
+        },
+        "test": {
+          "images": 2405,
+          "groups": 848
+        }
+      },
+      {
+        "class_id": 2,
+        "label": "Plectroglyphidodon dickii",
+        "train": {
+          "images": 1588,
+          "groups": 735
+        },
+        "val": {
+          "images": 547,
+          "groups": 245
+        },
+        "test": {
+          "images": 548,
+          "groups": 245
+        }
+      },
+      {
+        "class_id": 3,
+        "label": "Chromis chrysura",
+        "train": {
+          "images": 2114,
+          "groups": 705
+        },
+        "val": {
+          "images": 687,
+          "groups": 235
+        },
+        "test": {
+          "images": 792,
+          "groups": 235
+        }
+      },
+      {
+        "class_id": 4,
+        "label": "Amphiprion clarkii",
+        "train": {
+          "images": 2513,
+          "groups": 613
+        },
+        "val": {
+          "images": 825,
+          "groups": 204
+        },
+        "test": {
+          "images": 711,
+          "groups": 204
+        }
+      },
+      {
+        "class_id": 5,
+        "label": "Chaetodon lunulatus",
+        "train": {
+          "images": 1469,
+          "groups": 322
+        },
+        "val": {
+          "images": 547,
+          "groups": 107
+        },
+        "test": {
+          "images": 518,
+          "groups": 107
+        }
+      },
+      {
+        "class_id": 6,
+        "label": "Chaetodon trifascialis",
+        "train": {
+          "images": 101,
+          "groups": 47
+        },
+        "val": {
+          "images": 26,
+          "groups": 16
+        },
+        "test": {
+          "images": 63,
+          "groups": 16
+        }
+      },
+      {
+        "class_id": 7,
+        "label": "Myripristis kuntee",
+        "train": {
+          "images": 171,
+          "groups": 43
+        },
+        "val": {
+          "images": 125,
+          "groups": 14
+        },
+        "test": {
+          "images": 154,
+          "groups": 14
+        }
+      },
+      {
+        "class_id": 8,
+        "label": "Acanthurus nigrofuscus",
+        "train": {
+          "images": 144,
+          "groups": 43
+        },
+        "val": {
+          "images": 33,
+          "groups": 14
+        },
+        "test": {
+          "images": 41,
+          "groups": 14
+        }
+      },
+      {
+        "class_id": 9,
+        "label": "Hemigymnus fasciatus",
+        "train": {
+          "images": 144,
+          "groups": 34
+        },
+        "val": {
+          "images": 46,
+          "groups": 12
+        },
+        "test": {
+          "images": 51,
+          "groups": 12
+        }
+      },
+      {
+        "class_id": 10,
+        "label": "Neoniphon sammara",
+        "train": {
+          "images": 205,
+          "groups": 31
+        },
+        "val": {
+          "images": 52,
+          "groups": 11
+        },
+        "test": {
+          "images": 42,
+          "groups": 11
+        }
+      },
+      {
+        "class_id": 11,
+        "label": "Abudefduf vaigiensis",
+        "train": {
+          "images": 59,
+          "groups": 26
+        },
+        "val": {
+          "images": 14,
+          "groups": 8
+        },
+        "test": {
+          "images": 25,
+          "groups": 8
+        }
+      },
+      {
+        "class_id": 12,
+        "label": "Canthigaster valentini",
+        "train": {
+          "images": 64,
+          "groups": 16
+        },
+        "val": {
+          "images": 26,
+          "groups": 6
+        },
+        "test": {
+          "images": 57,
+          "groups": 6
+        }
+      },
+      {
+        "class_id": 13,
+        "label": "Pomacentrus moluccensis",
+        "train": {
+          "images": 133,
+          "groups": 17
+        },
+        "val": {
+          "images": 39,
+          "groups": 5
+        },
+        "test": {
+          "images": 9,
+          "groups": 5
+        }
+      },
+      {
+        "class_id": 14,
+        "label": "Zebrasoma scopas",
+        "train": {
+          "images": 48,
+          "groups": 13
+        },
+        "val": {
+          "images": 25,
+          "groups": 5
+        },
+        "test": {
+          "images": 17,
+          "groups": 5
+        }
+      },
+      {
+        "class_id": 15,
+        "label": "Hemigymnus melapterus",
+        "train": {
+          "images": 29,
+          "groups": 10
+        },
+        "val": {
+          "images": 9,
+          "groups": 3
+        },
+        "test": {
+          "images": 4,
+          "groups": 3
+        }
+      },
+      {
+        "class_id": 16,
+        "label": "Lutjanus fulvus",
+        "train": {
+          "images": 145,
+          "groups": 9
+        },
+        "val": {
+          "images": 30,
+          "groups": 3
+        },
+        "test": {
+          "images": 31,
+          "groups": 3
+        }
+      }
+    ],
+    "split_support": {
+      "train": {
+        "images": 16269,
+        "groups": 5208
+      },
+      "val": {
+        "images": 5396,
+        "groups": 1736
+      },
+      "test": {
+        "images": 5468,
+        "groups": 1736
+      }
+    },
+    "frequency_classes": {
+      "Head": [
+        "Dascyllus reticulatus",
+        "Amphiprion clarkii",
+        "Chromis chrysura",
+        "Plectroglyphidodon dickii",
+        "Chaetodon lunulatus",
+        "Neoniphon sammara"
+      ],
+      "Medium": [
+        "Myripristis kuntee",
+        "Lutjanus fulvus",
+        "Acanthurus nigrofuscus",
+        "Hemigymnus fasciatus",
+        "Pomacentrus moluccensis"
+      ],
+      "Tail": [
+        "Chaetodon trifascialis",
+        "Canthigaster valentini",
+        "Abudefduf vaigiensis",
+        "Zebrasoma scopas",
+        "Hemigymnus melapterus"
+      ]
+    },
+    "cross_split_leaks": 0,
+    "train_val_image_sha256_verified": 21665,
+    "test_rows_metadata_only": 5468,
+    "test_image_bytes_read": 0,
+    "manifest_regenerated_or_modified": false
+  },
+  "model_gate": {
+    "status": "PASS",
+    "adapter": "models.FishModel / local strict adapter",
+    "official_weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+    "converted_adapter_sha256": "c1bc33a75ef4d4dd607aa1cb0635ed42d547265a41ad0467081276e5009a7b3e",
+    "adapter_provenance_sha256": "eabeb88c5d01b2ce558e072fa1c091622852c3a2102699200a19942e30abc975",
+    "upstream_source_hashes": {
+      "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+      "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+      "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+      "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+      "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+      "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+    },
+    "plain_and_pif_common_initialization": true,
+    "pif_parameter_count": 2,
+    "network_weight_downloads": 0,
+    "legacy_ResNet50_FE_probe": "REMOVED_NOT_APPLICABLE"
+  },
+  "status": "PASS_PREFLIGHT_ONLY"
+}

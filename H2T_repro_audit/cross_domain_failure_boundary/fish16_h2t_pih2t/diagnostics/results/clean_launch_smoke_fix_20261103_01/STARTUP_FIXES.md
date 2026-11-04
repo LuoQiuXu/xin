@@ -1,0 +1,8 @@
+# 本轮启动修复
+
+用户于本轮明确授权“有问题就修复”，并再次确认固定使用D:\app\minicondaaa\envs\xiaoju\python.exe。修复在任何新门禁执行前完成并提交为960b1be97058202ee97db88f97a424bf1e6c37fb，此后执行源码未改。
+
+1. protocol_config.py中PI_H2T_REVIEW_ZH.md的SHA256字符串被截断。完整值c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9与本地原文件、既有外部ORIGINAL_SOURCE_HASHES.json及已提交的clean_launch_validation_20261103_01/EXECUTION_IDENTITY_BEFORE.json三方一致。只恢复已锁定的历史值，上游文件不变，严格比较保持不变。
+2. validate_cpu.py已生成source_sha256_before/source_sha256_after，但Smoke消费source_sha256。增加该输出字段，并只在before/after完全一致后填入同一组已验证指纹；原有source_hashes子集也保留。没有删除或绕过任何状态、HEAD、源码或哈希比较。
+
+原始H2T、PI-H2T、PIF、初始化、数据划分、增强、采样、损失、优化器、LR、batch和FP32设置均未因此改变。统一CPU门禁、预检、GPU Smoke各执行一次且全部退出0；没有失败后改数值设置重试，也没有正式训练。

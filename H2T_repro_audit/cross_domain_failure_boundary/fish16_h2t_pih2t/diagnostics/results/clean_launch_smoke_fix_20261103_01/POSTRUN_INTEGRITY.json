@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "execution_branch": "experiment/fish16-clean-launch-fix-20261103",
+  "execution_head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+  "source_sha256_after_smoke": {
+    "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637",
+    "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+    "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+    "smoke.py": "2be7990689e6740efdc1d4b8d80cd81a282549b06802f62b5a11937cd422bfc6",
+    "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+    "validate_cpu.py": "e367adf93785e33fbda7b0d96c70c8385c482ef83f30b7d908e999911025f062",
+    "test_amp_recovery.py": "cc13fd54a8656eac97848661b98f682dfa9d4f75e5eeae6ba0a28d71c29eca6d",
+    "test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+    "test_formal_train.py": "3fadba0dbb2356cf3a48e4882ff1508b2a6230b3040b63ffa7697993d8e5137f",
+    "diagnostics/__init__.py": "6609f051eb3b123be9dbaf992717bd2344d7856d71b6dc9abe13450fe2b4eedd",
+    "diagnostics/diagnose_b0.py": "23eade7c885d3324bac2b4237aac57087bc334df584609af08b1d1baf9dcdfda",
+    "diagnostics/test_diagnostic_stats.py": "c88089dad741088735239952aba25ece2e27ebf2ac3243fe102bc0883c8bd918"
+  },
+  "all14_sources_match_cpu_and_preflight": true,
+  "upstream_source_sha256_after_smoke": {
+    "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+    "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+    "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+    "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+  },
+  "all8_upstream_sources_unchanged": true,
+  "official_weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+  "converted_adapter_sha256": "c1bc33a75ef4d4dd607aa1cb0635ed42d547265a41ad0467081276e5009a7b3e",
+  "data_manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+  "worktree_clean_before_archive": true,
+  "original_raw_smoke_index_files_verified": 36,
+  "completed_conditions": [
+    "A0",
+    "B0",
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+  ],
+  "main_training_updates": 6102,
+  "optimizer_skips": 0,
+  "scaler_transitions": 0,
+  "test_image_bytes_read": 0,
+  "test_evaluations": 0,
+  "post_smoke_gpu_work": 0,
+  "formal_training_started": false,
+  "metadata_notes": [
+    "Raw auxiliary batch_smoke flag remains RUNNING after return; BATCH_SMOKE.json has all four successful FP32 checks, top-level COMPLETE_SMOKE_ONLY, six real results, SMOKE_SUMMARY and exit0 establish actual completion. The raw state was preserved without rewriting it. This reporting flag alone is not a condition still running."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-u",
+    "H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py",
+    "--output-dir",
+    "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02",
+    "--preflight-record",
+    "D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02\\preflight.json",
+    "--cpu-validation-record",
+    "D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\CPU_VALIDATION.json",
+    "--micro-batch",
+    "16"
+  ],
+  "cwd": "D:\\xiangmuxunlian\\xin",
+  "exit_code": 0,
+  "wall_seconds": 1099.0725436000002,
+  "head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+  "pid": 7080,
+  "gpu_smoke_invocations": 1,
+  "automatic_retry": false,
+  "formal_training_started": false
+}

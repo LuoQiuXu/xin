@@ -1,0 +1,71 @@
+{
+  "definition": "SHA256 of UTF-8 canonical JSON arrays with sort_keys=True, separators=(comma,colon), allow_nan=False. Full original per-batch controls are archived.",
+  "sequence_hashes": {
+    "A0": {
+      "recipient_sequence_sha256": "870a404977dc5f15ad3f9b3a3286514faa88916afdcc27c123d7bd62a35eba0d",
+      "donor_sequence_sha256": null,
+      "mixup_rng_sequence_sha256": "6cdbd23076bf23b1c7d0f2caf129c9cf52a8ecb3e05c64a9be8d03801b39fcdd",
+      "mixup_lambda_sequence_sha256": "61a11c88eadaf882975e7f68ac450b6d6569f81a7a8b4efa2a780460f5fa4e60"
+    },
+    "B0": {
+      "recipient_sequence_sha256": "870a404977dc5f15ad3f9b3a3286514faa88916afdcc27c123d7bd62a35eba0d",
+      "donor_sequence_sha256": null,
+      "mixup_rng_sequence_sha256": "6cdbd23076bf23b1c7d0f2caf129c9cf52a8ecb3e05c64a9be8d03801b39fcdd",
+      "mixup_lambda_sequence_sha256": "61a11c88eadaf882975e7f68ac450b6d6569f81a7a8b4efa2a780460f5fa4e60"
+    },
+    "A1": {
+      "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+      "donor_sequence_sha256": null,
+      "mixup_rng_sequence_sha256": null,
+      "mixup_lambda_sequence_sha256": null
+    },
+    "A2": {
+      "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+      "donor_sequence_sha256": "258e716d035d905e09b2316931bfec25f8858b0189b515cfc452d6ed1b976653",
+      "mixup_rng_sequence_sha256": null,
+      "mixup_lambda_sequence_sha256": null
+    },
+    "B1": {
+      "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+      "donor_sequence_sha256": null,
+      "mixup_rng_sequence_sha256": null,
+      "mixup_lambda_sequence_sha256": null
+    },
+    "B2": {
+      "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+      "donor_sequence_sha256": "258e716d035d905e09b2316931bfec25f8858b0189b515cfc452d6ed1b976653",
+      "mixup_rng_sequence_sha256": null,
+      "mixup_lambda_sequence_sha256": null
+    }
+  },
+  "equalities": {
+    "A0_B0_recipient_sha256": true,
+    "A0_B0_mixup_rng_sha256": true,
+    "A0_B0_mixup_lambda": true,
+    "A1_A2_recipient_views": true,
+    "B1_B2_recipient_views": true,
+    "A1_B1_recipient_views": true,
+    "A1_B2_recipient_views": true,
+    "A2_B2_donor_views": true,
+    "A1_A2_extractor_initial_sha256": true,
+    "A1_A2_classifier_initial_sha256": true,
+    "B1_B2_extractor_initial_sha256": true,
+    "B1_B2_classifier_initial_sha256": true,
+    "A1_extractor_matches_A0_final": true,
+    "A2_extractor_matches_A0_final": true,
+    "B1_extractor_matches_B0_final": true,
+    "B2_extractor_matches_B0_final": true
+  },
+  "all_equal": true,
+  "stage2_extractor_and_bn_unchanged": {
+    "A1": true,
+    "A2": true,
+    "B1": true,
+    "B2": true
+  },
+  "actual_train_schedules_only": {
+    "stage1": true,
+    "recipients": true,
+    "donors": true
+  }
+}

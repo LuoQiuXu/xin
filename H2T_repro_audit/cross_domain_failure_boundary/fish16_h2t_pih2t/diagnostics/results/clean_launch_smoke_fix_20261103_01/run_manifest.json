@@ -1,0 +1,122 @@
+{
+  "scope": "SMOKE_ONLY_NO_FORMAL_TRAINING_AUTHORIZATION",
+  "seed": 42,
+  "head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+  "branch": "experiment/fish16-clean-launch-fix-20261103",
+  "manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+  "weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "original_source_hashes": {
+    "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+    "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+    "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+    "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+    "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+    "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+  },
+  "new_source_hashes": {
+    "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637",
+    "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+    "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+    "smoke.py": "2be7990689e6740efdc1d4b8d80cd81a282549b06802f62b5a11937cd422bfc6",
+    "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+    "validate_cpu.py": "e367adf93785e33fbda7b0d96c70c8385c482ef83f30b7d908e999911025f062",
+    "test_amp_recovery.py": "cc13fd54a8656eac97848661b98f682dfa9d4f75e5eeae6ba0a28d71c29eca6d",
+    "test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+    "test_formal_train.py": "3fadba0dbb2356cf3a48e4882ff1508b2a6230b3040b63ffa7697993d8e5137f",
+    "diagnostics/__init__.py": "6609f051eb3b123be9dbaf992717bd2344d7856d71b6dc9abe13450fe2b4eedd",
+    "diagnostics/diagnose_b0.py": "23eade7c885d3324bac2b4237aac57087bc334df584609af08b1d1baf9dcdfda",
+    "diagnostics/test_diagnostic_stats.py": "c88089dad741088735239952aba25ece2e27ebf2ac3243fe102bc0883c8bd918"
+  },
+  "gate_evidence": {
+    "cpu_validation_record": "D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\CPU_VALIDATION.json",
+    "cpu_validation_sha256": "dbf4fe04619a2e9d6f1e0bfc5a0ebd63272fdfdd262499de1edbc4a42d6bf012",
+    "cpu_test_methods": 41,
+    "preflight_record": "D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02\\preflight.json",
+    "preflight_record_sha256": "40a9e8af8971223525fdf08b8a227f217cb79308b5c0e6df7e2d0bfbaa5e1626",
+    "preflight_status": "PASS_PREFLIGHT_ONLY",
+    "test_image_bytes_read": 0,
+    "source_sha256": {
+      "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637",
+      "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+      "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+      "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+      "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+      "smoke.py": "2be7990689e6740efdc1d4b8d80cd81a282549b06802f62b5a11937cd422bfc6",
+      "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+      "validate_cpu.py": "e367adf93785e33fbda7b0d96c70c8385c482ef83f30b7d908e999911025f062",
+      "test_amp_recovery.py": "cc13fd54a8656eac97848661b98f682dfa9d4f75e5eeae6ba0a28d71c29eca6d",
+      "test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+      "test_formal_train.py": "3fadba0dbb2356cf3a48e4882ff1508b2a6230b3040b63ffa7697993d8e5137f",
+      "diagnostics/__init__.py": "6609f051eb3b123be9dbaf992717bd2344d7856d71b6dc9abe13450fe2b4eedd",
+      "diagnostics/diagnose_b0.py": "23eade7c885d3324bac2b4237aac57087bc334df584609af08b1d1baf9dcdfda",
+      "diagnostics/test_diagnostic_stats.py": "c88089dad741088735239952aba25ece2e27ebf2ac3243fe102bc0883c8bd918"
+    }
+  },
+  "micro_batch": 16,
+  "effective_batch": 16,
+  "amp": false,
+  "workers": 4,
+  "numerical_mode": "float32_no_autocast_no_grad_scaler",
+  "autocast_enabled": false,
+  "grad_scaler_enabled": false,
+  "stage1_epoch_budget_per_branch": 1,
+  "stage2_epoch_budget_per_condition": 1,
+  "forensic_b0_only": false,
+  "forensic_max_batches": null,
+  "b0_stage1_only": false,
+  "selected_conditions": null,
+  "actual_execution_status": "See ACTUAL_EXECUTION_STATUS.json; budgets are not completion evidence",
+  "schedule_denominators": [
+    90,
+    10
+  ],
+  "train_transform": "Compose(\n    RandomResizedCrop(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bilinear, antialias=True)\n    RandomHorizontalFlip(p=0.5)\n    ColorJitter(brightness=(0.6, 1.4), contrast=None, saturation=None, hue=None)\n    ToTensor()\n    Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))\n)",
+  "validation_transform": "Compose(\n    Resize(size=256, interpolation=bilinear, max_size=None, antialias=True)\n    CenterCrop(size=(224, 224))\n    ToTensor()\n    Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))\n)",
+  "numeric_config": {
+    "precision": "float32_no_autocast_no_grad_scaler",
+    "autocast_enabled": false,
+    "grad_scaler_enabled": false,
+    "cudnn_deterministic": true,
+    "benchmark": false,
+    "cudnn_tf32": false,
+    "matmul_tf32": false
+  },
+  "test_model_evaluations": 0,
+  "class_groups": {
+    "Head": [
+      0,
+      3,
+      2,
+      1,
+      4,
+      9
+    ],
+    "Medium": [
+      6,
+      15,
+      7,
+      8,
+      12
+    ],
+    "Tail": [
+      5,
+      11,
+      10,
+      13,
+      14
+    ]
+  },
+  "note": "BN frozen for Stage-II; differs from original shift_bn=True"
+}

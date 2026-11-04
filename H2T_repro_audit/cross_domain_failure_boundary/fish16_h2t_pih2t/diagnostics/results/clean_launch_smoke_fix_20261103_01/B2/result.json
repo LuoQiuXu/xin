@@ -1,0 +1,73 @@
+{
+  "condition": "B2",
+  "scope": "ONE_EPOCH_SMOKE_ONLY",
+  "stage": 2,
+  "samples": 16269,
+  "optimizer_updates": 1017,
+  "attempted_optimizer_steps": 1017,
+  "optimizer_skips": 0,
+  "max_consecutive_optimizer_skips": 0,
+  "grad_scaler_enabled": false,
+  "numerical_mode": "float32_no_autocast_no_grad_scaler",
+  "gradient_audit_windows": 1017,
+  "lr": 0.01,
+  "momentum": 0.9,
+  "weight_decay": 0.0005,
+  "micro_batch": 16,
+  "accumulation": 1,
+  "effective_batch": 16,
+  "amp": false,
+  "autocast_enabled": false,
+  "workers": 4,
+  "train_loss": 1.7305787120808307,
+  "train_seconds": 103.88311490000024,
+  "train_images_per_second": 156.60870407727793,
+  "peak_allocated_mib": 348.66552734375,
+  "validation": {
+    "overall": 77.2979965209961,
+    "macro": 89.50450253486633,
+    "worst_class": 57.92811965942383,
+    "per_class": [
+      57.92811965942383,
+      88.8482666015625,
+      89.8107681274414,
+      92.0,
+      98.5374755859375,
+      100.0,
+      100.0,
+      60.60606384277344,
+      97.82608795166016,
+      100.0,
+      92.85713958740234,
+      80.76922607421875,
+      100.0,
+      84.0,
+      88.8888931274414,
+      100.0
+    ],
+    "group_image": {
+      "Head": 76.10989379882812,
+      "Medium": 94.87179565429688,
+      "Tail": 89.0
+    },
+    "group_macro": {
+      "Head": 87.85410499572754,
+      "Medium": 91.68643035888672,
+      "Tail": 89.3030517578125
+    }
+  },
+  "pif_before": [
+    -0.6528753042221069,
+    -0.43339666724205017
+  ],
+  "pif_after": [
+    -0.6528753042221069,
+    -0.43339666724205017
+  ],
+  "extractor_initial_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+  "extractor_final_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+  "classifier_initial_sha256": "b4bd21ddffdee2f2d22e9cad2327c3eeb7919230dcaa78efc1d9ed14b01c4c5a",
+  "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\B2\\smoke_epoch001.pth",
+  "checkpoint_sha256": "a090ab39e75b15555c28acabb7a42c93eb51f7bb05443f23f4a6834b675fed47",
+  "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+}

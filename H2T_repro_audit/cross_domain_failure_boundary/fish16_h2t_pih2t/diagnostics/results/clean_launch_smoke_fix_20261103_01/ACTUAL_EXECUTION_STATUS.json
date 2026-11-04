@@ -1,0 +1,28 @@
+{
+  "status": "COMPLETE_SMOKE_ONLY",
+  "scope": "SIX_CONDITION_ONE_EPOCH_SMOKE_ONLY",
+  "batch_smoke": "RUNNING",
+  "completed_conditions": [
+    "A0",
+    "B0",
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+  ],
+  "stage1_completed": [
+    "A0",
+    "B0"
+  ],
+  "stage2_completed": [
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+  ],
+  "current_condition": null,
+  "current_stage": null,
+  "formal_training_started": false,
+  "test_evaluations": 0,
+  "additional_seeds_started": []
+}

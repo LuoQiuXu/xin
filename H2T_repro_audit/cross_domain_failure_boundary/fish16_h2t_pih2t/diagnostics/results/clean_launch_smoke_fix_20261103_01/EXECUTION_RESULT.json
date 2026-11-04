@@ -1,0 +1,1082 @@
+{
+  "conclusion": "PASS_SMOKE_ONLY",
+  "execution_date_asia_shanghai": "2026-11-04T12:57:49.754380+08:00",
+  "execution_branch": "experiment/fish16-clean-launch-fix-20261103",
+  "execution_head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+  "initial_branch_head_before_repairs": "62e6a4dd796c7bc02ffb0fe3eb260dd01660170b",
+  "user_authorized_startup_repairs": true,
+  "canonical_gate_attempts": {
+    "cpu": 1,
+    "preflight": 1,
+    "gpu_smoke": 1
+  },
+  "commands": {
+    "cpu": {
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-u",
+        "H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\validate_cpu.py",
+        "--output-dir",
+        "D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02"
+      ],
+      "cwd": "D:\\xiangmuxunlian\\xin",
+      "exit_code": 0,
+      "wall_seconds": 20.15518269999984,
+      "head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+      "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+      "bytecode_cache_only": "D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\pycache",
+      "automatic_retry": false
+    },
+    "preflight": {
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-u",
+        "H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\preflight.py",
+        "--output-dir",
+        "D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02"
+      ],
+      "cwd": "D:\\xiangmuxunlian\\xin",
+      "exit_code": 0,
+      "wall_seconds": 54.027657999999974,
+      "head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+      "automatic_retry": false
+    },
+    "smoke": {
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-u",
+        "H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\smoke.py",
+        "--output-dir",
+        "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02",
+        "--preflight-record",
+        "D:\\h2t_cross_domain_results\\fish16_clean_launch_preflight_20261103_02\\preflight.json",
+        "--cpu-validation-record",
+        "D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\CPU_VALIDATION.json",
+        "--micro-batch",
+        "16"
+      ],
+      "cwd": "D:\\xiangmuxunlian\\xin",
+      "exit_code": 0,
+      "wall_seconds": 1099.0725436000002,
+      "head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+      "pid": 7080,
+      "gpu_smoke_invocations": 1,
+      "automatic_retry": false,
+      "formal_training_started": false
+    }
+  },
+  "cpu": {
+    "status": "PASS",
+    "syntax_files": 14,
+    "static_protocol": "PASS",
+    "suites": {
+      "test_amp_recovery": 12,
+      "test_contract": 10,
+      "test_formal_train": 14,
+      "diagnostics.test_diagnostic_stats": 5
+    },
+    "test_methods": 41
+  },
+  "preflight": {
+    "status": "PASS_PREFLIGHT_ONLY",
+    "data_gate": {
+      "status": "PASS",
+      "manifest": "D:\\h2t_cross_domain_audit\\fish4knowledge\\manifest_primary.csv",
+      "manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+      "headers": [
+        "image_id",
+        "relative_path",
+        "label",
+        "group_id",
+        "base_group",
+        "group_source",
+        "group_size",
+        "image_sha256",
+        "width",
+        "height",
+        "split_all",
+        "split_primary"
+      ],
+      "rows": 27133,
+      "classes": [
+        {
+          "class_id": 1,
+          "label": "Dascyllus reticulatus",
+          "train": {
+            "images": 7342,
+            "groups": 2544
+          },
+          "val": {
+            "images": 2365,
+            "groups": 848
+          },
+          "test": {
+            "images": 2405,
+            "groups": 848
+          }
+        },
+        {
+          "class_id": 2,
+          "label": "Plectroglyphidodon dickii",
+          "train": {
+            "images": 1588,
+            "groups": 735
+          },
+          "val": {
+            "images": 547,
+            "groups": 245
+          },
+          "test": {
+            "images": 548,
+            "groups": 245
+          }
+        },
+        {
+          "class_id": 3,
+          "label": "Chromis chrysura",
+          "train": {
+            "images": 2114,
+            "groups": 705
+          },
+          "val": {
+            "images": 687,
+            "groups": 235
+          },
+          "test": {
+            "images": 792,
+            "groups": 235
+          }
+        },
+        {
+          "class_id": 4,
+          "label": "Amphiprion clarkii",
+          "train": {
+            "images": 2513,
+            "groups": 613
+          },
+          "val": {
+            "images": 825,
+            "groups": 204
+          },
+          "test": {
+            "images": 711,
+            "groups": 204
+          }
+        },
+        {
+          "class_id": 5,
+          "label": "Chaetodon lunulatus",
+          "train": {
+            "images": 1469,
+            "groups": 322
+          },
+          "val": {
+            "images": 547,
+            "groups": 107
+          },
+          "test": {
+            "images": 518,
+            "groups": 107
+          }
+        },
+        {
+          "class_id": 6,
+          "label": "Chaetodon trifascialis",
+          "train": {
+            "images": 101,
+            "groups": 47
+          },
+          "val": {
+            "images": 26,
+            "groups": 16
+          },
+          "test": {
+            "images": 63,
+            "groups": 16
+          }
+        },
+        {
+          "class_id": 7,
+          "label": "Myripristis kuntee",
+          "train": {
+            "images": 171,
+            "groups": 43
+          },
+          "val": {
+            "images": 125,
+            "groups": 14
+          },
+          "test": {
+            "images": 154,
+            "groups": 14
+          }
+        },
+        {
+          "class_id": 8,
+          "label": "Acanthurus nigrofuscus",
+          "train": {
+            "images": 144,
+            "groups": 43
+          },
+          "val": {
+            "images": 33,
+            "groups": 14
+          },
+          "test": {
+            "images": 41,
+            "groups": 14
+          }
+        },
+        {
+          "class_id": 9,
+          "label": "Hemigymnus fasciatus",
+          "train": {
+            "images": 144,
+            "groups": 34
+          },
+          "val": {
+            "images": 46,
+            "groups": 12
+          },
+          "test": {
+            "images": 51,
+            "groups": 12
+          }
+        },
+        {
+          "class_id": 10,
+          "label": "Neoniphon sammara",
+          "train": {
+            "images": 205,
+            "groups": 31
+          },
+          "val": {
+            "images": 52,
+            "groups": 11
+          },
+          "test": {
+            "images": 42,
+            "groups": 11
+          }
+        },
+        {
+          "class_id": 11,
+          "label": "Abudefduf vaigiensis",
+          "train": {
+            "images": 59,
+            "groups": 26
+          },
+          "val": {
+            "images": 14,
+            "groups": 8
+          },
+          "test": {
+            "images": 25,
+            "groups": 8
+          }
+        },
+        {
+          "class_id": 12,
+          "label": "Canthigaster valentini",
+          "train": {
+            "images": 64,
+            "groups": 16
+          },
+          "val": {
+            "images": 26,
+            "groups": 6
+          },
+          "test": {
+            "images": 57,
+            "groups": 6
+          }
+        },
+        {
+          "class_id": 13,
+          "label": "Pomacentrus moluccensis",
+          "train": {
+            "images": 133,
+            "groups": 17
+          },
+          "val": {
+            "images": 39,
+            "groups": 5
+          },
+          "test": {
+            "images": 9,
+            "groups": 5
+          }
+        },
+        {
+          "class_id": 14,
+          "label": "Zebrasoma scopas",
+          "train": {
+            "images": 48,
+            "groups": 13
+          },
+          "val": {
+            "images": 25,
+            "groups": 5
+          },
+          "test": {
+            "images": 17,
+            "groups": 5
+          }
+        },
+        {
+          "class_id": 15,
+          "label": "Hemigymnus melapterus",
+          "train": {
+            "images": 29,
+            "groups": 10
+          },
+          "val": {
+            "images": 9,
+            "groups": 3
+          },
+          "test": {
+            "images": 4,
+            "groups": 3
+          }
+        },
+        {
+          "class_id": 16,
+          "label": "Lutjanus fulvus",
+          "train": {
+            "images": 145,
+            "groups": 9
+          },
+          "val": {
+            "images": 30,
+            "groups": 3
+          },
+          "test": {
+            "images": 31,
+            "groups": 3
+          }
+        }
+      ],
+      "split_support": {
+        "train": {
+          "images": 16269,
+          "groups": 5208
+        },
+        "val": {
+          "images": 5396,
+          "groups": 1736
+        },
+        "test": {
+          "images": 5468,
+          "groups": 1736
+        }
+      },
+      "frequency_classes": {
+        "Head": [
+          "Dascyllus reticulatus",
+          "Amphiprion clarkii",
+          "Chromis chrysura",
+          "Plectroglyphidodon dickii",
+          "Chaetodon lunulatus",
+          "Neoniphon sammara"
+        ],
+        "Medium": [
+          "Myripristis kuntee",
+          "Lutjanus fulvus",
+          "Acanthurus nigrofuscus",
+          "Hemigymnus fasciatus",
+          "Pomacentrus moluccensis"
+        ],
+        "Tail": [
+          "Chaetodon trifascialis",
+          "Canthigaster valentini",
+          "Abudefduf vaigiensis",
+          "Zebrasoma scopas",
+          "Hemigymnus melapterus"
+        ]
+      },
+      "cross_split_leaks": 0,
+      "train_val_image_sha256_verified": 21665,
+      "test_rows_metadata_only": 5468,
+      "test_image_bytes_read": 0,
+      "manifest_regenerated_or_modified": false
+    },
+    "model_gate": {
+      "status": "PASS",
+      "adapter": "models.FishModel / local strict adapter",
+      "official_weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+      "converted_adapter_sha256": "c1bc33a75ef4d4dd607aa1cb0635ed42d547265a41ad0467081276e5009a7b3e",
+      "adapter_provenance_sha256": "eabeb88c5d01b2ce558e072fa1c091622852c3a2102699200a19942e30abc975",
+      "upstream_source_hashes": {
+        "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+        "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+        "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+        "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+        "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+        "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+        "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+        "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+      },
+      "plain_and_pif_common_initialization": true,
+      "pif_parameter_count": 2,
+      "network_weight_downloads": 0,
+      "legacy_ResNet50_FE_probe": "REMOVED_NOT_APPLICABLE"
+    },
+    "test_image_bytes_read": 0
+  },
+  "environment": {
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12",
+    "torch": "2.14.1+cu132",
+    "cuda_build": "13.2",
+    "cudnn": 92400,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "numerical_mode": "float32_no_autocast_no_grad_scaler",
+  "results": {
+    "A0": {
+      "condition": "A0",
+      "scope": "ONE_EPOCH_SMOKE_ONLY",
+      "stage": 1,
+      "samples": 16269,
+      "optimizer_updates": 1017,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_skips": 0,
+      "max_consecutive_optimizer_skips": 0,
+      "grad_scaler_enabled": false,
+      "numerical_mode": "float32_no_autocast_no_grad_scaler",
+      "gradient_audit_windows": 1017,
+      "lr": 0.002,
+      "momentum": 0.9,
+      "weight_decay": 0.0001,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "amp": false,
+      "autocast_enabled": false,
+      "workers": 4,
+      "train_loss": 1.0145498458157527,
+      "train_seconds": 228.51981890000025,
+      "train_images_per_second": 71.19294982077365,
+      "peak_allocated_mib": 1631.48974609375,
+      "validation": {
+        "overall": 94.31060028076172,
+        "macro": 69.46453201770782,
+        "worst_class": 0.0,
+        "per_class": [
+          91.96617889404297,
+          99.63436889648438,
+          99.41775512695312,
+          100.0,
+          97.98902893066406,
+          26.923078536987305,
+          97.5999984741211,
+          69.69696807861328,
+          100.0,
+          100.0,
+          0.0,
+          61.5384635925293,
+          100.0,
+          0.0,
+          0.0,
+          66.66667175292969
+        ],
+        "group_image": {
+          "Head": 95.87895965576172,
+          "Medium": 91.57508850097656,
+          "Tail": 23.0
+        },
+        "group_macro": {
+          "Head": 98.16788864135742,
+          "Medium": 86.79272766113282,
+          "Tail": 17.69230842590332
+        }
+      },
+      "pif_before": [],
+      "pif_after": [],
+      "extractor_initial_sha256": "acab0d358237a478d8a2f573084e0ef3309d48b33d51e2122834dd83f520aa5e",
+      "extractor_final_sha256": "bfbdc334b1daea9585ddf14e258fa4029e589edd97ee3f05885111e16cafa544",
+      "classifier_initial_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+      "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\A0\\smoke_epoch001.pth",
+      "checkpoint_sha256": "1fda9205b8ec71cac607d8e355a45e194983c8ca1d7a16b597358429fc1892e1",
+      "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+    },
+    "B0": {
+      "condition": "B0",
+      "scope": "ONE_EPOCH_SMOKE_ONLY",
+      "stage": 1,
+      "samples": 16269,
+      "optimizer_updates": 1017,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_skips": 0,
+      "max_consecutive_optimizer_skips": 0,
+      "grad_scaler_enabled": false,
+      "numerical_mode": "float32_no_autocast_no_grad_scaler",
+      "gradient_audit_windows": 1017,
+      "lr": 0.002,
+      "momentum": 0.9,
+      "weight_decay": 0.0001,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "amp": false,
+      "autocast_enabled": false,
+      "workers": 4,
+      "train_loss": 1.004768759768775,
+      "train_seconds": 230.97031659999993,
+      "train_images_per_second": 70.43762263258726,
+      "peak_allocated_mib": 1635.9912109375,
+      "validation": {
+        "overall": 97.59081268310547,
+        "macro": 70.51132345199585,
+        "worst_class": 0.0,
+        "per_class": [
+          99.66172790527344,
+          98.35466003417969,
+          98.54439544677734,
+          99.51515197753906,
+          99.63436889648438,
+          53.84615707397461,
+          100.0,
+          39.39393997192383,
+          100.0,
+          100.0,
+          0.0,
+          69.23077392578125,
+          100.0,
+          0.0,
+          0.0,
+          70.0
+        ],
+        "group_image": {
+          "Head": 99.343017578125,
+          "Medium": 89.37728881835938,
+          "Tail": 32.0
+        },
+        "group_macro": {
+          "Head": 99.28505071004231,
+          "Medium": 81.87878799438477,
+          "Tail": 24.61538619995117
+        }
+      },
+      "pif_before": [
+        -0.027100861072540283,
+        -0.604386568069458
+      ],
+      "pif_after": [
+        -0.6528753042221069,
+        -0.43339666724205017
+      ],
+      "extractor_initial_sha256": "a8aa5d8eb5901f99ebf4731757f0a9aa2958b41ed713e4553c1c9f7dff641e43",
+      "extractor_final_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+      "classifier_initial_sha256": "2f78989d043cc7d5b63abf8a18e0d778c63ff64ab7850b0bd71d1e002766c434",
+      "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\B0\\smoke_epoch001.pth",
+      "checkpoint_sha256": "405dd47bd5fa3307230b350c89509c2d0b5acb67f931c2dfc561bca908991e2a",
+      "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+    },
+    "A1": {
+      "condition": "A1",
+      "scope": "ONE_EPOCH_SMOKE_ONLY",
+      "stage": 2,
+      "samples": 16269,
+      "optimizer_updates": 1017,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_skips": 0,
+      "max_consecutive_optimizer_skips": 0,
+      "grad_scaler_enabled": false,
+      "numerical_mode": "float32_no_autocast_no_grad_scaler",
+      "gradient_audit_windows": 1017,
+      "lr": 0.01,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "amp": false,
+      "autocast_enabled": false,
+      "workers": 4,
+      "train_loss": 0.3884651233301934,
+      "train_seconds": 70.24139549999973,
+      "train_images_per_second": 231.61555780878618,
+      "peak_allocated_mib": 338.64599609375,
+      "validation": {
+        "overall": 97.51667785644531,
+        "macro": 93.43376016616821,
+        "worst_class": 66.66667175292969,
+        "per_class": [
+          96.701904296875,
+          97.98902893066406,
+          99.2721939086914,
+          97.93939208984375,
+          99.63436889648438,
+          100.0,
+          100.0,
+          78.78787994384766,
+          100.0,
+          100.0,
+          100.0,
+          84.61538696289062,
+          100.0,
+          80.0,
+          66.66667175292969,
+          93.33333587646484
+        ],
+        "group_image": {
+          "Head": 97.75035095214844,
+          "Medium": 96.70330047607422,
+          "Tail": 88.0
+        },
+        "group_macro": {
+          "Head": 98.58948135375977,
+          "Medium": 94.4242431640625,
+          "Tail": 86.25641174316407
+        }
+      },
+      "pif_before": [],
+      "pif_after": [],
+      "extractor_initial_sha256": "bfbdc334b1daea9585ddf14e258fa4029e589edd97ee3f05885111e16cafa544",
+      "extractor_final_sha256": "bfbdc334b1daea9585ddf14e258fa4029e589edd97ee3f05885111e16cafa544",
+      "classifier_initial_sha256": "f0a3d4b7b58384331c46125052db7c8630639a0d869737cf21288ba5de900939",
+      "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\A1\\smoke_epoch001.pth",
+      "checkpoint_sha256": "bf1dada0b026e4f1da938434abc7d674ab6e3933bcdba820072995ad72f5891c",
+      "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+    },
+    "A2": {
+      "condition": "A2",
+      "scope": "ONE_EPOCH_SMOKE_ONLY",
+      "stage": 2,
+      "samples": 16269,
+      "optimizer_updates": 1017,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_skips": 0,
+      "max_consecutive_optimizer_skips": 0,
+      "grad_scaler_enabled": false,
+      "numerical_mode": "float32_no_autocast_no_grad_scaler",
+      "gradient_audit_windows": 1017,
+      "lr": 0.01,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "amp": false,
+      "autocast_enabled": false,
+      "workers": 4,
+      "train_loss": 0.4894483798889392,
+      "train_seconds": 102.73903059999975,
+      "train_images_per_second": 158.35267186178842,
+      "peak_allocated_mib": 348.66455078125,
+      "validation": {
+        "overall": 94.34767150878906,
+        "macro": 91.8244047164917,
+        "worst_class": 66.66667175292969,
+        "per_class": [
+          89.4714584350586,
+          99.08592224121094,
+          99.2721939086914,
+          97.81818389892578,
+          99.45155334472656,
+          92.30769348144531,
+          100.0,
+          81.81818389892578,
+          97.82608795166016,
+          100.0,
+          92.85713958740234,
+          84.61538696289062,
+          100.0,
+          68.0,
+          66.66667175292969,
+          100.0
+        ],
+        "group_image": {
+          "Head": 94.42564392089844,
+          "Medium": 97.43589782714844,
+          "Tail": 82.0
+        },
+        "group_macro": {
+          "Head": 97.51655197143555,
+          "Medium": 95.9288543701172,
+          "Tail": 80.88937835693359
+        }
+      },
+      "pif_before": [],
+      "pif_after": [],
+      "extractor_initial_sha256": "bfbdc334b1daea9585ddf14e258fa4029e589edd97ee3f05885111e16cafa544",
+      "extractor_final_sha256": "bfbdc334b1daea9585ddf14e258fa4029e589edd97ee3f05885111e16cafa544",
+      "classifier_initial_sha256": "f0a3d4b7b58384331c46125052db7c8630639a0d869737cf21288ba5de900939",
+      "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\A2\\smoke_epoch001.pth",
+      "checkpoint_sha256": "e88c47c95a78bf99878f70751d46ad3806d8e6e60e12c68ae65ce8a509dd69b0",
+      "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+    },
+    "B1": {
+      "condition": "B1",
+      "scope": "ONE_EPOCH_SMOKE_ONLY",
+      "stage": 2,
+      "samples": 16269,
+      "optimizer_updates": 1017,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_skips": 0,
+      "max_consecutive_optimizer_skips": 0,
+      "grad_scaler_enabled": false,
+      "numerical_mode": "float32_no_autocast_no_grad_scaler",
+      "gradient_audit_windows": 1017,
+      "lr": 0.01,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "amp": false,
+      "autocast_enabled": false,
+      "workers": 4,
+      "train_loss": 0.3143832708865622,
+      "train_seconds": 70.62501410000004,
+      "train_images_per_second": 230.3574761339409,
+      "peak_allocated_mib": 338.646484375,
+      "validation": {
+        "overall": 98.42475891113281,
+        "macro": 93.93745613098145,
+        "worst_class": 54.54545593261719,
+        "per_class": [
+          99.19661712646484,
+          98.5374755859375,
+          98.83551788330078,
+          96.84848022460938,
+          99.81718444824219,
+          100.0,
+          100.0,
+          54.54545593261719,
+          100.0,
+          100.0,
+          85.71428680419922,
+          84.61538696289062,
+          100.0,
+          96.0,
+          88.8888931274414,
+          100.0
+        ],
+        "group_image": {
+          "Head": 98.76567840576172,
+          "Medium": 94.5054931640625,
+          "Tail": 92.0
+        },
+        "group_macro": {
+          "Head": 98.87254587809245,
+          "Medium": 90.90909118652344,
+          "Tail": 91.04371337890625
+        }
+      },
+      "pif_before": [
+        -0.6528753042221069,
+        -0.43339666724205017
+      ],
+      "pif_after": [
+        -0.6528753042221069,
+        -0.43339666724205017
+      ],
+      "extractor_initial_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+      "extractor_final_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+      "classifier_initial_sha256": "b4bd21ddffdee2f2d22e9cad2327c3eeb7919230dcaa78efc1d9ed14b01c4c5a",
+      "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\B1\\smoke_epoch001.pth",
+      "checkpoint_sha256": "d38f7f74e7f89de3dc448e50d7d5dad0e162454e962a18aa7606fd6d12e6aa69",
+      "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+    },
+    "B2": {
+      "condition": "B2",
+      "scope": "ONE_EPOCH_SMOKE_ONLY",
+      "stage": 2,
+      "samples": 16269,
+      "optimizer_updates": 1017,
+      "attempted_optimizer_steps": 1017,
+      "optimizer_skips": 0,
+      "max_consecutive_optimizer_skips": 0,
+      "grad_scaler_enabled": false,
+      "numerical_mode": "float32_no_autocast_no_grad_scaler",
+      "gradient_audit_windows": 1017,
+      "lr": 0.01,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "micro_batch": 16,
+      "accumulation": 1,
+      "effective_batch": 16,
+      "amp": false,
+      "autocast_enabled": false,
+      "workers": 4,
+      "train_loss": 1.7305787120808307,
+      "train_seconds": 103.88311490000024,
+      "train_images_per_second": 156.60870407727793,
+      "peak_allocated_mib": 348.66552734375,
+      "validation": {
+        "overall": 77.2979965209961,
+        "macro": 89.50450253486633,
+        "worst_class": 57.92811965942383,
+        "per_class": [
+          57.92811965942383,
+          88.8482666015625,
+          89.8107681274414,
+          92.0,
+          98.5374755859375,
+          100.0,
+          100.0,
+          60.60606384277344,
+          97.82608795166016,
+          100.0,
+          92.85713958740234,
+          80.76922607421875,
+          100.0,
+          84.0,
+          88.8888931274414,
+          100.0
+        ],
+        "group_image": {
+          "Head": 76.10989379882812,
+          "Medium": 94.87179565429688,
+          "Tail": 89.0
+        },
+        "group_macro": {
+          "Head": 87.85410499572754,
+          "Medium": 91.68643035888672,
+          "Tail": 89.3030517578125
+        }
+      },
+      "pif_before": [
+        -0.6528753042221069,
+        -0.43339666724205017
+      ],
+      "pif_after": [
+        -0.6528753042221069,
+        -0.43339666724205017
+      ],
+      "extractor_initial_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+      "extractor_final_sha256": "71cd499442720b06d7c326df21f0e300e01f722c4edaba1d90ba026ae6bd1e2d",
+      "classifier_initial_sha256": "b4bd21ddffdee2f2d22e9cad2327c3eeb7919230dcaa78efc1d9ed14b01c4c5a",
+      "checkpoint": "D:\\h2t_cross_domain_results\\fish16_clean_launch_smoke_20261103_02\\B2\\smoke_epoch001.pth",
+      "checkpoint_sha256": "a090ab39e75b15555c28acabb7a42c93eb51f7bb05443f23f4a6834b675fed47",
+      "selection": "Only epoch1; smoke best/current/final refer to this same file; validation only"
+    }
+  },
+  "all_conditions_one_epoch": true,
+  "main_training_samples": 97614,
+  "main_attempted_windows": 6102,
+  "main_actual_optimizer_updates": 6102,
+  "main_finite_gradient_audits": 6102,
+  "optimizer_skips": 0,
+  "scaler_transitions": 0,
+  "validation_samples_each_condition": 5396,
+  "validation_count_evidence": "evaluate_validation asserts len(labels)==5396 on every completed call; all six result files were written only after successful return.",
+  "pairing": {
+    "definition": "SHA256 of UTF-8 canonical JSON arrays with sort_keys=True, separators=(comma,colon), allow_nan=False. Full original per-batch controls are archived.",
+    "sequence_hashes": {
+      "A0": {
+        "recipient_sequence_sha256": "870a404977dc5f15ad3f9b3a3286514faa88916afdcc27c123d7bd62a35eba0d",
+        "donor_sequence_sha256": null,
+        "mixup_rng_sequence_sha256": "6cdbd23076bf23b1c7d0f2caf129c9cf52a8ecb3e05c64a9be8d03801b39fcdd",
+        "mixup_lambda_sequence_sha256": "61a11c88eadaf882975e7f68ac450b6d6569f81a7a8b4efa2a780460f5fa4e60"
+      },
+      "B0": {
+        "recipient_sequence_sha256": "870a404977dc5f15ad3f9b3a3286514faa88916afdcc27c123d7bd62a35eba0d",
+        "donor_sequence_sha256": null,
+        "mixup_rng_sequence_sha256": "6cdbd23076bf23b1c7d0f2caf129c9cf52a8ecb3e05c64a9be8d03801b39fcdd",
+        "mixup_lambda_sequence_sha256": "61a11c88eadaf882975e7f68ac450b6d6569f81a7a8b4efa2a780460f5fa4e60"
+      },
+      "A1": {
+        "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+        "donor_sequence_sha256": null,
+        "mixup_rng_sequence_sha256": null,
+        "mixup_lambda_sequence_sha256": null
+      },
+      "A2": {
+        "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+        "donor_sequence_sha256": "258e716d035d905e09b2316931bfec25f8858b0189b515cfc452d6ed1b976653",
+        "mixup_rng_sequence_sha256": null,
+        "mixup_lambda_sequence_sha256": null
+      },
+      "B1": {
+        "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+        "donor_sequence_sha256": null,
+        "mixup_rng_sequence_sha256": null,
+        "mixup_lambda_sequence_sha256": null
+      },
+      "B2": {
+        "recipient_sequence_sha256": "9290b3b662a1be4c337bcd619df0cd696458cbaef6e4616c76082517b11f12d6",
+        "donor_sequence_sha256": "258e716d035d905e09b2316931bfec25f8858b0189b515cfc452d6ed1b976653",
+        "mixup_rng_sequence_sha256": null,
+        "mixup_lambda_sequence_sha256": null
+      }
+    },
+    "equalities": {
+      "A0_B0_recipient_sha256": true,
+      "A0_B0_mixup_rng_sha256": true,
+      "A0_B0_mixup_lambda": true,
+      "A1_A2_recipient_views": true,
+      "B1_B2_recipient_views": true,
+      "A1_B1_recipient_views": true,
+      "A1_B2_recipient_views": true,
+      "A2_B2_donor_views": true,
+      "A1_A2_extractor_initial_sha256": true,
+      "A1_A2_classifier_initial_sha256": true,
+      "B1_B2_extractor_initial_sha256": true,
+      "B1_B2_classifier_initial_sha256": true,
+      "A1_extractor_matches_A0_final": true,
+      "A2_extractor_matches_A0_final": true,
+      "B1_extractor_matches_B0_final": true,
+      "B2_extractor_matches_B0_final": true
+    },
+    "all_equal": true,
+    "stage2_extractor_and_bn_unchanged": {
+      "A1": true,
+      "A2": true,
+      "B1": true,
+      "B2": true
+    },
+    "actual_train_schedules_only": {
+      "stage1": true,
+      "recipients": true,
+      "donors": true
+    }
+  },
+  "postrun_integrity": {
+    "status": "PASS",
+    "execution_branch": "experiment/fish16-clean-launch-fix-20261103",
+    "execution_head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+    "source_sha256_after_smoke": {
+      "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637",
+      "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+      "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+      "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+      "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+      "smoke.py": "2be7990689e6740efdc1d4b8d80cd81a282549b06802f62b5a11937cd422bfc6",
+      "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+      "validate_cpu.py": "e367adf93785e33fbda7b0d96c70c8385c482ef83f30b7d908e999911025f062",
+      "test_amp_recovery.py": "cc13fd54a8656eac97848661b98f682dfa9d4f75e5eeae6ba0a28d71c29eca6d",
+      "test_contract.py": "fdcd8450a5eb8ce5702821fd7d2248ba3bae442010e1ea9b17059b9b34fca00a",
+      "test_formal_train.py": "3fadba0dbb2356cf3a48e4882ff1508b2a6230b3040b63ffa7697993d8e5137f",
+      "diagnostics/__init__.py": "6609f051eb3b123be9dbaf992717bd2344d7856d71b6dc9abe13450fe2b4eedd",
+      "diagnostics/diagnose_b0.py": "23eade7c885d3324bac2b4237aac57087bc334df584609af08b1d1baf9dcdfda",
+      "diagnostics/test_diagnostic_stats.py": "c88089dad741088735239952aba25ece2e27ebf2ac3243fe102bc0883c8bd918"
+    },
+    "all14_sources_match_cpu_and_preflight": true,
+    "upstream_source_sha256_after_smoke": {
+      "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+      "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+      "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+      "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+      "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+      "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+    },
+    "all8_upstream_sources_unchanged": true,
+    "official_weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+    "converted_adapter_sha256": "c1bc33a75ef4d4dd607aa1cb0635ed42d547265a41ad0467081276e5009a7b3e",
+    "data_manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+    "worktree_clean_before_archive": true,
+    "original_raw_smoke_index_files_verified": 36,
+    "completed_conditions": [
+      "A0",
+      "B0",
+      "A1",
+      "A2",
+      "B1",
+      "B2"
+    ],
+    "main_training_updates": 6102,
+    "optimizer_skips": 0,
+    "scaler_transitions": 0,
+    "test_image_bytes_read": 0,
+    "test_evaluations": 0,
+    "post_smoke_gpu_work": 0,
+    "formal_training_started": false,
+    "metadata_notes": [
+      "Raw auxiliary batch_smoke flag remains RUNNING after return; BATCH_SMOKE.json has all four successful FP32 checks, top-level COMPLETE_SMOKE_ONLY, six real results, SMOKE_SUMMARY and exit0 establish actual completion. The raw state was preserved without rewriting it. This reporting flag alone is not a condition still running."
+    ]
+  },
+  "smoke_wall_seconds": 1099.0725436000002,
+  "auxiliary_batch_smoke_checks": [
+    {
+      "condition": "A1",
+      "mode": "crt",
+      "feature_shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "dtype": "torch.float32",
+      "loss": 2.847133159637451,
+      "classifier_updated": true,
+      "extractor_and_bn_unchanged": true,
+      "h2t_channels": null,
+      "ratio_detached": null
+    },
+    {
+      "condition": "A2",
+      "mode": "h2t",
+      "feature_shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "dtype": "torch.float32",
+      "loss": 2.8372812271118164,
+      "classifier_updated": true,
+      "extractor_and_bn_unchanged": true,
+      "h2t_channels": 512,
+      "ratio_detached": null
+    },
+    {
+      "condition": "B1",
+      "mode": "crt",
+      "feature_shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "dtype": "torch.float32",
+      "loss": 2.77335262298584,
+      "classifier_updated": true,
+      "extractor_and_bn_unchanged": true,
+      "h2t_channels": null,
+      "ratio_detached": null
+    },
+    {
+      "condition": "B2",
+      "mode": "pi",
+      "feature_shape": [
+        16,
+        2048,
+        7,
+        7
+      ],
+      "dtype": "torch.float32",
+      "loss": 2.755880832672119,
+      "classifier_updated": true,
+      "extractor_and_bn_unchanged": true,
+      "h2t_channels": null,
+      "ratio_detached": true
+    }
+  ],
+  "auxiliary_count_scope": "Four disposable one-batch checks are separate from the six epoch update totals.",
+  "test_image_bytes_read": 0,
+  "test_model_evaluations": 0,
+  "additional_seeds": [],
+  "formal_training_started": false,
+  "scientific_limit": "One-epoch Smoke confirms executable numeric/data/pairing contracts only; validation values do not establish formal90+10 method effects or multi-seed cross-domain generalization.",
+  "smoke_only_validation_difference_pp": {
+    "A2-A1_overall": -3.16900634765625,
+    "B2-B1_overall": -21.12676239013672
+  },
+  "metadata_notes": [
+    "Raw auxiliary batch_smoke flag remains RUNNING after return; BATCH_SMOKE.json has all four successful FP32 checks, top-level COMPLETE_SMOKE_ONLY, six real results, SMOKE_SUMMARY and exit0 establish actual completion. The raw state was preserved without rewriting it. This reporting flag alone is not a condition still running."
+  ]
+}
