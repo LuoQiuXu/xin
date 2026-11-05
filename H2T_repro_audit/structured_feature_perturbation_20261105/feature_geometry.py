@@ -134,6 +134,7 @@ def make_boundary_targets(
     alpha=0.5,
     max_norm_ratio=0.25,
     min_alignment=0.05,
+    tail_class_ids=None,
     eps=EPS,
 ):
     """Move eligible tail features partway toward their nearest fixed boundary.
@@ -142,6 +143,10 @@ def make_boundary_targets(
     project g into the class augmentation subspace P_c g and move in direction
     -P_c g. The radius is min(alpha * margin / ||P_c g||,
     max_norm_ratio * ||z||), so the selected pairwise margin is not crossed.
+
+    If tail_class_ids is supplied, it defines the exact target classes (e.g.
+    the official H2T Tail IDs 71..99). Otherwise, classes with fewer than 20
+    training examples are treated as tail classes.
     """
     z = _matrix(features, "features")
     y = np.asarray(labels, dtype=np.int64)
@@ -165,6 +170,16 @@ def make_boundary_targets(
     if max_norm_ratio <= 0 or min_alignment < 0:
         raise ValueError("invalid perturbation cap or alignment threshold")
 
+    if tail_class_ids is None:
+        is_tail = counts[y] < 20
+    else:
+        tail_ids = np.asarray(tail_class_ids, dtype=np.int64)
+        if tail_ids.ndim != 1 or tail_ids.size == 0:
+            raise ValueError("tail_class_ids must be a nonempty vector")
+        if tail_ids.min() < 0 or tail_ids.max() >= num_classes:
+            raise ValueError("tail_class_ids contain out-of-range classes")
+        is_tail = np.isin(y, tail_ids)
+
     logits = z @ weight.T + bias[None, :]
     competitors_logits = logits.copy()
     rows = np.arange(n)
@@ -181,7 +196,6 @@ def make_boundary_targets(
     alignment = projected_norm / np.maximum(normal_norm, eps)
     feature_norm = np.linalg.norm(z, axis=1)
 
-    is_tail = counts[y] < 20
     eligible = (
         is_tail
         & (margin > 0.0)

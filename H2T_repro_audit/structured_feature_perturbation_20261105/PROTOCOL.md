@@ -59,7 +59,7 @@ Project the pairwise boundary normal into the class augmentation subspace:
 
 p = U_y U_y^T g.
 
-Eligible samples must be tail-class samples (n_y < 20), have a positive frozen Stage-I margin, and have projection alignment ||p||/||g|| >= 0.05. Their perturbation is:
+Eligible samples must belong to the official H2T Tail IDs 71–99, have a positive frozen Stage-I margin, and have projection alignment ||p||/||g|| >= 0.05. Class 70 has 19 training examples but belongs to the official Medium index group, so it is not perturbed. The frequency-based Few metric (count < 20) includes class 70; both Few and official Tail metrics are reported. Their perturbation is:
 
 delta_E = -r p/||p||,
 
@@ -69,7 +69,7 @@ r = min(0.5 * m/||p||, 0.25 * ||z||).
 
 Thus the construction moves at most halfway to the selected pairwise boundary and is capped at 25% of the feature norm. It must not cross that boundary. Ineligible samples receive zero perturbation.
 
-For every sample, gaussian and subspace_random receive the exact same per-example radius r as subspace_boundary. This isolates perturbation direction from perturbation magnitude. All generated perturbations are applied only to tail-class receivers; head and medium receivers remain unchanged.
+For every sample, gaussian and subspace_random receive the exact same per-example radius r as subspace_boundary. This isolates perturbation direction from perturbation magnitude. All generated perturbations are applied only to official Tail receivers (class IDs 71–99); official Head (0–35) and Medium (36–70) receivers remain unchanged.
 
 ## Data and leakage safeguards
 
@@ -86,7 +86,7 @@ For every sample, gaussian and subspace_random receive the exact same per-exampl
 Primary: Overall, Many, Medium, Few, Head, OfficialMedium, Tail, Macro at the fixed tenth Stage-II epoch.
 
 Diagnostics:
-- Tail-to-Head error rate and Head-to-Tail error rate.
+- Tail-to-Head error rate (true classes 71–99 predicted as 0–35) and Head-to-Tail error rate (true classes 0–35 predicted as 71–99). Frequency-based Few metrics also include class 70.
 - Mean true-vs-nearest-competitor margin, Few-class mean margin, and Few negative-margin fraction.
 - Boundary eligibility and clipping rates.
 - Per-example perturbation norm matching error.

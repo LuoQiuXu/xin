@@ -59,6 +59,7 @@ BOUNDARY_ALPHA = 0.5
 MAX_NORM_RATIO = 0.25
 MIN_ALIGNMENT = 0.05
 FEATURE_SEED_OFFSET = 300009
+TAIL_CLASS_IDS = np.arange(71, 100, dtype=np.int64)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -176,13 +177,6 @@ def verify_clean_inputs():
     assert len(labels) == 10847
     assert counts.tolist() == preflight["LT_class_counts"]
     assert counts.min() == 5 and counts.max() == 500
-    assert np.array_equal(
-        np.load(CLEAN_RUN / "validation_labels.npy", allow_pickle=False),
-        np.asarray(
-            np.load(CLEAN_RUN / "validation_labels.npy", allow_pickle=False),
-            dtype=np.int64,
-        ),
-    )
     return protocol, preflight, labels, counts
 
 
@@ -400,6 +394,7 @@ def extract_seed_feature_stream(
             alpha=BOUNDARY_ALPHA,
             max_norm_ratio=MAX_NORM_RATIO,
             min_alignment=MIN_ALIGNMENT,
+            tail_class_ids=TAIL_CLASS_IDS,
         )
         boundary_delta[epoch] = result["delta"]
         boundary_radius[epoch] = result["radius"]
@@ -489,6 +484,7 @@ def extract_seed_feature_stream(
         "receiver_bank_alignment": "receiver_features[epoch, balanced_draw_position]",
         "subspace_source": "paired instance-distribution donor views from epochs 1 and 2; TRAIN only",
         "boundary_source": "locked Stage-I classifier and current balanced TRAIN receiver feature",
+        "epoch_schedule_fingerprints": epoch_fingerprints,
     }
     write_json(cache_dir / "cache_manifest.json", manifest)
     return manifest
@@ -510,6 +506,7 @@ def prepare():
     assert int(checkpoint["epoch"]) == 184
     assert not checkpoint.get("TEST_used", True)
     backbone.eval().requires_grad_(False)
+    backbone_initial_hash = hash_state_dict(backbone.state_dict())
     assert all(parameter.grad is None for parameter in backbone.parameters())
 
     classifier.eval()
@@ -531,6 +528,8 @@ def prepare():
     validation_maps_path = CLEAN_RUN / "validation_feature_maps.npy"
     validation_labels = np.load(CLEAN_RUN / "validation_labels.npy", allow_pickle=False)
     validation_maps = np.load(validation_maps_path, mmap_mode="r", allow_pickle=False)
+    assert validation_labels.shape == (1980,)
+    assert np.bincount(validation_labels, minlength=NUM_CLASSES).tolist() == [0] + [20] * 99
     assert validation_maps.shape == (1980, 64, 8, 8)
     validation_features = np.empty((len(validation_labels), FEATURE_DIM), dtype=np.float32)
     with torch.no_grad():
@@ -554,6 +553,10 @@ def prepare():
             initial_bias,
             class_counts,
         )
+    backbone_final_hash = hash_state_dict(backbone.state_dict())
+    if backbone_final_hash != backbone_initial_hash:
+        raise AssertionError("Frozen Stage-I backbone or BN buffers changed during feature extraction")
+    assert all(parameter.grad is None for parameter in backbone.parameters())
 
     manifest = {
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -567,6 +570,7 @@ def prepare():
         "stage1_seed": 42,
         "initial_classifier_sha256": initial_classifier_sha,
         "initial_classifier_file_sha256": sha256_file(ROOT / "initial_classifier.pth"),
+        "backbone_state_sha256_before_after_extraction": backbone_initial_hash,
         "validation_features_sha256": sha256_file(ROOT / "validation_features.npy"),
         "validation_labels_sha256": sha256_file(ROOT / "validation_labels.npy"),
         "validation_samples": int(len(validation_labels)),
@@ -581,6 +585,7 @@ def prepare():
         "updates_per_epoch": 85,
         "feature_dim": FEATURE_DIM,
         "h2t_replaced_channels": NUM_CHANNELS_REPLACED,
+        "tail_class_ids": TAIL_CLASS_IDS.tolist(),
         "subspace_rank": SUBSPACE_RANK,
         "shrinkage_tau": SHRINKAGE_TAU,
         "boundary_alpha": BOUNDARY_ALPHA,
@@ -604,6 +609,10 @@ def prepare():
 def load_cache(seed):
     cache_dir = ROOT / "feature_cache" / f"seed{seed}"
     manifest = read_json(cache_dir / "cache_manifest.json")
+    prepared_manifest = read_json(ROOT / "prepare_manifest.json")
+    expected_manifest = prepared_manifest["feature_cache"][str(seed)]
+    if manifest != expected_manifest:
+        raise RuntimeError(f"cache manifest differs from locked preparation: seed={seed}")
     for name, expected in manifest["feature_cache_files"].items():
         actual = sha256_file(cache_dir / name)
         if actual != expected:
@@ -658,8 +667,10 @@ def evaluate_head(head, validation_features, validation_labels, class_counts):
     margins = logits[rows, validation_labels] - logits[rows, competitors]
     true_few = class_counts[validation_labels] < 20
     true_many = class_counts[validation_labels] > 100
-    predicted_few = class_counts[predictions] < 20
-    predicted_many = class_counts[predictions] > 100
+    true_tail = validation_labels >= 71
+    true_head = validation_labels < 36
+    predicted_tail = predictions >= 71
+    predicted_head = predictions < 36
 
     confusion = np.zeros((NUM_CLASSES, NUM_CLASSES), dtype=np.int64)
     np.add.at(confusion, (validation_labels, predictions), 1)
@@ -677,10 +688,10 @@ def evaluate_head(head, validation_features, validation_labels, class_counts):
             "few_negative_margin_fraction": float((margins[true_few] < 0).mean()) if true_few.any() else None,
             "mean_many_margin": float(margins[true_many].mean()) if true_many.any() else None,
             "tail_to_head_error_rate": (
-                float(predicted_many[true_few].mean()) if true_few.any() else None
+                float(predicted_head[true_tail].mean()) if true_tail.any() else None
             ),
             "head_to_tail_error_rate": (
-                float(predicted_few[true_many].mean()) if true_many.any() else None
+                float(predicted_tail[true_head].mean()) if true_head.any() else None
             ),
             "validation_is_historical_train_holdout": True,
             "official_TEST_used": False,
@@ -696,6 +707,11 @@ def run_one(seed, arm, epochs, output_dir, evaluate_final):
     output_dir.mkdir(parents=True)
 
     cache = load_cache(seed)
+    prepared_manifest = read_json(ROOT / "prepare_manifest.json")
+    if sha256_file(ROOT / "validation_features.npy") != prepared_manifest["validation_features_sha256"]:
+        raise RuntimeError("validation feature cache hash mismatch")
+    if sha256_file(ROOT / "validation_labels.npy") != prepared_manifest["validation_labels_sha256"]:
+        raise RuntimeError("validation label cache hash mismatch")
     cfg, transforms, _, _, criterion_class, _ = clean.imports(2)
     assert cfg.num_epochs == NUM_EPOCHS
     assert cfg.batch_size == BATCH_SIZE
@@ -777,6 +793,7 @@ def run_one(seed, arm, epochs, output_dir, evaluate_final):
                 x_np = z_np.copy()
                 delta_np = np.zeros_like(x_np)
                 budget = np.asarray(boundary_radius[epoch, start:stop], dtype=np.float32)
+                batch_projection_residual = 0.0
 
                 if arm == "h2t_pooled":
                     donor_idx = np.asarray(donor_indices[epoch, start:stop], dtype=np.int64)
@@ -810,7 +827,9 @@ def run_one(seed, arm, epochs, output_dir, evaluate_final):
                             )
                             residual = np.linalg.norm(selected_delta - projected, axis=1)
                             denom = np.maximum(np.linalg.norm(selected_delta, axis=1), 1e-12)
-                            epoch_projection_residuals.extend((residual / denom).tolist())
+                            residual_ratio = residual / denom
+                            batch_projection_residual = float(residual_ratio.mean())
+                            epoch_projection_residuals.extend(residual_ratio.tolist())
                     else:
                         delta_np = np.asarray(
                             boundary_delta[epoch, start:stop], dtype=np.float32
@@ -868,11 +887,7 @@ def run_one(seed, arm, epochs, output_dir, evaluate_final):
                         "max_norm_match_error": float(
                             np.abs(actual_norm - budget).max(initial=0.0)
                         ) if arm in ("gaussian", "subspace_random", "subspace_boundary") else 0.0,
-                        "subspace_projection_residual": (
-                            float(np.mean(epoch_projection_residuals[-batch_size:]))
-                            if arm == "subspace_random" and epoch_projection_residuals
-                            else 0.0
-                        ),
+                        "subspace_projection_residual": batch_projection_residual,
                     }
                 )
 

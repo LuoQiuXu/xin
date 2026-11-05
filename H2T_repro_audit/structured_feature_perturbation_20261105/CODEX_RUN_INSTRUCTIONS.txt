@@ -21,9 +21,10 @@ This is a controlled mechanism experiment, not a claim of novelty and not an off
 5. Use exactly the locked Clean Stage-I checkpoint: seed 42, epoch 184, SHA256 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88.
 6. Do not open CIFAR-100 official TEST images or labels. Do not instantiate CIFAR100(train=False). The runtime guard must remain active and test_guard.json must report zero accesses and zero blocked attempts.
 7. The existing 1,980-image TRAIN holdout is a historical development split, lacks class 0, and has been reused in earlier work. Use it only for the fixed epoch-10 diagnostic. Do not select checkpoints or hyperparameters from it. Do not describe it as an independent test set.
-8. Stage-II seeds 42, 43, 44 share one Stage-I checkpoint. Do not call them independent end-to-end seeds.
-9. Do not add multimodal models, diffusion models, multiple experts, a trainable generator, or new loss functions.
-10. Do not overwrite any existing outputs. The scripts intentionally refuse to overwrite preparation, smoke, or formal results.
+8. Generated perturbations target official H2T Tail IDs 71–99. Class 70 has 19 examples but belongs to the official Medium index group and remains unperturbed. The frequency-based Few metric includes class 70; report Few and official Tail separately.
+9. Stage-II seeds 42, 43, 44 share one Stage-I checkpoint. Do not call them independent end-to-end seeds.
+10. Do not add multimodal models, diffusion models, multiple experts, a trainable generator, or new loss functions.
+11. Do not overwrite any existing outputs. The scripts intentionally refuse to overwrite preparation, smoke, or formal results.
 
 ## Step 1 — Verify the local checkout
 
@@ -190,7 +191,7 @@ Answer these questions from the actual outputs:
 2. Does it improve Few/Tail over norm-matched Gaussian?
 3. Does it improve Few/Tail over norm-matched Subspace-Random?
 4. Does the effect preserve Many/Head accuracy?
-5. Does Tail-to-Head error fall without a compensating Head-to-Tail increase?
+5. Does official Tail-to-Head error (true classes 71–99 predicted as 0–35) fall without a compensating Head-to-Tail increase (true classes 0–35 predicted as 71–99)?
 6. What fraction of tail receiver draws is boundary-eligible? Is the projection alignment often too weak?
 7. Are the perturbations actually norm matched and subspace constrained?
 8. Are the per-seed directions consistent, or does one seed drive the mean?
