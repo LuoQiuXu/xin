@@ -1,0 +1,234 @@
+TASK: Run the Structured Feature Perturbation experiment on the dedicated GitHub branch.
+
+Repository: LuoQiuXu/xin
+Branch: experiment/structured-feature-perturbation-20261105
+Experiment directory: H2T_repro_audit/structured_feature_perturbation_20261105
+Primary entrypoint: run_experiment.py
+Protocol: PROTOCOL.md
+
+## Scientific objective
+
+Test whether tail-class feature perturbations generated from a TRAIN-only augmentation-induced subspace improve a frozen-feature long-tailed classifier, and whether projecting the perturbation toward the nearest Stage-I competing boundary adds value beyond random directions.
+
+This is a controlled mechanism experiment, not a claim of novelty and not an official-test benchmark.
+
+## Non-negotiable safety and scope
+
+1. Work only on branch experiment/structured-feature-perturbation-20261105.
+2. Do not modify H2T official source, PI-H2T source, the existing Clean Stage-I run, previous H2T/PI-H2T audit folders, historical results, or any other experiment branch.
+3. All new code fixes must stay inside H2T_repro_audit/structured_feature_perturbation_20261105.
+4. Do not retrain Stage I. Do not substitute another checkpoint.
+5. Use exactly the locked Clean Stage-I checkpoint: seed 42, epoch 184, SHA256 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88.
+6. Do not open CIFAR-100 official TEST images or labels. Do not instantiate CIFAR100(train=False). The runtime guard must remain active and test_guard.json must report zero accesses and zero blocked attempts.
+7. The existing 1,980-image TRAIN holdout is a historical development split, lacks class 0, and has been reused in earlier work. Use it only for the fixed epoch-10 diagnostic. Do not select checkpoints or hyperparameters from it. Do not describe it as an independent test set.
+8. Stage-II seeds 42, 43, 44 share one Stage-I checkpoint. Do not call them independent end-to-end seeds.
+9. Do not add multimodal models, diffusion models, multiple experts, a trainable generator, or new loss functions.
+10. Do not overwrite any existing outputs. The scripts intentionally refuse to overwrite preparation, smoke, or formal results.
+
+## Step 1 — Verify the local checkout
+
+From the local repository root:
+
+- Run git status --short and preserve any existing uncommitted user changes. If the working tree contains changes, do not reset, stash, or discard them; report the situation first.
+- Fetch origin and switch to experiment/structured-feature-perturbation-20261105.
+- Confirm the current branch exactly matches the requested branch.
+- Confirm these files exist:
+  - H2T_repro_audit/structured_feature_perturbation_20261105/feature_geometry.py
+  - H2T_repro_audit/structured_feature_perturbation_20261105/run_experiment.py
+  - H2T_repro_audit/structured_feature_perturbation_20261105/test_feature_geometry.py
+  - H2T_repro_audit/structured_feature_perturbation_20261105/PROTOCOL.md
+
+Do not proceed on main or on an old H2T experiment branch.
+
+## Step 2 — Verify environment and inputs
+
+Use the existing environment:
+D:\app\anaconda\envs\pytorch\python.exe
+
+Expected environment from the locked Clean run:
+- Python 3.12
+- PyTorch 2.11.0+cu130
+- torchvision 0.26.0+cu130
+- NumPy 2.3.1
+- one NVIDIA GeForce RTX 5070 Laptop GPU, approximately 8 GB VRAM
+
+Expected local inputs, relative to repository root:
+- H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/
+- H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/stage1/checkpoints/clean_stage1_best.pth
+- H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/train_images.npy
+- H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/train_labels.npy
+- H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/validation_feature_maps.npy
+- H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/validation_labels.npy
+- H2T/data/cifar100/
+
+The code verifies the Clean source lock, the 10,847-image LT split, class counts, checkpoint epoch, and checkpoint SHA. If any required file is missing or any hash differs, STOP. Do not silently fall back to a different checkpoint or dataset.
+
+## Step 3 — Syntax and unit tests
+
+Run:
+
+~~~powershell
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTHONDONTWRITEBYTECODE='1'
+& 'D:\app\anaconda\envs\pytorch\python.exe' -B -m py_compile H2T_repro_audit/structured_feature_perturbation_20261105/feature_geometry.py H2T_repro_audit/structured_feature_perturbation_20261105/run_experiment.py H2T_repro_audit/structured_feature_perturbation_20261105/test_feature_geometry.py
+& 'D:\app\anaconda\envs\pytorch\python.exe' -B -u -m unittest discover -s H2T_repro_audit/structured_feature_perturbation_20261105 -p "test_*.py"
+~~~
+
+All tests must pass before data extraction. The tests cover:
+- class-subspace orthonormality and finite eigenvalues;
+- boundary-directed margin reduction without crossing;
+- isotropic and structured unit directions;
+- exact per-example norm matching;
+- the identity showing H2T channel replacement commutes with GAP.
+
+If a test fails, diagnose and fix only the new experiment files. Re-run the complete test suite. Do not run feature extraction until it passes.
+
+## Step 4 — Prepare frozen feature streams
+
+Run:
+
+~~~powershell
+& 'D:\app\anaconda\envs\pytorch\python.exe' -B -u H2T_repro_audit/structured_feature_perturbation_20261105/run_experiment.py prepare
+~~~
+
+This extracts frozen 64-D GAP features from the existing Clean Stage-I backbone. It creates a separate feature cache for Stage-II seeds 42, 43, and 44. Within each seed:
+
+- each epoch uses class-balanced receiver sampling;
+- each donor epoch is a permutation of the full 10,847-image LT training set;
+- original train transforms are applied with a private deterministic augmentation RNG;
+- the receiver and donor feature streams are frozen and reused identically by all five arms;
+- the donor bank is aligned by original training-image index;
+- the first two donor-view epochs provide paired augmentation differences for the class-conditional covariance subspaces;
+- the fixed Stage-I classifier and the learned subspaces produce per-receiver boundary directions and norm budgets.
+
+The script writes caches under the ignored feature_cache/ directory. It writes a tracked prepare_manifest.json with source hashes, cache hashes, class counts, subspace diagnostics, boundary eligibility, and configuration.
+
+The extraction uses batch size 128 and the frozen backbone in eval mode. If CUDA OOM occurs, do not silently change the protocol or continue with partial caches. Record the failure and report it. A smaller extraction batch may be introduced only as a code-level memory-safe implementation change that preserves the same sample order, augmentation RNG stream, features, and final 128-example Stage-II batch schedule; verify the resulting feature hashes and document the change.
+
+After preparation, inspect:
+- prepare_manifest.json
+- test_guard.json
+- feature_cache/seed42/cache_manifest.json
+- feature_cache/seed43/cache_manifest.json
+- feature_cache/seed44/cache_manifest.json
+
+Require exact Stage-I SHA, 10 epochs per seed, 85 batches per epoch, 16 unique H2T channels per batch, finite features, and zero official TEST access.
+
+## Step 5 — Five-arm one-epoch smoke test
+
+Run:
+
+~~~powershell
+& 'D:\app\anaconda\envs\pytorch\python.exe' -B -u H2T_repro_audit/structured_feature_perturbation_20261105/run_experiment.py smoke
+~~~
+
+This runs one epoch for each arm using Stage-II seed 42:
+
+- crt
+- h2t_pooled
+- gaussian
+- subspace_random
+- subspace_boundary
+
+Require:
+- all five arms complete 85 updates;
+- all losses and gradients are finite;
+- all five arms start from the same Stage-I classifier hash;
+- the classifier changes in every arm;
+- Gaussian, Subspace-Random, and Subspace-Boundary perturbation norms match the same per-example boundary budget within tolerance;
+- Subspace-Random directions lie in the estimated class subspace;
+- H2T masks contain exactly 16 unique channels and are shared within each batch;
+- the frozen Stage-I model and BN are not trained or updated;
+- official TEST access remains zero.
+
+The smoke command must create smoke_status.json with passed=true. If any condition fails, STOP before formal training. Fix only the new experiment files, preserve the failed smoke outputs for diagnosis, and use a fresh output location/experiment branch for a clean rerun. Do not delete or overwrite prior outputs.
+
+## Step 6 — Formal experiment
+
+Only after smoke_status.json reports passed=true, run:
+
+~~~powershell
+& 'D:\app\anaconda\envs\pytorch\python.exe' -B -u H2T_repro_audit/structured_feature_perturbation_20261105/run_experiment.py train
+~~~
+
+This runs all five arms for Stage-II seeds 42, 43, 44, 10 epochs each. The backbone is not re-run during Stage II because all frozen feature streams are cached. Only the linear classifier is optimized.
+
+The primary endpoint is fixed epoch 10. Do not choose the best validation epoch. Validation diagnostics are computed once at the fixed endpoint. The official TEST set remains untouched.
+
+The expected number of formal runs is 15; each run has 850 optimizer updates. Preserve every run's:
+- status.json
+- train_log.csv
+- classifier_final.pth
+- metrics.json
+- confusion_matrix.npy
+- validation_predictions.npz
+
+All run artifacts are under ignored runs/formal/. Do not add model checkpoints or large feature arrays to Git.
+
+## Step 7 — Aggregate and report
+
+After formal_complete.json exists, run:
+
+~~~powershell
+& 'D:\app\anaconda\envs\pytorch\python.exe' -B -u H2T_repro_audit/structured_feature_perturbation_20261105/run_experiment.py report
+~~~
+
+Inspect and preserve:
+- summary.csv
+- summary.json
+- RESULTS.md
+- formal_complete.json
+- test_guard.json
+
+The report must show per-seed results, mean/std, and paired per-seed deltas against cRT. Do not make statistical-significance claims from three Stage-II seeds sharing one Stage-I checkpoint.
+
+## Step 8 — Scientific interpretation to include in the handoff
+
+Answer these questions from the actual outputs:
+
+1. Does Subspace-Boundary improve Few/Tail over cRT and H2T-pooled?
+2. Does it improve Few/Tail over norm-matched Gaussian?
+3. Does it improve Few/Tail over norm-matched Subspace-Random?
+4. Does the effect preserve Many/Head accuracy?
+5. Does Tail-to-Head error fall without a compensating Head-to-Tail increase?
+6. What fraction of tail receiver draws is boundary-eligible? Is the projection alignment often too weak?
+7. Are the perturbations actually norm matched and subspace constrained?
+8. Are the per-seed directions consistent, or does one seed drive the mean?
+9. Does the result support the proposed mechanism, reject it, or remain inconclusive?
+
+Do not call the approach successful based on Overall accuracy alone. Do not infer improved generalization from an algebraic margin reduction or from the instantaneous Stage-I classifier. The validation set is a reused TRAIN holdout and official TEST has not been evaluated.
+
+Decision rule:
+- If Subspace-Boundary beats both Gaussian and Subspace-Random on Few/Tail while avoiding a material Many/Head regression, recommend a separately pre-registered confirmation on a new dataset or a previously untouched test protocol.
+- If Subspace-Random matches or beats Subspace-Boundary, do not add more boundary gates; boundary guidance has not shown incremental value.
+- If Gaussian matches the structured arms, the subspace has not shown incremental value.
+- If all generated arms fail against cRT and H2T-pooled, stop this candidate rather than adding more modules.
+
+## Step 9 — GitHub handoff
+
+Commit and push only the new experiment source/protocol files and the small tracked result summaries:
+- feature_geometry.py
+- run_experiment.py
+- test_feature_geometry.py
+- PROTOCOL.md
+- CODEX_RUN_INSTRUCTIONS.txt
+- prepare_manifest.json
+- smoke_status.json
+- formal_complete.json
+- summary.csv
+- summary.json
+- RESULTS.md
+- test_guard.json
+
+Do not commit feature_cache/, runs/, model checkpoints, or large .npy/.npz arrays. The repository .gitignore is already configured to keep these local.
+
+At completion, report:
+- exact branch and commit;
+- exact commands executed;
+- unit-test and smoke status;
+- 15-run completion status;
+- summary metrics and per-seed deltas;
+- test_guard status;
+- any deviation from this protocol.
+
+If any mandatory hash, source, checkpoint, test guard, or numerical check fails, stop and report the precise failure. Do not improvise a different experiment.
