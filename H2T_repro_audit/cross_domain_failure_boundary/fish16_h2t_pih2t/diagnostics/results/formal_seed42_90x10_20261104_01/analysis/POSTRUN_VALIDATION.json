@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "execution_head": "072d7b77e0b77b8ca0187064519f5665f6422d0e",
+  "branch": "experiment/fish16-clean-launch-fix-20261103",
+  "run_root": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01",
+  "original_artifact_files_verified": 475,
+  "original_artifact_bytes_verified": 2463214977,
+  "counts": {
+    "epochs": 220,
+    "attempted_windows": 223740,
+    "actual_sgd_updates": 223740,
+    "gradient_audits": 223740,
+    "physical_log_entries": 223740,
+    "optimizer_skips": 0,
+    "logged_nan_count": 0,
+    "logged_inf_count": 0,
+    "event_kinds": {
+      "optimizer_step": 223740
+    }
+  },
+  "conditions": {
+    "A0": {
+      "status": "COMPLETE",
+      "epochs": 90,
+      "updates": 91530,
+      "skips": 0
+    },
+    "B0": {
+      "status": "COMPLETE",
+      "epochs": 90,
+      "updates": 91530,
+      "skips": 0
+    },
+    "A1": {
+      "status": "COMPLETE",
+      "epochs": 10,
+      "updates": 10170,
+      "skips": 0
+    },
+    "A2": {
+      "status": "COMPLETE",
+      "epochs": 10,
+      "updates": 10170,
+      "skips": 0
+    },
+    "B1": {
+      "status": "COMPLETE",
+      "epochs": 10,
+      "updates": 10170,
+      "skips": 0
+    },
+    "B2": {
+      "status": "COMPLETE",
+      "epochs": 10,
+      "updates": 10170,
+      "skips": 0
+    }
+  },
+  "source_hashes_unchanged": true,
+  "common_backbone_classifier_initialization_exact": true,
+  "epoch_pairing_checks": 100,
+  "all_pairing_checks_pass": true,
+  "all_stage2_batch_view_hashes_equal": true,
+  "frozen_extractor_endpoint_checks": [
+    {
+      "condition": "A1",
+      "source": "A0",
+      "epochs_with_runtime_freeze_gate": 10,
+      "extractor_tensors": 318,
+      "bn_stat_buffers": 159,
+      "source_extractor_state_sha256": "598014626c9c3ac2cd78796999f33fe0f3b8d59bff01dc338e8304200b42520b",
+      "final_extractor_state_sha256": "598014626c9c3ac2cd78796999f33fe0f3b8d59bff01dc338e8304200b42520b",
+      "source_checkpoint_sha256": "d1f0af7979d959d8018abd65cd61b45f8ef5c662a2a3e974b4944610e69b12e9",
+      "all_tensors_exact": true
+    },
+    {
+      "condition": "A2",
+      "source": "A0",
+      "epochs_with_runtime_freeze_gate": 10,
+      "extractor_tensors": 318,
+      "bn_stat_buffers": 159,
+      "source_extractor_state_sha256": "598014626c9c3ac2cd78796999f33fe0f3b8d59bff01dc338e8304200b42520b",
+      "final_extractor_state_sha256": "598014626c9c3ac2cd78796999f33fe0f3b8d59bff01dc338e8304200b42520b",
+      "source_checkpoint_sha256": "d1f0af7979d959d8018abd65cd61b45f8ef5c662a2a3e974b4944610e69b12e9",
+      "all_tensors_exact": true
+    },
+    {
+      "condition": "B1",
+      "source": "B0",
+      "epochs_with_runtime_freeze_gate": 10,
+      "extractor_tensors": 319,
+      "bn_stat_buffers": 159,
+      "source_extractor_state_sha256": "e5703e5dea909ff03d44443be03ab8db3be3bc33864c16f4ef4aeb0d4dd41b9a",
+      "final_extractor_state_sha256": "e5703e5dea909ff03d44443be03ab8db3be3bc33864c16f4ef4aeb0d4dd41b9a",
+      "source_checkpoint_sha256": "c7ee1c5fc62cc7af235c0d5e131cdd4c627c2fdb85446bd83df93fc85e5885b6",
+      "all_tensors_exact": true
+    },
+    {
+      "condition": "B2",
+      "source": "B0",
+      "epochs_with_runtime_freeze_gate": 10,
+      "extractor_tensors": 319,
+      "bn_stat_buffers": 159,
+      "source_extractor_state_sha256": "e5703e5dea909ff03d44443be03ab8db3be3bc33864c16f4ef4aeb0d4dd41b9a",
+      "final_extractor_state_sha256": "e5703e5dea909ff03d44443be03ab8db3be3bc33864c16f4ef4aeb0d4dd41b9a",
+      "source_checkpoint_sha256": "c7ee1c5fc62cc7af235c0d5e131cdd4c627c2fdb85446bd83df93fc85e5885b6",
+      "all_tensors_exact": true
+    }
+  ],
+  "runtime_stage2_freeze_gates_completed": 40,
+  "runtime_freeze_gate_evidence": "Pinned formal_train.py:696-697 checks full extractor state before each Stage-II epoch checkpoint; all 40 committed.",
+  "no_resume_or_retry": true,
+  "precision": "FP32; autocast and scaler disabled; all logged scales exactly 1",
+  "test_evaluations": 0,
+  "test_images_opened_by_analysis": 0,
+  "additional_seeds": [],
+  "postrun_gpu_inference_or_training": false,
+  "provenance": {
+    "formal_run_manifest_sha256": "372d29ca5cf545f0b000f1686c6457fcf8325be7567ef1e62213d51b9177fa1f",
+    "original_output_index_sha256": "11ef390ad8cface824154444e109299e2ef9e57ea5edb136c7b6a3ba841c4440",
+    "actual_execution_status_sha256": "8697cfccf720fde8c7e42244616405b3e5862c9f53d0f10e5fb62e7c29f8baf7",
+    "console_sha256": "36bed858e9431602e71c9d6b3ac6ed9c562c3b0ae9a9cbf76ef43af64d36b753",
+    "source_sha256": {
+      "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+      "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+      "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+      "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+      "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+      "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637"
+    },
+    "original_source_sha256": {
+      "H2T_official_clean/H2T-main/models/resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+      "H2T_official_clean/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "H2T_official_clean/H2T-main/train_stage1.py": "f97ea0b7524f115aaf08061a728cfe4be4ea93a7cca2180d20413aeec38e45f1",
+      "H2T_official_clean/H2T-main/train_stage2.py": "c0e1f794eacb50093a43651b585155600fafac9f3d26f69673aa13ce3d888614",
+      "PI_H2T_review/H2T-main/pi_h2t.py": "b63e481d7491bf38752e8071735ecc732c912ceb02a95e9f27b6f403052065a3",
+      "PI_H2T_review/H2T-main/methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "PI_H2T_review/H2T-main/models/resnet_cifar.py": "d8920c3a8b67d1603fc7fd1c8bdaab5db3aff63c4fe37f745282ae2988fd9e2d",
+      "PI_H2T_review/H2T-main/PI_H2T_REVIEW_ZH.md": "c8a74bb22bf37f1c09bb1dac7159920d79ca1a9abf2ff5065f082dffdf0dbcc9"
+    }
+  }
+}

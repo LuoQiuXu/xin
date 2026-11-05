@@ -1,0 +1,2 @@
+# Preserve exact original/derived bytes so the evidence SHA256 remains verifiable.
+* -text

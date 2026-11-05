@@ -1,0 +1,17 @@
+﻿class_id,species,group,validation_images,A1,A2,B1,B2,A2_minus_A1,B2_minus_B1
+0,Dascyllus reticulatus,Head,2365,2349,2327,2356,2291,-22,-65
+1,Plectroglyphidodon dickii,Head,547,547,546,546,542,-1,-4
+2,Chromis chrysura,Head,687,686,682,686,675,-4,-11
+3,Amphiprion clarkii,Head,825,823,823,824,815,0,-9
+4,Chaetodon lunulatus,Head,547,547,547,547,542,0,-5
+5,Chaetodon trifascialis,Tail,26,26,26,26,26,0,0
+6,Myripristis kuntee,Medium,125,125,125,125,125,0,0
+7,Acanthurus nigrofuscus,Medium,33,30,32,31,28,2,-3
+8,Hemigymnus fasciatus,Medium,46,46,46,46,46,0,0
+9,Neoniphon sammara,Head,52,52,52,52,52,0,0
+10,Abudefduf vaigiensis,Tail,14,14,14,14,14,0,0
+11,Canthigaster valentini,Tail,26,24,24,24,25,0,1
+12,Pomacentrus moluccensis,Medium,39,39,39,39,39,0,0
+13,Zebrasoma scopas,Tail,25,24,24,24,24,0,0
+14,Hemigymnus melapterus,Tail,9,9,9,9,9,0,0
+15,Lutjanus fulvus,Medium,30,30,30,30,30,0,0

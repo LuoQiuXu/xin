@@ -1,0 +1,105 @@
+{
+  "pi_all_epochs": {
+    "count": 162690,
+    "mean": 0.2879126115989521,
+    "std": 0.10321250433137634,
+    "minimum": 0.07955586910247803,
+    "maximum": 0.6103164553642273,
+    "p05": 0.15310739278793337,
+    "median": 0.251892626285553,
+    "p95": 0.460624523460865,
+    "donor_mean": 0.7120873884010479,
+    "donor_more_than_half_fraction": 0.9969574036511156,
+    "donor_more_than_075_fraction": 0.4918372364619829
+  },
+  "pi_epoch1": {
+    "count": 16269,
+    "mean": 0.26030326312194557,
+    "std": 0.11761501404612668,
+    "minimum": 0.07955586910247803,
+    "maximum": 0.6103164553642273,
+    "p05": 0.12380513548851013,
+    "median": 0.21075069904327393,
+    "p95": 0.46627016067504873,
+    "donor_mean": 0.7396967368780545,
+    "donor_more_than_half_fraction": 0.9916405433646813,
+    "donor_more_than_075_fraction": 0.6133136640236032
+  },
+  "pi_epoch10": {
+    "count": 16269,
+    "mean": 0.3000860390182324,
+    "std": 0.0946802361157725,
+    "minimum": 0.14002254605293274,
+    "maximum": 0.6062596440315247,
+    "p05": 0.17645830512046815,
+    "median": 0.26514875888824463,
+    "p95": 0.45858758091926555,
+    "donor_mean": 0.6999139609817676,
+    "donor_more_than_half_fraction": 0.9979716024340771,
+    "donor_more_than_075_fraction": 0.42602495543672014
+  },
+  "pi_epoch10_by_recipient_group": {
+    "Head": {
+      "count": 6098,
+      "mean": 0.38926695967529906,
+      "std": 0.06396651732201636,
+      "minimum": 0.21300184726715088,
+      "maximum": 0.6062596440315247,
+      "p05": 0.2471859022974968,
+      "median": 0.39903542399406433,
+      "p95": 0.4698272630572319,
+      "donor_mean": 0.610733040324701,
+      "donor_more_than_half_fraction": 0.9981961298786487,
+      "donor_more_than_075_fraction": 0.05788783207609052
+    },
+    "Medium": {
+      "count": 5063,
+      "mean": 0.2645301954644531,
+      "std": 0.053476754213801894,
+      "minimum": 0.18192347884178162,
+      "maximum": 0.5182672739028931,
+      "p05": 0.21203564405441283,
+      "median": 0.24757146835327148,
+      "p95": 0.3820908188819885,
+      "donor_mean": 0.7354698045355469,
+      "donor_more_than_half_fraction": 0.9992099545723879,
+      "donor_more_than_075_fraction": 0.5236026071499111
+    },
+    "Tail": {
+      "count": 5108,
+      "mean": 0.22886324766075228,
+      "std": 0.07079347929718995,
+      "minimum": 0.14002254605293274,
+      "maximum": 0.5371092557907104,
+      "p05": 0.16028103679418565,
+      "median": 0.20590099692344666,
+      "p95": 0.39538924843072887,
+      "donor_mean": 0.7711367523392477,
+      "donor_more_than_half_fraction": 0.9964761158966328,
+      "donor_more_than_075_fraction": 0.7687940485512921
+    }
+  },
+  "donor_group_fraction": {
+    "Head": 0.9380416743499908,
+    "Medium": 0.04425594689286373,
+    "Tail": 0.01770237875714549
+  },
+  "recipient_group_fraction": {
+    "Head": 0.37482328354539307,
+    "Medium": 0.31120535988690146,
+    "Tail": 0.3139713565677055
+  },
+  "same_class_pair_fraction": 0.06558485463150777,
+  "same_class_pairs_per_epoch": 1067,
+  "h2t_channels": {
+    "channels": 2048,
+    "selected_per_batch": 512,
+    "batches": 10170,
+    "total_selections": 5207040,
+    "minimum_channel_selections": 2395,
+    "maximum_channel_selections": 2686,
+    "mean_channel_selections": 2542.5
+  },
+  "prediction_distribution": "NOT_RECORDED; no new inference was run",
+  "semantic_compatibility": "UNVERIFIED; same/different class metadata is not a semantic-distance measure"
+}

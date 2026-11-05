@@ -1,0 +1,17 @@
+﻿class_id,class_folder,species,group,train_images,validation_images,train_groups,validation_groups,recipient_schedule_images,donor_schedule_images
+0,fish_01,Dascyllus reticulatus,Head,7342,2365,2544,848,1050,7343
+1,fish_02,Plectroglyphidodon dickii,Head,1588,547,735,245,982,1595
+2,fish_03,Chromis chrysura,Head,2114,687,705,235,1011,2089
+3,fish_04,Amphiprion clarkii,Head,2513,825,613,204,1045,2543
+4,fish_05,Chaetodon lunulatus,Head,1469,547,322,107,998,1483
+5,fish_06,Chaetodon trifascialis,Tail,101,26,47,16,1008,93
+6,fish_07,Myripristis kuntee,Medium,171,125,43,14,1005,156
+7,fish_08,Acanthurus nigrofuscus,Medium,144,33,43,14,969,142
+8,fish_09,Hemigymnus fasciatus,Medium,144,46,34,12,1014,137
+9,fish_10,Neoniphon sammara,Head,205,52,31,11,1012,208
+10,fish_11,Abudefduf vaigiensis,Tail,59,14,26,8,1058,55
+11,fish_12,Canthigaster valentini,Tail,64,26,16,6,1008,76
+12,fish_13,Pomacentrus moluccensis,Medium,133,39,17,5,1032,124
+13,fish_14,Zebrasoma scopas,Tail,48,25,13,5,1007,33
+14,fish_15,Hemigymnus melapterus,Tail,29,9,10,3,1027,31
+15,fish_16,Lutjanus fulvus,Medium,145,30,9,3,1043,161

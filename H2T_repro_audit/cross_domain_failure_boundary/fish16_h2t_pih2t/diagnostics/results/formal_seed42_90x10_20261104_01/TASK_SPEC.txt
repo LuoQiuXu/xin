@@ -1,0 +1,735 @@
+# CODEX TASK — Fish16 正式六组对照实验（Seed 42，90+10 Epoch）
+
+日期：2026-11-04
+
+仓库：`LuoQiuXu/xin`
+
+本地仓库：`D:\xiangmuxunlian\xin`
+
+唯一允许使用的分支：
+
+`experiment/fish16-clean-launch-fix-20261103`
+
+当前 GitHub 归档 HEAD：
+
+`072d7b77e0b77b8ca0187064519f5665f6422d0e`
+
+Smoke 实际执行 HEAD：
+
+`960b1be97058202ee97db88f97a424bf1e6c37fb`
+
+本任务已经获得用户授权，可以开始正式训练。
+
+---
+
+## 0. 任务目标
+
+正式验证 H2T 和 PI-H2T 在 Fish4Knowledge-16 真实长尾水下图像数据集上的表现。
+
+本轮不是 Smoke，不是机制审计，而是完整的 seed=42、90+10 Epoch 正式实验。
+
+严格执行六组条件：
+
+| 条件 | Stage-I | Stage-II |
+|---|---|---|
+| A0 | Plain ResNet50，90 Epoch | 无 |
+| B0 | PIF-ResNet50，90 Epoch | 无 |
+| A1 | 加载 A0 最终权重 | cRT，10 Epoch |
+| A2 | 加载 A0 最终权重 | H2T，10 Epoch |
+| B1 | 加载 B0 最终权重 | cRT，10 Epoch |
+| B2 | 加载 B0 最终权重 | PI-H2TF，10 Epoch |
+
+科学比较必须严格使用：
+
+- H2T 效果：A2 − A1。
+- PI-H2T 效果：B2 − B1。
+
+禁止直接将 A2 与 B2 的差值解释为独立方法效果，因为它们的 Stage-I 表征不同。
+
+本轮只验证 seed=42。
+
+禁止启动 seed=43、44。
+
+禁止访问 TEST 图像。
+
+禁止引入任何新的方法模块。
+
+## 1. Git 分支与代码保护
+
+只允许使用：
+
+`experiment/fish16-clean-launch-fix-20261103`
+
+禁止创建新分支、切换到其他分支、修改 main、修改原始 H2T 源码或 PI-H2T 源码。
+
+执行前：
+
+```powershell
+$ErrorActionPreference = "Stop"
+
+$REPO = "D:\xiangmuxunlian\xin"
+$BRANCH = "experiment/fish16-clean-launch-fix-20261103"
+$EXPECTED_HEAD = "072d7b77e0b77b8ca0187064519f5665f6422d0e"
+
+Set-Location $REPO
+
+git fetch origin
+
+$CURRENT_BRANCH = (git branch --show-current).Trim()
+if ($CURRENT_BRANCH -ne $BRANCH) {
+    throw "Wrong branch. Stop without switching branches."
+}
+
+$STATUS = git status --porcelain
+if ($STATUS) {
+    throw "Dirty worktree. Stop. Do not stash/reset/clean."
+}
+
+$REMOTE_HEAD = (git rev-parse "origin/$BRANCH").Trim()
+$LOCAL_HEAD = (git rev-parse HEAD).Trim()
+
+if ($REMOTE_HEAD -ne $EXPECTED_HEAD) {
+    throw "Remote branch HEAD differs from the approved archive commit."
+}
+
+if ($LOCAL_HEAD -ne $REMOTE_HEAD) {
+    git merge-base --is-ancestor HEAD "origin/$BRANCH"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Local branch diverged. Do not merge or reset."
+    }
+
+    git merge --ff-only "origin/$BRANCH"
+}
+
+if ((git rev-parse HEAD).Trim() -ne $EXPECTED_HEAD) {
+    throw "Unexpected HEAD after branch verification."
+}
+
+if (git status --porcelain) {
+    throw "Worktree is not clean."
+}
+```
+
+说明：
+
+CPU Validation 和 Preflight 记录的 HEAD 是 `960b1be...`，而当前归档 HEAD 是 `072d7b77...`。
+
+这两个版本之间只有本轮实验产物的归档提交。执行代码没有改变。
+
+必须比较实际源码 SHA256，不要因为两个 HEAD 不同就错误地判定 CPU Validation 失效。
+
+禁止覆盖或删除已有实验产物。
+
+## 2. 权威实验协议与旧文件处理
+
+实验协议以以下文件为准：
+
+```text
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/FORMAL_PROTOCOL.md
+
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/formal_train.py
+
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/protocol_config.py
+
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/models.py
+
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/data.py
+
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/amp_recovery.py
+```
+
+旧的：
+
+`CODEX_FISH16_FORMAL_90X10_TRAINING.txt`
+
+仍然包含旧分支、FP16 和旧的 AMP 恢复方案。
+
+禁止执行该旧文件中的命令。
+
+`README.md` 中保留的旧正式实验失败记录属于历史记录，不得覆盖当前正式协议。
+
+Smoke 顶层状态已经是 `COMPLETE_SMOKE_ONLY`。辅助字段 `batch_smoke=RUNNING` 是已知的过期日志字段，不代表 GPU 任务仍在执行。
+
+不允许重新运行 Smoke。
+
+## 3. 现有验证记录核对
+
+使用已有验证记录，不要重新执行 CPU 测试、Preflight 或 Smoke。
+
+CPU Validation：
+
+```text
+D:\h2t_cross_domain_results\fish16_clean_launch_cpu_20261103_02\CPU_VALIDATION.json
+```
+
+SHA256：
+
+```text
+dbf4fe04619a2e9d6f1e0bfc5a0ebd63272fdfdd262499de1edbc4a42d6bf012
+```
+
+要求：
+
+- status = PASS
+- test_methods_run = 41
+- branch 与当前正式分支一致
+- worktree_clean_before = true
+- worktree_clean_after = true
+- 六个正式运行器源码指纹与当前源码完全一致
+- 八个上游 H2T/PI-H2T 源码指纹保持锁定
+
+Preflight：
+
+```text
+D:\h2t_cross_domain_results\fish16_clean_launch_preflight_20261103_02\preflight.json
+```
+
+SHA256：
+
+```text
+40a9e8af8971223525fdf08b8a227f217cb79308b5c0e6df7e2d0bfbaa5e1626
+```
+
+要求：
+
+- status = PASS_PREFLIGHT_ONLY
+- manifest SHA256 正确
+- official weight SHA256 正确
+- test_image_bytes_read = 0
+
+Smoke 结果：
+
+```text
+H2T_repro_audit/cross_domain_failure_boundary/fish16_h2t_pih2t/diagnostics/results/clean_launch_smoke_fix_20261103_01/
+```
+
+要求：
+
+- 顶层状态 COMPLETE_SMOKE_ONLY
+- 六组结果完整
+- PAIRING_CHECKS.json 中 all_equal = true
+- POSTRUN_INTEGRITY.json 中 status = PASS
+
+如果任意记录或源码指纹不匹配，立即停止，不要修改源码后强行运行。
+
+正式运行器自身也会验证 CPU Validation、数据 Manifest、官方权重和源码指纹。
+
+## 4. 锁定数据集
+
+数据集：Fish4Knowledge FRGT，primary 16-class subset。
+
+Manifest：
+
+```text
+D:\h2t_cross_domain_audit\fish4knowledge\manifest_primary.csv
+```
+
+SHA256：
+
+```text
+62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30
+```
+
+数据统计：
+
+| Split | Images | Groups |
+|---|---:|---:|
+| Train | 16,269 | 5,208 |
+| Validation | 5,396 | 1,736 |
+| Test | 5,468 | 1,736 |
+
+训练集不平衡因子：253.17。
+
+Head / Medium / Tail 分别为 6 / 5 / 5 个类别。
+
+禁止：
+
+- 修改 Manifest。
+- 重新划分数据。
+- 修改 seed。
+- 访问 TEST 图像路径。
+- 读取 TEST 图像字节。
+- 创建 TEST Dataset 或 DataLoader。
+- 计算 TEST 准确率。
+
+只允许 TRAIN 和 VAL。
+
+## 5. 模型与初始化
+
+使用现有 `models.FishModel`。
+
+官方 ResNet50 ImageNet 初始化：
+
+```text
+resnet50-19c8e357.pth
+```
+
+SHA256：
+
+```text
+19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097
+```
+
+禁止重新下载权重。
+
+禁止替换 backbone。
+
+禁止修改 PIF 两参数初始化。
+
+禁止修改 PI-H2TF 公式。
+
+A0、B0 必须分别从共同的官方 ImageNet 初始化重新开始。
+
+A1、A2 必须加载同一个 A0 Epoch 90 权重。
+
+B1、B2 必须加载同一个 B0 Epoch 90 权重。
+
+禁止使用 Smoke checkpoint。
+
+Stage-II 的源权重必须是正式 Stage-I 的最终 Epoch 90 checkpoint，并保存 SHA256。
+
+## 6. 数值精度与训练配置
+
+本轮统一使用 FP32。
+
+```text
+precision = float32
+autocast = false
+AMP = false
+GradScaler = disabled
+gradient_accumulation = 1
+```
+
+注意：代码中保留的 GradScaler 对象仅为 disabled/no-op 兼容对象，不代表启用了 AMP。
+
+之前的 FP16 梯度 NaN/Inf 失败记录必须保留。
+
+这次不是修复 FP16，而是明确使用统一 FP32 协议。
+
+任何非有限 loss、logits 或梯度均为致命错误。
+
+禁止：
+
+- 梯度裁剪。
+- 梯度替换。
+- 梯度清零以绕过异常。
+- 自动跳过非有限梯度。
+- 自动调整 Loss Scale。
+- 自动降低学习率。
+- OOM 后自动修改 batch size。
+- 自动改变精度或梯度累积。
+- 使用异常恢复掩盖训练失败。
+
+所有异常必须保存失败现场并停止。
+
+### 统一训练参数
+
+| 参数 | 设置 |
+|---|---|
+| Seed | 42 |
+| 输入尺寸 | 224×224 |
+| Micro batch | 16 |
+| Effective batch | 16 |
+| Accumulation | 1 |
+| Workers | 4 |
+| Optimizer | SGD |
+| Momentum | 0.9 |
+| cuDNN deterministic | True |
+| cuDNN benchmark | False |
+| TF32 | False |
+
+### Stage-I
+
+A0、B0：
+
+- Epoch：90。
+- Loss：原有两目标 MixUp Cross Entropy。
+- MixUp alpha：1.0。
+- Weight decay：1e-4。
+- LR：按现有固定 warmup + cosine schedule。
+- 前五个 Epoch 的学习率分别为 0.002、0.004、0.006、0.008、0.01。
+- 后续按照正式 90 Epoch cosine schedule。
+- Backbone、classifier 和 B0 的 PIF 均参与训练。
+
+### Stage-II
+
+A1、A2、B1、B2：
+
+- Epoch：10。
+- Loss：普通 Cross Entropy。
+- Weight decay：5e-4。
+- Momentum：0.9。
+- 初始 LR：0.01。
+- 使用固定的 10 Epoch cosine schedule。
+- 只训练 classifier。
+
+Extractor、全部 BN 参数和 BN buffers 必须冻结。
+
+每个 Stage-II Epoch 结束后检查 extractor 完整 state SHA，确保没有变化。
+
+注意：当前受控实验冻结 BN，与原始 H2T 的 `shift_bn=True` 配置存在差异。结果报告必须披露，不得声称完全复现原作者的所有 BN 设置。
+
+不得根据 Smoke 结果修改任何学习率或训练参数。
+
+## 7. 六组严格执行顺序
+
+必须顺序执行，不允许并行占用 GPU。
+
+```text
+A0: Plain Stage-I, 90 Epoch
+
+B0: PIF Stage-I, 90 Epoch
+
+A1: A0 Epoch-90 -> cRT, 10 Epoch
+
+A2: A0 Epoch-90 -> H2T, 10 Epoch
+
+B1: B0 Epoch-90 -> cRT, 10 Epoch
+
+B2: B0 Epoch-90 -> PI-H2TF, 10 Epoch
+```
+
+数据采样：
+
+- A0/B0：相同 Stage-I instance-balanced schedule。
+- A1/A2/B1/B2：相同 class-balanced recipient schedule。
+- A2/B2：完全相同 donor schedule。
+- A0/B0：保持匹配的 MixUp 随机流。
+- A1/A2：相同初始化和 recipient views。
+- B1/B2：相同初始化和 recipient views。
+- A2/B2：相同 donor views。
+
+保留当前 H2T rho=0.25。
+
+保留 PI-H2TF 的：
+
+```text
+mode = paper_theoretical_bounds
+ratio_detach = true
+```
+
+禁止替换 donor selector、channel selector、融合比例、融合公式或监督目标。
+
+## 8. 正式启动命令
+
+使用已经验证的 Python：
+
+```text
+D:\app\minicondaaa\envs\xiaoju\python.exe
+```
+
+正式运行器：
+
+```text
+H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t\formal_train.py
+```
+
+输出必须在 Git 仓库之外。
+
+新建输出目录：
+
+```text
+D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261104_01
+```
+
+控制台日志：
+
+```text
+D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261104_01_console.log
+```
+
+先检查输出目录和日志文件均不存在。
+
+不要预先创建正式输出目录，因为 `formal_train.py` 要求使用新的空输出目录。
+
+PowerShell 启动命令：
+
+```powershell
+$ErrorActionPreference = "Stop"
+
+$PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
+
+$REPO = "D:\xiangmuxunlian\xin"
+
+$TASK_DIR = "H2T_repro_audit\cross_domain_failure_boundary\fish16_h2t_pih2t"
+
+$CPU = "D:\h2t_cross_domain_results\fish16_clean_launch_cpu_20261103_02\CPU_VALIDATION.json"
+
+$OUT = "D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261104_01"
+
+$LOG = "D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261104_01_console.log"
+
+Set-Location $REPO
+
+if (Test-Path $OUT) {
+    throw "Output directory already exists. Never overwrite or reuse it for a fresh run."
+}
+
+if (Test-Path $LOG) {
+    throw "Console log already exists. Do not overwrite it."
+}
+
+& $PY -B -X utf8 -u "$TASK_DIR\formal_train.py" `
+    --condition all `
+    --output-dir $OUT `
+    --cpu-validation-record $CPU `
+    2>&1 | Tee-Object -FilePath $LOG
+
+$RUN_EXIT_CODE = $LASTEXITCODE
+
+if ($RUN_EXIT_CODE -ne 0) {
+    throw "Formal training failed. Preserve all failure artifacts and stop."
+}
+```
+
+本轮必须直接调用现有 formal_train.py。
+
+不要改写训练程序。
+
+不要重新执行 smoke.py。
+
+不要额外启动其他实验。
+
+## 9. 运行过程监控
+
+训练期间监控：
+
+```text
+ACTUAL_EXECUTION_STATUS.json
+```
+
+每个 Epoch 必须完成：
+
+1. 完整训练。
+2. 完整 VAL 评价。
+3. 梯度与实际 optimizer update 统计。
+4. 配对控制检查。
+5. BN/extractor 冻结检查。
+6. checkpoint 原子保存。
+7. Epoch metrics 保存。
+
+每 100 个 batch 应能看到进度记录。
+
+如果发生：
+
+- CUDA OOM；
+- NaN/Inf；
+- Missing gradient；
+- optimizer skip；
+- checkpoint 损坏；
+- pairing mismatch；
+- extractor/BN 非预期变化；
+
+必须停止，保留原始失败记录。
+
+不允许自动重跑或更改配置。
+
+### 中断恢复规则
+
+只有在外部进程意外中断、没有生成 `FAILURE.json`、没有进入 `FAILED_STOPPED`，并且原有正式 manifest 与 last checkpoint 完整有效时，才允许使用原输出目录精确恢复：
+
+```powershell
+& $PY -B -X utf8 -u "$TASK_DIR\formal_train.py" `
+    --condition all `
+    --output-dir $OUT `
+    --cpu-validation-record $CPU `
+    --resume
+```
+
+恢复必须使用原目录、原分支、原源码、原协议和原 CPU Validation 记录。
+
+如果已经存在 `FAILURE.json` 或状态为 `FAILED_STOPPED`，禁止恢复，等待科学审查。
+
+## 10. 正式训练完成的判定标准
+
+每个 Epoch 1017 个训练窗口。
+
+理论预期：
+
+| 条件 | Epoch | 实际更新数 |
+|---|---:|---:|
+| A0 | 90 | 91,530 |
+| B0 | 90 | 91,530 |
+| A1 | 10 | 10,170 |
+| A2 | 10 | 10,170 |
+| B1 | 10 | 10,170 |
+| B2 | 10 | 10,170 |
+| Total | 220 | 223,740 |
+
+期望：
+
+- attempted windows = 223,740。
+- actual SGD updates = 223,740。
+- optimizer skips = 0。
+- NaN = 0。
+- Inf = 0。
+- TEST evaluations = 0。
+- Additional seeds = 0。
+- 六组全部完成。
+- Stage-II 冻结检查全部通过。
+- 配对源 checkpoint SHA 全部一致。
+
+若任何指标不满足，不能将实验标记为成功。
+
+## 11. 正式实验后的科学分析
+
+训练完成后，不要立即修改任何算法。
+
+请生成独立的：
+
+`D:\h2t_cross_domain_results\fish16_formal_seed42_90x10_20261104_01_POSTRUN_ANALYSIS.md`
+
+该报告必须包含：
+
+### A. Stage-I 分析
+
+A0 与 B0：
+
+- Overall accuracy。
+- Macro accuracy。
+- Head / Medium / Tail accuracy。
+- Tail group macro accuracy。
+- Worst-class accuracy。
+- 90 Epoch train loss 曲线。
+- 90 Epoch validation 曲线。
+- PIF 参数变化。
+- 是否出现过拟合或收敛差异。
+
+重点回答：
+
+PIF 在 Smoke 中的早期优势，是否能延续到完整 Stage-I？
+
+### B. Stage-II 分析
+
+A1 与 A2：
+
+- H2T 相对于 cRT 的增量。
+- 每个 Epoch 的准确率变化。
+- 每个类别的准确率变化。
+- Head / Medium / Tail 变化。
+- Tail macro 与 Tail image accuracy。
+- 训练 Loss 与验证指标是否存在异常分离。
+
+B1 与 B2：
+
+进行完全相同的比较。
+
+重点回答：
+
+PI-H2TF 是否持续损害 Head 类？
+
+Tail 是否真正受益？
+
+PI-H2TF 是否只是改变了类别预测分布，而没有形成有效的尾类迁移？
+
+### C. 机制线索
+
+结合：
+
+- PI-H2TF recipient mass 分布。
+- donor mass 分布。
+- donor class frequency 分布。
+- H2T 通道替换统计。
+- 各类性能变化。
+- train loss 与 validation accuracy 的变化关系。
+
+判断是否有证据支持：
+
+1. 供体贡献过强。
+2. 供体与接收者语义不匹配。
+3. 训练阶段融合与推理阶段原始特征之间的分布差异。
+4. 头部与尾部类别受到的迁移影响不对称。
+
+必须区分实验事实、相关性和因果假设。
+
+不能仅凭一个异常指标就宣布找到机制原因。
+
+### D. 主要评价指标
+
+主分析同时报告：
+
+- Macro accuracy。
+- Tail group macro accuracy。
+- Tail image accuracy。
+- Overall accuracy。
+- Head / Medium / Tail。
+- Worst-class accuracy。
+
+以正式 Epoch 10 的结果作为 Stage-II 主比较结果。
+
+Best-validation checkpoint 作为补充结果，不得选择对方法最有利的指标进行单方面汇报。
+
+所有结果都必须标明为 Validation，不得混淆为 Test。
+
+### E. 最终科学结论
+
+回答：
+
+1. H2T 在 Fish16 上是否存在正向迁移？
+2. PI-H2TF 相比 cRT 是否有实际收益？
+3. PIF Stage-I 是否改善了尾类表示？
+4. 负迁移主要出现在什么类别？
+5. 当前数据是否足以支持继续改进 H2T/PI-H2T？
+6. 下一轮最值得验证的唯一科学假设是什么？
+
+本轮仅一个 seed，不得宣称跨域普遍规律或统计显著性。
+
+## 12. 最终产物
+
+训练结束后保留：
+
+```text
+FORMAL_RUN_MANIFEST.json
+
+ACTUAL_EXECUTION_STATUS.json
+
+RESULTS_SUMMARY.csv
+
+RESULTS_SUMMARY.md
+
+OUTPUT_SHA256.csv
+
+A0/epoch_metrics.csv
+
+B0/epoch_metrics.csv
+
+A1/epoch_metrics.csv
+
+A2/epoch_metrics.csv
+
+B1/epoch_metrics.csv
+
+B2/epoch_metrics.csv
+```
+
+以及完整的控制台日志和独立分析报告。
+
+检查每组 Stage-I/Stage-II checkpoint SHA256 和来源关系。
+
+禁止把大体积 checkpoint、原始图片、数据集、NPZ 或大规模训练日志上传到 GitHub。
+
+可以上传小型汇总报告、指标 CSV、执行状态和必要的哈希记录。
+
+不要提交修改过的训练源码，因为本轮不需要修改算法。
+
+---
+
+## 13. 最终执行原则
+
+这次正式训练已经获得用户明确授权。
+
+不要再进入反复的机制审计。
+
+不要再设计新的模块。
+
+不要因为 Smoke 中的负面结果擅自修改 PI-H2TF。
+
+不要因为担心失败而降低训练标准。
+
+不要因为某个阶段表现不好就提前停止一个正常运行的实验。
+
+按照既定协议完成全部六组 90+10 Epoch。
+
+如果发生真实异常，保留证据并停止；如果正常运行，就一直完成到六组全部结束。
+
+**本轮的唯一任务：用完整训练结果回答 H2T 与 PI-H2T 在 Fish16 真实长尾跨域场景中的迁移效果与失效边界。**

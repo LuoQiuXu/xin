@@ -1,0 +1,301 @@
+{
+  "status": "COMPLETE_EXTERNAL_REPORT_DELIVERY",
+  "external_report": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01_POSTRUN_ANALYSIS.md",
+  "external_archive": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01_POSTRUN_ANALYSIS",
+  "report_sha256": "15d1f8548d47cc440abde4f74c51e383fa46abf88aa421af63906d479f68cb57",
+  "copied_files": [
+    {
+      "relative_path": "analysis/ANALYSIS_SUMMARY.json",
+      "bytes": 11274,
+      "sha256": "5a818f0113b0e5633c5fb4bbae73209411086d8a3f238a78d005aab38e2e4f1f"
+    },
+    {
+      "relative_path": "analysis/BEST_VALIDATION.csv",
+      "bytes": 1282,
+      "sha256": "a99afa0b7c9a352f59181c5e8368522a4b13dad945028ac83d70b8b1ab3ca3c4"
+    },
+    {
+      "relative_path": "analysis/CHECKPOINT_SHA256.csv",
+      "bytes": 2571,
+      "sha256": "332eb49dab876e7376c3fb2de1207a8ecf39241b93d75058cbaa37b4d9aaecce"
+    },
+    {
+      "relative_path": "analysis/CLASS_COVERAGE.csv",
+      "bytes": 1113,
+      "sha256": "07c685745b2ff209a1cce78479ea416a84f6cb3816ba20f04fc00509ab75c711"
+    },
+    {
+      "relative_path": "analysis/DONOR_RECIPIENT_CLASS_PAIRS.csv",
+      "bytes": 5128,
+      "sha256": "9131c247e986e036c512bda9837cc802ef395239c14cc7191ecfb45a9f5e0dc1"
+    },
+    {
+      "relative_path": "analysis/DONOR_RECIPIENT_FREQUENCY.csv",
+      "bytes": 1804,
+      "sha256": "8b1b2ec48f6417153d980499c9b48cc719db0e9ed9e0cacf27d0564d40d4446f"
+    },
+    {
+      "relative_path": "analysis/EPOCH_METRICS_ALL.csv",
+      "bytes": 48914,
+      "sha256": "c00088bfe8385ce8507b799dfb4cf8cea6a6a809015f88878ed7b7ae79186c1e"
+    },
+    {
+      "relative_path": "analysis/EXTRACTOR_FREEZE_CHECKS.csv",
+      "bytes": 1061,
+      "sha256": "ab4ccb284ad2bde111a686a1326e36d407aa868b26cd2e517eb5b0337e3f198b"
+    },
+    {
+      "relative_path": "analysis/figures/paired_epoch_effects.pdf",
+      "bytes": 26119,
+      "sha256": "9be39b0b2de93beb5715fda7a5a0b1a8243d4b81a2aa8e0ac08b5dceaf3e8cae"
+    },
+    {
+      "relative_path": "analysis/figures/paired_epoch_effects.png",
+      "bytes": 201336,
+      "sha256": "6e7717273f60fd3780ecceba1b0fd43fd4150c1190657ec81afe57a48305ef74"
+    },
+    {
+      "relative_path": "analysis/figures/per_class_effects.pdf",
+      "bytes": 22442,
+      "sha256": "8350b1e294e2228143ca95596a79df324ed64fe42520050166158a841d14acef"
+    },
+    {
+      "relative_path": "analysis/figures/per_class_effects.png",
+      "bytes": 150334,
+      "sha256": "8feb0051360e1d6497474d0ebc3cf77640c8386f0321fd8c7e25a75208879b56"
+    },
+    {
+      "relative_path": "analysis/figures/pi_recipient_mass.pdf",
+      "bytes": 19403,
+      "sha256": "607aac61c7e46a50eda14b2b174e4ec65c7de0cc76d5d656cd55e624455f41dd"
+    },
+    {
+      "relative_path": "analysis/figures/pi_recipient_mass.png",
+      "bytes": 61998,
+      "sha256": "521b3eb2770c18b089ce0f6fd8e80135b41fd8608c7c097c34cebef21b343d7f"
+    },
+    {
+      "relative_path": "analysis/figures/pif_evolution.pdf",
+      "bytes": 15817,
+      "sha256": "c39147b2a2f4e3b1f95310e93fd0c745557a36768daa51c2a04c1fcf928a3d5c"
+    },
+    {
+      "relative_path": "analysis/figures/pif_evolution.png",
+      "bytes": 58352,
+      "sha256": "7986dbdc932dd230106c59636fedea6e4cc6f30dcd3d30e9c78723e0db2b2493"
+    },
+    {
+      "relative_path": "analysis/figures/stage1_curves.pdf",
+      "bytes": 22960,
+      "sha256": "ffc15cb6e29fbf88ebcf37e69b513b2a5de42554a5d0e8ea40539b61bba1bb66"
+    },
+    {
+      "relative_path": "analysis/figures/stage1_curves.png",
+      "bytes": 195023,
+      "sha256": "45a3f79fd1f1dc909da3a8f91e6710c9b304517e5dbaf5c1d2e7fccee6228da7"
+    },
+    {
+      "relative_path": "analysis/figures/stage2_curves.pdf",
+      "bytes": 31838,
+      "sha256": "4ff5526c00b89a630e1fc39a89fc65b9eab30d37e5aa5ab67bb8c83530708098"
+    },
+    {
+      "relative_path": "analysis/figures/stage2_curves.png",
+      "bytes": 264198,
+      "sha256": "ea664017bec8d63a3e3a3b7d2943576afde8a2b3852593ea121835dad96bed31"
+    },
+    {
+      "relative_path": "analysis/FINAL_VALIDATION.csv",
+      "bytes": 1081,
+      "sha256": "aa0d4e16b7516f687cca7bc1e72f3811c2242e93a695ef65914d90ef34006fdf"
+    },
+    {
+      "relative_path": "analysis/H2T_CHANNEL_COUNTS.csv",
+      "bytes": 61464,
+      "sha256": "7f716970360a4176ab684502fd7256a761befcd2e4782f1a3569b3740b6ffbaa"
+    },
+    {
+      "relative_path": "analysis/MECHANISM_SUMMARY.json",
+      "bytes": 3555,
+      "sha256": "7ea8a753a8ec4ca30834dffbca0a8d5bbf3042eaaa6e8d34a971521898c0f50a"
+    },
+    {
+      "relative_path": "analysis/PAIRING_CHECKS.csv",
+      "bytes": 3607,
+      "sha256": "370328e413bbb6ed27439e0929e5f0df2a7497248761efad2c97d302c80552d4"
+    },
+    {
+      "relative_path": "analysis/PAIRWISE_EPOCH_EFFECTS.csv",
+      "bytes": 3346,
+      "sha256": "5064ca96ed86575387bdedec727d529c226e9396b40d2a1a507ecdc4c396db2f"
+    },
+    {
+      "relative_path": "analysis/PER_CLASS_FINAL.csv",
+      "bytes": 2531,
+      "sha256": "4a92b8bbc6fdefccbb342001f170ea6dbb7ab8301e5c86c999b39dafa538fa1d"
+    },
+    {
+      "relative_path": "analysis/PER_CLASS_NET_CORRECT_COUNTS.csv",
+      "bytes": 902,
+      "sha256": "1b56f5c70a564c33ce9de11d551dd6280fd14bff52938564e7b3356a3bcb790e"
+    },
+    {
+      "relative_path": "analysis/PI_RECIPIENT_MASS_STATS.csv",
+      "bytes": 40448,
+      "sha256": "822a46b2fcde5b112671d1ae0a621a915a1bf5b7039f5caba6c6e813583d6af9"
+    },
+    {
+      "relative_path": "analysis/POSTRUN_VALIDATION.json",
+      "bytes": 6178,
+      "sha256": "b79ad3e3c713a8130b27e33638dd8736e414aed21f131cd2021927e2ca22e1f3"
+    },
+    {
+      "relative_path": "ANALYSIS_EXECUTION_RECORD.json",
+      "bytes": 616,
+      "sha256": "b00a8f882648fb8f6fb27ee42871e3a76599f9989535d7be42b13eab8ae013b8"
+    },
+    {
+      "relative_path": "copy_external_reports.py",
+      "bytes": 2204,
+      "sha256": "d581d5b37819244fb022901b6ed555d348e0b9ced5b1db646e715ce833bb9e51"
+    },
+    {
+      "relative_path": "derive_postrun.py",
+      "bytes": 21700,
+      "sha256": "15db2e6f46d7f9da3710fc8261b8ea5f493bc649a94c7cfd66d06c0f650c2ab8"
+    },
+    {
+      "relative_path": "finalize_report.py",
+      "bytes": 24087,
+      "sha256": "17d11fefa136f01588dcb1571728deaa49bb6e4be8ef1df8553e75f1c2ce7140"
+    },
+    {
+      "relative_path": "POSTRUN_ANALYSIS.md",
+      "bytes": 18094,
+      "sha256": "b18cdd2f5cfcd3e97a8c1dab762e0712ced63b1ae144daa92b55fbf3cafe4f1f"
+    },
+    {
+      "relative_path": "raw/A0/CONDITION_MANIFEST.json",
+      "bytes": 2795,
+      "sha256": "6bb791d656a611df76c2a4793b747ccc57a2bbd19722f3e64a4a4b533878ac3a"
+    },
+    {
+      "relative_path": "raw/A0/epoch_metrics.csv",
+      "bytes": 67846,
+      "sha256": "7f6c46bc22fe54dd5bb66b8c5563210580dffcc626f591e069903d34e835ea9f"
+    },
+    {
+      "relative_path": "raw/A1/CONDITION_MANIFEST.json",
+      "bytes": 906,
+      "sha256": "11ae03b980b2feda5198d3213e6abacc8d7b56eb04488841a72624cbfb87d978"
+    },
+    {
+      "relative_path": "raw/A1/epoch_metrics.csv",
+      "bytes": 7091,
+      "sha256": "df0e031403a4dbd5c2e62d416b56e0a49073ead46888334c672443f4e1a1ddb1"
+    },
+    {
+      "relative_path": "raw/A2/CONDITION_MANIFEST.json",
+      "bytes": 906,
+      "sha256": "4738121770f57dd9b86500a001b9120c970a17b442577f52db76b71b4b3af1a7"
+    },
+    {
+      "relative_path": "raw/A2/epoch_metrics.csv",
+      "bytes": 7812,
+      "sha256": "801f852af2f940df471ef362bb94ae345004e49037c40bf719ea1daff9d61e29"
+    },
+    {
+      "relative_path": "raw/ACTUAL_EXECUTION_STATUS.json",
+      "bytes": 445219,
+      "sha256": "8697cfccf720fde8c7e42244616405b3e5862c9f53d0f10e5fb62e7c29f8baf7"
+    },
+    {
+      "relative_path": "raw/B0/CONDITION_MANIFEST.json",
+      "bytes": 2795,
+      "sha256": "0632af5c610b58d469bc0f94c1cb610346079e0b5c3fc3d5abf50261c2429f3a"
+    },
+    {
+      "relative_path": "raw/B0/epoch_metrics.csv",
+      "bytes": 71493,
+      "sha256": "44ac1e4f34abfa2c46c844f54b342696c76667892d75ef6af7ed524f676fa194"
+    },
+    {
+      "relative_path": "raw/B1/CONDITION_MANIFEST.json",
+      "bytes": 906,
+      "sha256": "78eb8cb82ed8124baa856f54fa7e8e38dda2c300f025aae58d66274fa15922d0"
+    },
+    {
+      "relative_path": "raw/B1/epoch_metrics.csv",
+      "bytes": 7592,
+      "sha256": "136c463ac7562343e6aed0a21dbb9c57f7fcdbae94b11d38afe98e492f1671bf"
+    },
+    {
+      "relative_path": "raw/B2/CONDITION_MANIFEST.json",
+      "bytes": 906,
+      "sha256": "a87178076dc88e725512dae37dd721e565b92f6e676c8498511fb9acb21dade3"
+    },
+    {
+      "relative_path": "raw/B2/epoch_metrics.csv",
+      "bytes": 8328,
+      "sha256": "9043ff989ace1fc2b5f2448adb7edd8b55e39ed5c68f202344a50f8b60ca298a"
+    },
+    {
+      "relative_path": "raw/CPU_VALIDATION.json",
+      "bytes": 9059,
+      "sha256": "dbf4fe04619a2e9d6f1e0bfc5a0ebd63272fdfdd262499de1edbc4a42d6bf012"
+    },
+    {
+      "relative_path": "raw/FORMAL_RUN_MANIFEST.json",
+      "bytes": 7365,
+      "sha256": "372d29ca5cf545f0b000f1686c6457fcf8325be7567ef1e62213d51b9177fa1f"
+    },
+    {
+      "relative_path": "raw/LAUNCH.json",
+      "bytes": 895,
+      "sha256": "7b242b3d3feabe485c9910922b13e6843349b9f31fe303dbcbaf5302c552a686"
+    },
+    {
+      "relative_path": "raw/OUTPUT_SHA256.csv",
+      "bytes": 47542,
+      "sha256": "11ef390ad8cface824154444e109299e2ef9e57ea5edb136c7b6a3ba841c4440"
+    },
+    {
+      "relative_path": "raw/PRELAUNCH_CHECK.json",
+      "bytes": 1877,
+      "sha256": "5d2db7dac3b4897d1a2c76afea3a2579a16311d70b0f18833e71d88c014b58c1"
+    },
+    {
+      "relative_path": "raw/PROCESS_EXIT.json",
+      "bytes": 1270,
+      "sha256": "3daf6c51ae649802283dd35234a5e0181774d7905d161c686bd2be1f305e9b92"
+    },
+    {
+      "relative_path": "raw/RESULTS_SUMMARY.csv",
+      "bytes": 890,
+      "sha256": "4c54a196c4e57b98d36acde43de84815a932d8a81cfd6d0f55e3c396706f0215"
+    },
+    {
+      "relative_path": "raw/RESULTS_SUMMARY.md",
+      "bytes": 844,
+      "sha256": "85c191b7863ddc3f163981174995f4287d02a9108cf1c606677b4c448385b3cd"
+    },
+    {
+      "relative_path": "README.md",
+      "bytes": 1089,
+      "sha256": "a2c26ab7857038e0e6b2488b75c8ff32739484509847e06c3633158f2c69cdc6"
+    },
+    {
+      "relative_path": "TASK_SPEC.txt",
+      "bytes": 18194,
+      "sha256": "ebb559aa18083eb8443e1a55dd8fe3eee9072de9206a8ced59db7a9f1c3ef94b"
+    },
+    {
+      "relative_path": "VALIDATION_REPORT.md",
+      "bytes": 3136,
+      "sha256": "a5a17dc1c477977e97673a81ce7a0e0152494e34eac60e94ea58a65c7a4d18ec"
+    }
+  ],
+  "original_training_outputs_modified": 0,
+  "earlier_external_analysis_launch_approval_timeouts": 2,
+  "external_copy_is_safer_alternative_to_executing_analysis_outside_workspace": true
+}

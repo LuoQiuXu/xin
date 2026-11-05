@@ -1,0 +1,26 @@
+{
+  "condition": "A1",
+  "stage": 2,
+  "seed": 42,
+  "epochs": 10,
+  "protocol_sha256": "d7c6fe93ba634b545b5821005b833ddfc58f47a47bb1f307329339a6c2334737",
+  "initialization": {
+    "backbone": "3cc893327e39fad86be455b324ac2dcac4e4123b604299c07afe3c9b26e44ecc",
+    "classifier": "e6c322b922c0de79fd7d839bcfec4414cda11c5b2ca7f79f996768830aa0b10f",
+    "extractor": "598014626c9c3ac2cd78796999f33fe0f3b8d59bff01dc338e8304200b42520b"
+  },
+  "source_checkpoint": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01\\A0\\epoch_090.pth",
+  "source_checkpoint_sha256": "d1f0af7979d959d8018abd65cd61b45f8ef5c662a2a3e974b4944610e69b12e9",
+  "per_epoch_lr": [
+    0.01,
+    0.009755282581475769,
+    0.009045084971874737,
+    0.007938926261462366,
+    0.006545084971874737,
+    0.005,
+    0.003454915028125263,
+    0.0020610737385376348,
+    0.0009549150281252633,
+    0.00024471741852423234
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "status": "PASS_EXISTING_RECORDS_AND_SOURCE_IDENTITY",
+  "branch": "experiment/fish16-clean-launch-fix-20261103",
+  "approved_archive_head": "072d7b77e0b77b8ca0187064519f5665f6422d0e",
+  "cpu_and_preflight_execution_head": "960b1be97058202ee97db88f97a424bf1e6c37fb",
+  "archive_only_changed_files": 42,
+  "cpu_record_sha256": "dbf4fe04619a2e9d6f1e0bfc5a0ebd63272fdfdd262499de1edbc4a42d6bf012",
+  "preflight_record_sha256": "40a9e8af8971223525fdf08b8a227f217cb79308b5c0e6df7e2d0bfbaa5e1626",
+  "six_formal_source_sha256": {
+    "formal_train.py": "4be9bb32910ac07bca4aaaad700e0be45e6a804f7c9f20b10df9480005a3e435",
+    "models.py": "97b17097361ca2042df668a0519b088ff6088eed685b15b967a39c5cb2b94d26",
+    "data.py": "8ac34ba838e1ed99734a4ddb131ba29d33fbca4057db673137ea7e7b9b9b7e6e",
+    "amp_recovery.py": "227fe159295d135a0f3d494f60100640ac964878a279cb5b0e6474fb7d7da644",
+    "preflight.py": "e6faef3407f31dcafe36587bcf254b82e3c1b62f55a90c84517b7087b72f94c5",
+    "protocol_config.py": "ea02bc0f41bb58f21b2223bd819d8d32ec00b8f75827b3541f8ef8cbd8ea2637"
+  },
+  "all14_cpu_source_fingerprints_match": true,
+  "all8_upstream_fingerprints_match": true,
+  "manifest_sha256": "62d9a2e9fffaaca22ef0c99c0ce4134b4d0e1ecc308333a7cb57b10cf95f0f30",
+  "official_weight_sha256": "19c8e3572231adff6824a2da93fd67b5986919a2e65f8b6007eab4edee220097",
+  "smoke_actual_completed_conditions": [
+    "A0",
+    "B0",
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+  ],
+  "smoke_pairing_pass": true,
+  "smoke_stage2_freeze_pass": true,
+  "no_cpu_test_preflight_or_smoke_rerun": true,
+  "fresh_initialization": true,
+  "output": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01",
+  "console_log": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01_console.log",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe"
+}

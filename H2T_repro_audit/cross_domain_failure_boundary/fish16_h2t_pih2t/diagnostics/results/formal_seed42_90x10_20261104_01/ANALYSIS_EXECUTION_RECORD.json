@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "analysis_cpu_only": true,
+  "derive_script_sha256": "15db2e6f46d7f9da3710fc8261b8ea5f493bc649a94c7cfd66d06c0f650c2ab8",
+  "report_script_sha256": "17d11fefa136f01588dcb1571728deaa49bb6e4be8ef1df8553e75f1c2ce7140",
+  "task_spec_sha256": "ebb559aa18083eb8443e1a55dd8fe3eee9072de9206a8ced59db7a9f1c3ef94b",
+  "reused_cpu_record_sha256": "dbf4fe04619a2e9d6f1e0bfc5a0ebd63272fdfdd262499de1edbc4a42d6bf012",
+  "original_training_exit_code": 0,
+  "new_training_executions": 0,
+  "original_run_files_modified": 0,
+  "external_analysis_launches_started": 0,
+  "external_launch_approval_timeouts": 2
+}

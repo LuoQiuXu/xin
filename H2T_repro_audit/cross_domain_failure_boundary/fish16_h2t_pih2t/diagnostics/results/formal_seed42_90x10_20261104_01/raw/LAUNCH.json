@@ -1,0 +1,25 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-u",
+    "H2T_repro_audit\\cross_domain_failure_boundary\\fish16_h2t_pih2t\\formal_train.py",
+    "--condition",
+    "all",
+    "--output-dir",
+    "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01",
+    "--cpu-validation-record",
+    "D:\\h2t_cross_domain_results\\fish16_clean_launch_cpu_20261103_02\\CPU_VALIDATION.json"
+  ],
+  "cwd": "D:\\xiangmuxunlian\\xin",
+  "pid": 23344,
+  "started_asia_shanghai": "2026-11-04T14:20:20.033107+08:00",
+  "execution_head": "072d7b77e0b77b8ca0187064519f5665f6422d0e",
+  "fresh_official_initialization": true,
+  "resume": false,
+  "prelaunch_record": "D:\\h2t_cross_domain_results\\fish16_formal_seed42_90x10_20261104_01_PRELAUNCH_CHECK.json",
+  "automatic_retry": false,
+  "no_validation_reruns": true
+}
