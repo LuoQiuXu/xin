@@ -1,0 +1,266 @@
+{
+  "phase": "snapshot",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py",
+    "snapshot"
+  ],
+  "started": "2026-11-06T22:29:42.707637+08:00",
+  "formal_training_started": false,
+  "error_type": "ValueError",
+  "error": "'H2T_repro_audit\\\\clean_vs_stability_runs\\\\clean_s1_seed42_s2_124_125_20261014\\\\locked\\\\clean_stage1_best.pth' is not in the subpath of 'D:\\\\xiangmuxunlian\\\\xin'",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\run_phase.py\", line 25, in <module>\n    runpy.run_path(str(OUT/target),run_name=\"__main__\")\n  File \"<frozen runpy>\", line 287, in run_path\n  File \"<frozen runpy>\", line 98, in _run_module_code\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py\", line 140, in <module>\n    {\"snapshot\":snapshot,\"structure\":structure}[sys.argv[1]]()\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py\", line 27, in snapshot\n    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior[\"protected_external_inputs\"])\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py\", line 27, in <genexpr>\n    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior[\"protected_external_inputs\"])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\pathlib.py\", line 682, in relative_to\n    raise ValueError(f\"{str(self)!r} is not in the subpath of {str(other)!r}\")\nValueError: 'H2T_repro_audit\\\\clean_vs_stability_runs\\\\clean_s1_seed42_s2_124_125_20261014\\\\locked\\\\clean_stage1_best.pth' is not in the subpath of 'D:\\\\xiangmuxunlian\\\\xin'\n",
+  "test_guard": {
+    "installed_at": "2026-11-06T22:29:47+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "FAILED_STOPPED",
+  "exit_code": 1,
+  "ended": "2026-11-06T22:29:47.953387+08:00"
+}
+----- complete phase stdout/stderr -----
+Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\run_phase.py", line 25, in <module>
+    runpy.run_path(str(OUT/target),run_name="__main__")
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\preflight.py", line 140, in <module>
+    {"snapshot":snapshot,"structure":structure}[sys.argv[1]]()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\preflight.py", line 27, in snapshot
+    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior["protected_external_inputs"])
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\preflight.py", line 27, in <genexpr>
+    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior["protected_external_inputs"])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\pathlib.py", line 682, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: 'H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\locked\\clean_stage1_best.pth' is not in the subpath of 'D:\\xiangmuxunlian\\xin'
+
+{
+  "phase": "snapshot_pathfix",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py",
+    "snapshot"
+  ],
+  "started": "2026-11-06T22:30:12.383613+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:30:16+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:30:22.279530+08:00"
+}
+----- complete phase stdout/stderr -----
+{"snapshot": "PASS", "protected_files": 1147, "assets": 140, "environment": {"python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]", "executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe", "torch": "2.14.1+cu132", "cuda": "13.2", "cudnn": 92400, "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU", "device_count": 1, "cudnn_deterministic": true, "cudnn_benchmark": false, "cudnn_allow_tf32": true, "matmul_allow_tf32": false, "default_dtype": "torch.float32", "autocast_enabled": false}}
+
+{
+  "phase": "structure",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py",
+    "structure"
+  ],
+  "started": "2026-11-06T22:30:30.037895+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:30:33+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:30:39.419777+08:00"
+}
+----- complete phase stdout/stderr -----
+{"structure": "PASS", "rows": 15300, "seeds": {"123": {"batches": 5100, "repeated_class_batches": 3129, "last_batches": 30, "max_multiplicity": 2, "official_indices_compared": 325410, "official_mismatched_indices": 0, "plan_sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45"}, "124": {"batches": 5100, "repeated_class_batches": 3143, "last_batches": 30, "max_multiplicity": 2, "official_indices_compared": 325410, "official_mismatched_indices": 0, "plan_sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39"}, "125": {"batches": 5100, "repeated_class_batches": 3120, "last_batches": 30, "max_multiplicity": 2, "official_indices_compared": 325410, "official_mismatched_indices": 0, "plan_sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2"}}, "first_epoch": {"123": {"batches": 170, "sample_occurrences": 10847, "multi_sample_classes": 774, "max_multiplicity": 2}, "124": {"batches": 170, "sample_occurrences": 10847, "multi_sample_classes": 750, "max_multiplicity": 2}, "125": {"batches": 170, "sample_occurrences": 10847, "multi_sample_classes": 748, "max_multiplicity": 2}}}
+
+{
+  "phase": "sweep",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\numerical_audit.py",
+    "sweep"
+  ],
+  "started": "2026-11-06T22:37:10.444042+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:37:14+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:41:16.465407+08:00"
+}
+----- complete phase stdout/stderr -----
+{"seed": 123, "batch": 0, "batch_size": 64, "samples_processed": 64, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 10, "batch_size": 64, "samples_processed": 704, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 20, "batch_size": 64, "samples_processed": 1344, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 30, "batch_size": 64, "samples_processed": 1984, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 40, "batch_size": 64, "samples_processed": 2624, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 50, "batch_size": 64, "samples_processed": 3264, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 60, "batch_size": 64, "samples_processed": 3904, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 70, "batch_size": 64, "samples_processed": 4544, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 80, "batch_size": 64, "samples_processed": 5184, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 90, "batch_size": 64, "samples_processed": 5824, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 100, "batch_size": 64, "samples_processed": 6464, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 110, "batch_size": 64, "samples_processed": 7104, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 120, "batch_size": 64, "samples_processed": 7744, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 130, "batch_size": 64, "samples_processed": 8384, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 140, "batch_size": 64, "samples_processed": 9024, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 150, "batch_size": 64, "samples_processed": 9664, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 160, "batch_size": 64, "samples_processed": 10304, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 123, "batch": 169, "batch_size": 31, "samples_processed": 10847, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 0, "batch_size": 64, "samples_processed": 64, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 10, "batch_size": 64, "samples_processed": 704, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 20, "batch_size": 64, "samples_processed": 1344, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 30, "batch_size": 64, "samples_processed": 1984, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 40, "batch_size": 64, "samples_processed": 2624, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 50, "batch_size": 64, "samples_processed": 3264, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 60, "batch_size": 64, "samples_processed": 3904, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 70, "batch_size": 64, "samples_processed": 4544, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 80, "batch_size": 64, "samples_processed": 5184, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 90, "batch_size": 64, "samples_processed": 5824, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 100, "batch_size": 64, "samples_processed": 6464, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 110, "batch_size": 64, "samples_processed": 7104, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 120, "batch_size": 64, "samples_processed": 7744, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 130, "batch_size": 64, "samples_processed": 8384, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 140, "batch_size": 64, "samples_processed": 9024, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 150, "batch_size": 64, "samples_processed": 9664, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 160, "batch_size": 64, "samples_processed": 10304, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 124, "batch": 169, "batch_size": 31, "samples_processed": 10847, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 0, "batch_size": 64, "samples_processed": 64, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 10, "batch_size": 64, "samples_processed": 704, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 20, "batch_size": 64, "samples_processed": 1344, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 30, "batch_size": 64, "samples_processed": 1984, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 40, "batch_size": 64, "samples_processed": 2624, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 50, "batch_size": 64, "samples_processed": 3264, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 60, "batch_size": 64, "samples_processed": 3904, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 70, "batch_size": 64, "samples_processed": 4544, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 80, "batch_size": 64, "samples_processed": 5184, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 90, "batch_size": 64, "samples_processed": 5824, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 100, "batch_size": 64, "samples_processed": 6464, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 110, "batch_size": 64, "samples_processed": 7104, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 120, "batch_size": 64, "samples_processed": 7744, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 130, "batch_size": 64, "samples_processed": 8384, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 140, "batch_size": 64, "samples_processed": 9024, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 150, "batch_size": 64, "samples_processed": 9664, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 160, "batch_size": 64, "samples_processed": 10304, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+{"seed": 125, "batch": 169, "batch_size": 31, "samples_processed": 10847, "candidate_F_passed": true, "candidate_F_violations": 0, "candidate_F_max_abs": 0.0}
+
+{
+  "phase": "stress",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\numerical_audit.py",
+    "stress"
+  ],
+  "started": "2026-11-06T22:42:19.998467+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:42:23+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:42:34.338271+08:00"
+}
+----- complete phase stdout/stderr -----
+{"case": "unique_64", "F": {"case": "unique_64", "batch_size": 64, "candidate": "F", "max_multiplicity": 1, "unique_classes": 64, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "one_duplicate_2", "F": {"case": "one_duplicate_2", "batch_size": 64, "candidate": "F", "max_multiplicity": 2, "unique_classes": 63, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "several_duplicate_2", "F": {"case": "several_duplicate_2", "batch_size": 64, "candidate": "F", "max_multiplicity": 2, "unique_classes": 60, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "32_classes_x2", "F": {"case": "32_classes_x2", "batch_size": 64, "candidate": "F", "max_multiplicity": 2, "unique_classes": 32, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "16_classes_x4", "F": {"case": "16_classes_x4", "batch_size": 64, "candidate": "F", "max_multiplicity": 4, "unique_classes": 16, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "single_class_x64", "F": {"case": "single_class_x64", "batch_size": 64, "candidate": "F", "max_multiplicity": 64, "unique_classes": 1, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "observed_modal_duplicate", "F": {"case": "observed_modal_duplicate", "batch_size": 64, "candidate": "F", "max_multiplicity": 2, "unique_classes": 56, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "tail_31", "F": {"case": "tail_31", "batch_size": 31, "candidate": "F", "max_multiplicity": 1, "unique_classes": 31, "passed": true, "violations": 0, "max_abs": 0.0, "max_normalized_error": 0.0, "all_finite": true, "byte_equal": true}}
+{"case": "one_triplicate_3", "F": {"case": "one_triplicate_3", "batch_size": 64, "candidate": "F", "max_multiplicity": 3, "unique_classes": 62, "passed": true, "violations": 0, "max_abs": 4.470348358154297e-08, "max_normalized_error": 0.03865184040132525, "all_finite": true, "byte_equal": false}}
+{"case": "nonpower_counts_5_7", "F": {"case": "nonpower_counts_5_7", "batch_size": 64, "candidate": "F", "max_multiplicity": 7, "unique_classes": 54, "passed": true, "violations": 0, "max_abs": 4.470348358154297e-08, "max_normalized_error": 0.03576148359261166, "all_finite": true, "byte_equal": false}}
+{"real_batches": 510, "stress_cases": 10, "candidate_F_admitted": true}
+
+{
+  "phase": "regression",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\production_validation.py",
+    "regression"
+  ],
+  "started": "2026-11-06T22:44:02.260380+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:06+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:44:10.818882+08:00"
+}
+----- complete phase stdout/stderr -----
+{"regression": "PASS", "real_cases": 3, "scope": {"only_analytic_function_changed": true, "oracle_unchanged": true, "all_other_production_AST_unchanged": true, "before_sha256": "decf55ddb84d13bb08fee1ef3bd6e4b523e1feffae0998ef555d8a3b53007689", "after_sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6", "original_rtol_atol_unchanged": true}}
+
+{
+  "phase": "syntax",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\production_validation.py",
+    "syntax"
+  ],
+  "started": "2026-11-06T22:44:17.241520+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:21+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:44:23.072288+08:00"
+}
+----- complete phase stdout/stderr -----
+{"py_compile": "PASS", "files": 9}
+
+{
+  "phase": "smoke",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\production_validation.py",
+    "smoke"
+  ],
+  "started": "2026-11-06T22:44:28.858068+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:33+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:44:36.815703+08:00"
+}
+----- complete phase stdout/stderr -----
+CC-SAM SMOKE PASS: all three arms, paired inputs, finite gradients, classifier-only updates, frozen backbone/BN.
+No formal training was started.
+

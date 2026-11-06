@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "files": [
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/analyze_ccsam.py",
+      "sha256": "f9b4f854615e1d504dcb9768501790f6ad0135be713ade73205ad6f39b84236a",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py",
+      "sha256": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py",
+      "sha256": "674c7c87e359b323b295e889d7f0a282b795aca546e42d08a29efbc2a775970b",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py",
+      "sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/audit_support.py",
+      "sha256": "04cd285de185c7e7648451613e9d2f91286cb7917ad6a0a05d293a45c60a41b3",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/numerical_audit.py",
+      "sha256": "0a6ac39da6b8a0d5f0ae838ed28c03f7c31ffcec14dd0e2428c21532399b1d82",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/preflight.py",
+      "sha256": "87fa06128e7325914a82c513e43d3a94b76a9dcc2611bc6f5daed24729161b75",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/production_validation.py",
+      "sha256": "4de0c65c168658747f43d58134b44c13bbabe36ab3acda70c254cbddec7be9f3",
+      "passed": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/run_phase.py",
+      "sha256": "68e05eec9c750d0f4942f3d1fed7caa1c89f299b5f99e41d7275cb0e126d6c00",
+      "passed": true
+    }
+  ],
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:21+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "protection": {
+    "protected_file_count": 1147,
+    "changed_protected_files": []
+  }
+}

@@ -20,18 +20,39 @@ from ccsam_common import (
 
 def analytic_classwise_feature_delta(logits_clean, gap, labels, class_weights, classifier_weight):
     """
-    Vectorized exact equivalent of the official CC-SAM Stage-II per-class
+    FP32 numerical alignment with the official CC-SAM Stage-II per-class
     autograd.grad(loss_class, feature) operation for a single linear classifier.
 
     For z_i = W f_i + b:
       d CE_i / d f_i = (softmax(z_i) - one_hot(y_i)) @ W.
     The official code differentiates the mean loss of each class subset, so
-    the per-sample gradient is divided by that class's batch count and then
-    normalized jointly over the class subset.
+    the logit gradient is divided by that class's batch count before the
+    Linear backward product. Normalize over the full zero-padded batch, as
+    in the autograd reference; the mathematical perturbation is unchanged.
     """
-    probabilities = logits_clean.detach().softmax(dim=1)
+    if gap.ndim != 2 or gap.shape[1] != FEATURE_DIM or gap.shape[0] == 0:
+        raise ValueError("Expected a nonempty [B,64] feature batch")
+    if (logits_clean.shape != (gap.shape[0], NUM_CLASSES)
+            or classifier_weight.shape != (NUM_CLASSES, FEATURE_DIM)
+            or class_weights.shape != (NUM_CLASSES,)):
+        raise ValueError("CC-SAM logits, classifier weight or class-weight shape mismatch")
+    if labels.shape != (gap.shape[0],) or labels.dtype != torch.long:
+        raise ValueError("Expected one int64 class label per feature row")
+    if any(t.device != gap.device for t in (logits_clean, labels, class_weights, classifier_weight)):
+        raise ValueError("CC-SAM feature, label and classifier devices must match")
+    if any(t.dtype != gap.dtype for t in (logits_clean, class_weights, classifier_weight)):
+        raise ValueError("CC-SAM floating-point input dtypes must match")
+    if bool(((labels < 0) | (labels >= NUM_CLASSES)).any().item()):
+        raise ValueError("CC-SAM labels are outside the fixed class range")
+
+    probabilities = F.log_softmax(logits_clean.detach(), dim=1).exp()
     one_hot = F.one_hot(labels, num_classes=NUM_CLASSES).to(probabilities.dtype)
-    per_sample_gradient = (probabilities - one_hot) @ classifier_weight.detach()
+    counts = torch.bincount(labels, minlength=NUM_CLASSES)
+    sample_counts = counts[labels].to(probabilities.dtype).unsqueeze(1)
+    if sample_counts.shape != (gap.shape[0], 1) or bool((sample_counts <= 0).any().item()):
+        raise ValueError("Invalid per-sample class counts for mean-loss scaling")
+    scaled_logit_gradient = (probabilities - one_hot) / sample_counts
+    per_sample_gradient = scaled_logit_gradient @ classifier_weight.detach()
 
     delta = torch.zeros_like(gap)
     pre_norms = []
@@ -39,9 +60,9 @@ def analytic_classwise_feature_delta(logits_clean, gap, labels, class_weights, c
     zero_grad_classes = 0
     for class_id in torch.unique(labels, sorted=True):
         mask = labels == class_id
-        class_count = int(mask.sum().item())
-        class_gradient = per_sample_gradient[mask] / float(class_count)
-        gradient_norm = torch.linalg.vector_norm(class_gradient)
+        class_gradient_full = per_sample_gradient * mask.unsqueeze(1).to(per_sample_gradient.dtype)
+        class_gradient = class_gradient_full[mask]
+        gradient_norm = torch.linalg.vector_norm(class_gradient_full)
         pre_norms.append(float(gradient_norm.detach().cpu()))
         if not torch.isfinite(gradient_norm):
             raise RuntimeError("Non-finite class-conditional feature gradient norm")

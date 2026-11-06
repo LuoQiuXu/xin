@@ -1,0 +1,233 @@
+{
+  "publication_prepared_at": "2026-11-06T22:58:59.391336+08:00",
+  "branch": "experiment/ccsam-gradient-numerics-fix-20261106",
+  "parent_head": "6dd45e70040b5fd14a6d563a9fa19d0e52ac4753",
+  "authorization": "User explicitly requested local commit and GitHub push after scientific review.",
+  "sealed_diagnostic_manifest": {
+    "path": "ARTIFACT_SHA256.csv",
+    "bytes": 7988,
+    "sha256": "5e3033bed542105c996195396ebb44a2fa5a3b23f316f956b2ce6b2321a3f9ee"
+  },
+  "sealed_entries_verified_before_packaging": 84,
+  "all_scientific_results_preserved": true,
+  "packaging_changes": [
+    {
+      "path": ".gitignore",
+      "reason": "Ignore exactly four bulky CSV files; existing NPZ/bytecode rules retained.",
+      "diagnostic_seal_bytes": 39,
+      "diagnostic_seal_sha256": "c2d3473cbd2cc5a4c4fef366d4a5118ae48aa817e629dd99a9df17f1edb5808a",
+      "diagnostic_seal_content": "*.npz\n*.pyc\n__pycache__/\nsyntax_cache/\n",
+      "current": {
+        "bytes": 191,
+        "sha256": "c965c60524a2723f5389335cd1f0ceffb59ad0b321619e4daa7701dbe6327835"
+      }
+    }
+  ],
+  "checksum_policy": "ARTIFACT_SHA256.csv is the immutable diagnostic-time seal. Its .gitignore row describes the pre-publication 39-byte file; this declared packaging-only change is reflected in PUBLICATION_SHA256.csv. All other sealed entries are unchanged. The publication checksum index excludes itself.",
+  "production_file": {
+    "path": "../train_ccsam.py",
+    "bytes": 31219,
+    "sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6"
+  },
+  "local_only_evidence": [
+    {
+      "path": "BATCH_STRUCTURE_30EPOCH.csv",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 9612789,
+      "sha256": "422c9f4bd9ae0cde8d65c73a1422f812ba2d60fe4ce9989262482b30e6922787"
+    },
+    {
+      "path": "CLASS_NORMS_REAL.csv",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 14045669,
+      "sha256": "1fc9006ddfbdb69b434ec68f6eb9b1a350daa0afb61b53268cecf9f5fd145706"
+    },
+    {
+      "path": "WORST_CASES.csv",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 15682137,
+      "sha256": "f1685ed0dddafbab02fc5ad2e4df3ef4405eb715e73a9b4595559ef72ed6262b"
+    },
+    {
+      "path": "WORST_CASES_REAL.csv",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 15370732,
+      "sha256": "9726d5f582cec8d293ca5051b867ebf05608ec98ead94bd01563d5566ccc7fb9"
+    },
+    {
+      "path": "DUPLICATE_CAPTURE_seed123_batch1.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 944581,
+      "sha256": "0472dac37b2f9b091f652351e47d14d77ee4188687e14dc0b552e3fb67bbe825"
+    },
+    {
+      "path": "FEATURE_CACHE_seed123.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 2580609,
+      "sha256": "c27154a31c42248c982df1588e2434afe87a12e66e882fc7a76e8bd02ca69730"
+    },
+    {
+      "path": "FEATURE_CACHE_seed124.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 2580817,
+      "sha256": "a93878a455535944251e2b41c2c1e35839b5311668a05d8c21a1c023d3e6fe37"
+    },
+    {
+      "path": "FEATURE_CACHE_seed125.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 2580621,
+      "sha256": "621fc06b5ce73d9c8154bd16248074df21af955184ad13398812e1390faab21f"
+    },
+    {
+      "path": "REPLAY_BATCH0.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 1229104,
+      "sha256": "1c07cf2f52b32afc199375a68134a99f5ecd1e82451a06b870c1a28306bd58b9"
+    },
+    {
+      "path": "STRESS_16_classes_x4.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 822495,
+      "sha256": "497b7c733b0d4439bf311e700e8634079aeb38d1a2952ed464ed513390f454be"
+    },
+    {
+      "path": "STRESS_32_classes_x2.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 867763,
+      "sha256": "011b3985a14c12712fc8e867c773b7c2f5ad9840ea8794c030578d76ec2525b6"
+    },
+    {
+      "path": "STRESS_nonpower_counts_5_7.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 933464,
+      "sha256": "a881916a881d56d8c64d5ee49adac337bf0106a7428645d500428948804d5233"
+    },
+    {
+      "path": "STRESS_observed_modal_duplicate.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 939425,
+      "sha256": "18db09bb22b64dab7220ca8b973436fdf93d96f97da8812405bdf32969e7139a"
+    },
+    {
+      "path": "STRESS_one_duplicate_2.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 953080,
+      "sha256": "f6a97707d24503525f13df5bca4a7232280a48c5e4c430e8ceea70503cc22a54"
+    },
+    {
+      "path": "STRESS_one_triplicate_3.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 949209,
+      "sha256": "fcbb7fe3b8d97091063d7a079d7a5c4373cdd2092108b84773dc9be57108bc52"
+    },
+    {
+      "path": "STRESS_several_duplicate_2.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 946438,
+      "sha256": "69b4efc1d5acedb2e8ff7a029d94bd163b27b277e23d3a5cd7c3ad071e382ba6"
+    },
+    {
+      "path": "STRESS_single_class_x64.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 773522,
+      "sha256": "b258f332dc5b9a9e949097425d279e68b25b595e136a5991073b1f35e3e3d5ae"
+    },
+    {
+      "path": "STRESS_tail_31.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 439381,
+      "sha256": "17287e86a9088d2f2c067c6f61cb961daa6400601d96f9bfcbea3d5849ab458f"
+    },
+    {
+      "path": "STRESS_unique_64.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 952866,
+      "sha256": "8e1f566bb4a4492a49e000a9256f3348ee601d09c9737daf31131f4c51ca5f1e"
+    },
+    {
+      "path": "TAIL_seed123_batch169.npz",
+      "reason": "Large CSV detail or tensor snapshot; retained locally, excluded from Git.",
+      "bytes": 450511,
+      "sha256": "27150a83063e93a23d7ae29ac1030e11894d64c6b65f22052662323aed723051"
+    }
+  ],
+  "git_files_planned": [
+    ".gitignore",
+    "ARTIFACT_SHA256.csv",
+    "BATCH0_REPLAY_HASHES.json",
+    "C1_GRADIENT_NUMERICS_FIX_REPORT.md",
+    "CANDIDATE_MATRIX.json",
+    "CLASS_NORMS_STRESS.csv",
+    "DUPLICATE_CAPTURE_seed123_batch1.npz.json",
+    "EXECUTION_LOG.txt",
+    "FEATURE_CACHE_seed123.npz.json",
+    "FEATURE_CACHE_seed124.npz.json",
+    "FEATURE_CACHE_seed125.npz.json",
+    "GIT_STATUS_BEFORE.txt",
+    "GIT_STATUS_FINAL.txt",
+    "MEAN_BACKWARD_CAPTURE.json",
+    "POST_SMOKE_VERIFICATION.json",
+    "PRE_SWITCH_UNTRACKED.json",
+    "PRODUCTION_DIFF.patch",
+    "PRODUCTION_PATH_BEFORE.txt",
+    "PRODUCTION_REGRESSION.json",
+    "PROTECTION_BEFORE.json",
+    "PROTECTION_REPORT.json",
+    "PUBLICATION_MANIFEST.json",
+    "PUBLICATION_SHA256.csv",
+    "REAL_BATCH_SWEEP.csv",
+    "REAL_SWEEP_SUMMARY.json",
+    "REPLAY_BATCH0.npz.json",
+    "SMOKE_ATTEMPT.json",
+    "STRESS_16_classes_x4.npz.json",
+    "STRESS_32_classes_x2.npz.json",
+    "STRESS_SUMMARY.json",
+    "STRESS_nonpower_counts_5_7.npz.json",
+    "STRESS_observed_modal_duplicate.npz.json",
+    "STRESS_one_duplicate_2.npz.json",
+    "STRESS_one_triplicate_3.npz.json",
+    "STRESS_several_duplicate_2.npz.json",
+    "STRESS_single_class_x64.npz.json",
+    "STRESS_tail_31.npz.json",
+    "STRESS_unique_64.npz.json",
+    "STRUCTURE_SUMMARY.json",
+    "SYNTAX_CHECK.json",
+    "SYNTHETIC_DUPLICATE_STRESS.csv",
+    "TAIL_seed123_batch169.npz.json",
+    "WORST_CASES_STRESS.csv",
+    "audit_support.py",
+    "finalize_results.py",
+    "numerical_audit.py",
+    "preflight.py",
+    "production_validation.py",
+    "regression.log",
+    "regression_execution.json",
+    "run_phase.py",
+    "smoke.log",
+    "smoke_execution.json",
+    "smoke_report.json",
+    "snapshot.log",
+    "snapshot_execution.json",
+    "snapshot_pathfix.log",
+    "snapshot_pathfix_execution.json",
+    "stress.log",
+    "stress_execution.json",
+    "structure.log",
+    "structure_execution.json",
+    "sweep.log",
+    "sweep_execution.json",
+    "syntax.log",
+    "syntax_execution.json"
+  ],
+  "git_files_planned_count": 67,
+  "scientific_gate_summary": {
+    "real_batches_passed": 510,
+    "synthetic_cases_passed": 10,
+    "smoke_invocations": 1,
+    "smoke_passed": true,
+    "formal_training_started": false,
+    "official_TEST_used": false
+  },
+  "old_untracked_assets_included": false,
+  "protected_historical_files_modified": false
+}

@@ -1,0 +1,2 @@
+CC-SAM SMOKE PASS: all three arms, paired inputs, finite gradients, classifier-only updates, frozen backbone/BN.
+No formal training was started.

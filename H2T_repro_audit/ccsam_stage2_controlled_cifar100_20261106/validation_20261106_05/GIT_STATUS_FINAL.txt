@@ -1,0 +1,315 @@
+$ git branch --show-current
+experiment/ccsam-gradient-numerics-fix-20261106
+
+$ git rev-parse HEAD
+6dd45e70040b5fd14a6d563a9fa19d0e52ac4753
+
+$ git status --short --branch --untracked-files=all
+## experiment/ccsam-gradient-numerics-fix-20261106...origin/experiment/ccsam-gradient-numerics-fix-20261106
+ M H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/.gitignore
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/ARTIFACT_SHA256.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/BATCH0_REPLAY_HASHES.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/BATCH_STRUCTURE_30EPOCH.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/C1_GRADIENT_NUMERICS_FIX_REPORT.md
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/CANDIDATE_MATRIX.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/CLASS_NORMS_REAL.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/CLASS_NORMS_STRESS.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/DUPLICATE_CAPTURE_seed123_batch1.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/EXECUTION_LOG.txt
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/FEATURE_CACHE_seed123.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/FEATURE_CACHE_seed124.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/FEATURE_CACHE_seed125.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/GIT_STATUS_BEFORE.txt
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/GIT_STATUS_FINAL.txt
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/MEAN_BACKWARD_CAPTURE.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/POST_SMOKE_VERIFICATION.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/PRE_SWITCH_UNTRACKED.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/PRODUCTION_DIFF.patch
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/PRODUCTION_PATH_BEFORE.txt
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/PRODUCTION_REGRESSION.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/PROTECTION_BEFORE.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/PROTECTION_REPORT.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/REAL_BATCH_SWEEP.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/REAL_SWEEP_SUMMARY.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/REPLAY_BATCH0.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/SMOKE_ATTEMPT.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_16_classes_x4.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_32_classes_x2.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_SUMMARY.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_nonpower_counts_5_7.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_observed_modal_duplicate.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_one_duplicate_2.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_one_triplicate_3.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_several_duplicate_2.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_single_class_x64.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_tail_31.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_unique_64.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRUCTURE_SUMMARY.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/SYNTAX_CHECK.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/SYNTHETIC_DUPLICATE_STRESS.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/TAIL_seed123_batch169.npz.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/WORST_CASES.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/WORST_CASES_REAL.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/WORST_CASES_STRESS.csv
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/audit_support.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/finalize_results.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/numerical_audit.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/preflight.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/production_validation.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/regression_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/run_phase.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/smoke_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/smoke_report.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/snapshot_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/snapshot_pathfix_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/stress_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/structure_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/sweep_execution.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/syntax_execution.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/A/diagnostic.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/A/pairwise_differences.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/B/diagnostic.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/B/pairwise_differences.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/C/diagnostic.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/C/pairwise_differences.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/CONTROLLED_FINDINGS.md
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/D/diagnostic.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/D/pairwise_differences.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/SINGLE_BATCH_COMPUTE_REPORT.md
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/SUMMARY.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/VALIDATION.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/input_verification.json
+?? H2T_repro_audit/fusion_semantic_audit/diagnostics/single_batch_compute_20261025_01/pairwise_differences.csv
+?? H2T_repro_audit/fusion_semantic_audit/single_batch_compute_probe.py
+?? H2T_repro_audit/fusion_semantic_audit/test_single_batch_compute_probe.py
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/DBG_p4.png
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/DBG_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/FEATRECON_p7.png
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/FEATRECON_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/H2T_ARXIV_V3_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/H2T_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/KERNEL_MIXUP.pdf
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/KERNEL_MIXUP_p4.png
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/KERNEL_MIXUP_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/PI_H2T_p5.png
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/PI_H2T_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/PUBLICATION_RECEIPT.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/SELMIX.pdf
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/SELMIX_p6.png
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/SELMIX_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/SEL_p4.png
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/SEL_pages.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/historical_reports.json
+?? H2T_repro_audit/h2t_decision_20261028/results/decision_01/primary_cache/supporting_sources.json
+?? H2T_repro_audit/lowvs_mask_parity/results/seed124/U-Individual/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed124/U-Shared/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed124/VS-Individual/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed124/VS-Shared/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed125/U-Individual/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed125/U-Shared/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed125/VS-Individual/batch_signatures.csv
+?? H2T_repro_audit/lowvs_mask_parity/results/seed125/VS-Shared/batch_signatures.csv
+?? H2T_repro_audit/mdlt_domain_probe/output/reference_source/algorithms.py
+?? H2T_repro_audit/mdlt_domain_probe/output/reference_source/datasets.py
+?? H2T_repro_audit/mdlt_domain_probe/output/reference_source/hparams_registry.py
+?? H2T_repro_audit/mdlt_domain_probe/output/reference_source/networks.py
+?? H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/seed42/output/sampling_plan.npz
+?? H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/seed43/output/sampling_plan.npz
+?? H2T_repro_audit/mdlt_domain_probe/results/pilot_20261018_01/seed44/output/sampling_plan.npz
+?? H2T_repro_audit/mdlt_domain_probe/results/smoke_20261018_01/seed42/output/sampling_plan.npz
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/dryrun_repr_clean_labels_noisy_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/dryrun_repr_clean_labels_noisy_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_clean_labels_noisy_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_clean_labels_noisy_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_clean_labels_noisy_seed125_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_clean_labels_noisy_seed125_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_noisy_labels_clean_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_noisy_labels_clean_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_noisy_labels_clean_seed125_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_cross_stage2/results/cross_stage2_01/local_only/repr_noisy_labels_clean_seed125_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/IF200_prior.md
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/OFFICEHOME_prior.md
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/dryrun_stage1_clean/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/dryrun_stage1_noisy/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/dryrun_stage2_clean_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/dryrun_stage2_clean_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/dryrun_stage2_noisy_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/dryrun_stage2_noisy_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/historical_metadata_before.json
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/provided/CODEX_CIFAR100N_LT_FAILURE_SCREEN.txt
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/provided/README.md
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/provided/SCIENTIFIC_RATIONALE.md
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/provided/compare_outcomes.py
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/provided/prepare_protocol.py
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/provided/test_contracts.py
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage1_clean/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage1_noisy/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed125_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_clean_seed125_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed124_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed124_no_fusion/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed125_h2t/batch_controls.csv
+?? H2T_repro_audit/noisy_lt_failure_screen/results/cifar100n_lt_seed42_20261029_01/primary_cache/stage2_noisy_seed125_no_fusion/batch_controls.csv
+?? H2T_repro_audit/pi_failure_screen/results/primary_cache/checkpoint_inventory_initial.json
+?? H2T_repro_audit/pi_failure_screen/results/primary_cache/historical_metadata_before.json
+?? H2T_repro_audit/pi_failure_screen/results/primary_cache/provided_CODEX_PI_FAILURE_SCENARIO_SCREEN.txt
+?? H2T_repro_audit/pi_failure_screen/results/primary_cache/provided_README.md
+?? H2T_repro_audit/pi_failure_screen/results/primary_cache/provided_screen.py
+?? H2T_repro_audit/pi_failure_screen/results/primary_cache/provided_test_screen.py
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_page_10.png
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_page_12.png
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_page_16.png
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_page_4.png
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_page_5.png
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_page_7.png
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/arxiv_v2_tex_sources.json
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/author_files.json
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/crossref.json
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/generate_reports.py
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/results/source_gate_01/primary_cache/journal_page.html
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/DBG_PAGES.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/FEATRECON_PAGES.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/H2T_ARXIV_V3_PAGES.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/H2T_PAGES.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/PI_H2T_PAGES.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/SEL_PAGES.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/DBG.pdf
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/FEATRECON.pdf
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/H2T.pdf
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/H2T_ARXIV_V3.pdf
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/PI_H2T.pdf
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/PROTECTED_BASELINE.json
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/paper_cache/SEL.pdf
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/DBG_03.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/DBG_04.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/FEATRECON_07.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/FEATRECON_08.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/H2T_03.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/PI_H2T_04.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/PI_H2T_05.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/PI_H2T_12.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/PI_H2T_16.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/SEL_03.png
+?? H2T_repro_audit/research_gap_20261026/results/evidence_20261026_01/rendered/SEL_04.png
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/ANALYSIS_SUMMARY.json
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/CLASS_ANALYSIS.csv
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/MATCH_DISTANCE_AUDIT.csv
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/RECIPIENT_ANALYSIS.csv
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/SCIENTIFIC_DECISION.json
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/SUPERCLASS_ANALYSIS.csv
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/HISTORICAL_METADATA_BEFORE.json
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/PI_FAILURE_REPORT_FROM_COMMIT_8b00d96.md
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/analyze_attempt01.py
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/provided_CODEX_SEMANTIC_COMPATIBILITY_SCREEN.txt
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/provided_SEMANTIC_SCREEN_PROTOCOL.md
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/provided_gitignore
+?? H2T_repro_audit/semantic_compatibility_screen/results/semantic_screen_20261029_01/primary_cache/provided_screen.py
+
+$ git diff --check
+
+$ git diff --stat
+ .../train_ccsam.py                                 | 37 +++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 8 deletions(-)
+
+$ git diff --name-status
+M	H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+
+$ git diff --cached --name-status
+
+$ git diff
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+index ec7bef6..26e4687 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+@@ -20,18 +20,39 @@ from ccsam_common import (
+ 
+ def analytic_classwise_feature_delta(logits_clean, gap, labels, class_weights, classifier_weight):
+     """
+-    Vectorized exact equivalent of the official CC-SAM Stage-II per-class
++    FP32 numerical alignment with the official CC-SAM Stage-II per-class
+     autograd.grad(loss_class, feature) operation for a single linear classifier.
+ 
+     For z_i = W f_i + b:
+       d CE_i / d f_i = (softmax(z_i) - one_hot(y_i)) @ W.
+     The official code differentiates the mean loss of each class subset, so
+-    the per-sample gradient is divided by that class's batch count and then
+-    normalized jointly over the class subset.
++    the logit gradient is divided by that class's batch count before the
++    Linear backward product. Normalize over the full zero-padded batch, as
++    in the autograd reference; the mathematical perturbation is unchanged.
+     """
+-    probabilities = logits_clean.detach().softmax(dim=1)
++    if gap.ndim != 2 or gap.shape[1] != FEATURE_DIM or gap.shape[0] == 0:
++        raise ValueError("Expected a nonempty [B,64] feature batch")
++    if (logits_clean.shape != (gap.shape[0], NUM_CLASSES)
++            or classifier_weight.shape != (NUM_CLASSES, FEATURE_DIM)
++            or class_weights.shape != (NUM_CLASSES,)):
++        raise ValueError("CC-SAM logits, classifier weight or class-weight shape mismatch")
++    if labels.shape != (gap.shape[0],) or labels.dtype != torch.long:
++        raise ValueError("Expected one int64 class label per feature row")
++    if any(t.device != gap.device for t in (logits_clean, labels, class_weights, classifier_weight)):
++        raise ValueError("CC-SAM feature, label and classifier devices must match")
++    if any(t.dtype != gap.dtype for t in (logits_clean, class_weights, classifier_weight)):
++        raise ValueError("CC-SAM floating-point input dtypes must match")
++    if bool(((labels < 0) | (labels >= NUM_CLASSES)).any().item()):
++        raise ValueError("CC-SAM labels are outside the fixed class range")
++
++    probabilities = F.log_softmax(logits_clean.detach(), dim=1).exp()
+     one_hot = F.one_hot(labels, num_classes=NUM_CLASSES).to(probabilities.dtype)
+-    per_sample_gradient = (probabilities - one_hot) @ classifier_weight.detach()
++    counts = torch.bincount(labels, minlength=NUM_CLASSES)
++    sample_counts = counts[labels].to(probabilities.dtype).unsqueeze(1)
++    if sample_counts.shape != (gap.shape[0], 1) or bool((sample_counts <= 0).any().item()):
++        raise ValueError("Invalid per-sample class counts for mean-loss scaling")
++    scaled_logit_gradient = (probabilities - one_hot) / sample_counts
++    per_sample_gradient = scaled_logit_gradient @ classifier_weight.detach()
+ 
+     delta = torch.zeros_like(gap)
+     pre_norms = []
+@@ -39,9 +60,9 @@ def analytic_classwise_feature_delta(logits_clean, gap, labels, class_weights, c
+     zero_grad_classes = 0
+     for class_id in torch.unique(labels, sorted=True):
+         mask = labels == class_id
+-        class_count = int(mask.sum().item())
+-        class_gradient = per_sample_gradient[mask] / float(class_count)
+-        gradient_norm = torch.linalg.vector_norm(class_gradient)
++        class_gradient_full = per_sample_gradient * mask.unsqueeze(1).to(per_sample_gradient.dtype)
++        class_gradient = class_gradient_full[mask]
++        gradient_norm = torch.linalg.vector_norm(class_gradient_full)
+         pre_norms.append(float(gradient_norm.detach().cpu()))
+         if not torch.isfinite(gradient_norm):
+             raise RuntimeError("Non-finite class-conditional feature gradient norm")
+
+$ git diff --cached
+
+$ git status --short --ignored -- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/DUPLICATE_CAPTURE_seed123_batch1.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/FEATURE_CACHE_seed123.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/FEATURE_CACHE_seed124.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/FEATURE_CACHE_seed125.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/REPLAY_BATCH0.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_16_classes_x4.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_32_classes_x2.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_nonpower_counts_5_7.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_observed_modal_duplicate.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_one_duplicate_2.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_one_triplicate_3.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_several_duplicate_2.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_single_class_x64.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_tail_31.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/STRESS_unique_64.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/TAIL_seed123_batch169.npz
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/regression.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/smoke.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/snapshot.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/snapshot_pathfix.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/stress.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/structure.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/sweep.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/syntax.log
+!! H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_05/syntax_cache/
+

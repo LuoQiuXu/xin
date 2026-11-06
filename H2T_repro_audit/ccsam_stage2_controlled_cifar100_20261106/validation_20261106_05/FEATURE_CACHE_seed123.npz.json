@@ -1,0 +1,51 @@
+{
+  "file": "FEATURE_CACHE_seed123.npz",
+  "bytes": 2580609,
+  "sha256": "c27154a31c42248c982df1588e2434afe87a12e66e882fc7a76e8bd02ca69730",
+  "tensors": {
+    "gap": {
+      "shape": [
+        10847,
+        64
+      ],
+      "dtype": "float32",
+      "sha256": "371dd0a1fe35102dbb96e2e0a6a218be025a6c6def2f874a1480e17ec360a08c"
+    },
+    "indices": {
+      "shape": [
+        10847
+      ],
+      "dtype": "int64",
+      "sha256": "c1571098bbaf825883686ca4309441a3a67ec564eaea2a4bccb77120a7b30f13"
+    },
+    "labels": {
+      "shape": [
+        10847
+      ],
+      "dtype": "int64",
+      "sha256": "5fb6f1f68dde147f1a3b91ae017b7fa4859f033c2a926f56cf23740758b8799f"
+    },
+    "head_weight": {
+      "shape": [
+        100,
+        64
+      ],
+      "dtype": "float32",
+      "sha256": "fd9495632c5e4ec7f8bea7caea5a013c22af8ed29df8c02090497d852a848a52"
+    },
+    "head_bias": {
+      "shape": [
+        100
+      ],
+      "dtype": "float32",
+      "sha256": "ce1b958fc7223ff8a3395eb1ffb5191f72b94c35a12ffd3f940ac93d54c4275a"
+    },
+    "weights": {
+      "shape": [
+        100
+      ],
+      "dtype": "float32",
+      "sha256": "c049e4c43595194d83bd44bdb5404dd537b0e5940eb5bae976632b2c2cb4e014"
+    }
+  }
+}

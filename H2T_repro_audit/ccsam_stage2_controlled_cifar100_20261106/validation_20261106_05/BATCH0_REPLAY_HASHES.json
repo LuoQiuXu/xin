@@ -1,0 +1,27 @@
+{
+  "indices_sha256": {
+    "actual": "5c07ee3aab6c32bf948c53bc2a552e137a14ef7a5e7170e19b776eaebbf7056f",
+    "expected": "5c07ee3aab6c32bf948c53bc2a552e137a14ef7a5e7170e19b776eaebbf7056f",
+    "matches": true
+  },
+  "labels_sha256": {
+    "actual": "7d50452453966659686dd84d989c81faa2bd76488828fd0c3ca8f4499f20aca8",
+    "expected": "7d50452453966659686dd84d989c81faa2bd76488828fd0c3ca8f4499f20aca8",
+    "matches": true
+  },
+  "augmented_images_sha256": {
+    "actual": "856f4274c898407ec6c07c60de61902b9b86bd81f403ec077cb099596d9e20c1",
+    "expected": "856f4274c898407ec6c07c60de61902b9b86bd81f403ec077cb099596d9e20c1",
+    "matches": true
+  },
+  "gap_features_sha256": {
+    "actual": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+    "expected": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+    "matches": true
+  },
+  "classifier_state_sha256": {
+    "actual": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+    "expected": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+    "matches": true
+  }
+}

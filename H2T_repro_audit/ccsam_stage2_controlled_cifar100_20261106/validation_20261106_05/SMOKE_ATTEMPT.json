@@ -1,0 +1,18 @@
+{
+  "attempt": 1,
+  "started": "2026-11-06T22:44:33.186726+08:00",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py",
+    "--smoke-only"
+  ],
+  "scope": {
+    "only_analytic_function_changed": true,
+    "oracle_unchanged": true,
+    "all_other_production_AST_unchanged": true,
+    "before_sha256": "decf55ddb84d13bb08fee1ef3bd6e4b523e1feffae0998ef555d8a3b53007689",
+    "after_sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6",
+    "original_rtol_atol_unchanged": true
+  },
+  "output_routing": "Only native smoke_report.json is redirected to validation_20261106_05 with exclusive creation; payload is unchanged.",
+  "formal_training_started": false
+}

@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "original_smoke_main_invocations": 1,
+  "disposable_classifier_optimizer_steps": 3,
+  "checkpoint_written": false,
+  "formal_training_started": false,
+  "source_scope": {
+    "only_analytic_function_changed": true,
+    "oracle_unchanged": true,
+    "all_other_production_AST_unchanged": true,
+    "before_sha256": "decf55ddb84d13bb08fee1ef3bd6e4b523e1feffae0998ef555d8a3b53007689",
+    "after_sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6",
+    "original_rtol_atol_unchanged": true
+  },
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:33+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "protection": {
+    "protected_file_count": 1147,
+    "changed_protected_files": []
+  }
+}

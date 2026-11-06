@@ -1,0 +1,123 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-06T22:44:34+08:00",
+  "purpose": "one real CIFAR-100-LT batch per arm; all optimizer updates discarded",
+  "formal_training_started": false,
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+  "analytic_gradient_equivalence_synthetic": {
+    "passed": true,
+    "max_abs_difference": 0.0,
+    "comparison": "synthetic vectorized gradient vs direct autograd reference"
+  },
+  "analytic_gradient_equivalence_actual_batch": {
+    "passed": true,
+    "max_abs_difference": 0.0,
+    "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+  },
+  "seed_smoke": {
+    "seed": 123,
+    "batch_size": 64,
+    "paired_inputs_and_initialization_match": true,
+    "arms": {
+      "C0_BALANCED_CE": {
+        "loss": 0.7871572375297546,
+        "alpha_epoch1": 0.03333333333333333,
+        "clean_ce": 0.7871572375297546,
+        "adversarial_ce_unweighted": 0.7871572375297546,
+        "perturbation": {
+          "num_classes_in_batch": 64,
+          "zero_gradient_classes": 0,
+          "mean_class_gradient_norm_before_normalization": 0.0,
+          "mean_delta_l2_per_sample": 0.0,
+          "mean_relative_delta_l2": 0.0,
+          "max_delta_l2_per_sample": 0.0
+        },
+        "classifier_updated": true,
+        "backbone_and_bn_bitwise_unchanged": true,
+        "analytic_gradient_check": null,
+        "paired_controls": {
+          "indices_and_labels_sha256": "54868a36cc03bb37f44d0b30726ac573d5137398b9a4538cc741627917e4c1f2",
+          "augmented_images_sha256": "fe1248b57aee486d4cc1dede58f8f3a4e58d4166102d732154469edf2819360e",
+          "gap_features_sha256": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+          "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+          "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+        }
+      },
+      "C1_CCSAM_FEATURE_GRAD": {
+        "loss": 0.8877630829811096,
+        "alpha_epoch1": 0.03333333333333333,
+        "clean_ce": 0.7871572375297546,
+        "adversarial_ce_unweighted": 2.406351327896118,
+        "perturbation": {
+          "num_classes_in_batch": 64,
+          "zero_gradient_classes": 0,
+          "mean_class_gradient_norm_before_normalization": 0.8261569708702154,
+          "mean_delta_l2_per_sample": 1.1679407358169556,
+          "mean_relative_delta_l2": 0.15183024108409882,
+          "max_delta_l2_per_sample": 2.3026351928710938,
+          "mean_unweighted_adv_minus_clean_ce": 1.6191942691802979
+        },
+        "classifier_updated": true,
+        "backbone_and_bn_bitwise_unchanged": true,
+        "analytic_gradient_check": {
+          "passed": true,
+          "max_abs_difference": 0.0,
+          "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+        },
+        "paired_controls": {
+          "indices_and_labels_sha256": "54868a36cc03bb37f44d0b30726ac573d5137398b9a4538cc741627917e4c1f2",
+          "augmented_images_sha256": "fe1248b57aee486d4cc1dede58f8f3a4e58d4166102d732154469edf2819360e",
+          "gap_features_sha256": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+          "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+          "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+        }
+      },
+      "C2_WEIGHTED_CE_NO_PERTURB": {
+        "loss": 0.8018354177474976,
+        "alpha_epoch1": 0.03333333333333333,
+        "clean_ce": 0.7871572375297546,
+        "adversarial_ce_unweighted": 0.7871572375297546,
+        "perturbation": {
+          "num_classes_in_batch": 64,
+          "zero_gradient_classes": 0,
+          "mean_class_gradient_norm_before_normalization": 0.0,
+          "mean_delta_l2_per_sample": 0.0,
+          "mean_relative_delta_l2": 0.0,
+          "max_delta_l2_per_sample": 0.0
+        },
+        "classifier_updated": true,
+        "backbone_and_bn_bitwise_unchanged": true,
+        "analytic_gradient_check": null,
+        "paired_controls": {
+          "indices_and_labels_sha256": "54868a36cc03bb37f44d0b30726ac573d5137398b9a4538cc741627917e4c1f2",
+          "augmented_images_sha256": "fe1248b57aee486d4cc1dede58f8f3a4e58d4166102d732154469edf2819360e",
+          "gap_features_sha256": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+          "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+          "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+        }
+      }
+    },
+    "controls": {
+      "indices_and_labels_sha256": "54868a36cc03bb37f44d0b30726ac573d5137398b9a4538cc741627917e4c1f2",
+      "augmented_images_sha256": "fe1248b57aee486d4cc1dede58f8f3a4e58d4166102d732154469edf2819360e",
+      "gap_features_sha256": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+      "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+      "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2"
+    },
+    "validation_features_shape": [
+      1980,
+      64
+    ],
+    "validation_labels_shape": [
+      1980
+    ]
+  },
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:33+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "official_TEST_used": false
+}

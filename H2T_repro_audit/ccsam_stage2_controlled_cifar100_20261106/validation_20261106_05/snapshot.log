@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\run_phase.py", line 25, in <module>
+    runpy.run_path(str(OUT/target),run_name="__main__")
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\preflight.py", line 140, in <module>
+    {"snapshot":snapshot,"structure":structure}[sys.argv[1]]()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\preflight.py", line 27, in snapshot
+    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior["protected_external_inputs"])
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\validation_20261106_05\preflight.py", line 27, in <genexpr>
+    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior["protected_external_inputs"])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\pathlib.py", line 682, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: 'H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\locked\\clean_stage1_best.pth' is not in the subpath of 'D:\\xiangmuxunlian\\xin'

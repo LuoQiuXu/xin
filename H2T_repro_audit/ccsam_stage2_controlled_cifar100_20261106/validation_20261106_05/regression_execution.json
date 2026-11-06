@@ -1,0 +1,20 @@
+{
+  "phase": "regression",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\production_validation.py",
+    "regression"
+  ],
+  "started": "2026-11-06T22:44:02.260380+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T22:44:06+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T22:44:10.818882+08:00"
+}

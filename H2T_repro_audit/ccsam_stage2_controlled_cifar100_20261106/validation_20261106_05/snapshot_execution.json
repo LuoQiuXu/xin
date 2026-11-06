@@ -1,0 +1,23 @@
+{
+  "phase": "snapshot",
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py",
+    "snapshot"
+  ],
+  "started": "2026-11-06T22:29:42.707637+08:00",
+  "formal_training_started": false,
+  "error_type": "ValueError",
+  "error": "'H2T_repro_audit\\\\clean_vs_stability_runs\\\\clean_s1_seed42_s2_124_125_20261014\\\\locked\\\\clean_stage1_best.pth' is not in the subpath of 'D:\\\\xiangmuxunlian\\\\xin'",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\run_phase.py\", line 25, in <module>\n    runpy.run_path(str(OUT/target),run_name=\"__main__\")\n  File \"<frozen runpy>\", line 287, in run_path\n  File \"<frozen runpy>\", line 98, in _run_module_code\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py\", line 140, in <module>\n    {\"snapshot\":snapshot,\"structure\":structure}[sys.argv[1]]()\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py\", line 27, in snapshot\n    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior[\"protected_external_inputs\"])\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\preflight.py\", line 27, in <genexpr>\n    paths.update(Path(p).relative_to(REPO).as_posix() for p in prior[\"protected_external_inputs\"])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\app\\minicondaaa\\envs\\xiaoju\\Lib\\pathlib.py\", line 682, in relative_to\n    raise ValueError(f\"{str(self)!r} is not in the subpath of {str(other)!r}\")\nValueError: 'H2T_repro_audit\\\\clean_vs_stability_runs\\\\clean_s1_seed42_s2_124_125_20261014\\\\locked\\\\clean_stage1_best.pth' is not in the subpath of 'D:\\\\xiangmuxunlian\\\\xin'\n",
+  "test_guard": {
+    "installed_at": "2026-11-06T22:29:47+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "FAILED_STOPPED",
+  "exit_code": 1,
+  "ended": "2026-11-06T22:29:47.953387+08:00"
+}

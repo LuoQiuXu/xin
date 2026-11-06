@@ -1,0 +1,10 @@
+*.npz
+*.pyc
+__pycache__/
+syntax_cache/
+
+# Bulky per-batch evidence stays local; checksums are published.
+BATCH_STRUCTURE_30EPOCH.csv
+CLASS_NORMS_REAL.csv
+WORST_CASES.csv
+WORST_CASES_REAL.csv

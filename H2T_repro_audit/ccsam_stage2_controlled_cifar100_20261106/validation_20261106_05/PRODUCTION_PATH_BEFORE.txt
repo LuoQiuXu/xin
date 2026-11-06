@@ -1,0 +1,63 @@
+A (exact original source):
+def analytic_classwise_feature_delta(logits_clean, gap, labels, class_weights, classifier_weight):
+    """
+    Vectorized exact equivalent of the official CC-SAM Stage-II per-class
+    autograd.grad(loss_class, feature) operation for a single linear classifier.
+
+    For z_i = W f_i + b:
+      d CE_i / d f_i = (softmax(z_i) - one_hot(y_i)) @ W.
+    The official code differentiates the mean loss of each class subset, so
+    the per-sample gradient is divided by that class's batch count and then
+    normalized jointly over the class subset.
+    """
+    probabilities = logits_clean.detach().softmax(dim=1)
+    one_hot = F.one_hot(labels, num_classes=NUM_CLASSES).to(probabilities.dtype)
+    per_sample_gradient = (probabilities - one_hot) @ classifier_weight.detach()
+
+    delta = torch.zeros_like(gap)
+    pre_norms = []
+    delta_norms = []
+    zero_grad_classes = 0
+    for class_id in torch.unique(labels, sorted=True):
+        mask = labels == class_id
+        class_count = int(mask.sum().item())
+        class_gradient = per_sample_gradient[mask] / float(class_count)
+        gradient_norm = torch.linalg.vector_norm(class_gradient)
+        pre_norms.append(float(gradient_norm.detach().cpu()))
+        if not torch.isfinite(gradient_norm):
+            raise RuntimeError("Non-finite class-conditional feature gradient norm")
+        if float(gradient_norm.detach().cpu()) <= 1e-12:
+            zero_grad_classes += 1
+            continue
+        class_delta = ADVER_REG * class_weights[class_id] * class_gradient / gradient_norm
+        delta[mask] = class_delta
+        delta_norms.extend(torch.linalg.vector_norm(class_delta, dim=1).detach().cpu().tolist())
+
+    if not torch.isfinite(delta).all():
+        raise RuntimeError("Non-finite CC-SAM feature perturbation")
+    feature_norms = torch.linalg.vector_norm(gap.detach(), dim=1).clamp_min(1e-12)
+    relative = torch.linalg.vector_norm(delta, dim=1) / feature_norms
+    stats = {
+        "num_classes_in_batch": int(torch.unique(labels).numel()),
+        "zero_gradient_classes": int(zero_grad_classes),
+        "mean_class_gradient_norm_before_normalization": float(np.mean(pre_norms)) if pre_norms else 0.0,
+        "mean_delta_l2_per_sample": float(torch.linalg.vector_norm(delta, dim=1).mean().detach().cpu()),
+        "mean_relative_delta_l2": float(relative.mean().detach().cpu()),
+        "max_delta_l2_per_sample": float(torch.linalg.vector_norm(delta, dim=1).max().detach().cpu()),
+    }
+    return delta.detach(), stats
+
+B (unchanged oracle):
+def autograd_reference_delta(gap, labels, classifier_fc, class_weights):
+    """Slow reference used only by the smoke test to verify the vectorized formula."""
+    z = gap.detach().clone().requires_grad_(True)
+    logits = classifier_fc(z)
+    losses = F.cross_entropy(logits, labels, reduction="none")
+    reference = torch.zeros_like(z)
+    for class_id in torch.unique(labels, sorted=True):
+        mask = labels == class_id
+        grad = torch.autograd.grad(losses[mask].mean(), z, retain_graph=True)[0]
+        norm = torch.linalg.vector_norm(grad)
+        if float(norm.detach().cpu()) > 1e-12:
+            reference[mask] = ADVER_REG * class_weights[class_id] * grad[mask] / norm
+    return reference.detach()
