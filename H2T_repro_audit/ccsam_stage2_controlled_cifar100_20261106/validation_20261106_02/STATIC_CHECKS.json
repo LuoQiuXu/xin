@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "py_compile": [
+    {
+      "file": "ccsam_common.py",
+      "status": "PASS"
+    },
+    {
+      "file": "prepare_ccsam.py",
+      "status": "PASS"
+    },
+    {
+      "file": "train_ccsam.py",
+      "status": "PASS"
+    },
+    {
+      "file": "analyze_ccsam.py",
+      "status": "PASS"
+    },
+    {
+      "file": "validation_20261106_01/run_stage.py",
+      "status": "PASS"
+    },
+    {
+      "file": "validation_20261106_02/run_stage.py",
+      "status": "PASS"
+    },
+    {
+      "file": "validation_20261106_02/diagnose_gap.py",
+      "status": "PASS"
+    },
+    {
+      "file": "validation_20261106_02/verify_gap_fix.py",
+      "status": "PASS"
+    }
+  ],
+  "ccsam_gradient_and_arm_functions_AST_unchanged": [
+    "analytic_classwise_feature_delta",
+    "autograd_reference_delta",
+    "compute_arm_loss",
+    "verify_analytic_gradient"
+  ],
+  "experiment_protocol_unchanged": true,
+  "historical_run_stage_unchanged_and_delegates_to_fixed_entrypoints": true,
+  "equivalence_rtol": 1e-05,
+  "equivalence_atol": 1e-06
+}

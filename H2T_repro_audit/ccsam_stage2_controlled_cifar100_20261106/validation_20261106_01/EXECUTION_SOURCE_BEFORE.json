@@ -1,0 +1,9 @@
+{
+  "ccsam_common.py": "861ff26c110c358736ac2bbfa9e525a94208f99fe8599279e8458b389c5f5b0c",
+  "prepare_ccsam.py": "a75e2561b92f861cc29b5d40f2ff1a8e4bd13b23b060d6f7064798694197da06",
+  "train_ccsam.py": "e1614769fb1a22e9fb4c19cb7c9ecbb51f0ad66f81e4d24c34b5f3b3305d03b0",
+  "analyze_ccsam.py": "f9b4f854615e1d504dcb9768501790f6ad0135be713ade73205ad6f39b84236a",
+  "experiment_protocol.json": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813",
+  "README.md": "a9e049fd0fa1d8c0afb337554fffba6177309f6aff6098c5741d6f4d55dd17aa",
+  "CODEX_CCSAM_STAGE2_TASK.txt": "24e6744bbd890ccac154d465f54c257ee2f5a9ffa6afe93f711a2855a906801f"
+}

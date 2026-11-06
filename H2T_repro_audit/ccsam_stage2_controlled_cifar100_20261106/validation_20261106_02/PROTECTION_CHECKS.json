@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "prior_validation_files_unchanged": 24,
+  "historical_untracked_files_unchanged": 140,
+  "protected_inputs_unchanged": 38,
+  "checkpoint_and_split_unchanged": true,
+  "original_classifier_source_unchanged": true,
+  "CCSAM_formula_and_arms_unchanged": true,
+  "sampler_function_unchanged": true,
+  "formal_runs": 0,
+  "smoke_runs": 0,
+  "partial_prepared_files_preserved": [
+    "train_images.npy",
+    "train_labels.npy",
+    "validation_gap_features.npy",
+    "validation_images.npy",
+    "validation_labels.npy"
+  ],
+  "awaiting_scope_review_for_independent_sampler_validator": true
+}

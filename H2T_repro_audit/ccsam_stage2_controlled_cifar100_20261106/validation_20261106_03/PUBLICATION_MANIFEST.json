@@ -1,0 +1,611 @@
+{
+  "branch": "experiment/ccsam-stage2-controlled-cifar100-20261106",
+  "base_commit": "b6235cc9fe45be479e7dffeb5cefdd06f4402cbd",
+  "scope": "Only current CC-SAM experiment; 140 unrelated historical untracked files excluded",
+  "scientific_status": "PREPARATION_PASS_SINGLE_SMOKE_FAILED_ACTUAL_GRADIENT_EQUIVALENCE",
+  "preparation": "PASS",
+  "single_smoke": "FAIL actual delta equivalence",
+  "smoke_invocations": 1,
+  "formal_runs": 0,
+  "runtime_code_matches_recorded_execution_diff": true,
+  "new_evidence_and_pinned_source_bytes_preserved_with_local_gitattributes": true,
+  "tracked_source_files_use_existing_Git_text_filters": [
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md",
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py",
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py",
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py"
+  ],
+  "files": [
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/.gitattributes",
+      "bytes": 219,
+      "working_tree_sha256": "1ca3caaee555f84ec851e50ecb456f50472c5fc893823c38d5503da814ead47a",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/.gitignore",
+      "bytes": 198,
+      "working_tree_sha256": "1fa12ba0b0eb039537bde970c969d50c703a97c1b105b9983c9340c2f9e32e14",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md",
+      "bytes": 8100,
+      "working_tree_sha256": "d15cea0e4ff4c31bd09d5c55ddbdb31e9d417f4c52b5552501b929b0ddbf6cdf",
+      "exact_git_bytes_required": false
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py",
+      "bytes": 19220,
+      "working_tree_sha256": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9",
+      "exact_git_bytes_required": false
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/official_reference/PROVENANCE.json",
+      "bytes": 327,
+      "working_tree_sha256": "d2379cf4a242512c2281a4c8a6cc7096af1dab2732d19bdc513409a52d2d3a27",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/official_reference/Samplers.py",
+      "bytes": 2263,
+      "working_tree_sha256": "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py",
+      "bytes": 13135,
+      "working_tree_sha256": "674c7c87e359b323b295e889d7f0a282b795aca546e42d08a29efbc2a775970b",
+      "exact_git_bytes_required": false
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/prepared_manifest.json",
+      "bytes": 183065,
+      "working_tree_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/test_guard_prepare.json",
+      "bytes": 191,
+      "working_tree_sha256": "ebdc95eb15cf238c82c43fb115775441d927f6f2775b1cc09f7974910bec046b",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py",
+      "bytes": 29616,
+      "working_tree_sha256": "decf55ddb84d13bb08fee1ef3bd6e4b523e1feffae0998ef555d8a3b53007689",
+      "exact_git_bytes_required": false
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/ARTIFACT_SHA256.csv",
+      "bytes": 2196,
+      "working_tree_sha256": "d59b5914cf39ff104a6f14bace0d3bca464a6dab1c563a2297cf50c220653576",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/CCSAM_STAGE2_PRE_SMOKE_REPORT.md",
+      "bytes": 9775,
+      "working_tree_sha256": "f1a6072055e08bcadee68d85f1aca225ee7d8c6f77d96203e727179129449bdf",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/CHANGED_FILES.json",
+      "bytes": 1417,
+      "working_tree_sha256": "a5a32fb489c39dc0431e95d2824cc68a7ab5d5d8e1b4c684dd05363997d1046b",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/CHANGED_FILES_FINAL.json",
+      "bytes": 1590,
+      "working_tree_sha256": "f609058cf58d77d08f8a06f5b96bb8f2ee1c55889deedefe074a92d3da78c3f3",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/EXECUTION_SOURCE_BEFORE.json",
+      "bytes": 649,
+      "working_tree_sha256": "aecd6b3419680ed313efaf00afd3308160b78848a022891c4c89203a0d8f2c98",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/GIT_STATUS_AFTER.txt",
+      "bytes": 16083,
+      "working_tree_sha256": "5686051bfb9d79e7ba4ee6e18f3bbe6ce7ee57dfb7453806f0ea70911b23e1cb",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/GIT_STATUS_BEFORE.txt",
+      "bytes": 15327,
+      "working_tree_sha256": "c48c3de735a25ab7d8b9c171ae0a496924ed6eb2cf6d1e965a8e2a8abb87f224",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/GIT_STATUS_FINAL.txt",
+      "bytes": 17275,
+      "working_tree_sha256": "b622e6439d24fdce7f6a88185b627d892f526fa9cd3b27d488b27e70224e754c",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/HISTORICAL_UNTRACKED_BEFORE.json",
+      "bytes": 31005,
+      "working_tree_sha256": "3dd6140a162e7c9cc95f9a3129e61e3b1790f2419e5dd75d2d3a4180d187cbb2",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/INPUT_VALIDATION.json",
+      "bytes": 10512,
+      "working_tree_sha256": "c5af6747fbe6e2dd7f23c4620ebf2aa42842d19ac06a9a07001187dc641f5d91",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/POSTRUN_PROTECTION.json",
+      "bytes": 433,
+      "working_tree_sha256": "456f2a08ca8f9dc534eadd4886267ace790db0e0ad290f1cece009084df507b1",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/SEALED_CLASS_COUNTS.csv",
+      "bytes": 10179,
+      "working_tree_sha256": "1cd706ec7c5d73dd8b142e2cfcba0134fb4a1956b010ef43e835e63a01e8ff6a",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/SOURCE_CONSISTENCY_MATRIX.csv",
+      "bytes": 2147,
+      "working_tree_sha256": "d634ddf45cde880e5bbf6e5ac9b7a813f8308340977c173551281db0030f845c",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/STATIC_SYNTAX.json",
+      "bytes": 1579,
+      "working_tree_sha256": "30a2e27e80782ea1cdc0d87469d2aceed3ba0d3e29e6a87f39677ae434187761",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/VALIDATION_STATUS.json",
+      "bytes": 2799,
+      "working_tree_sha256": "0489aa1441b942085f7c909cbcf78c346b37dd17b98a75544db6aa5419fb92b3",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/official_sources.json",
+      "bytes": 49118,
+      "working_tree_sha256": "0a570445f8f89884debfae4d88086938df32941946d08cdc0f3a7372680a9ade",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/prepare_execution.json",
+      "bytes": 2184,
+      "working_tree_sha256": "7ee573bf7fa60e9139345296d6bb670092a225fa56f4984ab7f89dd0276960e8",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/run_stage.py",
+      "bytes": 2429,
+      "working_tree_sha256": "5b8fa4ce46157aab5061266232968719aa4e4dbf49c39bab5202818645ee2a33",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_01/write_reports.py",
+      "bytes": 15272,
+      "working_tree_sha256": "f3aadaec0d59708cb0e33d54de798e6bd5cfc0eb32f2beaabd9a7ddaa73aac7f",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/ARTIFACT_SHA256.csv",
+      "bytes": 2712,
+      "working_tree_sha256": "58afc68b52896d72c3d374adafdf4b6bf3a8f934188da1f5fa87dad1994d461a",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GAP_AFTER.json",
+      "bytes": 1365,
+      "working_tree_sha256": "a5b1fa4d80a6d7d23689550932c374aef27ab18fafb996d50d9bbf4f1f167928",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GAP_BEFORE.json",
+      "bytes": 2812,
+      "working_tree_sha256": "a6540c16fcbe8a73b9143a7c226c6d906733c68c46abbf7bc45c4a293b66de88",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GAP_BEFORE_PER_SAMPLE.csv",
+      "bytes": 13041,
+      "working_tree_sha256": "88e2552fc16acc0fce7dec477e7a1dee0097e5fd22a6733361514173fdae7b3f",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GAP_FIX_REPORT.md",
+      "bytes": 8003,
+      "working_tree_sha256": "dc045444239433fed0d84c5b2652bf42b7a0d7927f3797785f2fa1b19a4fbf74",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GIT_DIFF.patch",
+      "bytes": 7030,
+      "working_tree_sha256": "02c2139fd0c3dd4eba7fad3f740b0c63f69f46decf1b42528a818f443b462fb6",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GIT_STATUS_BEFORE.txt",
+      "bytes": 18317,
+      "working_tree_sha256": "dd0111a99930fd8feda381bf3b21fe89a4ba73bcf0b853ebc23598df5b53d7c8",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GIT_STATUS_FINAL.txt",
+      "bytes": 20317,
+      "working_tree_sha256": "8d88a5a4d0b1ab36ff5343ae05b5b10dd3ba0b5451d1173f6d71879b40374fc4",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/GIT_STATUS_REPORT_TIME.txt",
+      "bytes": 19915,
+      "working_tree_sha256": "257a670a9b90ba73f3d42933baa5210e9ee40de7e9c5d0ff2c94e701611dd1ff",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/PARTIAL_PREPARED_SHA256.json",
+      "bytes": 700,
+      "working_tree_sha256": "5c60028adcf3c1c44eaa7d0daac3e7ef380ab451efd4aacc9a4889e8dac21cee",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/PRIOR_VALIDATION_SHA256.json",
+      "bytes": 2892,
+      "working_tree_sha256": "19bdbc4f53a32345e5296d60c0cd64bf6024e54b35ca6588e0682f6df9d5dbf6",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/PROTECTION_CHECKS.json",
+      "bytes": 629,
+      "working_tree_sha256": "918a6ddadf1c4a03f24867a019a9d619fcba67effb7e218fa7c365bc6ae9b552",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/SAMPLER_DIAGNOSIS.json",
+      "bytes": 1090,
+      "working_tree_sha256": "219bdc5c1480f950d5e2b1cee58e8f92162f9a473119772fe247e277f7b6128b",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/STATIC_CHECKS.json",
+      "bytes": 1093,
+      "working_tree_sha256": "869462c9b6802bd261dde427cf2f320f042ffbbc11a6dde07542d4ab43d8b9b6",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/TOLERANCE_VIOLATIONS.json",
+      "bytes": 362,
+      "working_tree_sha256": "eb69353b77d647cc9e37fc33942146cb33c97dcfb48cda71d00aa8df64b1274d",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/VALIDATION_STATUS.json",
+      "bytes": 4122,
+      "working_tree_sha256": "b20c3eb033abe382f935ff0ed1dbdb7b12b2d99fb9f079eb2ea6e350af309a7b",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/diagnose_gap.py",
+      "bytes": 6192,
+      "working_tree_sha256": "c2bed06fd57c29eadc932f3f4ff0db522573f611f814200465328f983446aef1",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/prepare_execution.json",
+      "bytes": 17236,
+      "working_tree_sha256": "88d0365445d28f2624fdb70f25bdde08262528ed3b2f3618a83b0458ab2bebdd",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/run_stage.py",
+      "bytes": 2693,
+      "working_tree_sha256": "12ce66d41110151418074f4ff71fbd0c15e75e7a64c2a3b247d4ee99f6c1b203",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/sources_before/README.md",
+      "bytes": 6146,
+      "working_tree_sha256": "a9e049fd0fa1d8c0afb337554fffba6177309f6aff6098c5741d6f4d55dd17aa",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/sources_before/ccsam_common.py",
+      "bytes": 16063,
+      "working_tree_sha256": "861ff26c110c358736ac2bbfa9e525a94208f99fe8599279e8458b389c5f5b0c",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/sources_before/experiment_protocol.json",
+      "bytes": 5011,
+      "working_tree_sha256": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/sources_before/prepare_ccsam.py",
+      "bytes": 10308,
+      "working_tree_sha256": "a75e2561b92f861cc29b5d40f2ff1a8e4bd13b23b060d6f7064798694197da06",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/sources_before/train_ccsam.py",
+      "bytes": 29624,
+      "working_tree_sha256": "e1614769fb1a22e9fb4c19cb7c9ecbb51f0ad66f81e4d24c34b5f3b3305d03b0",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/sources_before/validation_20261106_01__run_stage.py",
+      "bytes": 2429,
+      "working_tree_sha256": "5b8fa4ce46157aab5061266232968719aa4e4dbf49c39bab5202818645ee2a33",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/verify_gap_fix.py",
+      "bytes": 2652,
+      "working_tree_sha256": "fdf071f1220e92f7efbd79bed11b60bea0862caf30b4979ac2df3435650a3e61",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/write_fix_report.py",
+      "bytes": 11726,
+      "working_tree_sha256": "146c9a57e5c95fd3fd568feddcb7f8400e374bf6b7e06317eb25c5d444c4d04f",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/ARTIFACT_SHA256.csv",
+      "bytes": 3331,
+      "working_tree_sha256": "0f381d090ff084798b90bb5945f77eb4ab533a2ca38b36e67c6fd50548160515",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/CCSAM_PREPARATION_SMOKE_FINAL_REPORT.md",
+      "bytes": 10109,
+      "working_tree_sha256": "786fe7fc576a2ac33bf835a37c4a0275686f41ff1dd483afcbff082bd68de62b",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/CHANGED_FILES.json",
+      "bytes": 9725,
+      "working_tree_sha256": "2eed7452bd8b9292fa01eb26293ceb3dd966f82e58086e122ae240e0e2aa797a",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/FULL_SAMPLER_AFTER_FIX.json",
+      "bytes": 1517,
+      "working_tree_sha256": "a77ebaf9ba97df69c5c1d4da1d46f74452b12b07e761acf381de5bc12724581f",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/FULL_SAMPLER_BEFORE_FIX.json",
+      "bytes": 2930,
+      "working_tree_sha256": "610223a0280e9f0ca9561420a66bba11e94aaaf085a7497127c2314281079904",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/FULL_SAMPLER_EPOCH_COUNTS_AFTER.csv",
+      "bytes": 38636,
+      "working_tree_sha256": "9b1a8d115a8337744a266551e6b6a7203a6529e571e74c10ecd77c968c5e049b",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/FULL_SAMPLER_EPOCH_COUNTS_BEFORE.csv",
+      "bytes": 39385,
+      "working_tree_sha256": "401b3d592e0f7b333934da7a4d064786d2ad62b466fb867d03882afce15fff90",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/GIT_DIFF.patch",
+      "bytes": 18607,
+      "working_tree_sha256": "9a52ab127c8fd53496c74ffc9ed32134cbb2cdc8cf1c25b5c51b881e26f120ac",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/GIT_DIFF_SAMPLER_SCOPE.patch",
+      "bytes": 4829,
+      "working_tree_sha256": "d955b6e8f2daf9a6c89496193d1ffa7b96a36a6bcf68411f4a8e012f774deb13",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/GIT_STATUS_BEFORE.txt",
+      "bytes": 21448,
+      "working_tree_sha256": "9245814c8479ec146f5148b23f2ac6ba09d96baa01167dadf68bd0d4b64ec6d3",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/GIT_STATUS_FINAL.txt",
+      "bytes": 24321,
+      "working_tree_sha256": "51d0d36dd888f20569ee7ec387a8894be11258a465bd07d52ea997eddf7f3c73",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/GIT_STATUS_REPORT_TIME.txt",
+      "bytes": 23446,
+      "working_tree_sha256": "2cf4b03cd7f35da35f260070f23fed1bb1ce4b9cc9c5adc0e5841f711bb54287",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/POSTRUN_PROTECTION.json",
+      "bytes": 2532,
+      "working_tree_sha256": "b4d1b5ab15c5609badfaaffc59deb54ae719bd5d31864ec00da7f6336793c9c0",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/PRE_SMOKE_VERIFICATION.json",
+      "bytes": 1194,
+      "working_tree_sha256": "9b9be2b242a73cd14925449022488aaf1420b34dd7726601870f1644723dbe0f",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/PRIOR_OUTPUTS_BEFORE.json",
+      "bytes": 9910,
+      "working_tree_sha256": "f706061cc19293fad8c969845e3de6a0414b8112368f45bc69396e598d7d2440",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/SMOKE_FAILURE_SUMMARY.json",
+      "bytes": 899,
+      "working_tree_sha256": "5c36bab97c89ee8649fbf88a8d037d89ceba393bfd80fda6258ccda619880a87",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/STATIC_CHECKS.json",
+      "bytes": 373,
+      "working_tree_sha256": "ea3268a9f87d43bf7d3aa99765d8cd518cd35490f0d230a5fd31636b01065a77",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/STATIC_FINAL.json",
+      "bytes": 151,
+      "working_tree_sha256": "d9cfbcdfadc036041972417242efd7c8ae6274a445fa6f4d783d611ac6823d88",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/VALIDATION_STATUS.json",
+      "bytes": 10583,
+      "working_tree_sha256": "c5e4e00babb46ae4836f86964b0d11a069b459d51833e5bdb9fc1da163986373",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/check_sampler_validation.py",
+      "bytes": 3424,
+      "working_tree_sha256": "fd124b559578831f22fc7cbcbe088d4172cd4820eb5f8bc763f5ee2cfc8434a2",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/prepare_execution.json",
+      "bytes": 666,
+      "working_tree_sha256": "201336c90ef16d6a00c4196656a291262ebb749902649703c117195cc3fac713",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/run_stage.py",
+      "bytes": 1784,
+      "working_tree_sha256": "7dbae14eb9a22e789bb47f09064b1c416972f7c8a7db69b82344f62f3d70a0b1",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/smoke_execution.json",
+      "bytes": 2146,
+      "working_tree_sha256": "6823749f59d2bc45cb402bc54a229bd8aa40a25f5140d6bfc8d87c7ff723645a",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/sources_before/README.md",
+      "bytes": 6646,
+      "working_tree_sha256": "8b1a6c95a94fd7e35c77c6eccee39e035176e449020c131f4db5ce80ac265fde",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/sources_before/ccsam_common.py",
+      "bytes": 16475,
+      "working_tree_sha256": "fa3c396da1e28e4141c66cce835825fda3b8e79738d2d68a9976c97e9fc8f7d8",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/sources_before/experiment_protocol.json",
+      "bytes": 5011,
+      "working_tree_sha256": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/sources_before/prepare_ccsam.py",
+      "bytes": 10622,
+      "working_tree_sha256": "35aae901d38171729bfb1b46f969de34a4e99a6fa983ee54e6ff21a96f427495",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/sources_before/train_ccsam.py",
+      "bytes": 29616,
+      "working_tree_sha256": "decf55ddb84d13bb08fee1ef3bd6e4b523e1feffae0998ef555d8a3b53007689",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/verify_full_sampler_before_fix.py",
+      "bytes": 4604,
+      "working_tree_sha256": "c4707ab5175ac77a3621ec7a271bb775ec94945580e4817e2bd0275d835d2ec4",
+      "exact_git_bytes_required": true
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/write_final_report.py",
+      "bytes": 13582,
+      "working_tree_sha256": "2041c521959bef687243364156811053480b3da58faef91c0ded2f4a1fd7180c",
+      "exact_git_bytes_required": true
+    }
+  ],
+  "local_only_assets": [
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/sampling_plan_seed123.npy",
+      "bytes": 1301768,
+      "sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/sampling_plan_seed124.npy",
+      "bytes": 1301768,
+      "sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/sampling_plan_seed125.npy",
+      "bytes": 1301768,
+      "sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/train_images.npy",
+      "bytes": 33322112,
+      "sha256": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/train_labels.npy",
+      "bytes": 86904,
+      "sha256": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/validation_gap_features.npy",
+      "bytes": 507008,
+      "sha256": "3e8677636f1e4f64a7823177c8d84f4f976f6dfa056f17bc0e24f17139342462",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/validation_images.npy",
+      "bytes": 6082688,
+      "sha256": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/validation_labels.npy",
+      "bytes": 15968,
+      "sha256": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_02/tensor_snapshots/first_adaptive_failure.pt",
+      "bytes": 2352069,
+      "sha256": "9fa42b510b64c17d099a7e2caa0d927d2238d04c1d35b3a9fa8dee50eab481e7",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/reference_plans/seed123.npy",
+      "bytes": 1301768,
+      "sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/reference_plans/seed124.npy",
+      "bytes": 1301768,
+      "sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39",
+      "storage": "local_only"
+    },
+    {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/validation_20261106_03/reference_plans/seed125.npy",
+      "bytes": 1301768,
+      "sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2",
+      "storage": "local_only"
+    }
+  ],
+  "datasets_and_checkpoints_uploaded": false
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import pickle
 from pathlib import Path
 
@@ -39,21 +40,52 @@ def load_official_train_pickle(data_root: Path):
     return images, labels, train_pickle, digest
 
 
+def save_array_without_overwrite(path: Path, array: np.ndarray):
+    """Verify existing partial preparation exactly, or exclusively create a missing array."""
+    if path.exists():
+        before = sha256_file(path)
+        existing = np.load(path, mmap_mode="r", allow_pickle=False)
+        if existing.shape != array.shape or existing.dtype != array.dtype or not np.array_equal(existing, array):
+            raise RuntimeError(f"Existing prepared array differs from recomputed sealed data: {path}")
+        if sha256_file(path) != before:
+            raise RuntimeError(f"Existing prepared array changed during verification: {path}")
+        return {"action": "reused_unchanged", "sha256": before}
+    with path.open("xb") as stream:
+        np.save(stream, array, allow_pickle=False)
+    return {"action": "created_missing", "sha256": sha256_file(path)}
+
+
+def write_prepared_json_without_overwrite(path: Path, payload):
+    with path.open("x", encoding="utf-8") as stream:
+        json.dump(payload, stream, ensure_ascii=False, indent=2, allow_nan=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Prepare the sealed Clean Stage I basis for CC-SAM Stage II transfer.")
     parser.add_argument("--checkpoint", type=str, default=None)
     parser.add_argument("--data-root", type=str, default=str(DEFAULT_DATA_ROOT))
     parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS))
+    parser.add_argument("--complete-existing-preparation", action="store_true",
+                        help="Validate partial arrays exactly and create only missing outputs; never overwrite.")
     args = parser.parse_args()
 
     if tuple(args.seeds) != tuple(SEEDS):
         raise RuntimeError(f"This frozen protocol requires Stage II seeds {SEEDS}; got {tuple(args.seeds)}")
     prepared = ROOT / "prepared"
-    if prepared.exists():
+    if prepared.exists() and not args.complete_existing_preparation:
         raise FileExistsError(
             f"Refusing to overwrite existing preparation directory: {prepared}. "
             "Inspect the existing manifest before deciding how to proceed."
         )
+    if args.complete_existing_preparation:
+        if not prepared.is_dir():
+            raise FileNotFoundError("No partial prepared directory exists to complete")
+        allowed = {"train_images.npy", "train_labels.npy", "validation_images.npy",
+                   "validation_labels.npy", "validation_gap_features.npy"}
+        allowed.update(f"sampling_plan_seed{seed}.npy" for seed in SEEDS)
+        unexpected = [p.name for p in prepared.iterdir() if not p.is_file() or p.name not in allowed]
+        if unexpected:
+            raise RuntimeError(f"Prepared directory contains completed or unexpected artifacts; refusing modification: {unexpected}")
 
     data_root = Path(args.data_root).expanduser().resolve()
     guard = install_test_guard(data_root)
@@ -119,6 +151,7 @@ def main():
     device = torch.device("cuda:0")
     backbone, classifier, checkpoint = build_models(checkpoint_path, device)
 
+    # extract_gap delegates to the same Clean-compatible pooling used by Smoke/Stage II.
     validation_gap = extract_gap(
         backbone, classifier, validation_images, eval_transform, device, batch_size=128
     )
@@ -134,24 +167,34 @@ def main():
             f"recomputed={baseline_metrics['Overall']:.10f}, sealed={expected_overall:.10f}"
         )
 
-    prepared.mkdir(parents=True, exist_ok=False)
-    np.save(prepared / "train_images.npy", train_images)
-    np.save(prepared / "train_labels.npy", train_labels)
-    np.save(prepared / "validation_images.npy", validation_images)
-    np.save(prepared / "validation_labels.npy", validation_labels)
-    np.save(prepared / "validation_gap_features.npy", validation_gap.astype(np.float32, copy=False))
+    print(
+        f"Clean TRAIN-holdout validation reproduced: actual={baseline_metrics['Overall']:.10f}% "
+        f"sealed={expected_overall:.10f}%; GAP shape={list(validation_gap.shape)}",
+        flush=True,
+    )
+    if not prepared.exists():
+        prepared.mkdir(parents=True, exist_ok=False)
+    array_actions = {}
+    for name, array in (
+        ("train_images.npy", train_images), ("train_labels.npy", train_labels),
+        ("validation_images.npy", validation_images), ("validation_labels.npy", validation_labels),
+        ("validation_gap_features.npy", validation_gap.astype(np.float32, copy=False)),
+    ):
+        array_actions[name] = save_array_without_overwrite(prepared / name, array)
 
     sampling_plan_hashes = {}
     for seed in SEEDS:
-        plan = make_class_aware_plan(train_labels, seed)
+        plan, statistics = make_class_aware_plan(train_labels, seed, return_statistics=True)
         plan_path = prepared / f"sampling_plan_seed{seed}.npy"
-        np.save(plan_path, plan)
+        plan_action = save_array_without_overwrite(plan_path, plan)
         sampling_plan_hashes[str(seed)] = {
             "path": plan_path.name,
             "sha256": sha256_file(plan_path),
             "shape": list(plan.shape),
             "dtype": str(plan.dtype),
-            "all_epochs_class_balanced": True,
+            "file_action": plan_action["action"],
+            "all_epochs_match_official_continuous_sampler": True,
+            "official_sequence_validation": statistics,
         }
 
     manifest = {
@@ -184,10 +227,12 @@ def main():
         "CIFAR100_train_false_calls": 0,
         "checkpoint_retrained": False,
         "class_statistics_recomputed_for_method": False,
+        "preparation_mode": "complete_existing_without_overwrite" if args.complete_existing_preparation else "fresh",
+        "prepared_array_actions": array_actions,
     }
-    write_json(prepared / "prepared_manifest.json", manifest)
+    write_prepared_json_without_overwrite(prepared / "prepared_manifest.json", manifest)
     guard_result = guard_pass()
-    write_json(prepared / "test_guard_prepare.json", guard_result)
+    write_prepared_json_without_overwrite(prepared / "test_guard_prepare.json", guard_result)
     print("CC-SAM PREPARATION PASS")
     print(f"Clean Stage I SHA256: {manifest['clean_stage1_sha256']}")
     print(f"TRAIN samples: {manifest['train_samples']}; validation samples: {manifest['validation_samples']}")

@@ -14,7 +14,7 @@ from ccsam_common import (
     sha256_file, hash_arrays, state_hash, write_json, read_json,
     install_test_guard, guard_pass, resolve_checkpoint, build_transforms,
     build_models, seed_everything, augment_batch, class_weights_from_counts,
-    alpha_for_epoch, evaluate_gap, check_backbone_unchanged,
+    alpha_for_epoch, evaluate_gap, check_backbone_unchanged, clean_compatible_gap,
 )
 
 
@@ -200,7 +200,7 @@ def smoke_test(seed, manifest, train_images, train_labels, validation_gap, valid
         images_hash = hash_arrays(indices, labels.cpu().numpy(), images_cpu.numpy())
         with torch.no_grad():
             feature_map = backbone(images_cpu.to("cuda:0"))
-            gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
+            gap = clean_compatible_gap(feature_map)
         feature_hash = hash_arrays(gap.detach().cpu().numpy())
 
         controls = {
@@ -373,7 +373,7 @@ def train_one_arm(seed, arm, manifest, train_images, train_labels, validation_ga
                 images_cpu = augment_batch(train_images, indices, train_transform, augmentation_generator)
                 with torch.no_grad():
                     feature_map = backbone(images_cpu.to(device, non_blocking=True))
-                    gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
+                    gap = clean_compatible_gap(feature_map)
                 if gap.shape != (end - start, FEATURE_DIM) or not torch.isfinite(gap).all():
                     raise RuntimeError("Malformed or non-finite 64-D GAP features.")
 

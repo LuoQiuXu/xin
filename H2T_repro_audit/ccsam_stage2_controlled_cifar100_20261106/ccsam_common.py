@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import importlib.util
 import json
 import os
 import pickle
 import random
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import torch
@@ -43,6 +45,8 @@ ALPHA_MAX = 0.3
 ALPHA_RAMP_EPOCHS = 30
 SEEDS = (123, 124, 125)
 ARMS = ("C0_BALANCED_CE", "C1_CCSAM_FEATURE_GRAD", "C2_WEIGHTED_CE_NO_PERTURB")
+OFFICIAL_SAMPLER_SOURCE = ROOT / "official_reference" / "Samplers.py"
+OFFICIAL_SAMPLER_SHA256 = "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174"
 
 _TEST_GUARD = None
 
@@ -246,6 +250,17 @@ def build_models(checkpoint_path: Path, device: torch.device):
     return backbone, classifier, checkpoint
 
 
+def clean_compatible_gap(feature_map: torch.Tensor) -> torch.Tensor:
+    """Use the sealed Clean Classifier.forward pooling and view, without dtype changes."""
+    if feature_map.ndim != 4 or feature_map.shape[1:] != (FEATURE_DIM, 8, 8):
+        raise RuntimeError(f"Expected [B,64,8,8] Clean feature maps, got {tuple(feature_map.shape)}")
+    pooled = F.avg_pool2d(feature_map, feature_map.size(3))
+    gap = pooled.view(pooled.size(0), -1)
+    if gap.shape != (feature_map.size(0), FEATURE_DIM):
+        raise RuntimeError(f"Expected [B,64] Clean GAP features, got {tuple(gap.shape)}")
+    return gap
+
+
 def extract_gap(backbone, classifier, images: np.ndarray, eval_transform, device, batch_size=128):
     feature_chunks = []
     classifier.eval()
@@ -254,9 +269,7 @@ def extract_gap(backbone, classifier, images: np.ndarray, eval_transform, device
             chunk = images[start:start + batch_size]
             batch = torch.stack([eval_transform(Image.fromarray(im)) for im in chunk]).to(device)
             feature_map = backbone(batch)
-            if feature_map.ndim != 4 or feature_map.shape[1:] != (64, 8, 8):
-                raise RuntimeError(f"Expected [B,64,8,8] Clean feature maps, got {tuple(feature_map.shape)}")
-            gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
+            gap = clean_compatible_gap(feature_map)
             logits_from_gap = classifier.module.fc(gap)
             logits_from_map = classifier(feature_map)
             if not torch.allclose(logits_from_gap, logits_from_map, rtol=1e-5, atol=1e-6):
@@ -318,7 +331,54 @@ def evaluate_gap(classifier, gap_features: np.ndarray, labels: np.ndarray, train
     return metrics_from_predictions(pred, labels, train_counts), pred
 
 
-def make_class_aware_plan(labels: np.ndarray, seed: int, epochs=STAGE2_EPOCHS):
+def official_class_aware_plan(labels: np.ndarray, seed: int, epochs: int):
+    """Run the pinned, unmodified author sampler without changing ambient RNG state."""
+    if sha256_file(OFFICIAL_SAMPLER_SOURCE) != OFFICIAL_SAMPLER_SHA256:
+        raise RuntimeError("Pinned official CC-SAM sampler source checksum mismatch")
+    rng_state = random.getstate()
+    try:
+        spec = importlib.util.spec_from_file_location("_ccsam_pinned_official_sampler", OFFICIAL_SAMPLER_SOURCE)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        random.seed(int(seed))
+        sampler = module.ClassAwareSampler(SimpleNamespace(labels=np.asarray(labels, dtype=np.int64)))
+        reference = np.stack([
+            np.asarray(list(iter(sampler)), dtype=np.int32) for _ in range(epochs)
+        ])
+    finally:
+        random.setstate(rng_state)
+    return reference
+
+
+def validate_class_aware_plan(labels: np.ndarray, seed: int, plan: np.ndarray):
+    """Require every index to match the official continuous sampler; retain epoch counts."""
+    labels = np.asarray(labels, dtype=np.int64)
+    plan = np.asarray(plan)
+    if plan.ndim != 2 or plan.shape[0] < 1 or plan.shape[1] != len(labels) or plan.dtype != np.int32:
+        raise RuntimeError("Malformed class-aware sampling plan shape or dtype")
+    if np.any(plan < 0) or np.any(plan >= len(labels)):
+        raise RuntimeError("Class-aware sampling plan contains out-of-range indices")
+    reference = official_class_aware_plan(labels, seed, plan.shape[0])
+    if not np.array_equal(plan, reference):
+        location = np.argwhere(plan != reference)[0].tolist()
+        raise RuntimeError(f"Sampling indices differ from official CC-SAM at epoch/position {location}")
+    counts = np.stack([np.bincount(labels[row], minlength=NUM_CLASSES) for row in plan])
+    return {
+        "matches_official_sequence": True,
+        "indices_compared": int(plan.size),
+        "mismatched_indices": 0,
+        "official_source_sha256": OFFICIAL_SAMPLER_SHA256,
+        "local_array_sha256": hash_arrays(plan),
+        "official_array_sha256": hash_arrays(reference),
+        "balance_definition": "exact official continuous class-aware sequence; epoch boundaries need not align with class cycles",
+        "per_epoch_class_counts": counts.tolist(),
+        "per_epoch_count_min": counts.min(axis=1).tolist(),
+        "per_epoch_count_max": counts.max(axis=1).tolist(),
+        "per_epoch_count_spread": (counts.max(axis=1) - counts.min(axis=1)).tolist(),
+    }
+
+
+def make_class_aware_plan(labels: np.ndarray, seed: int, epochs=STAGE2_EPOCHS, return_statistics=False):
     labels = np.asarray(labels, dtype=np.int64)
     classes = np.unique(labels)
     if not np.array_equal(classes, np.arange(NUM_CLASSES)):
@@ -352,10 +412,10 @@ def make_class_aware_plan(labels: np.ndarray, seed: int, epochs=STAGE2_EPOCHS):
             dtype=np.int32,
             count=len(labels),
         )
-        per_class = np.bincount(labels[order], minlength=NUM_CLASSES)
-        if int(per_class.max() - per_class.min()) > 1:
-            raise RuntimeError("Class-aware sampler did not produce a balanced epoch")
         plan[epoch] = order
+    statistics = validate_class_aware_plan(labels, seed, plan)
+    if return_statistics:
+        return plan, statistics
     return plan
 
 

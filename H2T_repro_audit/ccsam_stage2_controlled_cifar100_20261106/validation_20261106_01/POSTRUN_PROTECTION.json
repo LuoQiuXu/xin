@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "historical_files_checked": 140,
+  "historical_files_changed": [],
+  "protected_inputs_checked": 38,
+  "protected_inputs_changed": [],
+  "experiment_sources_changed": [],
+  "tracked_changes": [],
+  "new_untracked_outside_experiment": [],
+  "prepared_directory_exists": false,
+  "smoke_report_exists": false,
+  "formal_results_directory_exists": false,
+  "formal_completion_marker_exists": false
+}

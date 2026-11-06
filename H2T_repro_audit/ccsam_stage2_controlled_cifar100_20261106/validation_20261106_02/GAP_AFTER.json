@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "feature_shape": [
+    128,
+    64,
+    8,
+    8
+  ],
+  "feature_dtype": "torch.float32",
+  "gap_shape": [
+    128,
+    64
+  ],
+  "gap_dtype": "torch.float32",
+  "original_avg_vs_fixed_gap_max_abs": 0.0,
+  "original_A_vs_fixed_B_logits_max_abs": 0.0,
+  "original_A_vs_fixed_B_logits_max_relative": 0.0,
+  "original_A_vs_fixed_B_bitwise_equal": true,
+  "allclose": true,
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "finite": true,
+  "input_and_original_logits_match_saved_pre_fix": true,
+  "invalid_shapes_rejected": [
+    [
+      2,
+      64,
+      8,
+      7
+    ],
+    [
+      2,
+      63,
+      8,
+      8
+    ],
+    [
+      2,
+      64
+    ]
+  ],
+  "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "checkpoint_expected": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "feature_snapshot_sha256": "9fa42b510b64c17d099a7e2caa0d927d2238d04c1d35b3a9fa8dee50eab481e7",
+  "backbone_and_bn_bitwise_unchanged": true,
+  "classifier_bitwise_unchanged": true,
+  "optimizer_updates": 0,
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T17:37:09+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}

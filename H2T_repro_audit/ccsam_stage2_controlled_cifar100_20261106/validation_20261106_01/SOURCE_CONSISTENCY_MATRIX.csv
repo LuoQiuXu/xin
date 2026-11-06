@@ -1,0 +1,13 @@
+﻿item,status,evidence,source
+Checkpoint and split,PASS_INPUT,Sealed checkpoint 7ced9d...; seed42 epoch184; original frozen split,INPUT_VALIDATION.json
+Perturbation variable,STATIC_MATCH_ONLY,64-D GAP; official ResNet32Feature.forward avgpool then fea=x; local runtime validation blocked,models/ResNet32Feature.py; ccsam_common.py:259
+Class-conditional gradient,STATIC_FORMULA_MATCH; NUMERICAL_NOT_RUN,Mean class CE gradient; one joint L2 norm per class subset; linear-head analytic derivative,train_cifar.py:train_sample; train_ccsam.py:analytic_classwise_feature_delta
+Class weights,STATIC_MATCH,log(max_count/count+0.01)/2.0,utils/utils.py:88-105; configs/Cifar100.json train.div
+Alpha ramp,STATIC_MATCH,"min((epoch_index+1)/30,0.3)",train_cifar.py:train_sample; configs/Cifar100.json
+CIFAR Stage-II LR,STATIC_MATCH,"0.1 * 0.1 = 0.01, constant for epoch indices 0..29",utils/lr_scheduler.py:adjust_learning_rate
+Class-aware sampler,STATIC_CONTINUOUS_CYCLE; EXECUTION_NOT_REACHED,Official default num_samples_cls=1; local random-cycle stream; additional local max-min<=1 check may conflict with epoch-crossing cycles,datasets/Samplers.py; ccsam_common.py:321-357
+C0/C1/C2 controls,STATIC_MATCH; SMOKE_NOT_RUN,All start from Clean head; C0 unweighted CE; C1 weighted perturbation; C2 weighted zero delta,experiment_protocol.json; train_ccsam.py:compute_arm_loss
+BN and backbone,INTENTIONAL_CONTROLLED_TRANSFER,Local eval/freeze including buffers; official freeze_backbone freezes parameter grads but train_sample calls model.train(),utils/utils.py:61-66; train_cifar.py:train_sample; ccsam_common.py
+Dataset and Stage-I,INTENTIONAL_CONTROLLED_TRANSFER,Sealed local IF100/Stage-I; official CIFAR100 config uses imbalance 0.005 and its own Stage-I,experiment_protocol.json; configs/Cifar100.json
+Zero class-gradient behavior,LOCAL_SAFETY_CHOICE_NOT_EXERCISED,Local <=1e-12 leaves zero delta; official unconditionally divides by norm,train_ccsam.py:analytic_classwise_feature_delta; train_cifar.py:train_sample
+TEST access,PASS_OBSERVED_GUARD,0 TEST opens; 0 CIFAR100(train=False); 0 blocked attempts,prepare_execution.json:test_guard

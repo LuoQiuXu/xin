@@ -1,0 +1,103 @@
+{
+  "experiment": "CC-SAM Stage II feature-gradient transfer on the sealed Clean Stage I",
+  "repository": "LuoQiuXu/xin",
+  "branch": "experiment/ccsam-stage2-controlled-cifar100-20261106",
+  "dataset": {
+    "name": "CIFAR-100-LT",
+    "imbalance_factor": 100,
+    "train_samples": 10847,
+    "class_counts_source": "sealed Clean Stage I TRAIN split",
+    "validation": "1980 images held out from official TRAIN; 20 images for class IDs 1..99; class 0 absent",
+    "official_test": "prohibited; no test images or labels may be opened, decoded, evaluated, or used for selection"
+  },
+  "clean_stage1": {
+    "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+    "seed": 42,
+    "best_epoch": 184,
+    "selection_partition": "official TRAIN holdout",
+    "backbone_retrained": false,
+    "classifier_initialization": "same Clean Stage I classifier checkpoint for every arm and every Stage-II seed"
+  },
+  "source_method": {
+    "paper": "Class-Conditional Sharpness-Aware Minimization for Deep Long-Tailed Recognition",
+    "venue": "CVPR 2023",
+    "official_code": "https://github.com/zzpustc/CC-SAM",
+    "transfer_scope": "Stage II feature-gradient perturbation only; not a full reproduction of the original two-stage CC-SAM pipeline",
+    "official_stage2_files": [
+      "train_cifar.py",
+      "configs/Cifar100.json",
+      "utils/lr_scheduler.py",
+      "datasets/Samplers.py"
+    ],
+    "representation": "64-dimensional GAP embedding after the Clean ResNet-32 feature map [B,64,8,8]; this matches the pooled feature vector used by the official CC-SAM ResNet32 implementation"
+  },
+  "stage2": {
+    "epochs": 30,
+    "batch_size": 64,
+    "learning_rate": 0.01,
+    "learning_rate_schedule": "constant 0.01 for CIFAR Stage II, matching the official CC-SAM adjust_learning_rate implementation for the 30-epoch Stage-II window",
+    "optimizer": "SGD",
+    "momentum": 0.9,
+    "weight_decay": 0.0002,
+    "nesterov": false,
+    "precision": "FP32",
+    "amp": false,
+    "mixup": false,
+    "gradient_accumulation": false,
+    "backbone": "frozen; eval mode; all parameters and BN buffers checked bitwise unchanged",
+    "sampler": "class-aware sampler; a single per-seed 30-epoch sampling plan is shared across all three arms",
+    "augmentation": "RandomCrop(32,padding=4), RandomHorizontalFlip, ToTensor, CIFAR-100 normalization",
+    "seeds": [
+      123,
+      124,
+      125
+    ],
+    "primary_epoch": 30,
+    "early_stopping": false,
+    "hyperparameter_search": false
+  },
+  "ccsam_stage2_hyperparameters": {
+    "class_weight": "w_c = log(max_count / count_c + 0.01) / 2.0",
+    "adver_reg": 1,
+    "alpha_schedule": "alpha_e = min((e+1)/30, 0.3), with e zero-based",
+    "feature_perturbation": "delta_i = adver_reg * w_yi * g_yi / ||g_yi||_2; g_c is the gradient of the mean clean CE over samples of class c with respect to the pooled 64-D feature batch",
+    "objective": "L = alpha * mean_i[w_yi * CE(W(f_i+delta_i)+b,y_i)] + (1-alpha) * mean_i[CE(Wf_i+b,y_i)]"
+  },
+  "arms": [
+    {
+      "id": "C0_BALANCED_CE",
+      "description": "Frozen-backbone class-aware balanced CE; cRT-style matched control. Retains the Clean Stage I classifier as the common initialization, so it is not claimed to be a strict canonical cRT reinitialization."
+    },
+    {
+      "id": "C1_CCSAM_FEATURE_GRAD",
+      "description": "CC-SAM Stage II-inspired feature-gradient perturbation, with official class weights and alpha schedule."
+    },
+    {
+      "id": "C2_WEIGHTED_CE_NO_PERTURB",
+      "description": "Same class-aware sampler, class weights, alpha schedule, optimizer, and initialization as C1, but delta is exactly zero; isolates the incremental contribution of feature perturbation."
+    }
+  ],
+  "primary_comparisons": {
+    "C1-C2": "added contribution of class-conditional feature-gradient perturbation",
+    "C2-C0": "contribution of class weighting and alpha blend without feature perturbation",
+    "C1-C0": "combined Stage-II transfer effect"
+  },
+  "pairing_and_integrity": {
+    "same_per_seed_initial_classifier": true,
+    "same_per_seed_sample_order_across_arms": true,
+    "same_per_seed_augmented_images_across_arms": true,
+    "same_per_seed_frozen_features_across_arms": true,
+    "batch_level_hash_checks": true,
+    "vectorized_gradient_verified_against_autograd_reference": true,
+    "no_test_loader_instantiation": true,
+    "no_test_file_open": true
+  },
+  "analysis": {
+    "metric_source": "same fixed 1980-image TRAIN-derived validation partition",
+    "primary_reporting": "fixed epoch 30, not best epoch",
+    "paired_seed_deltas": true,
+    "sample_standard_deviation_ddof": 1,
+    "statistical_significance_claims": false,
+    "caveat": "Three Stage-II seeds share one Clean Stage-I backbone and one reused development validation partition; they do not establish independent-backbone or cross-dataset generalization."
+  }
+}

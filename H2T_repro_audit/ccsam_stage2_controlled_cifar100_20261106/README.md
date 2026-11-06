@@ -6,11 +6,23 @@ Official paper: Class-Conditional Sharpness-Aware Minimization for Deep Long-Tai
 
 Official code: https://github.com/zzpustc/CC-SAM
 
+## Current validation status (2026-11-06)
+
+Preparation passed: the sealed 40.050505% TRAIN-holdout accuracy was reproduced,
+and all 976,230 sampling indices across three seeds and 30 epochs matched the
+official sampler. The single authorized Smoke invocation stopped at the C1
+actual-batch analytic/autograd perturbation-equivalence check (max absolute
+difference 5.364418029785156e-7). C2 was not reached; formal training has not started.
+See the [complete report](validation_20261106_03/CCSAM_PREPARATION_SMOKE_FINAL_REPORT.md)
+and [structured status](validation_20261106_03/VALIDATION_STATUS.json).
+
 ## Why the perturbation is applied to 64-D GAP features
 
 The official CC-SAM CIFAR ResNet32 implementation pools its final convolutional map before returning the feature variable used by the Stage-II feature-gradient operation. Its feature-gradient variable is therefore a 64-dimensional vector, not the full 64 x 8 x 8 convolutional map.
 
-The Clean Stage I backbone in this repository returns a 64 x 8 x 8 map. This implementation applies global average pooling first, verifies that the 64-D path gives exactly the same logits as the frozen Clean classifier, and then computes the CC-SAM-style perturbation in that 64-D embedding space.
+The Clean Stage I backbone in this repository returns a 64 x 8 x 8 map. The shared clean_compatible_gap helper uses F.avg_pool2d(feature_map, feature_map.size(3)) and the same view(batch, -1) as the sealed Clean classifier, preserving its floating-point reduction path and dtype. Preparation, Smoke and the formal feature-extraction path all use this helper; run_stage.py delegates to these entry points. Adaptive average pooling is mathematically equivalent here but can differ numerically in FP32, so it is not used for this Clean-compatible path.
+
+The original classifier-path equivalence check remains active with unchanged rtol=1e-5 and atol=1e-6. The perturbation remains in the 64-D embedding space; the original Clean model/checkpoint and the CC-SAM perturbation objective are unchanged.
 
 ## Controlled arms
 
@@ -43,6 +55,13 @@ The code computes this exactly in a vectorized way, then normalizes each class s
 
 ## Frozen protocol
 
+Sampling validation compares every index against the pinned, unmodified official
+CC-SAM ClassAwareSampler (official_reference/Samplers.py). The original local
+producer, private RNG and continuous class/data cycles are unchanged. Epoch
+boundaries can straddle class cycles, so each epoch's counts are recorded rather
+than required to differ by at most one. The full 30-epoch sequence must match for
+each of seeds 123, 124 and 125.
+
 - CIFAR-100-LT, IF=100; 10,847 official TRAIN images.
 - Clean Stage I checkpoint SHA256: 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88.
 - Clean Stage I seed 42, best epoch 184.
@@ -69,6 +88,12 @@ Run from the repository root in PowerShell.
    python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\prepare_ccsam.py --checkpoint "D:\path\to\clean_stage1_best.pth" --data-root "D:\path\to\cifar100"
 
 2. Run only the one-batch-per-arm smoke test:
+
+   If a previous preparation stopped with partial arrays, the explicitly approved
+   completion command is prepare_ccsam.py --complete-existing-preparation.
+   It recomputes and verifies sealed data and features exactly, preserves every
+   existing array byte, and exclusively creates missing plans and manifests.
+   Completed or unexpected preparation artifacts are refused; nothing is deleted.
 
    python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\train_ccsam.py --smoke-only
 

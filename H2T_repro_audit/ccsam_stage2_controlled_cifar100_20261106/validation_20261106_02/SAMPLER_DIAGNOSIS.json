@@ -1,0 +1,32 @@
+{
+  "status": "OFFICIAL_SEQUENCE_EXACT_LOCAL_VALIDATION_REJECTS",
+  "seed": 123,
+  "epochs_compared": 2,
+  "all_indices_equal": true,
+  "official_source_git_blob": "9711d4d60ac41da5d01b3b2214d3f07d4ba4ac23",
+  "official_source_url": "https://github.com/zzpustc/CC-SAM/blob/main/datasets/Samplers.py",
+  "local_sequence_sha256": "a4adf17dab9ef174599cbd057287cdee32253f8c881f769af0c135b6ace04c0a",
+  "official_sequence_sha256": "a4adf17dab9ef174599cbd057287cdee32253f8c881f769af0c135b6ace04c0a",
+  "official_epoch_class_count_ranges": [
+    [
+      108,
+      109
+    ],
+    [
+      107,
+      109
+    ]
+  ],
+  "actual_local_error": "Class-aware sampler did not produce a balanced epoch",
+  "original_validation_still_enforced": true,
+  "sampling_strategy_modified": false,
+  "formal_training_started": false,
+  "sampling_plan_files_written": 0,
+  "test_guard": {
+    "installed_at": "2026-11-06T17:39:57+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}

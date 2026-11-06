@@ -1,0 +1,7 @@
+# The runtime checks the exact pinned author-source bytes.
+official_reference/Samplers.py -text
+.gitattributes -text
+.gitignore -text
+official_reference/PROVENANCE.json -text
+prepared/*.json -text
+validation_*/** -text

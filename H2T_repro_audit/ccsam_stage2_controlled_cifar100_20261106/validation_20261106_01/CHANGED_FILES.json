@@ -1,0 +1,29 @@
+{
+  "existing_implementation_modified": [],
+  "added_files": [
+    "validation_20261106_01/CCSAM_STAGE2_PRE_SMOKE_REPORT.md",
+    "validation_20261106_01/EXECUTION_SOURCE_BEFORE.json",
+    "validation_20261106_01/GIT_STATUS_AFTER.txt",
+    "validation_20261106_01/GIT_STATUS_BEFORE.txt",
+    "validation_20261106_01/HISTORICAL_UNTRACKED_BEFORE.json",
+    "validation_20261106_01/INPUT_VALIDATION.json",
+    "validation_20261106_01/official_sources.json",
+    "validation_20261106_01/POSTRUN_PROTECTION.json",
+    "validation_20261106_01/prepare.log",
+    "validation_20261106_01/prepare_execution.json",
+    "validation_20261106_01/run_stage.py",
+    "validation_20261106_01/SEALED_CLASS_COUNTS.csv",
+    "validation_20261106_01/SOURCE_CONSISTENCY_MATRIX.csv",
+    "validation_20261106_01/STATIC_SYNTAX.json",
+    "validation_20261106_01/SYNTAX_analyze_ccsam.py.log",
+    "validation_20261106_01/SYNTAX_ccsam_common.py.log",
+    "validation_20261106_01/SYNTAX_prepare_ccsam.py.log",
+    "validation_20261106_01/SYNTAX_train_ccsam.py.log",
+    "validation_20261106_01/VALIDATION_STATUS.json",
+    "validation_20261106_01/write_reports.py",
+    ".gitignore"
+  ],
+  "generated_python_cache": "Ignored within experiment; no outside cache written by Python -B",
+  "generated_dataset_arrays": "None; preparation stopped before creating prepared/",
+  "unrelated_historical_untracked_files": 140
+}

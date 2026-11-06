@@ -1,0 +1,15 @@
+{
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "elements": [
+    {
+      "sample_within_batch": 8,
+      "class_logit": 22,
+      "original_logit": 0.008202150464057922,
+      "adaptive_logit": 0.00820334255695343,
+      "abs_error": 1.1920928955078125e-06,
+      "allowed_error": 1.082021504640579e-06
+    }
+  ],
+  "argmax_changes_in_diagnostic_batch": 0
+}

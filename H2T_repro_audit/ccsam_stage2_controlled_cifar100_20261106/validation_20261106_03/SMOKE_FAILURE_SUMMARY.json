@@ -1,0 +1,19 @@
+{
+  "status": "FAIL",
+  "invocations": 1,
+  "failure_stage": "C1 actual Clean-batch analytic vs autograd delta comparison",
+  "reported_max_abs_delta_difference": 5.364418029785156e-07,
+  "rtol": 1e-05,
+  "atol": 1e-07,
+  "synthetic_check": "passed by control flow; maximum difference not persisted",
+  "C0": "one disposable update and finite-gradient/frozen-state checks passed before entering C1",
+  "C1": "gradient-equivalence assertion failed before its optimizer was constructed",
+  "C2": "not reached",
+  "C0_C1_controls": "comparison passed by control flow; actual hash strings not persisted",
+  "all_three_arms_passed": false,
+  "actual_batch_tensors_or_relative_error_saved": false,
+  "root_cause": "UNDETERMINED; do not infer harmless rounding from the small maximum",
+  "tolerance_or_formula_modified": false,
+  "smoke_retry": false,
+  "formal_training_started": false
+}

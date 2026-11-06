@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "file": "ccsam_common.py",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "py_compile",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccsam_common.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "prepare_ccsam.py",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "py_compile",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\prepare_ccsam.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "train_ccsam.py",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "py_compile",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "analyze_ccsam.py",
+      "command": [
+        "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "py_compile",
+        "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\analyze_ccsam.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "formal_training_started": false
+}

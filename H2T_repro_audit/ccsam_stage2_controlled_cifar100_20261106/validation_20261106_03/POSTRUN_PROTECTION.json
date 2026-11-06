@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "prior_outputs_unchanged": 61,
+  "historical_untracked_unchanged": 140,
+  "protected_inputs_unchanged": 38,
+  "existing_prepared_arrays_unchanged": 5,
+  "prepared_files": {
+    "prepared_manifest.json": {
+      "bytes": 183065,
+      "sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02"
+    },
+    "sampling_plan_seed123.npy": {
+      "bytes": 1301768,
+      "sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45"
+    },
+    "sampling_plan_seed124.npy": {
+      "bytes": 1301768,
+      "sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39"
+    },
+    "sampling_plan_seed125.npy": {
+      "bytes": 1301768,
+      "sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2"
+    },
+    "test_guard_prepare.json": {
+      "bytes": 191,
+      "sha256": "ebdc95eb15cf238c82c43fb115775441d927f6f2775b1cc09f7974910bec046b"
+    },
+    "train_images.npy": {
+      "bytes": 33322112,
+      "sha256": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64"
+    },
+    "train_labels.npy": {
+      "bytes": 86904,
+      "sha256": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9"
+    },
+    "validation_gap_features.npy": {
+      "bytes": 507008,
+      "sha256": "3e8677636f1e4f64a7823177c8d84f4f976f6dfa056f17bc0e24f17139342462"
+    },
+    "validation_images.npy": {
+      "bytes": 6082688,
+      "sha256": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656"
+    },
+    "validation_labels.npy": {
+      "bytes": 15968,
+      "sha256": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e"
+    }
+  },
+  "sampler_reference_sha256": "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174",
+  "loss_alpha_optimizer_arm_train_script_unchanged_since_approval": true,
+  "experiment_protocol_unchanged": true,
+  "smoke_invocations": 1,
+  "smoke_status": "FAILED_STOPPED",
+  "C0_update_check": "passed by unchanged control-flow evidence before C1 failure",
+  "C1_optimizer_update": "not reached",
+  "C2": "not reached",
+  "formal_runs": 0,
+  "tracked_modified_files": [
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md",
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py",
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py",
+    "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py"
+  ],
+  "staged_files": 0
+}

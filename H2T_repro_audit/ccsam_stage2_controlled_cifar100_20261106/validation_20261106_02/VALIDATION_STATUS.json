@@ -1,0 +1,111 @@
+{
+  "status": "GAP_FIXED_BASELINE_REPRODUCED_PREPARATION_BLOCKED_BY_INDEPENDENT_SAMPLER_VALIDATOR",
+  "branch": "experiment/ccsam-stage2-controlled-cifar100-20261106",
+  "execution_head": "b6235cc9fe45be479e7dffeb5cefdd06f4402cbd",
+  "gap_root_cause_confirmed": true,
+  "root_cause": "Different FP32 pooling reduction paths: adaptive_avg_pool2d vs sealed avg_pool2d; same feature map/head. Original avg path is bitwise identical to Clean, adaptive logits fail unchanged tolerance.",
+  "feature_shape": [
+    128,
+    64,
+    8,
+    8
+  ],
+  "feature_dtype": "torch.float32",
+  "before_pool_max_abs": 1.9073486328125e-06,
+  "before_pool_max_relative": 4.498508924231974e-07,
+  "before_logits_max_abs": 2.6226043701171875e-06,
+  "before_logits_max_relative": 0.0042752171008684035,
+  "after_pool_max_abs": 0.0,
+  "after_logits_max_abs": 0.0,
+  "after_logits_bitwise_equal": true,
+  "allclose_rtol": 1e-05,
+  "allclose_atol": 1e-06,
+  "static_python_files_passed": 8,
+  "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "clean_stage1_holdout_overall": 40.05050505050505,
+  "validation_samples": 1980,
+  "validation_feature_shape": [
+    1980,
+    64
+  ],
+  "validation_reproduction": "PASS",
+  "preparation": "FAILED_STOPPED",
+  "preparation_failure": "Class-aware sampler did not produce a balanced epoch",
+  "sampler_diagnosis": {
+    "status": "OFFICIAL_SEQUENCE_EXACT_LOCAL_VALIDATION_REJECTS",
+    "seed": 123,
+    "epochs_compared": 2,
+    "all_indices_equal": true,
+    "official_source_git_blob": "9711d4d60ac41da5d01b3b2214d3f07d4ba4ac23",
+    "official_source_url": "https://github.com/zzpustc/CC-SAM/blob/main/datasets/Samplers.py",
+    "local_sequence_sha256": "a4adf17dab9ef174599cbd057287cdee32253f8c881f769af0c135b6ace04c0a",
+    "official_sequence_sha256": "a4adf17dab9ef174599cbd057287cdee32253f8c881f769af0c135b6ace04c0a",
+    "official_epoch_class_count_ranges": [
+      [
+        108,
+        109
+      ],
+      [
+        107,
+        109
+      ]
+    ],
+    "actual_local_error": "Class-aware sampler did not produce a balanced epoch",
+    "original_validation_still_enforced": true,
+    "sampling_strategy_modified": false,
+    "formal_training_started": false,
+    "sampling_plan_files_written": 0,
+    "test_guard": {
+      "installed_at": "2026-11-06T17:39:57+08:00",
+      "official_test_file_open_attempts": 0,
+      "CIFAR100_train_false_attempts": 0,
+      "blocked_attempts": [],
+      "official_TEST_used": false
+    }
+  },
+  "smoke": "NOT_RUN_BLOCKED",
+  "smoke_arms_completed": [],
+  "gradient_equivalence_check": "NOT_RUN",
+  "gradient_equivalence_max_error": null,
+  "backbone_BN_bitwise_unchanged_in_gap_diagnostics": true,
+  "backbone_BN_smoke_check": "NOT_RUN",
+  "formal_training_started": false,
+  "formal_runs": 0,
+  "optimizer_updates": 0,
+  "test_guards": {
+    "GAP_BEFORE.json": {
+      "installed_at": "2026-11-06T17:34:37+08:00",
+      "official_test_file_open_attempts": 0,
+      "CIFAR100_train_false_attempts": 0,
+      "blocked_attempts": [],
+      "official_TEST_used": false
+    },
+    "GAP_AFTER.json": {
+      "installed_at": "2026-11-06T17:37:09+08:00",
+      "official_test_file_open_attempts": 0,
+      "CIFAR100_train_false_attempts": 0,
+      "blocked_attempts": [],
+      "official_TEST_used": false
+    },
+    "prepare_execution.json": {
+      "installed_at": "2026-11-06T17:37:44+08:00",
+      "official_test_file_open_attempts": 0,
+      "CIFAR100_train_false_attempts": 0,
+      "blocked_attempts": [],
+      "official_TEST_used": false
+    },
+    "SAMPLER_DIAGNOSIS.json": {
+      "installed_at": "2026-11-06T17:39:57+08:00",
+      "official_test_file_open_attempts": 0,
+      "CIFAR100_train_false_attempts": 0,
+      "blocked_attempts": [],
+      "official_TEST_used": false
+    }
+  },
+  "original_classifier_and_checkpoint_modified": false,
+  "protocol_modified": false,
+  "sampling_strategy_modified": false,
+  "CCSAM_formula_or_arm_definitions_modified": false,
+  "old_run_stage_has_no_pooling_and_delegates_to_repaired_entrypoints": true,
+  "awaiting_user_scope_decision_for_independent_sampler_validator": true
+}

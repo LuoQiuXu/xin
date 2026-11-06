@@ -1,0 +1,33 @@
+{
+  "stage": "prepare",
+  "target_argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\prepare_ccsam.py"
+  ],
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "started": "2026-11-06T16:57:28.319152+08:00",
+  "formal_training_started": false,
+  "error_type": "RuntimeError",
+  "error": "GAP(64-D) classifier path is not equivalent to the frozen Clean classifier",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_01\\run_stage.py\", line 27, in <module>\n    runpy.run_path(str(target), run_name=\"__main__\")\n  File \"<frozen runpy>\", line 287, in run_path\n  File \"<frozen runpy>\", line 98, in _run_module_code\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\prepare_ccsam.py\", line 199, in <module>\n    main()\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\prepare_ccsam.py\", line 122, in main\n    validation_gap = extract_gap(\n                     ^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccsam_common.py\", line 263, in extract_gap\n    raise RuntimeError(\"GAP(64-D) classifier path is not equivalent to the frozen Clean classifier\")\nRuntimeError: GAP(64-D) classifier path is not equivalent to the frozen Clean classifier\n",
+  "test_guard": {
+    "installed_at": "2026-11-06T16:57:34+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "environment": {
+    "torch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "default_dtype": "torch.float32",
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "ended": "2026-11-06T16:57:36.179964+08:00",
+  "status": "FAILED_STOPPED",
+  "exit_code": 1
+}

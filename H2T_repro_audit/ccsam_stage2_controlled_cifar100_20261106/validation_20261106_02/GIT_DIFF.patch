@@ -1,0 +1,103 @@
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md
+index ee0df7e..ac8303b 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md
+@@ -10,7 +10,9 @@ Official code: https://github.com/zzpustc/CC-SAM
+ 
+ The official CC-SAM CIFAR ResNet32 implementation pools its final convolutional map before returning the feature variable used by the Stage-II feature-gradient operation. Its feature-gradient variable is therefore a 64-dimensional vector, not the full 64 x 8 x 8 convolutional map.
+ 
+-The Clean Stage I backbone in this repository returns a 64 x 8 x 8 map. This implementation applies global average pooling first, verifies that the 64-D path gives exactly the same logits as the frozen Clean classifier, and then computes the CC-SAM-style perturbation in that 64-D embedding space.
++The Clean Stage I backbone in this repository returns a 64 x 8 x 8 map. The shared clean_compatible_gap helper uses F.avg_pool2d(feature_map, feature_map.size(3)) and the same view(batch, -1) as the sealed Clean classifier, preserving its floating-point reduction path and dtype. Preparation, Smoke and the formal feature-extraction path all use this helper; run_stage.py delegates to these entry points. Adaptive average pooling is mathematically equivalent here but can differ numerically in FP32, so it is not used for this Clean-compatible path.
++
++The original classifier-path equivalence check remains active with unchanged rtol=1e-5 and atol=1e-6. The perturbation remains in the 64-D embedding space; the original Clean model/checkpoint and the CC-SAM perturbation objective are unchanged.
+ 
+ ## Controlled arms
+ 
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
+index 36b6797..713b32e 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
+@@ -246,6 +246,17 @@ def build_models(checkpoint_path: Path, device: torch.device):
+     return backbone, classifier, checkpoint
+ 
+ 
++def clean_compatible_gap(feature_map: torch.Tensor) -> torch.Tensor:
++    """Use the sealed Clean Classifier.forward pooling and view, without dtype changes."""
++    if feature_map.ndim != 4 or feature_map.shape[1:] != (FEATURE_DIM, 8, 8):
++        raise RuntimeError(f"Expected [B,64,8,8] Clean feature maps, got {tuple(feature_map.shape)}")
++    pooled = F.avg_pool2d(feature_map, feature_map.size(3))
++    gap = pooled.view(pooled.size(0), -1)
++    if gap.shape != (feature_map.size(0), FEATURE_DIM):
++        raise RuntimeError(f"Expected [B,64] Clean GAP features, got {tuple(gap.shape)}")
++    return gap
++
++
+ def extract_gap(backbone, classifier, images: np.ndarray, eval_transform, device, batch_size=128):
+     feature_chunks = []
+     classifier.eval()
+@@ -254,9 +265,7 @@ def extract_gap(backbone, classifier, images: np.ndarray, eval_transform, device
+             chunk = images[start:start + batch_size]
+             batch = torch.stack([eval_transform(Image.fromarray(im)) for im in chunk]).to(device)
+             feature_map = backbone(batch)
+-            if feature_map.ndim != 4 or feature_map.shape[1:] != (64, 8, 8):
+-                raise RuntimeError(f"Expected [B,64,8,8] Clean feature maps, got {tuple(feature_map.shape)}")
+-            gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
++            gap = clean_compatible_gap(feature_map)
+             logits_from_gap = classifier.module.fc(gap)
+             logits_from_map = classifier(feature_map)
+             if not torch.allclose(logits_from_gap, logits_from_map, rtol=1e-5, atol=1e-6):
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py
+index 93119c2..25418d2 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py
+@@ -119,6 +119,7 @@ def main():
+     device = torch.device("cuda:0")
+     backbone, classifier, checkpoint = build_models(checkpoint_path, device)
+ 
++    # extract_gap delegates to the same Clean-compatible pooling used by Smoke/Stage II.
+     validation_gap = extract_gap(
+         backbone, classifier, validation_images, eval_transform, device, batch_size=128
+     )
+@@ -134,6 +135,11 @@ def main():
+             f"recomputed={baseline_metrics['Overall']:.10f}, sealed={expected_overall:.10f}"
+         )
+ 
++    print(
++        f"Clean TRAIN-holdout validation reproduced: actual={baseline_metrics['Overall']:.10f}% "
++        f"sealed={expected_overall:.10f}%; GAP shape={list(validation_gap.shape)}",
++        flush=True,
++    )
+     prepared.mkdir(parents=True, exist_ok=False)
+     np.save(prepared / "train_images.npy", train_images)
+     np.save(prepared / "train_labels.npy", train_labels)
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+index aca97ce..ec7bef6 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+@@ -14,7 +14,7 @@ from ccsam_common import (
+     sha256_file, hash_arrays, state_hash, write_json, read_json,
+     install_test_guard, guard_pass, resolve_checkpoint, build_transforms,
+     build_models, seed_everything, augment_batch, class_weights_from_counts,
+-    alpha_for_epoch, evaluate_gap, check_backbone_unchanged,
++    alpha_for_epoch, evaluate_gap, check_backbone_unchanged, clean_compatible_gap,
+ )
+ 
+ 
+@@ -200,7 +200,7 @@ def smoke_test(seed, manifest, train_images, train_labels, validation_gap, valid
+         images_hash = hash_arrays(indices, labels.cpu().numpy(), images_cpu.numpy())
+         with torch.no_grad():
+             feature_map = backbone(images_cpu.to("cuda:0"))
+-            gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
++            gap = clean_compatible_gap(feature_map)
+         feature_hash = hash_arrays(gap.detach().cpu().numpy())
+ 
+         controls = {
+@@ -373,7 +373,7 @@ def train_one_arm(seed, arm, manifest, train_images, train_labels, validation_ga
+                 images_cpu = augment_batch(train_images, indices, train_transform, augmentation_generator)
+                 with torch.no_grad():
+                     feature_map = backbone(images_cpu.to(device, non_blocking=True))
+-                    gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
++                    gap = clean_compatible_gap(feature_map)
+                 if gap.shape != (end - start, FEATURE_DIM) or not torch.isfinite(gap).all():
+                     raise RuntimeError("Malformed or non-finite 64-D GAP features.")
+ 

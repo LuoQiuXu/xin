@@ -1,0 +1,20 @@
+{
+  "stage": "prepare",
+  "target_argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\prepare_ccsam.py",
+    "--complete-existing-preparation"
+  ],
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "started": "2026-11-06T18:05:48.186222+08:00",
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T18:05:52+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "ended": "2026-11-06T18:05:55.001519+08:00"
+}

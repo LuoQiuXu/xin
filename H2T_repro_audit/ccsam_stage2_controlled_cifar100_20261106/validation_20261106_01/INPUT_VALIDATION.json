@@ -1,0 +1,267 @@
+{
+  "status": "PASS",
+  "checkpoint": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\locked\\clean_stage1_best.pth",
+  "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "epoch": 184,
+  "seed": 42,
+  "selection_partition": "official TRAIN holdout",
+  "TEST_used": false,
+  "expected_validation_overall": 40.05050505050505,
+  "LT_class_counts": [
+    500,
+    477,
+    455,
+    434,
+    415,
+    396,
+    378,
+    361,
+    344,
+    328,
+    314,
+    299,
+    286,
+    273,
+    260,
+    248,
+    237,
+    226,
+    216,
+    206,
+    197,
+    188,
+    179,
+    171,
+    163,
+    156,
+    149,
+    142,
+    135,
+    129,
+    123,
+    118,
+    112,
+    107,
+    102,
+    98,
+    93,
+    89,
+    85,
+    81,
+    77,
+    74,
+    70,
+    67,
+    64,
+    61,
+    58,
+    56,
+    53,
+    51,
+    48,
+    46,
+    44,
+    42,
+    40,
+    38,
+    36,
+    35,
+    33,
+    32,
+    30,
+    29,
+    27,
+    26,
+    25,
+    24,
+    23,
+    22,
+    21,
+    20,
+    19,
+    18,
+    17,
+    16,
+    15,
+    15,
+    14,
+    13,
+    13,
+    12,
+    12,
+    11,
+    11,
+    10,
+    10,
+    9,
+    9,
+    8,
+    8,
+    7,
+    7,
+    7,
+    6,
+    6,
+    6,
+    6,
+    5,
+    5,
+    5,
+    5
+  ],
+  "protected_inputs": {
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\locked\\clean_stage1_best.pth": {
+      "sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "bytes": 3856969
+    },
+    "H2T_repro_audit\\clean_vs_runs\\clean_s1_seed42_vs_seed123_20261013\\stage1\\checkpoints\\clean_stage1_best.pth": {
+      "sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+      "bytes": 3856969
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\split_indices.npz": {
+      "sha256": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1",
+      "bytes": 96517
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\clean_stage1_protocol.json": {
+      "sha256": "791911c3f2c0900f1be667ec4c8000a5df6b25cb21ec2f752f3b48e4617fc782",
+      "bytes": 8967
+    },
+    "H2T\\data\\cifar100\\cifar-100-python\\train": {
+      "sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+      "bytes": 155249918
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\cifar10.py": {
+      "sha256": "74d06a6548723c91021d44f97c740a1d16801555d0e945fc5c812ba64b96b9dc",
+      "bytes": 8180
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\cifar100.py": {
+      "sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+      "bytes": 8354
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\imagenet.py": {
+      "sha256": "38dd579a1d7da90ee22053329461bd20b4cbe1289b9b6baa08b9fcb789beae5d",
+      "bytes": 7437
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\ina2018.py": {
+      "sha256": "3ad6e8f15d2d5bcb125478986ae8086198275a1971912c742876f96bf1e7a67b",
+      "bytes": 7398
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\places.py": {
+      "sha256": "f64b7e35ae78d6bd64da6d33f4dc9674926ca6d54e97f6b02329d01e73ff548b",
+      "bytes": 6697
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\sampler.py": {
+      "sha256": "b5acc56eee2a6f622944d65320315beb1385a5278cf81867744b9ee66b999908",
+      "bytes": 4803
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\eval-modifed.py": {
+      "sha256": "d2de389002f6ed9ceae1a8292931b1c5e67db46759786d2f29df686ec1e90abe",
+      "bytes": 13577
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\loss.py": {
+      "sha256": "01f6dd3eec61f63927a1a9a7d89bdfbe92fb7ed0a3c3c406e108ea6d8f099a07",
+      "bytes": 14002
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\methods.py": {
+      "sha256": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+      "bytes": 2261
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\resnet.py": {
+      "sha256": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+      "bytes": 21202
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\resnet_cifar.py": {
+      "sha256": "5da74ceeefded52a721a710a71765edd5d26f6183622b41ff5d3413456d3f42b",
+      "bytes": 7690
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\resnet_places.py": {
+      "sha256": "712eb3ba5ce4bd317f23d774ab6ec72faf46c50f3b7fcbbad6dbe70970a3f2f6",
+      "bytes": 22046
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\EAResNet.py": {
+      "sha256": "4666e23b6771933cb317dc510151a1642e425a2e7d6ead494ec08f3ced399d48",
+      "bytes": 12376
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\EAResNeXt.py": {
+      "sha256": "af2a8e4611e87ca4cc139c8fa6c5c139d0a1ab2c01fad333f93d5a83fc7115b3",
+      "bytes": 12536
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\ResNet.py": {
+      "sha256": "6345f25ee6e5f9bc9eb42b7323220b5ce91774229493bac9f2f295a2f5d166dc",
+      "bytes": 8924
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\ResNeXt.py": {
+      "sha256": "d80edad478136c5771b0a7f4cb32864e09692d05cb09d9ba4bd906a7cf607807",
+      "bytes": 6401
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\RIDEResNet.py": {
+      "sha256": "548e48e0773b3a2fa4f78f6d8d9f8e3f268abdc6750365938bbd9672d08c060b",
+      "bytes": 8020
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\RIDEResNeXt.py": {
+      "sha256": "65bd50df409d992e11dd6f0508e9b847b4aee32d09afdf6b0845084f2b1fba1e",
+      "bytes": 8034
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\ldam_drw_resnets\\ride_resnet.py": {
+      "sha256": "511a1d171a6ef51bc093dd5d269b3f6ce3eb358443ff0fbfd2a860db59328ff4",
+      "bytes": 12792
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\ldam_drw_resnets\\ride_resnet_cifar.py": {
+      "sha256": "3f11e7e6ae0dccfe6f39805f0f528d5ab32a80a59328a32d6d22a546985887e6",
+      "bytes": 11126
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\ldam_drw_resnets\\ride_resnet_places.py": {
+      "sha256": "26b483f18d4c3b73db54b88b467325847a997fce8cac999ee0be42b1c2ce69d3",
+      "bytes": 11899
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\loss.py": {
+      "sha256": "b6b320c0d9b2ec9c9a65a013338eddf0d12cd5c30916fb417517e36af373eab5",
+      "bytes": 12086
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\metric.py": {
+      "sha256": "e0c729b40b20bc610245bf57b4ae583d124332c5f56d2be5f791a208c4a7fbf0",
+      "bytes": 776
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\model.py": {
+      "sha256": "b7930fadfb702895eec562e3e9d1896bab51f6635cbb157280cc125fb639f29b",
+      "bytes": 9617
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\train_stage1.py": {
+      "sha256": "ec3a3bb3029bbb948ed7bbc975a1006e0392d40549b125dbf9e95712b45e0782",
+      "bytes": 19620
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\train_stage2.py": {
+      "sha256": "af44ab86a3873717b8287919f5c3c2f0b4e168198a48d295ca00e3a10225f8f9",
+      "bytes": 21131
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\__init__.py": {
+      "sha256": "7ee7c19e09851641a41f8182330f3514c61f050021b3ccdf4a5869d2beb21977",
+      "bytes": 359
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\logger.py": {
+      "sha256": "bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88",
+      "bytes": 3229
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\meter.py": {
+      "sha256": "6d70adc2be7f5884da2688faac671fa57ef542584c9b3a1dbf9aa7e980aeed7e",
+      "bytes": 1208
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\metric.py": {
+      "sha256": "d5da5eb30abd9328f5342182f3c23b4ca44253f89fa17c3efeffe1fee8c9933e",
+      "bytes": 3141
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\Unzip.py": {
+      "sha256": "db6badce518b786b45695a43276e355edb9bba84b6aa8d2ee47349d281c6d4cf",
+      "bytes": 1878
+    },
+    "H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\util.py": {
+      "sha256": "f06ba80b0b9e8d96c91a61e31660baf0411eb0209dfd93f5b27a89c0502de0d2",
+      "bytes": 1038
+    }
+  },
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe"
+}

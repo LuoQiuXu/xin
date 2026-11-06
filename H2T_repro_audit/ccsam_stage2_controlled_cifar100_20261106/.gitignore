@@ -1,0 +1,7 @@
+__pycache__/
+prepared/*.npy
+prepared/*.npz
+validation_20261106_02/tensor_snapshots/
+validation_20261106_02/syntax_cache/
+validation_20261106_03/reference_plans/
+validation_20261106_03/syntax_cache/

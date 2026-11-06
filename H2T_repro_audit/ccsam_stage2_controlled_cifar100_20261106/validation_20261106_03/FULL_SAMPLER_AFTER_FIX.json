@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "seeds": [
+    {
+      "seed": 123,
+      "all_30_epochs_equal": true,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "array_sha256": "f5a997b664518ad88cc94deedb80ba47da27ccf759138ae5138f7ce0a687e7f1",
+      "ambient_python_rng_unchanged": true
+    },
+    {
+      "seed": 124,
+      "all_30_epochs_equal": true,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "array_sha256": "31f89149dfbfa5f6d875ada8b6dc3f17919d251a2ba8d358ccadcc8b4004787a",
+      "ambient_python_rng_unchanged": true
+    },
+    {
+      "seed": 125,
+      "all_30_epochs_equal": true,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "array_sha256": "88e9d65fe8782cedd2f0edc82ab3a1c73ebdbe3264799ceedb606b0050405c9a",
+      "ambient_python_rng_unchanged": true
+    }
+  ],
+  "total_indices_compared": 976230,
+  "total_mismatches": 0,
+  "exact_pre_fix_official_sequences_preserved": true,
+  "identical_counts_but_reordered_indices_rejected": "Sampling indices differ from official CC-SAM at epoch/position [0, 0]",
+  "class_weights_alpha_augment_models_GAP_AST_unchanged": true,
+  "train_script_bytes_unchanged_since_scope_approval": true,
+  "experiment_protocol_bytes_unchanged": true,
+  "test_guard": {
+    "installed_at": "2026-11-06T18:05:16+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "formal_training_started": false
+}

@@ -1,0 +1,23 @@
+{
+  "stage": "smoke",
+  "target_argv": [
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py",
+    "--smoke-only"
+  ],
+  "interpreter": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "started": "2026-11-06T18:07:02.232825+08:00",
+  "formal_training_started": false,
+  "error_type": "RuntimeError",
+  "error": "Vectorized CC-SAM gradient does not match autograd reference; max_abs=5.364418029785156e-07",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_03\\run_stage.py\", line 26, in <module>\n    runpy.run_path(str(target),run_name=\"__main__\")\n  File \"<frozen runpy>\", line 287, in run_path\n  File \"<frozen runpy>\", line 98, in _run_module_code\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py\", line 576, in <module>\n    main()\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py\", line 526, in main\n    smoke = smoke_test(\n            ^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py\", line 222, in smoke_test\n    analytic_check = verify_analytic_gradient(\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py\", line 155, in verify_analytic_gradient\n    raise RuntimeError(f\"Vectorized CC-SAM gradient does not match autograd reference; max_abs={max_abs}\")\nRuntimeError: Vectorized CC-SAM gradient does not match autograd reference; max_abs=5.364418029785156e-07\n",
+  "test_guard": {
+    "installed_at": "2026-11-06T18:07:06+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "status": "FAILED_STOPPED",
+  "exit_code": 1,
+  "ended": "2026-11-06T18:07:07.680060+08:00"
+}

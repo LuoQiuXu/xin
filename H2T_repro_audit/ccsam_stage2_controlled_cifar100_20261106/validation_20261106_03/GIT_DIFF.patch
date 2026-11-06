@@ -1,0 +1,333 @@
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md
+index ee0df7e..25c8db4 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md
+@@ -10,7 +10,9 @@ Official code: https://github.com/zzpustc/CC-SAM
+ 
+ The official CC-SAM CIFAR ResNet32 implementation pools its final convolutional map before returning the feature variable used by the Stage-II feature-gradient operation. Its feature-gradient variable is therefore a 64-dimensional vector, not the full 64 x 8 x 8 convolutional map.
+ 
+-The Clean Stage I backbone in this repository returns a 64 x 8 x 8 map. This implementation applies global average pooling first, verifies that the 64-D path gives exactly the same logits as the frozen Clean classifier, and then computes the CC-SAM-style perturbation in that 64-D embedding space.
++The Clean Stage I backbone in this repository returns a 64 x 8 x 8 map. The shared clean_compatible_gap helper uses F.avg_pool2d(feature_map, feature_map.size(3)) and the same view(batch, -1) as the sealed Clean classifier, preserving its floating-point reduction path and dtype. Preparation, Smoke and the formal feature-extraction path all use this helper; run_stage.py delegates to these entry points. Adaptive average pooling is mathematically equivalent here but can differ numerically in FP32, so it is not used for this Clean-compatible path.
++
++The original classifier-path equivalence check remains active with unchanged rtol=1e-5 and atol=1e-6. The perturbation remains in the 64-D embedding space; the original Clean model/checkpoint and the CC-SAM perturbation objective are unchanged.
+ 
+ ## Controlled arms
+ 
+@@ -43,6 +45,13 @@ The code computes this exactly in a vectorized way, then normalizes each class s
+ 
+ ## Frozen protocol
+ 
++Sampling validation compares every index against the pinned, unmodified official
++CC-SAM ClassAwareSampler (official_reference/Samplers.py). The original local
++producer, private RNG and continuous class/data cycles are unchanged. Epoch
++boundaries can straddle class cycles, so each epoch's counts are recorded rather
++than required to differ by at most one. The full 30-epoch sequence must match for
++each of seeds 123, 124 and 125.
++
+ - CIFAR-100-LT, IF=100; 10,847 official TRAIN images.
+ - Clean Stage I checkpoint SHA256: 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88.
+ - Clean Stage I seed 42, best epoch 184.
+@@ -70,6 +79,12 @@ Run from the repository root in PowerShell.
+ 
+ 2. Run only the one-batch-per-arm smoke test:
+ 
++   If a previous preparation stopped with partial arrays, the explicitly approved
++   completion command is prepare_ccsam.py --complete-existing-preparation.
++   It recomputes and verifies sealed data and features exactly, preserves every
++   existing array byte, and exclusively creates missing plans and manifests.
++   Completed or unexpected preparation artifacts are refused; nothing is deleted.
++
+    python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\train_ccsam.py --smoke-only
+ 
+    This performs disposable updates only. It verifies paired images/features, exact analytic-gradient equivalence, finite classifier gradients, classifier updates, and bitwise-frozen backbone/BN. It does not start formal training.
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
+index 36b6797..3807185 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
+@@ -2,12 +2,14 @@ from __future__ import annotations
+ 
+ import csv
+ import hashlib
++import importlib.util
+ import json
+ import os
+ import pickle
+ import random
+ import sys
+ from pathlib import Path
++from types import SimpleNamespace
+ 
+ import numpy as np
+ import torch
+@@ -43,6 +45,8 @@ ALPHA_MAX = 0.3
+ ALPHA_RAMP_EPOCHS = 30
+ SEEDS = (123, 124, 125)
+ ARMS = ("C0_BALANCED_CE", "C1_CCSAM_FEATURE_GRAD", "C2_WEIGHTED_CE_NO_PERTURB")
++OFFICIAL_SAMPLER_SOURCE = ROOT / "official_reference" / "Samplers.py"
++OFFICIAL_SAMPLER_SHA256 = "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174"
+ 
+ _TEST_GUARD = None
+ 
+@@ -246,6 +250,17 @@ def build_models(checkpoint_path: Path, device: torch.device):
+     return backbone, classifier, checkpoint
+ 
+ 
++def clean_compatible_gap(feature_map: torch.Tensor) -> torch.Tensor:
++    """Use the sealed Clean Classifier.forward pooling and view, without dtype changes."""
++    if feature_map.ndim != 4 or feature_map.shape[1:] != (FEATURE_DIM, 8, 8):
++        raise RuntimeError(f"Expected [B,64,8,8] Clean feature maps, got {tuple(feature_map.shape)}")
++    pooled = F.avg_pool2d(feature_map, feature_map.size(3))
++    gap = pooled.view(pooled.size(0), -1)
++    if gap.shape != (feature_map.size(0), FEATURE_DIM):
++        raise RuntimeError(f"Expected [B,64] Clean GAP features, got {tuple(gap.shape)}")
++    return gap
++
++
+ def extract_gap(backbone, classifier, images: np.ndarray, eval_transform, device, batch_size=128):
+     feature_chunks = []
+     classifier.eval()
+@@ -254,9 +269,7 @@ def extract_gap(backbone, classifier, images: np.ndarray, eval_transform, device
+             chunk = images[start:start + batch_size]
+             batch = torch.stack([eval_transform(Image.fromarray(im)) for im in chunk]).to(device)
+             feature_map = backbone(batch)
+-            if feature_map.ndim != 4 or feature_map.shape[1:] != (64, 8, 8):
+-                raise RuntimeError(f"Expected [B,64,8,8] Clean feature maps, got {tuple(feature_map.shape)}")
+-            gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
++            gap = clean_compatible_gap(feature_map)
+             logits_from_gap = classifier.module.fc(gap)
+             logits_from_map = classifier(feature_map)
+             if not torch.allclose(logits_from_gap, logits_from_map, rtol=1e-5, atol=1e-6):
+@@ -318,7 +331,54 @@ def evaluate_gap(classifier, gap_features: np.ndarray, labels: np.ndarray, train
+     return metrics_from_predictions(pred, labels, train_counts), pred
+ 
+ 
+-def make_class_aware_plan(labels: np.ndarray, seed: int, epochs=STAGE2_EPOCHS):
++def official_class_aware_plan(labels: np.ndarray, seed: int, epochs: int):
++    """Run the pinned, unmodified author sampler without changing ambient RNG state."""
++    if sha256_file(OFFICIAL_SAMPLER_SOURCE) != OFFICIAL_SAMPLER_SHA256:
++        raise RuntimeError("Pinned official CC-SAM sampler source checksum mismatch")
++    rng_state = random.getstate()
++    try:
++        spec = importlib.util.spec_from_file_location("_ccsam_pinned_official_sampler", OFFICIAL_SAMPLER_SOURCE)
++        module = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(module)
++        random.seed(int(seed))
++        sampler = module.ClassAwareSampler(SimpleNamespace(labels=np.asarray(labels, dtype=np.int64)))
++        reference = np.stack([
++            np.asarray(list(iter(sampler)), dtype=np.int32) for _ in range(epochs)
++        ])
++    finally:
++        random.setstate(rng_state)
++    return reference
++
++
++def validate_class_aware_plan(labels: np.ndarray, seed: int, plan: np.ndarray):
++    """Require every index to match the official continuous sampler; retain epoch counts."""
++    labels = np.asarray(labels, dtype=np.int64)
++    plan = np.asarray(plan)
++    if plan.ndim != 2 or plan.shape[0] < 1 or plan.shape[1] != len(labels) or plan.dtype != np.int32:
++        raise RuntimeError("Malformed class-aware sampling plan shape or dtype")
++    if np.any(plan < 0) or np.any(plan >= len(labels)):
++        raise RuntimeError("Class-aware sampling plan contains out-of-range indices")
++    reference = official_class_aware_plan(labels, seed, plan.shape[0])
++    if not np.array_equal(plan, reference):
++        location = np.argwhere(plan != reference)[0].tolist()
++        raise RuntimeError(f"Sampling indices differ from official CC-SAM at epoch/position {location}")
++    counts = np.stack([np.bincount(labels[row], minlength=NUM_CLASSES) for row in plan])
++    return {
++        "matches_official_sequence": True,
++        "indices_compared": int(plan.size),
++        "mismatched_indices": 0,
++        "official_source_sha256": OFFICIAL_SAMPLER_SHA256,
++        "local_array_sha256": hash_arrays(plan),
++        "official_array_sha256": hash_arrays(reference),
++        "balance_definition": "exact official continuous class-aware sequence; epoch boundaries need not align with class cycles",
++        "per_epoch_class_counts": counts.tolist(),
++        "per_epoch_count_min": counts.min(axis=1).tolist(),
++        "per_epoch_count_max": counts.max(axis=1).tolist(),
++        "per_epoch_count_spread": (counts.max(axis=1) - counts.min(axis=1)).tolist(),
++    }
++
++
++def make_class_aware_plan(labels: np.ndarray, seed: int, epochs=STAGE2_EPOCHS, return_statistics=False):
+     labels = np.asarray(labels, dtype=np.int64)
+     classes = np.unique(labels)
+     if not np.array_equal(classes, np.arange(NUM_CLASSES)):
+@@ -352,10 +412,10 @@ def make_class_aware_plan(labels: np.ndarray, seed: int, epochs=STAGE2_EPOCHS):
+             dtype=np.int32,
+             count=len(labels),
+         )
+-        per_class = np.bincount(labels[order], minlength=NUM_CLASSES)
+-        if int(per_class.max() - per_class.min()) > 1:
+-            raise RuntimeError("Class-aware sampler did not produce a balanced epoch")
+         plan[epoch] = order
++    statistics = validate_class_aware_plan(labels, seed, plan)
++    if return_statistics:
++        return plan, statistics
+     return plan
+ 
+ 
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py
+index 93119c2..ec0cff2 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepare_ccsam.py
+@@ -2,6 +2,7 @@ from __future__ import annotations
+ 
+ import argparse
+ import hashlib
++import json
+ import pickle
+ from pathlib import Path
+ 
+@@ -39,21 +40,52 @@ def load_official_train_pickle(data_root: Path):
+     return images, labels, train_pickle, digest
+ 
+ 
++def save_array_without_overwrite(path: Path, array: np.ndarray):
++    """Verify existing partial preparation exactly, or exclusively create a missing array."""
++    if path.exists():
++        before = sha256_file(path)
++        existing = np.load(path, mmap_mode="r", allow_pickle=False)
++        if existing.shape != array.shape or existing.dtype != array.dtype or not np.array_equal(existing, array):
++            raise RuntimeError(f"Existing prepared array differs from recomputed sealed data: {path}")
++        if sha256_file(path) != before:
++            raise RuntimeError(f"Existing prepared array changed during verification: {path}")
++        return {"action": "reused_unchanged", "sha256": before}
++    with path.open("xb") as stream:
++        np.save(stream, array, allow_pickle=False)
++    return {"action": "created_missing", "sha256": sha256_file(path)}
++
++
++def write_prepared_json_without_overwrite(path: Path, payload):
++    with path.open("x", encoding="utf-8") as stream:
++        json.dump(payload, stream, ensure_ascii=False, indent=2, allow_nan=False)
++
++
+ def main():
+     parser = argparse.ArgumentParser(description="Prepare the sealed Clean Stage I basis for CC-SAM Stage II transfer.")
+     parser.add_argument("--checkpoint", type=str, default=None)
+     parser.add_argument("--data-root", type=str, default=str(DEFAULT_DATA_ROOT))
+     parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS))
++    parser.add_argument("--complete-existing-preparation", action="store_true",
++                        help="Validate partial arrays exactly and create only missing outputs; never overwrite.")
+     args = parser.parse_args()
+ 
+     if tuple(args.seeds) != tuple(SEEDS):
+         raise RuntimeError(f"This frozen protocol requires Stage II seeds {SEEDS}; got {tuple(args.seeds)}")
+     prepared = ROOT / "prepared"
+-    if prepared.exists():
++    if prepared.exists() and not args.complete_existing_preparation:
+         raise FileExistsError(
+             f"Refusing to overwrite existing preparation directory: {prepared}. "
+             "Inspect the existing manifest before deciding how to proceed."
+         )
++    if args.complete_existing_preparation:
++        if not prepared.is_dir():
++            raise FileNotFoundError("No partial prepared directory exists to complete")
++        allowed = {"train_images.npy", "train_labels.npy", "validation_images.npy",
++                   "validation_labels.npy", "validation_gap_features.npy"}
++        allowed.update(f"sampling_plan_seed{seed}.npy" for seed in SEEDS)
++        unexpected = [p.name for p in prepared.iterdir() if not p.is_file() or p.name not in allowed]
++        if unexpected:
++            raise RuntimeError(f"Prepared directory contains completed or unexpected artifacts; refusing modification: {unexpected}")
+ 
+     data_root = Path(args.data_root).expanduser().resolve()
+     guard = install_test_guard(data_root)
+@@ -119,6 +151,7 @@ def main():
+     device = torch.device("cuda:0")
+     backbone, classifier, checkpoint = build_models(checkpoint_path, device)
+ 
++    # extract_gap delegates to the same Clean-compatible pooling used by Smoke/Stage II.
+     validation_gap = extract_gap(
+         backbone, classifier, validation_images, eval_transform, device, batch_size=128
+     )
+@@ -134,24 +167,34 @@ def main():
+             f"recomputed={baseline_metrics['Overall']:.10f}, sealed={expected_overall:.10f}"
+         )
+ 
+-    prepared.mkdir(parents=True, exist_ok=False)
+-    np.save(prepared / "train_images.npy", train_images)
+-    np.save(prepared / "train_labels.npy", train_labels)
+-    np.save(prepared / "validation_images.npy", validation_images)
+-    np.save(prepared / "validation_labels.npy", validation_labels)
+-    np.save(prepared / "validation_gap_features.npy", validation_gap.astype(np.float32, copy=False))
++    print(
++        f"Clean TRAIN-holdout validation reproduced: actual={baseline_metrics['Overall']:.10f}% "
++        f"sealed={expected_overall:.10f}%; GAP shape={list(validation_gap.shape)}",
++        flush=True,
++    )
++    if not prepared.exists():
++        prepared.mkdir(parents=True, exist_ok=False)
++    array_actions = {}
++    for name, array in (
++        ("train_images.npy", train_images), ("train_labels.npy", train_labels),
++        ("validation_images.npy", validation_images), ("validation_labels.npy", validation_labels),
++        ("validation_gap_features.npy", validation_gap.astype(np.float32, copy=False)),
++    ):
++        array_actions[name] = save_array_without_overwrite(prepared / name, array)
+ 
+     sampling_plan_hashes = {}
+     for seed in SEEDS:
+-        plan = make_class_aware_plan(train_labels, seed)
++        plan, statistics = make_class_aware_plan(train_labels, seed, return_statistics=True)
+         plan_path = prepared / f"sampling_plan_seed{seed}.npy"
+-        np.save(plan_path, plan)
++        plan_action = save_array_without_overwrite(plan_path, plan)
+         sampling_plan_hashes[str(seed)] = {
+             "path": plan_path.name,
+             "sha256": sha256_file(plan_path),
+             "shape": list(plan.shape),
+             "dtype": str(plan.dtype),
+-            "all_epochs_class_balanced": True,
++            "file_action": plan_action["action"],
++            "all_epochs_match_official_continuous_sampler": True,
++            "official_sequence_validation": statistics,
+         }
+ 
+     manifest = {
+@@ -184,10 +227,12 @@ def main():
+         "CIFAR100_train_false_calls": 0,
+         "checkpoint_retrained": False,
+         "class_statistics_recomputed_for_method": False,
++        "preparation_mode": "complete_existing_without_overwrite" if args.complete_existing_preparation else "fresh",
++        "prepared_array_actions": array_actions,
+     }
+-    write_json(prepared / "prepared_manifest.json", manifest)
++    write_prepared_json_without_overwrite(prepared / "prepared_manifest.json", manifest)
+     guard_result = guard_pass()
+-    write_json(prepared / "test_guard_prepare.json", guard_result)
++    write_prepared_json_without_overwrite(prepared / "test_guard_prepare.json", guard_result)
+     print("CC-SAM PREPARATION PASS")
+     print(f"Clean Stage I SHA256: {manifest['clean_stage1_sha256']}")
+     print(f"TRAIN samples: {manifest['train_samples']}; validation samples: {manifest['validation_samples']}")
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+index aca97ce..ec7bef6 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+@@ -14,7 +14,7 @@ from ccsam_common import (
+     sha256_file, hash_arrays, state_hash, write_json, read_json,
+     install_test_guard, guard_pass, resolve_checkpoint, build_transforms,
+     build_models, seed_everything, augment_batch, class_weights_from_counts,
+-    alpha_for_epoch, evaluate_gap, check_backbone_unchanged,
++    alpha_for_epoch, evaluate_gap, check_backbone_unchanged, clean_compatible_gap,
+ )
+ 
+ 
+@@ -200,7 +200,7 @@ def smoke_test(seed, manifest, train_images, train_labels, validation_gap, valid
+         images_hash = hash_arrays(indices, labels.cpu().numpy(), images_cpu.numpy())
+         with torch.no_grad():
+             feature_map = backbone(images_cpu.to("cuda:0"))
+-            gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
++            gap = clean_compatible_gap(feature_map)
+         feature_hash = hash_arrays(gap.detach().cpu().numpy())
+ 
+         controls = {
+@@ -373,7 +373,7 @@ def train_one_arm(seed, arm, manifest, train_images, train_labels, validation_ga
+                 images_cpu = augment_batch(train_images, indices, train_transform, augmentation_generator)
+                 with torch.no_grad():
+                     feature_map = backbone(images_cpu.to(device, non_blocking=True))
+-                    gap = F.adaptive_avg_pool2d(feature_map, 1).flatten(1)
++                    gap = clean_compatible_gap(feature_map)
+                 if gap.shape != (end - start, FEATURE_DIM) or not torch.isfinite(gap).all():
+                     raise RuntimeError("Malformed or non-finite 64-D GAP features.")
+ 

@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "holdout_overall": 40.05050505050505,
+  "unchanged_existing_arrays": 5,
+  "new_sampling_plans": [
+    {
+      "seed": 123,
+      "epochs": 30,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "plan_file_sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45"
+    },
+    {
+      "seed": 124,
+      "epochs": 30,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "plan_file_sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39"
+    },
+    {
+      "seed": 125,
+      "epochs": 30,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "plan_file_sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2"
+    }
+  ],
+  "total_indices_compared": 976230,
+  "TEST_guard": {
+    "installed_at": "2026-11-06T18:05:52+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "raw_id_overlap": 0,
+  "pixel_overlap": 0,
+  "formal_training_started": false
+}

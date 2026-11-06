@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "files": [
+    "ccsam_common.py",
+    "prepare_ccsam.py",
+    "train_ccsam.py",
+    "analyze_ccsam.py",
+    "official_reference/Samplers.py",
+    "validation_20261106_03/verify_full_sampler_before_fix.py",
+    "validation_20261106_03/check_sampler_validation.py",
+    "validation_20261106_03/run_stage.py"
+  ],
+  "py_compile_files": 8
+}

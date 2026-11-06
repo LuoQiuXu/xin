@@ -1,0 +1,83 @@
+{
+  "status": "PASS_EXACT_ALL_SEEDS_ALL_EPOCHS",
+  "seeds": [
+    {
+      "seed": 123,
+      "epochs": 30,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "shape": [
+        30,
+        10847
+      ],
+      "dtype": "int32",
+      "all_indices_equal": true,
+      "local_array_sha256": "f5a997b664518ad88cc94deedb80ba47da27ccf759138ae5138f7ce0a687e7f1",
+      "official_array_sha256": "f5a997b664518ad88cc94deedb80ba47da27ccf759138ae5138f7ce0a687e7f1",
+      "reference_file_sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45"
+    },
+    {
+      "seed": 124,
+      "epochs": 30,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "shape": [
+        30,
+        10847
+      ],
+      "dtype": "int32",
+      "all_indices_equal": true,
+      "local_array_sha256": "31f89149dfbfa5f6d875ada8b6dc3f17919d251a2ba8d358ccadcc8b4004787a",
+      "official_array_sha256": "31f89149dfbfa5f6d875ada8b6dc3f17919d251a2ba8d358ccadcc8b4004787a",
+      "reference_file_sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39"
+    },
+    {
+      "seed": 125,
+      "epochs": 30,
+      "indices_compared": 325410,
+      "mismatches": 0,
+      "shape": [
+        30,
+        10847
+      ],
+      "dtype": "int32",
+      "all_indices_equal": true,
+      "local_array_sha256": "88e9d65fe8782cedd2f0edc82ab3a1c73ebdbe3264799ceedb606b0050405c9a",
+      "official_array_sha256": "88e9d65fe8782cedd2f0edc82ab3a1c73ebdbe3264799ceedb606b0050405c9a",
+      "reference_file_sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2"
+    }
+  ],
+  "total_indices_compared": 976230,
+  "total_mismatches": 0,
+  "official_source_git_blob": "9711d4d60ac41da5d01b3b2214d3f07d4ba4ac23",
+  "official_source_sha256": "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174",
+  "official_source_url": "https://github.com/zzpustc/CC-SAM/blob/main/datasets/Samplers.py",
+  "source": "D:/xiangmuxunlian/xin/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py",
+  "production_source_sha256": "fa3c396da1e28e4141c66cce835825fda3b8e79738d2d68a9976c97e9fc8f7d8",
+  "diagnostic_method": "In-memory AST copy omits only the known false validation If/Raise; producer RNG, iterators and index construction untouched. Production file remains unchanged.",
+  "diagnostic_validation_statements_omitted": 1,
+  "production_validation_modified": false,
+  "actual_epoch_count_ranges": [
+    [
+      107,
+      109
+    ],
+    [
+      108,
+      109
+    ],
+    [
+      108,
+      110
+    ]
+  ],
+  "formal_training_started": false,
+  "sampling_plan_files_written_to_prepared": 0,
+  "test_guard": {
+    "installed_at": "2026-11-06T18:01:25+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}
