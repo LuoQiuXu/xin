@@ -132,21 +132,28 @@ def compute_arm_loss(arm, gap, labels, classifier_fc, class_weights, epoch_index
     return loss, logits_clean, clean_losses, adv_ce, delta, perturb_stats, alpha
 
 
-def verify_analytic_gradient():
-    device = torch.device("cuda:0")
-    torch.manual_seed(20261106)
-    fc = torch.nn.Linear(FEATURE_DIM, NUM_CLASSES).to(device)
-    z = torch.randn(64, FEATURE_DIM, device=device)
-    y = torch.arange(64, device=device, dtype=torch.long) % NUM_CLASSES
-    counts = np.linspace(5, 500, NUM_CLASSES, dtype=np.float64)
-    weights = class_weights_from_counts(counts, device)
-    logits = fc(z)
-    analytic, _ = analytic_classwise_feature_delta(logits, z, y, weights, fc.weight)
-    reference = autograd_reference_delta(z, y, fc, weights)
+def verify_analytic_gradient(gap=None, labels=None, classifier_fc=None, class_weights=None):
+    if gap is None:
+        device = torch.device("cuda:0")
+        torch.manual_seed(20261106)
+        classifier_fc = torch.nn.Linear(FEATURE_DIM, NUM_CLASSES).to(device)
+        gap = torch.randn(64, FEATURE_DIM, device=device)
+        labels = torch.arange(64, device=device, dtype=torch.long) % NUM_CLASSES
+        counts = np.linspace(5, 500, NUM_CLASSES, dtype=np.float64)
+        class_weights = class_weights_from_counts(counts, device)
+        comparison = "synthetic vectorized gradient vs direct autograd reference"
+    else:
+        gap = gap.detach()
+        comparison = "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+    logits = classifier_fc(gap.detach())
+    analytic, _ = analytic_classwise_feature_delta(
+        logits, gap, labels, class_weights, classifier_fc.weight
+    )
+    reference = autograd_reference_delta(gap, labels, classifier_fc, class_weights)
     max_abs = float((analytic - reference).abs().max().detach().cpu())
     if not torch.allclose(analytic, reference, rtol=1e-5, atol=1e-7):
         raise RuntimeError(f"Vectorized CC-SAM gradient does not match autograd reference; max_abs={max_abs}")
-    return {"passed": True, "max_abs_difference": max_abs, "comparison": "vectorized analytic gradient vs official-style per-class autograd.grad"}
+    return {"passed": True, "max_abs_difference": max_abs, "comparison": comparison}
 
 
 def load_prepared():
@@ -212,7 +219,9 @@ def smoke_test(seed, manifest, train_images, train_labels, validation_gap, valid
             arm, gap, labels, classifier.module.fc, weights, epoch_index=0
         )
         if arm == "C1_CCSAM_FEATURE_GRAD":
-            analytic_check = verify_analytic_gradient()
+            analytic_check = verify_analytic_gradient(
+                gap, labels, classifier.module.fc, weights
+            )
             if float(torch.linalg.vector_norm(delta, dim=1).mean().detach().cpu()) <= 0:
                 raise RuntimeError("CC-SAM feature perturbation is identically zero in smoke test.")
         else:
@@ -492,13 +501,22 @@ def main():
 
     if tuple(args.seeds) != tuple(SEEDS):
         raise RuntimeError(f"This frozen protocol requires Stage II seeds {SEEDS}; got {tuple(args.seeds)}")
-    data_root = Path(args.data_root).expanduser().resolve() if args.data_root else ROOT.parents[1] / "H2T" / "data" / "cifar100"
+    manifest_path = ROOT / "prepared" / "prepared_manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError("Run prepare_ccsam.py successfully before training.")
+    preliminary_manifest = read_json(manifest_path)
+    manifest_data_root = Path(preliminary_manifest["official_train_pickle"]).resolve().parent.parent
+    data_root = Path(args.data_root).expanduser().resolve() if args.data_root else manifest_data_root
+    if data_root != manifest_data_root:
+        raise RuntimeError("The training data-root override differs from the TRAIN data-root sealed during preparation.")
     install_test_guard(data_root)
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is required; CPU fallback is intentionally disabled.")
     device = torch.device("cuda:0")
     manifest, train_images, train_labels, validation_gap, validation_labels = load_prepared()
-    train_transform, _, _ = build_transforms()
+    train_transform, _, transform_sha = build_transforms()
+    if transform_sha != manifest["transform_source_sha256"]:
+        raise RuntimeError("The audited CIFAR transform source changed after preparation.")
 
     if args.smoke_only:
         report_path = ROOT / "smoke_report.json"
@@ -515,7 +533,9 @@ def main():
             "completed_at": __import__("datetime").datetime.now().astimezone().isoformat(timespec="seconds"),
             "purpose": "one real CIFAR-100-LT batch per arm; all optimizer updates discarded",
             "formal_training_started": False,
-            "analytic_gradient_equivalence": analytic_check,
+            "prepared_manifest_sha256": sha256_file(manifest_path),
+            "analytic_gradient_equivalence_synthetic": analytic_check,
+            "analytic_gradient_equivalence_actual_batch": smoke["arms"]["C1_CCSAM_FEATURE_GRAD"]["analytic_gradient_check"],
             "seed_smoke": smoke,
             "test_guard": guard,
             "official_TEST_used": False,
@@ -528,6 +548,8 @@ def main():
     smoke_path = ROOT / "smoke_report.json"
     if not smoke_path.is_file() or not read_json(smoke_path).get("passed"):
         raise RuntimeError("Formal training is blocked until a successful smoke_report.json exists.")
+    if read_json(smoke_path).get("prepared_manifest_sha256") != sha256_file(manifest_path):
+        raise RuntimeError("Smoke report was produced from a different prepared manifest; rerun preparation and smoke review.")
     if ROOT.joinpath("formal_test_guard.json").exists():
         raise FileExistsError("Formal run appears to have been sealed already; refusing a second run.")
     for seed in SEEDS:
