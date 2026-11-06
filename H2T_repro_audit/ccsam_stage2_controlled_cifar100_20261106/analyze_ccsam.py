@@ -23,7 +23,8 @@ def load_final(seed, arm):
     status_path = run_dir / "status.json"
     metrics_path = run_dir / "metrics.csv"
     checkpoint_path = run_dir / "final_classifier.pth"
-    if not status_path.is_file() or not metrics_path.is_file() or not checkpoint_path.is_file():
+    trace_path = run_dir / "batch_trace.csv"
+    if not status_path.is_file() or not metrics_path.is_file() or not checkpoint_path.is_file() or not trace_path.is_file():
         raise FileNotFoundError(f"Incomplete formal run: {run_dir}")
     status = read_json(status_path)
     if status.get("state") != "completed" or status.get("official_TEST_used") is not False:
@@ -36,7 +37,32 @@ def load_final(seed, arm):
         rows = list(csv.DictReader(f))
     if len(rows) != STAGE2_EPOCHS or int(rows[-1]["epoch"]) != STAGE2_EPOCHS:
         raise RuntimeError(f"Final epoch metrics are missing: {metrics_path}")
-    return status["final_validation"], rows[-1], status
+    with trace_path.open("r", encoding="utf-8", newline="") as f:
+        trace_rows = list(csv.DictReader(f))
+    expected_batches = STAGE2_EPOCHS * 170
+    if len(trace_rows) != expected_batches:
+        raise RuntimeError(f"Unexpected paired trace length in {trace_path}: {len(trace_rows)}")
+    return status["final_validation"], rows[-1], status, trace_rows
+
+
+def verify_paired_runs(seed, statuses, traces):
+    reference = traces["C0_BALANCED_CE"]
+    for arm in ("C1_CCSAM_FEATURE_GRAD", "C2_WEIGHTED_CE_NO_PERTURB"):
+        if traces[arm] != reference:
+            raise RuntimeError(f"Batch-level pairing mismatch for seed {seed}: {arm}")
+    classifier_hashes = {statuses[arm]["initial_classifier_sha256"] for arm in ARMS}
+    backbone_hashes = {statuses[arm]["initial_backbone_sha256"] for arm in ARMS}
+    clean_hashes = {statuses[arm]["clean_stage1_sha256"] for arm in ARMS}
+    if len(classifier_hashes) != 1 or len(backbone_hashes) != 1 or len(clean_hashes) != 1:
+        raise RuntimeError(f"Initial model states differ across arms for seed {seed}")
+    return {
+        "seed": int(seed),
+        "batch_trace_rows_per_arm": len(reference),
+        "C1_C2_inputs_and_features_match_C0": True,
+        "initial_classifier_match": True,
+        "initial_backbone_match": True,
+        "clean_stage1_checkpoint_match": True,
+    }
 
 
 def main():
@@ -53,21 +79,32 @@ def main():
 
     all_results = {}
     final_rows = []
+    pairing_verification = []
     for seed in SEEDS:
         all_results[str(seed)] = {}
+        statuses = {}
+        traces = {}
         for arm in ARMS:
-            validation, csv_row, status = load_final(seed, arm)
+            validation, csv_row, status, trace_rows = load_final(seed, arm)
             all_results[str(seed)][arm] = validation
+            statuses[arm] = status
+            traces[arm] = trace_rows
+            delta_value = float(csv_row["mean_delta_l2_per_sample"])
+            if arm == "C1_CCSAM_FEATURE_GRAD" and delta_value <= 0:
+                raise RuntimeError(f"CC-SAM feature perturbation was zero in the completed run: seed={seed}")
+            if arm != "C1_CCSAM_FEATURE_GRAD" and delta_value != 0:
+                raise RuntimeError(f"Unexpected feature perturbation in control arm {arm}, seed={seed}")
             final_rows.append({
                 "seed": seed,
                 "arm": arm,
                 **{metric: float(validation[metric]) for metric in METRICS},
                 "train_loss": float(csv_row["train_loss"]),
                 "train_clean_accuracy": float(csv_row["train_clean_accuracy"]),
-                "mean_delta_l2_per_sample": float(csv_row["mean_delta_l2_per_sample"]),
+                "mean_delta_l2_per_sample": delta_value,
                 "mean_relative_delta_l2": float(csv_row["mean_relative_delta_l2"]),
                 "mean_adv_minus_clean_ce": float(csv_row["mean_adv_minus_clean_ce"]),
             })
+        pairing_verification.append(verify_paired_runs(seed, statuses, traces))
 
     final_table_path = ROOT / "final_epoch_metrics.csv"
     with final_table_path.open("w", encoding="utf-8", newline="") as f:
@@ -122,6 +159,7 @@ def main():
         "official_TEST_used": False,
         "stage2_seed_count_is_not_independent_backbone_count": True,
         "final_epoch_metrics": all_results,
+        "batch_and_initialization_pairing_verification": pairing_verification,
         "paired_delta_summary": delta_summary,
         "interpretation": {
             "C1_minus_C2": "Primary estimate of the added contribution of CC-SAM-style class-conditional feature-gradient perturbation, with class weights, alpha schedule, sampler, initialization, and optimizer held fixed.",
