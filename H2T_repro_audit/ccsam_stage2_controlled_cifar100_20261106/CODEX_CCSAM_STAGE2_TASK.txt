@@ -1,0 +1,127 @@
+CC-SAM Stage II controlled experiment — Codex execution instructions
+Repository: LuoQiuXu/xin
+Branch: experiment/ccsam-stage2-controlled-cifar100-20261106
+Experiment folder: H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106
+
+PURPOSE
+Prepare and smoke-test a controlled transfer of the official CC-SAM Stage II class-conditional feature-gradient perturbation to the already trained Clean Stage I checkpoint on CIFAR-100-LT IF=100.
+
+IMPORTANT SCOPE
+This is not a full reproduction of original CC-SAM. Only its Stage II feature-gradient perturbation objective is transferred.
+Do not retrain Stage I.
+Do not modify H2T, PI-H2T, the existing Clean Stage I run, historical result folders, or any file outside the new experiment folder.
+Do not start formal training in this task. Stop after static checks, preparation, and the one-batch smoke test. The user will review the code and smoke report before authorizing formal training.
+
+1. CHECKOUT AND PROTECT THE BRANCH
+- Confirm the working repository is LuoQiuXu/xin.
+- Fetch origin and checkout experiment/ccsam-stage2-controlled-cifar100-20261106.
+- Record git status before work.
+- Do not commit unrelated local changes.
+- Do not switch to or modify main.
+
+2. INSPECT THE IMPLEMENTATION
+Read:
+- ccsam_common.py
+- prepare_ccsam.py
+- train_ccsam.py
+- experiment_protocol.json
+- README.md
+
+Check that the implementation uses:
+- the sealed Clean Stage I checkpoint with SHA256 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88;
+- the exact frozen TRAIN split from clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/split_indices.npz;
+- the 64-D GAP feature vector before the linear classifier, matching the official CC-SAM CIFAR ResNet32 feature variable;
+- official CC-SAM Stage II class weights, alpha ramp, class-aware sampling, and CIFAR learning-rate schedule;
+- the C0/C1/C2 matched-arm definitions in experiment_protocol.json.
+
+Do not replace the 64-D GAP perturbation with a perturbation on the 64x8x8 feature map. Do not add H2T channel fusion to this experiment.
+
+3. VERIFY LOCAL INPUTS — DO NOT SUBSTITUTE
+Expected default data root:
+H2T/data/cifar100
+
+Expected raw file:
+H2T/data/cifar100/cifar-100-python/train
+
+Expected Clean Stage I checkpoint candidates:
+H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/locked/clean_stage1_best.pth
+H2T_repro_audit/clean_vs_runs/clean_s1_seed42_vs_seed123_20261013/stage1/checkpoints/clean_stage1_best.pth
+
+The checkpoint must match the exact SHA256 above, be seed 42 / epoch 184, and have the sealed TRAIN-holdout provenance.
+If the checkpoint, split, or dataset file is missing or has a different checksum, STOP and report the exact mismatch. Do not retrain Stage I, download a substitute dataset, rebuild a different split, or silently select another checkpoint.
+
+4. STATIC CHECKS
+From the repository root, run:
+python -m py_compile H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\ccsam_common.py
+python -m py_compile H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\prepare_ccsam.py
+python -m py_compile H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\train_ccsam.py
+python -m py_compile H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\analyze_ccsam.py
+
+Do not instantiate torchvision.datasets.CIFAR100(train=False). The scripts deliberately block that call and block opening the official CIFAR-100 TEST pickle.
+
+5. PREPARE THE SEALED DATA
+Run:
+python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\prepare_ccsam.py
+
+If the data root is elsewhere, use:
+python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\prepare_ccsam.py --data-root "D:\actual\path\to\cifar100"
+
+The preparation must:
+- verify the official TRAIN pickle checksum;
+- reconstruct exactly 10,847 LT training samples and 1,980 TRAIN-holdout validation samples;
+- verify the expected IF=100 class counts;
+- verify zero raw-ID and exact-pixel overlap;
+- load only the sealed Clean Stage I checkpoint;
+- reproduce its sealed 40.050505% TRAIN-holdout Overall accuracy using the 64-D GAP classifier path;
+- save the 30-epoch class-aware sampling plans for seeds 123, 124, 125;
+- certify that official TEST was not accessed.
+
+If any check fails, stop and report it. Do not bypass the assertion.
+
+6. RUN ONLY THE SMOKE TEST
+Run:
+python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\train_ccsam.py --smoke-only
+
+The smoke test uses one real batch and one disposable classifier update per arm. It must verify:
+- C0, C1, C2 receive identical sampled indices, labels, augmented images, and frozen GAP features for the same seed;
+- all arms start from the exact same Clean Stage I classifier state;
+- vectorized analytic classwise gradients match the direct autograd reference;
+- C1 creates a finite, nonzero feature perturbation;
+- C0 and C2 use exactly zero perturbation;
+- the classifier receives finite gradients and updates;
+- the backbone and all BN buffers remain bitwise unchanged;
+- no official TEST access is attempted.
+
+The smoke test must not write formal checkpoints or begin the 30-epoch runs.
+
+7. STOP AND REPORT
+After successful smoke:
+- inspect prepared/prepared_manifest.json;
+- inspect smoke_report.json;
+- report the Clean checkpoint SHA, validation reproduction, class counts, paired hashes, gradient-equivalence maximum error, C1 perturbation magnitude, classifier update checks, and TEST guard status;
+- show git status and list files changed on this branch;
+- stop and wait for the user's approval.
+
+DO NOT RUN:
+python ...\train_ccsam.py --formal
+
+Formal training requires a separate explicit user approval. After approval only, the formal command is:
+python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\train_ccsam.py --formal
+
+After all nine runs complete, analyze with:
+python H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\analyze_ccsam.py
+
+FORMAL DESIGN REFERENCE
+C0_BALANCED_CE:
+Frozen-backbone class-aware balanced sampling + unweighted CE. This is a matched cRT-style control that retains the Clean Stage I classifier initialization; do not call it strict canonical cRT with a randomly reinitialized head.
+
+C1_CCSAM_FEATURE_GRAD:
+CC-SAM Stage II-inspired class-conditional gradient-ascent perturbation in the 64-D GAP embedding, with class weights and alpha schedule.
+
+C2_WEIGHTED_CE_NO_PERTURB:
+Same sampler, class weights, alpha schedule, optimizer, and initialization as C1, but delta is exactly zero.
+
+Primary comparison: C1 minus C2.
+Secondary comparisons: C2 minus C0, and C1 minus C0.
+
+All three Stage-II seeds share one fixed Clean Stage I backbone. Do not describe them as three independent Stage I runs or as cross-dataset generalization.
