@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import pickle
 from pathlib import Path
 
@@ -99,6 +100,12 @@ def main():
     expected_counts = np.asarray(clean_protocol["LT_class_counts"], dtype=np.int64)
     if not np.array_equal(train_counts, expected_counts):
         raise RuntimeError("The reconstructed LT training class counts differ from the sealed Clean Stage I protocol.")
+    lt_pixel_hash = hashlib.sha256(train_images.tobytes(order="C")).hexdigest()
+    if lt_pixel_hash != clean_protocol["LT_pixel_hash"]:
+        raise RuntimeError(
+            "The reconstructed LT training pixels differ from the sealed Clean Stage I data. "
+            f"actual={lt_pixel_hash}; expected={clean_protocol['LT_pixel_hash']}"
+        )
     if validation_counts.tolist() != [0] + [20] * 99:
         raise RuntimeError("The frozen validation partition must contain 20 examples for classes 1..99 and none for class 0.")
 
@@ -163,6 +170,7 @@ def main():
         "train_samples": int(len(train_labels)),
         "validation_samples": int(len(validation_labels)),
         "train_class_counts": train_counts.tolist(),
+        "LT_pixel_hash": lt_pixel_hash,
         "validation_class_counts": validation_counts.tolist(),
         "train_validation_raw_id_overlap": 0,
         "train_validation_exact_pixel_overlap": 0,
