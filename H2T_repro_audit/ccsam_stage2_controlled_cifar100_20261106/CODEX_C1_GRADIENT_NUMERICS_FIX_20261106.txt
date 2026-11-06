@@ -1,0 +1,326 @@
+# Codex 任务：一次性定位并修复 CC-SAM C1 解析梯度数值不一致
+
+## 0. 工作分支、基线与任务边界
+
+- 仓库：LuoQiuXu/xin
+- 工作分支：experiment/ccsam-gradient-numerics-fix-20261106
+- 基线分支：experiment/ccsam-stage2-controlled-cifar100-20261106
+- 基线提交：e63e190edd72b9ca62b763639f190bbc07b81ede
+- 实验目录：H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106
+- 固定解释器：D:\app\minicondaaa\envs\xiaoju\python.exe
+- GPU：NVIDIA GeForce RTX 5070 Laptop GPU（如环境变化，记录实际值）
+
+本任务只解决 C1 的解析特征梯度与 Autograd 参考之间的数值等价性问题。必须先完成只读诊断，再实施最小生产修复，最后执行一次 Smoke。禁止启动 9 组正式训练。
+
+不要切回或修改基线分支；不要创建其他分支。不要覆盖任何历史 validation_20261106_01 至 validation_20261106_04 的文件。所有新诊断结果写入新目录：
+
+validation_20261106_05/
+
+所有报告/日志/JSON/CSV 采用排他创建（文件已存在即停止，不覆盖）。大型张量快照可本地保存并按本实验既有规则 git-ignore，但必须记录 SHA256、shape、dtype；不要把大型 NPZ 强行提交到 Git。
+
+## 1. 已经确认的事实（不可重复误判）
+
+请先阅读以下文件，再执行：
+
+1. train_ccsam.py
+2. ccsam_common.py
+3. experiment_protocol.json
+4. validation_20261106_03/CCSAM_PREPARATION_SMOKE_FINAL_REPORT.md
+5. validation_20261106_04/C1_GRADIENT_DIAGNOSTIC_REPORT.md
+6. validation_20261106_04/gradient_diagnostic.json
+7. validation_20261106_04/BATCH_RECONSTRUCTION.json
+8. validation_20261106_04/DIAGNOSTIC_VERIFICATION.json
+
+已确认：
+
+- 第三轮唯一一次 Smoke 在 C1 真实批次的解析/autograd delta 检查失败，max_abs=5.364418029785156e-07，原门禁 rtol=1e-5、atol=1e-7；没有进入 C2，没有正式训练。
+- 第四轮重建了该真实批次（seed=123，epoch 0，batch 0，B=64），每个类别恰好一个样本。
+- 该批次 A（当前生产解析实现）失败；C（只把 softmax 改成 log_softmax(...).exp()）通过原门禁；E（概率路径和完整 Batch norm 形状同时对齐）与 Autograd 参考逐位一致。
+- 独立 softmax 与 CrossEntropy 内部 LogSoftmax 的 FP32 概率路径差异，是该真实批次失败的已证实原因之一。
+- 紧凑 [n_c,64] norm 与 Autograd 的完整 [B,64] 零填充 norm 存在独立 FP32 归约差异；本批次只改 norm 形状仍失败，但与概率对齐一起使用后逐位一致。
+- 第四轮没有覆盖同一类别在一个 Batch 中出现多个样本的情况。
+- 当前生产实现还存在一个必须验证的操作顺序差异：它先计算 (p-y) @ W，再除以 class_count；而 Autograd 对 mean(losses[class_mask]) 反传时，1/class_count 会先作用到 logits 梯度，再经过 Linear 的反向矩阵乘法。二者数学等价，但 FP32 结果可能不同。此前每类一个样本，所以这一差异完全没有被测试。
+- 第四轮没有修改生产代码。当前 train_ccsam.py 仍是原实现。
+
+因此，不能只把 softmax 换成 log_softmax().exp() 就宣布修复。必须把多样本类、完整 norm 形状、真实采样批次一起验证。
+
+## 2. 必须保持不变的实验协议
+
+不得更改：
+
+- Clean Stage I checkpoint SHA256：7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88
+- Clean Stage I seed=42、epoch=184
+- TRAIN / TRAIN-holdout 划分及所有 prepared 数组
+- CIFAR-100-LT IF=100、100 类、TRAIN=10,847、VAL=1,980
+- Stage-II seeds=(123,124,125)
+- batch_size=64、30 epochs
+- 官方 ClassAwareSampler 的连续采样序列及三个 sampling_plan 文件
+- RandomCrop(32,padding=4)、RandomHorizontalFlip、ToTensor、原 CIFAR Normalize
+- FP32、AMP=False、TF32 配置保持原运行环境
+- class weight：log(max_count/count_c + 0.01)/2
+- ADVER_REG=1.0
+- alpha=min((epoch+1)/30,0.3)
+- C0/C1/C2 定义、loss、SGD、lr、momentum、weight_decay
+- 原数值门禁 rtol=1e-5、atol=1e-7
+
+不得放宽容差、改用 FP64 生产训练、打开 AMP、改用梯度裁剪、改权重、改扰动强度、换 checkpoint、重训 Stage I、改变采样顺序或修改 TEST/VAL 使用规则。
+
+官方 CIFAR-100 TEST 严禁访问。每个独立执行进程必须在加载数据前安装现有 TEST guard。禁止 torchvision CIFAR100(train=False)，禁止打开官方 test pickle，禁止任何官方 TEST 评价或调参。
+
+## 3. 先做生产代码与数学路径审计
+
+在修改任何生产代码前，生成以下只读快照：
+
+- 当前分支、HEAD、git status、tracked/untracked/ignored 状态；
+- train_ccsam.py、ccsam_common.py、experiment_protocol.json 的 SHA256；
+- Clean checkpoint、prepared_manifest、三个 sampling_plan、TRAIN 图像/标签数组的 SHA256；
+- 当前 PyTorch/CUDA/cuDNN/GPU、deterministic、TF32 配置；
+- 原 Smoke 报告是否存在；results/ 是否存在。
+
+必须用代码逐项确认当前生产 A 和 Autograd B 的真实计算路径：
+
+A 当前解析路径：
+1. logits_clean.detach().softmax(dim=1)
+2. p-one_hot
+3. (p-one_hot) @ classifier_weight
+4. 对 class mask 取 compact [n_c,64] 梯度
+5. 在 compact 梯度上做 L2 norm
+6. 除以 norm，再乘 class_weight 和 ADVER_REG
+
+B 参考路径：
+1. classifier_fc(z)
+2. F.cross_entropy(logits, labels, reduction="none")
+3. 对每个类别调用 torch.autograd.grad(losses[mask].mean(), z)
+4. 得到完整 [B,64] 梯度（非本类样本位置为零）
+5. 在完整 [B,64] 张量上做 L2 norm
+6. 用本类对应位置生成 delta
+
+确认类别计数 n_c>1 时，mean backward 的缩放顺序。用只读的 autograd.grad(losses[mask].mean(), logits) 捕获实际 logits 梯度，不能只靠公式推测。
+
+## 4. 实现前的数值候选矩阵（只读，不写生产代码）
+
+以第四轮完全相同的 seed123/epoch0/batch0 数据、特征、分类头、类别权重重放，保留 A/B，并至少比较以下候选：
+
+- A：原生产实现。
+- B：原 autograd_reference_delta，作为唯一 oracle。
+- C：只把概率改为 F.log_softmax(logits.detach(),dim=1).exp()。
+- D：只把 class norm 的输入改成完整 [B,64] 零填充张量。
+- E：只把 class_count 的除法移动到 (p-y) 与 W 矩阵乘法之前。
+- F：log_softmax.exp + class_count 预缩放 + 完整 [B,64] norm，作为优先候选。
+- G/H：若 F 未通过，分别测试 count 缩放采用除法与乘 reciprocal 两种 FP32 操作顺序；必须保留中间张量，不得暗中混合多项改动。
+
+候选 F 的数学结构如下（这是待验证候选，不是预先认定的最终答案）：
+
+~~~python
+log_prob = F.log_softmax(logits_clean.detach(), dim=1)
+probabilities = log_prob.exp()
+one_hot = F.one_hot(labels, num_classes=NUM_CLASSES).to(probabilities.dtype)
+logit_gradient = probabilities - one_hot
+
+counts = torch.bincount(labels, minlength=NUM_CLASSES)
+sample_counts = counts[labels].to(logit_gradient.dtype).unsqueeze(1)
+scaled_logit_gradient = logit_gradient / sample_counts
+per_sample_gradient = scaled_logit_gradient @ classifier_weight.detach()
+
+delta = torch.zeros_like(gap)
+for class_id in torch.unique(labels, sorted=True):
+    mask = labels == class_id
+    class_gradient_full = per_sample_gradient * mask.unsqueeze(1).to(per_sample_gradient.dtype)
+    class_norm = torch.linalg.vector_norm(class_gradient_full)
+    if class_norm > 1e-12:
+        delta[mask] = (
+            ADVER_REG * class_weights[class_id]
+            * class_gradient_full[mask] / class_norm
+        )
+~~~
+
+重点：候选 F 将 1/n_c 放到矩阵乘法之前；norm 输入与 Autograd 保持完整 [B,64] 形状。必须通过 autograd 实测确认，不得仅凭数学等价宣告正确。
+
+如果 F 不通过，先比较捕获的 logits gradient、feature gradient、norm、direction、delta，定位第一个出现超容差的阶段，再只调整对应的 FP32 运算顺序。不得同时改变无关模块。
+
+每个候选、每个阶段都记录：
+- finite / NaN / Inf；
+- max_abs；
+- max_relative（分母 max(abs(reference),1e-12)）；
+- max_normalized_error = max(abs(error)/(1e-7+1e-5*abs(reference)))；
+- 超容差元素数；
+- torch.allclose；
+- byte_equal；
+- 最坏元素的 class_id、batch_position、TRAIN index、feature dimension、candidate/reference/error/allowed_error；
+- 每个类别的 n_c、class norm、class weight。
+
+阶段至少包括：
+1. probability；
+2. logits gradient；
+3. raw feature gradient；
+4. class-averaged full feature gradient；
+5. class norm；
+6. normalized direction；
+7. final delta。
+
+禁止只报告 max_abs 而不报告逐元素容差违规数。
+
+## 5. 真实批次覆盖：必须覆盖重复类别和末尾小 Batch
+
+不能再只验证 seed123 第一个 Batch。
+
+### 5.1 完整 30 Epoch 标签/批次结构审计
+
+对 seeds 123/124/125 的既有官方 sampling_plan，逐 epoch、逐 batch 检查：
+- batch size；
+- 每类样本数；
+- unique class count；
+- max class multiplicity；
+- 重复类别数；
+- 最后一个不完整 Batch（预期 31 个样本）；
+- 任何空类、越界 index、标签与索引不一致。
+
+计划必须与官方连续 ClassAwareSampler 逐索引一致。不能使用“每个 epoch 类计数差<=1”替代官方连续采样核验。
+
+将 3×30×全部 Batch 的结构统计保存为 CSV/JSON。该阶段不跑模型、不更新参数。
+
+### 5.2 三个 seed 的第一完整 Epoch 真实特征梯度审计
+
+对 seeds 123、124、125 各自的 epoch 0 全部 Batch 执行只读数值对照：
+- 每个 seed 调用 seed_everything(seed, deterministic=True) 一次；
+- 加载相同封存 Clean Stage I checkpoint；
+- backbone eval + requires_grad=False；
+- augmentation generator 只初始化一次，seed=seed+300009；
+- 严格按 sampling_plan 顺序逐 batch 调用 augment_batch；
+- generator 状态必须连续推进，不能每个 batch 重新设 seed；
+- 用原 clean_compatible_gap 提取 FP32 [B,64] GAP；
+- 使用同一 Clean Stage I classifier head 和真实 class_weights；
+- 对每个 Batch 的每个候选计算解析 delta 与 Autograd oracle；
+- 不调用 optimizer，不调用 loss.backward()，不更新 classifier/backbone/BN；
+- reference 只用 torch.autograd.grad；
+- classifier 参数 .grad 必须始终为 None；
+- backbone 和全部 BN buffers 前后 state hash 必须逐位不变。
+
+每个 seed 应覆盖 10,847 个 TRAIN 样本、170 个 Batch（最后一批 31）。三个 seed 合计 510 个真实 Batch。对每个候选汇总：
+- 通过/失败 Batch 数；
+- 全部 delta 元素超容差总数；
+- max_abs、max_normalized_error；
+- 最差 Batch/类别/样本/维度；
+- 多样本类别数、最大类内样本数；
+- 按 n_c=1、2、3、4+ 分组的误差；
+- 最后一批是否通过。
+
+必须确认第四轮的 seed123 batch0 哈希和特征哈希完全重现：
+indices_sha256=5c07ee3aab6c32bf948c53bc2a552e137a14ef7a5e7170e19b776eaebbf7056f
+labels_sha256=7d50452453966659686dd84d989c81faa2bd76488828fd0c3ca8f4499f20aca8
+gap_features_sha256=35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee
+
+若由于 GPU/PyTorch 环境变化导致哈希不同，立即记录差异并停止，不得把不同输入称为原批次重放。
+
+### 5.3 重复类别压力测试
+
+在真实 Batch 之外，使用确定性 synthetic logits/gap/head，覆盖：
+- 64 个样本、64 个类别（全部唯一）；
+- 1 个类别出现 2 次，其余类别唯一；
+- 多个类别分别出现 2 次；
+- 32 类各 2 个样本；
+- 16 类各 4 个样本；
+- 单一类别占满 Batch；
+- 真实采样器中观测到的最常见重复模式；
+- batch_size=31 的不完整 Batch。
+
+所有测试均对照同一个 autograd_reference_delta 语义。不得只测试随机标签一次。
+
+## 6. 最小生产修复决策
+
+只有在候选 F（或经阶段定位后进一步调整的最小候选）满足以下条件后，才允许修改 train_ccsam.py：
+
+- seed123/124/125 第一完整 Epoch 的全部 510 个真实 Batch 通过原门禁；
+- 所有重复类别压力测试通过原门禁；
+- 所有阶段均有限；
+- final delta 每个元素都满足原 allclose；
+- 没有更改公式、class weights、ADVER_REG、alpha、loss、数据、采样器或 checkpoint。
+
+生产修复原则：
+- 只修改 analytic_classwise_feature_delta() 内与数值路径直接相关的代码；
+- 保持函数签名、返回值、stats 字段兼容；
+- 不修改 autograd_reference_delta() 的 oracle 定义；
+- 不修改原 rtol/atol；
+- 不修改 compute_arm_loss 的目标函数；
+- 不修改 optimizer、训练轮数、seed、Batch size；
+- 保留 finite 检查和 zero-gradient <=1e-12 的原语义；
+- 加入必要的 shape/count 断言，避免错误广播或标签索引；
+- 不要为追求 byte_equal 而增加不必要的数学改动；但原 allclose 必须全通过。
+
+若没有任何解析候选能在全部真实批次和压力测试通过，停止在诊断阶段，不要硬改生产代码。报告第一个失败阶段及证据，提出下一种可验证的最小候选；禁止放宽容差。
+
+## 7. 修复后验证与 Smoke
+
+如果第 6 节准入条件全部通过：
+
+1. 保存生产修改前后 diff，确认只有 analytic_classwise_feature_delta() 的必要数值实现发生变化。
+2. 对原 seed123 batch0 重放，候选输出必须与 Autograd 通过原门禁。
+3. 对至少一个含重复类别的真实 Batch、seed123 最后一个 31 样本 Batch 再做生产函数回归。
+4. 执行 py_compile。
+5. 用原 TEST guard 执行一次 train_ccsam.py --smoke-only，最多一次，不允许失败后重试。
+6. Smoke 必须验证 C0/C1/C2、paired inputs、classifier-only disposable update、backbone/BN bitwise unchanged、C1 非零有限扰动、C0/C2 零扰动、gradient equivalence、TEST guard。
+7. Smoke 若失败，立即停止并保留失败日志；不得改容差后重跑。
+8. Smoke 通过后只报告“Smoke PASS / formal training still not started”。不要运行 --formal，不要创建 results/ 正式训练目录，不要启动 9 组训练。
+
+Smoke 使用的 optimizer update 仅为现有 smoke_test 中每个 arm 的 disposable classifier 更新，不得写回 Clean checkpoint。
+
+## 8. 保护与 Git 完整性
+
+执行前后逐文件核验：
+- Clean checkpoint；
+- TRAIN pickle、split；
+- prepared/train_images.npy、train_labels.npy、validation arrays；
+- 三个 sampling_plan；
+- experiment_protocol.json；
+- ccsam_common.py；
+- 历史 validation_20261106_01..04 所有文件；
+- 原有 140 个历史未跟踪资产；
+- 所有既有结果与报告。
+
+禁止覆盖、删除、移动或重命名任何历史文件。禁止改官方 sampler 源码或其 SHA。禁止改其他 H2T/PI-H2T 实验目录。
+
+本轮允许改动：
+- train_ccsam.py（只有第 6 节通过后）；
+- 新建 validation_20261106_05/ 诊断与报告；
+- 本任务 TXT 本身。
+
+完成后记录：
+- branch / HEAD；
+- git status --short --branch --untracked-files=all；
+- git diff --check；
+- git diff --stat、name-status；
+- tracked/staged diff；
+- 受保护文件变更清单（必须为空）；
+- 新增文件清单；
+- 每个结果文件 SHA256；
+- TEST guard 统计。
+
+不要自行 push 或 merge。由用户审阅后决定推送。
+
+## 9. 最终交付物
+
+在 validation_20261106_05/ 独占创建：
+
+1. C1_GRADIENT_NUMERICS_FIX_REPORT.md：完整结论、因果证据、候选比较、最终修改。
+2. CANDIDATE_MATRIX.json：A/B/C/D/E/F/G/H 各阶段统计。
+3. REAL_BATCH_SWEEP.csv：510 个真实 Batch 的逐批结果。
+4. BATCH_STRUCTURE_30EPOCH.csv：三个 seed 的 30 Epoch 批次结构与重复类别统计。
+5. SYNTHETIC_DUPLICATE_STRESS.csv：所有重复类别压力测试结果。
+6. WORST_CASES.csv：全部最差 Batch/类/元素。
+7. EXECUTION_LOG.txt：命令、开始结束时间、返回码、异常完整栈。
+8. PROTECTION_REPORT.json：受保护文件哈希和 TEST guard。
+9. GIT_STATUS_FINAL.txt。
+10. ARTIFACT_SHA256.csv。
+11. 若有生产改动，附 PRODUCTION_DIFF.patch。
+12. 若 Smoke 通过，保存原 smoke_report.json；若失败，保存完整失败日志，不得伪造 PASS。
+
+最终报告必须明确区分：
+- 只读诊断是否完成；
+- 生产代码是否修改；
+- 原始门禁是否通过；
+- 510 个真实 Batch 是否全部通过；
+- 重复类别压力测试是否全部通过；
+- Smoke 是否通过；
+- 正式训练是否启动（必须为 false）。
+
+任务成功标准：定位并修复 C1 数值实现问题，所有真实批次/压力测试/原门禁通过，Smoke 一次通过；不允许通过放宽容差或改变实验协议来制造成功。
