@@ -8,13 +8,27 @@ Official code: https://github.com/zzpustc/CC-SAM
 
 ## Current validation status (2026-11-06)
 
-Preparation passed: the sealed 40.050505% TRAIN-holdout accuracy was reproduced,
-and all 976,230 sampling indices across three seeds and 30 epochs matched the
-official sampler. The single authorized Smoke invocation stopped at the C1
-actual-batch analytic/autograd perturbation-equivalence check (max absolute
-difference 5.364418029785156e-7). C2 was not reached; formal training has not started.
-See the [complete report](validation_20261106_03/CCSAM_PREPARATION_SMOKE_FINAL_REPORT.md)
-and [structured status](validation_20261106_03/VALIDATION_STATUS.json).
+Gradient numerical alignment is complete. All 510 real epoch-0 batches across
+seeds 123/124/125 passed the original analytic/autograd gate; the admitted
+candidate's final deltas were byte-identical to the oracle. All 10 deterministic
+duplicate-label stress cases passed the unchanged tolerances.
+
+The single post-fix production Smoke passed C0/C1/C2, paired inputs and
+initialization, disposable classifier updates, and bitwise-frozen backbone/BN.
+Its original report is retained in
+[validation_20261106_05/smoke_report.json](validation_20261106_05/smoke_report.json)
+and has been copied byte-for-byte to [smoke_report.json](smoke_report.json), the
+path read by the formal entry point. Smoke was not rerun during this copy.
+
+Preparation also passed: the sealed 40.050505% TRAIN-holdout accuracy was
+reproduced, and all 976,230 sampling positions across three seeds and 30 epochs
+matched the official continuous sampler. The earlier C1 Smoke failure is
+historical evidence preserved in validation_20261106_03; it is superseded by the
+[gradient fix report](validation_20261106_05/C1_GRADIENT_NUMERICS_FIX_REPORT.md).
+
+The [final prelaunch checklist](FINAL_PRELAUNCH_CHECK.md) records the native
+entry-point checks and current readiness. Formal training has not started.
+Starting the nine formal runs still requires the user's explicit confirmation.
 
 ## Why the perturbation is applied to 64-D GAP features
 
@@ -51,7 +65,7 @@ The official implementation obtains a class-specific feature gradient with autog
 
 d CE / d f = (softmax(logits) - one_hot(label)) @ W
 
-The code computes this exactly in a vectorized way, then normalizes each class subset's gradient exactly as the official per-class autograd operation does. The smoke test compares the vectorized result against a direct autograd reference and fails if they differ beyond tolerance. This avoids hundreds of separate autograd calls per batch without changing the mathematical gradient.
+The implementation uses log_softmax(logits).exp() to align with CrossEntropy's numerical probability path, applies class-mean scaling in logit space before the linear product, and normalizes the class gradient in the full zero-padded batch shape. The smoke test retains the direct autograd reference and unchanged rtol=1e-5, atol=1e-7 gate. The mathematical gradient and perturbation objective are unchanged; numerical equality is documented by the real-batch and duplicate-label checks above.
 
 ## Frozen protocol
 
@@ -77,7 +91,13 @@ The 1980-image validation partition is held out from official CIFAR-100 TRAIN, c
 
 ## Run sequence
 
-Run from the repository root in PowerShell.
+Run from the repository root in PowerShell with
+D:\app\minicondaaa\envs\xiaoju\python.exe.
+
+For this prepared checkout, steps 1 and 2 below are already complete and are
+historical command references. Do not rerun preparation or Smoke. The existing
+passing Smoke report is installed at the native formal-entry path. This
+prelaunch task does not execute step 3; user confirmation is still required.
 
 1. Prepare the frozen TRAIN split and verify the Clean Stage I checkpoint:
 

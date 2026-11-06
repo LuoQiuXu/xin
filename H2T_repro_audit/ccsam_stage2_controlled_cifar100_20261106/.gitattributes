@@ -5,3 +5,4 @@ official_reference/Samplers.py -text
 official_reference/PROVENANCE.json -text
 prepared/*.json -text
 validation_*/** -text
+smoke_report.json -text

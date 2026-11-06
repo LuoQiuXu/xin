@@ -1,0 +1,28 @@
+{
+  "started": "2026-11-06T23:20:26.551353+08:00",
+  "branch": "experiment/ccsam-gradient-numerics-fix-20261106",
+  "head": "cc7e60a29068a3548cf2fefd6ebd776c1eb9d8c8",
+  "source_smoke_sha256": "7c7973531cc4158e4f9e28273eaf2446021cd766b28c5dfd204863906035968e",
+  "source_smoke_bytes": 5638,
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+  "source_hashes": {
+    "train_ccsam.py": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6",
+    "ccsam_common.py": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9",
+    "experiment_protocol.json": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813",
+    "README.md": "d15cea0e4ff4c31bd09d5c55ddbdb31e9d417f4c52b5552501b929b0ddbf6cdf",
+    ".gitattributes": "1ca3caaee555f84ec851e50ecb456f50472c5fc893823c38d5503da814ead47a"
+  },
+  "authorized_existing_file_changes": [
+    "README.md",
+    ".gitattributes"
+  ],
+  "root_smoke_report_existed": false,
+  "formal_training_started": false,
+  "test_guard": {
+    "installed_at": "2026-11-06T23:20:26+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}

@@ -1,0 +1,448 @@
+{
+  "status": "READY_FOR_FORMAL_TRAINING",
+  "started": "2026-11-06T23:24:32.680332+08:00",
+  "completed": "2026-11-06T23:24:35.887289+08:00",
+  "branch": "experiment/ccsam-gradient-numerics-fix-20261106",
+  "checked_head": "cc7e60a29068a3548cf2fefd6ebd776c1eb9d8c8",
+  "checks": [
+    {
+      "item": "Branch and baseline",
+      "status": "PASS",
+      "evidence": {
+        "branch": "experiment/ccsam-gradient-numerics-fix-20261106",
+        "head": "cc7e60a29068a3548cf2fefd6ebd776c1eb9d8c8"
+      }
+    },
+    {
+      "item": "Native formal-entry preconditions",
+      "status": "PASS",
+      "evidence": {
+        "passed": true,
+        "data_root": "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100",
+        "manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+        "train_shape": [
+          10847,
+          32,
+          32,
+          3
+        ],
+        "labels_shape": [
+          10847
+        ],
+        "validation_gap_shape": [
+          1980,
+          64
+        ],
+        "original_main_called": false,
+        "training_loop_compiled": false,
+        "smoke_or_train_callbacks": 0,
+        "stop_boundary": "before outer for seed in SEEDS; no training loop or later statements included"
+      }
+    },
+    {
+      "item": "Smoke report original bytes",
+      "status": "PASS",
+      "evidence": {
+        "source": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\validation_20261106_05\\smoke_report.json",
+        "destination": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\smoke_report.json",
+        "sha256": "7c7973531cc4158e4f9e28273eaf2446021cd766b28c5dfd204863906035968e",
+        "bytes": 5638,
+        "byte_equal": true,
+        "json_equal": true
+      }
+    },
+    {
+      "item": "Smoke result flags",
+      "status": "PASS",
+      "evidence": {
+        "passed": true,
+        "formal_training_started": false
+      }
+    },
+    {
+      "item": "Smoke/prepared manifest binding",
+      "status": "PASS",
+      "evidence": {
+        "actual": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+        "expected": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02"
+      }
+    },
+    {
+      "item": "Unchanged train_ccsam.py",
+      "status": "PASS",
+      "evidence": {
+        "sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6"
+      }
+    },
+    {
+      "item": "Unchanged ccsam_common.py",
+      "status": "PASS",
+      "evidence": {
+        "sha256": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9"
+      }
+    },
+    {
+      "item": "Unchanged experiment_protocol.json",
+      "status": "PASS",
+      "evidence": {
+        "sha256": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813"
+      }
+    },
+    {
+      "item": "Clean Stage I checkpoint",
+      "status": "PASS",
+      "evidence": {
+        "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\locked\\clean_stage1_best.pth",
+        "sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+        "expected": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88"
+      }
+    },
+    {
+      "item": "Prepared train_images.npy",
+      "status": "PASS",
+      "evidence": {
+        "shape": [
+          10847,
+          32,
+          32,
+          3
+        ],
+        "dtype": "uint8",
+        "sha256": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64",
+        "expected": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64"
+      }
+    },
+    {
+      "item": "Prepared train_labels.npy",
+      "status": "PASS",
+      "evidence": {
+        "shape": [
+          10847
+        ],
+        "dtype": "int64",
+        "sha256": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9",
+        "expected": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9"
+      }
+    },
+    {
+      "item": "Prepared validation_images.npy",
+      "status": "PASS",
+      "evidence": {
+        "shape": [
+          1980,
+          32,
+          32,
+          3
+        ],
+        "dtype": "uint8",
+        "sha256": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656",
+        "expected": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656"
+      }
+    },
+    {
+      "item": "Prepared validation_labels.npy",
+      "status": "PASS",
+      "evidence": {
+        "shape": [
+          1980
+        ],
+        "dtype": "int64",
+        "sha256": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e",
+        "expected": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e"
+      }
+    },
+    {
+      "item": "Prepared validation_gap_features.npy",
+      "status": "PASS",
+      "evidence": {
+        "shape": [
+          1980,
+          64
+        ],
+        "dtype": "float32",
+        "sha256": "3e8677636f1e4f64a7823177c8d84f4f976f6dfa056f17bc0e24f17139342462",
+        "expected": "3e8677636f1e4f64a7823177c8d84f4f976f6dfa056f17bc0e24f17139342462"
+      }
+    },
+    {
+      "item": "Sampling plan seed 123",
+      "status": "PASS",
+      "evidence": {
+        "sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45",
+        "expected": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45",
+        "shape": [
+          30,
+          10847
+        ],
+        "dtype": "int32",
+        "matches_official": true,
+        "indices_compared": 325410
+      }
+    },
+    {
+      "item": "Sampling plan seed 124",
+      "status": "PASS",
+      "evidence": {
+        "sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39",
+        "expected": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39",
+        "shape": [
+          30,
+          10847
+        ],
+        "dtype": "int32",
+        "matches_official": true,
+        "indices_compared": 325410
+      }
+    },
+    {
+      "item": "Sampling plan seed 125",
+      "status": "PASS",
+      "evidence": {
+        "sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2",
+        "expected": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2",
+        "shape": [
+          30,
+          10847
+        ],
+        "dtype": "int32",
+        "matches_official": true,
+        "indices_compared": 325410
+      }
+    },
+    {
+      "item": "C0/C1/C2 and frozen hyperparameters",
+      "status": "PASS",
+      "evidence": {
+        "stage2": {
+          "epochs": 30,
+          "batch_size": 64,
+          "learning_rate": 0.01,
+          "momentum": 0.9,
+          "weight_decay": 0.0002,
+          "nesterov": false,
+          "amp": false,
+          "mixup": false,
+          "gradient_accumulation": false,
+          "seeds": [
+            123,
+            124,
+            125
+          ]
+        },
+        "arms": [
+          "C0_BALANCED_CE",
+          "C1_CCSAM_FEATURE_GRAD",
+          "C2_WEIGHTED_CE_NO_PERTURB"
+        ],
+        "precision": "FP32",
+        "adver_reg": 1.0,
+        "class_weight_divisor": 2.0
+      }
+    },
+    {
+      "item": "Alpha schedule",
+      "status": "PASS",
+      "evidence": "Original 30-epoch ramp, cap 0.3; no changes"
+    },
+    {
+      "item": "Output paths have no old runs or conflicts",
+      "status": "PASS",
+      "evidence": {
+        "conflicts": [],
+        "nine_run_paths": [
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_123\\C0_BALANCED_CE",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_123\\C1_CCSAM_FEATURE_GRAD",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_123\\C2_WEIGHTED_CE_NO_PERTURB",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_124\\C0_BALANCED_CE",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_124\\C1_CCSAM_FEATURE_GRAD",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_124\\C2_WEIGHTED_CE_NO_PERTURB",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_125\\C0_BALANCED_CE",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_125\\C1_CCSAM_FEATURE_GRAD",
+          "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\results\\seed_125\\C2_WEIGHTED_CE_NO_PERTURB"
+        ]
+      }
+    },
+    {
+      "item": "Output parent writable",
+      "status": "PASS",
+      "evidence": {
+        "parent": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106",
+        "free_bytes": 333122269184
+      }
+    },
+    {
+      "item": "Backbone/BN freeze and checkpoint state",
+      "status": "PASS",
+      "evidence": {
+        "backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+        "classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+        "bn_modules": 31,
+        "checkpoint_seed": 42,
+        "checkpoint_epoch": 184,
+        "current_check": "CPU construction/load and eval/frozen state; no model forward",
+        "historical_real_smoke_bn_unchanged": true
+      }
+    },
+    {
+      "item": "Validated numerical environment",
+      "status": "PASS",
+      "evidence": {
+        "torch": "2.14.1+cu132",
+        "cuda": "13.2",
+        "cudnn": 92400,
+        "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+        "cudnn_deterministic": true,
+        "cudnn_benchmark": false,
+        "cudnn_allow_tf32": true,
+        "matmul_allow_tf32": false
+      }
+    },
+    {
+      "item": "Historical results, inputs and sources protected",
+      "status": "PASS",
+      "evidence": {
+        "unexpected_changes": [],
+        "previous_protected_files": 1147,
+        "authorized_doc_attribute_changes": [
+          "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/.gitattributes",
+          "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/README.md"
+        ],
+        "publication_entries_verified": 86
+      }
+    },
+    {
+      "item": "Official TEST isolation",
+      "status": "PASS",
+      "evidence": {
+        "installed_at": "2026-11-06T23:24:32+08:00",
+        "official_test_file_open_attempts": 0,
+        "CIFAR100_train_false_attempts": 0,
+        "blocked_attempts": [],
+        "official_TEST_used": false
+      }
+    },
+    {
+      "item": "No Smoke rerun, forward or formal training",
+      "status": "PASS",
+      "evidence": {
+        "new_smoke_calls": 0,
+        "model_forward_calls": 0,
+        "backward_calls": 0,
+        "optimizer_instances": 0,
+        "optimizer_steps": 0,
+        "formal_training_started": false
+      }
+    }
+  ],
+  "details": {
+    "native_entry_preconditions": {
+      "passed": true,
+      "data_root": "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100",
+      "manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+      "train_shape": [
+        10847,
+        32,
+        32,
+        3
+      ],
+      "labels_shape": [
+        10847
+      ],
+      "validation_gap_shape": [
+        1980,
+        64
+      ],
+      "original_main_called": false,
+      "training_loop_compiled": false,
+      "smoke_or_train_callbacks": 0,
+      "stop_boundary": "before outer for seed in SEEDS; no training loop or later statements included"
+    },
+    "checkpoint_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+    "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+    "prepared_arrays": {
+      "train_images.npy": {
+        "shape": [
+          10847,
+          32,
+          32,
+          3
+        ],
+        "dtype": "uint8",
+        "sha256": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64"
+      },
+      "train_labels.npy": {
+        "shape": [
+          10847
+        ],
+        "dtype": "int64",
+        "sha256": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9"
+      },
+      "validation_images.npy": {
+        "shape": [
+          1980,
+          32,
+          32,
+          3
+        ],
+        "dtype": "uint8",
+        "sha256": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656"
+      },
+      "validation_labels.npy": {
+        "shape": [
+          1980
+        ],
+        "dtype": "int64",
+        "sha256": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e"
+      },
+      "validation_gap_features.npy": {
+        "shape": [
+          1980,
+          64
+        ],
+        "dtype": "float32",
+        "sha256": "3e8677636f1e4f64a7823177c8d84f4f976f6dfa056f17bc0e24f17139342462"
+      }
+    },
+    "sampling_plans": {
+      "123": {
+        "sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45",
+        "indices_compared": 325410,
+        "mismatched_indices": 0
+      },
+      "124": {
+        "sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39",
+        "indices_compared": 325410,
+        "mismatched_indices": 0
+      },
+      "125": {
+        "sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2",
+        "indices_compared": 325410,
+        "mismatched_indices": 0
+      }
+    },
+    "environment": {
+      "torch": "2.14.1+cu132",
+      "cuda": "13.2",
+      "cudnn": 92400,
+      "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "cudnn_deterministic": true,
+      "cudnn_benchmark": false,
+      "cudnn_allow_tf32": true,
+      "matmul_allow_tf32": false
+    },
+    "test_guard": {
+      "installed_at": "2026-11-06T23:24:32+08:00",
+      "official_test_file_open_attempts": 0,
+      "CIFAR100_train_false_attempts": 0,
+      "blocked_attempts": [],
+      "official_TEST_used": false
+    },
+    "unexpected_protected_changes": [],
+    "train_source_sha256": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6",
+    "source_smoke_sha256": "7c7973531cc4158e4f9e28273eaf2446021cd766b28c5dfd204863906035968e",
+    "copied_smoke_sha256": "7c7973531cc4158e4f9e28273eaf2446021cd766b28c5dfd204863906035968e",
+    "formal_training_started": false
+  },
+  "smoke_rerun": false,
+  "formal_training_started": false
+}
