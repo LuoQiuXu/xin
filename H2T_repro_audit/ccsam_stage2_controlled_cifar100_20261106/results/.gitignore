@@ -1,0 +1,3 @@
+# Preserve full paired batch signatures locally; publish their SHA256 with summaries.
+batch_trace.csv
+*.writing

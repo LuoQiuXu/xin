@@ -6,3 +6,13 @@ official_reference/PROVENANCE.json -text
 prepared/*.json -text
 validation_*/** -text
 smoke_report.json -text
+
+# Preserve formal artifact bytes for the recorded SHA256 hashes.
+CCSAM_STAGE2_RESULTS.md -text
+final_epoch_metrics.csv -text
+formal_completed.json -text
+formal_test_guard.json -text
+paired_deltas.csv -text
+summary.json -text
+formal_launch_20261106_01/** -text
+results/** -text

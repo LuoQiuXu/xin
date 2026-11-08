@@ -1,0 +1,39 @@
+{
+  "started": "2026-11-06T23:47:48.472319+08:00",
+  "argv": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "-u",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py",
+    "--formal"
+  ],
+  "cwd": "D:\\xiangmuxunlian\\xin",
+  "parent_pid": 13464,
+  "branch": "experiment/ccsam-gradient-numerics-fix-20261106",
+  "head": "40c593750615c72dd0a3ae913e7e47fcbd020978",
+  "source_sha256": {
+    "train_ccsam.py": "7e3e26752e2b350618081e164bf0e5249294c72a651311c0b4db5f6feed1f3e6",
+    "ccsam_common.py": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9",
+    "experiment_protocol.json": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813"
+  },
+  "smoke_report_sha256": "7c7973531cc4158e4f9e28273eaf2446021cd766b28c5dfd204863906035968e",
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+  "budget": {
+    "seeds": [
+      123,
+      124,
+      125
+    ],
+    "arms": [
+      "C0_BALANCED_CE",
+      "C1_CCSAM_FEATURE_GRAD",
+      "C2_WEIGHTED_CE_NO_PERTURB"
+    ],
+    "epochs_per_run": 30
+  },
+  "smoke_rerun": false,
+  "automatic_retry": false,
+  "training_pid": 26176
+}

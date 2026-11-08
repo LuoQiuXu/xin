@@ -1,0 +1,17 @@
+{
+  "completed_at": "2026-11-07T00:20:34+08:00",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "arms": [
+    "C0_BALANCED_CE",
+    "C1_CCSAM_FEATURE_GRAD",
+    "C2_WEIGHTED_CE_NO_PERTURB"
+  ],
+  "epochs_per_run": 30,
+  "formal_runs": 9,
+  "official_TEST_used": false,
+  "primary_metric_epoch": 30
+}

@@ -6,7 +6,7 @@ Official paper: Class-Conditional Sharpness-Aware Minimization for Deep Long-Tai
 
 Official code: https://github.com/zzpustc/CC-SAM
 
-## Current validation status (2026-11-06)
+## Current validation and execution status (2026-11-07)
 
 Gradient numerical alignment is complete. All 510 real epoch-0 batches across
 seeds 123/124/125 passed the original analytic/autograd gate; the admitted
@@ -26,9 +26,16 @@ matched the official continuous sampler. The earlier C1 Smoke failure is
 historical evidence preserved in validation_20261106_03; it is superseded by the
 [gradient fix report](validation_20261106_05/C1_GRADIENT_NUMERICS_FIX_REPORT.md).
 
-The [final prelaunch checklist](FINAL_PRELAUNCH_CHECK.md) records the native
-entry-point checks and current readiness. Formal training has not started.
-Starting the nine formal runs still requires the user's explicit confirmation.
+Formal Stage II was authorized and completed on 2026-11-07: all nine runs
+(seeds 123/124/125 x C0/C1/C2) finished 30 epochs, with 45,900 actual optimizer
+steps. Full batch traces and initialization matched across each seed's arms;
+the formal TEST guard recorded zero access attempts. No Smoke was rerun.
+
+See the [fixed-epoch results](CCSAM_STAGE2_RESULTS.md),
+[structured summary](summary.json), and
+[actual execution report](formal_launch_20261106_01/FORMAL_EXECUTION_REPORT.md).
+The [prelaunch checklist](FINAL_PRELAUNCH_CHECK.md) preserves the readiness state
+before this authorized execution.
 
 ## Why the perturbation is applied to 64-D GAP features
 
@@ -94,10 +101,10 @@ The 1980-image validation partition is held out from official CIFAR-100 TRAIN, c
 Run from the repository root in PowerShell with
 D:\app\minicondaaa\envs\xiaoju\python.exe.
 
-For this prepared checkout, steps 1 and 2 below are already complete and are
-historical command references. Do not rerun preparation or Smoke. The existing
-passing Smoke report is installed at the native formal-entry path. This
-prelaunch task does not execute step 3; user confirmation is still required.
+For this completed checkout, steps 1 through 4 below are historical command
+references. Preparation, Smoke, all nine formal runs, and fixed-epoch analysis
+are complete. Do not rerun them over the existing artifacts. The original
+passing Smoke report remains at the native formal-entry path.
 
 1. Prepare the frozen TRAIN split and verify the Clean Stage I checkpoint:
 
