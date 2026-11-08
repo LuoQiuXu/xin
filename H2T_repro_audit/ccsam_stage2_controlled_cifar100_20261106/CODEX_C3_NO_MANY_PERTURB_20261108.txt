@@ -1,0 +1,209 @@
+# CODEX: C3 对照实验 — 关闭 Many 类直接扰动，保留其余全部 C1 定义
+# 这份指令已配套实现代码，请执行，不要重新发明或重写训练管线。
+
+## A. 科学任务
+
+九组已完成的正式实验（C0/C1/C2, seeds=123/124/125）显示：
+- C1−C2：Many −4.804 pp；Few +4.167 pp；Overall −0.556 pp。
+- 这只能证明在固定 Stage I 下增加 C1 特征扰动改变头尾分类性能，不能证明原因是头类语义足够丰富。
+- C3 只去掉 Many 类输入自己的 feature delta，以区分 Many 直接扰动的负面影响与 Medium/Few 扰动对共享分类器边界的间接影响。
+
+明确且仅有的新增实验条件：
+  ARM = C3_NO_MANY_PERTURB
+  delta_i_C3 = 0           if train_count[y_i] > 100
+               delta_i_C1  if train_count[y_i] <= 100
+
+  L_C3 = alpha * mean_i[w_yi * CE(fc(f_i + delta_i_C3), y_i)]
+         + (1-alpha) * mean_i[CE(fc(f_i), y_i)]
+
+  alpha=min((epoch+1)/30,0.3), w_c=log(max_count/count_c+0.01)/2
+  所有类别仍进入损失；不冻结 Many 分类器权重，不降低 Many loss 权重，不改其他模块。
+
+注意：Many 判断取原封存 TRAIN 类别计数 >100；不能使用类 ID <=35，不能用验证集计数，不能误用 >=100。
+
+## B. 代码位置与分支
+
+Repo：LuoQiuXu/xin
+工作分支：experiment/ccsam-c3-no-many-perturb-20261108
+基线提交：f916957ea4a7b90cf82dc5839eb193e044d881dd
+实验根：
+H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/
+
+新增加的文件：
+- train_c3.py：仅 C3 的只读 preflight / 真实 Smoke / 正式三种子训练
+- analyze_c3.py：只读 C0/C1/C2 和新 C3，输出独立 C3 结果分析
+- test_c3_semantics.py：纯 CPU 数学与屏蔽逻辑单元测试
+- c3_selective/C3_PROTOCOL.md：完整冻结协议
+- CODEX_C3_NO_MANY_PERTURB_20261108.txt：本指令
+
+唯一修改的原有生产文件：
+- train_ccsam.py
+  * 添加 C3_ARM 常量；
+  * 添加 mask_many_feature_delta()；
+  * compute_arm_loss() 增加可选 train_counts 与 C3 分支；
+  * train_one_arm() 只在 C3 向 compute_arm_loss 传递封存 train_counts。
+  * 任何 C0/C1/C2 分支、解析梯度函数、Autograd 参考、optimizer、数据、BN/Backbone、评价逻辑均必须语义不变。
+
+禁止直接运行原 train_ccsam.py --formal，因为它是原九组训练命令，旧输出目录全部已存在。
+禁止重跑 prepare_ccsam.py、原 analyze_ccsam.py、原 Smoke。
+
+## C. 首先确认 Git 与本机历史文件
+
+Windows PowerShell 下：
+
+  Set-Location D:\xiangmuxunlian\xin
+  git fetch origin
+  git switch experiment/ccsam-c3-no-many-perturb-20261108
+  git pull --ff-only origin experiment/ccsam-c3-no-many-perturb-20261108
+
+如果工作树存在未提交实验资产，不得强行切分支、git clean、reset --hard、删除或覆盖。先记录状态，在本地保护资产后再进行。
+
+务必确认：
+- 工作分支和 HEAD 与 GitHub 当前 C3 分支一致；
+- 旧九组 C0/C1/C2 的 9 份 status.json、metrics.csv、final_classifier.pth、batch_trace.csv 都在本机。
+- batch_trace.csv 和 *.pth 被 Git 忽略，GitHub 不一定包含这些大文件；不得仅凭 GitHub 有 status.json 就推断本机已具备完整原数据。
+- 旧九组训练的独立 SHA256 封存清单在 formal_launch_20261106_01/ARTIFACT_SHA256.csv；必须按清单逐项核验，尤其是原九组批次轨迹。
+- 之前的 ROOT/summary.json、final_epoch_metrics.csv、paired_deltas.csv、CCSAM_STAGE2_RESULTS.md 原样存在。
+- 原 Clean Stage I checkpoint SHA256=7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88。
+- 原五个 prepared 数组、三份 sampling_plan、TRAIN split/transform 均封存。
+- 官方 CIFAR-100 TEST 严格零访问，严禁实例化 CIFAR100(train=False)，严禁读取 test pickle。
+
+若旧九组本地 .pth 或 batch_trace.csv 丢失：立即停止，汇报缺哪些文件，严禁重跑九组、伪造轨迹、从 metrics 推断轨迹或默默跳过哈希校验。
+
+## D. 训练预算和配对要求
+
+只新增：
+- C3 seed=123：30 Epoch
+- C3 seed=124：30 Epoch
+- C3 seed=125：30 Epoch
+
+共 90 Epoch，15,300 次优化器更新，数据访问位置 3*30*10,847=976,230。
+
+训练：
+- CIFAR-100-LT IF=100、TRAIN=10,847；64-D GAP/ResNet-32；
+- 仅冻结 Backbone；分类器从同一个 Stage I checkpoint 初始化；
+- 64 batch，SGD lr0.01 momentum0.9 weight_decay0.0002 nesterov=False；
+- FP32，AMP=False，没有梯度累积；
+- 与 C0/C1/C2 完全相同的计划、每个 seed 的增强 RNG 连续状态、训练长度和验证划分；
+- 原始类权重和 alpha 调度完全一致；
+- 使用真实数据与原始 Clean checkpoint，不允许合成数据进入正式训练。
+
+保持旧 ROOT/results/seed_123|124|125 的原三组目录只读。
+新结果目录必须只创建：
+  results/seed_123/C3_NO_MANY_PERTURB/
+  results/seed_124/C3_NO_MANY_PERTURB/
+  results/seed_125/C3_NO_MANY_PERTURB/
+
+C3 新的 Smoke、preflight、分析结果在 c3_selective/，与原九组结果完全隔离。
+
+## E. 只做必要静态验证，然后一次真实 Smoke
+
+在实验根目录执行（所有命令都要检查退出码；任一失败禁止进入下一阶段）：
+
+  & "D:\app\minicondaaa\envs\xiaoju\python.exe" -B -m py_compile train_ccsam.py train_c3.py analyze_c3.py test_c3_semantics.py
+  & "D:\app\minicondaaa\envs\xiaoju\python.exe" -B -m unittest -v test_c3_semantics
+  & "D:\app\minicondaaa\envs\xiaoju\python.exe" -B -u train_c3.py --preflight
+  & "D:\app\minicondaaa\envs\xiaoju\python.exe" -B -u train_c3.py --smoke-only
+
+严格检查：
+1. 测试中类别计数为 101 的样本被关闭扰动、100 的样本保留 C1 扰动。
+2. 真实 Batch 中 Many 的 C3 delta 精确为0。
+3. 同一 Batch 所有非 Many 的 C3 delta 与 C1 bitwise identical。
+4. Batch 全为 Many 时 C3 的整个 loss 必须与 C2 完全一致。
+5. Batch 全为非 Many 时 C3 的整个 loss 必须与 C1 完全一致。
+6. 类别内多个样本与不完整 Batch 的梯度语义应保持原始 C1 的 FP32 数值对齐；不得更改原门禁。
+7. 第一个与第二个真实 Batch 均使用同一 Seed 的连续增强 RNG，不允许每 batch reset。
+8. 三个 Seed 的 Smoke 均执行丢弃的单步分类器更新且 Backbone/BN 位级不变。
+9. 官方 TEST guard 无访问记录。
+10. 旧九组所有 SHA256 与已发布清单匹配并在 Smoke 前后不变。
+
+只运行一次真实 Smoke。若出现代码实现上的确定性错误，允许最小修复并重新运行静态测试与 preflight；若 Smoke 已生成报告或修改了任何原产物，禁止自行覆盖/重复，停止并汇报。
+
+任何情况下都不能修改原始已通过数值一致性验证的 C1 解析梯度实现和容差。
+
+## F. 正式训练：前面通过后直接执行，不再等待人工确认
+
+以上全部 PASS 并确认新三个 C3 目录不存在后：
+
+  & "D:\app\minicondaaa\envs\xiaoju\python.exe" -B -u train_c3.py --formal
+
+这会依次运行 C3 的三个种子，每个30 Epoch。每个批次必须与对应 seed 的原 C0 batch_trace.csv 精确匹配：
+- 样本和标签 SHA；
+- 数据增强图像 SHA；
+- GAP 特征 SHA；
+- seed 固定的初始 classifier/backbone SHA。
+
+每个 Epoch 必须验证 Backbone 和 BN buffers 没有变化；每 Seed 验证 classifier 已更新、C3 平均扰动非零、所有训练数值有限、100% 按计划完成。
+三个种子训练完成后，核对旧九组 SHA256 未变化，官方 TEST guard=0，生成 c3_selective/formal_completed.json。
+
+禁止：
+- 运行原始九组；
+- 重新生成 sample plan；
+- 覆盖旧任何文件；
+- 更改 batch/epoch/seed/lr/alpha/weight 或阈值；
+- 访问官方 TEST；
+- 开启 AMP / 梯度累积；
+- 自动删除重试 / 人为挑选最优 Epoch；
+- 自动续跑或合并不同状态的损坏结果。
+
+若一个 Seed 训练失败，不得删除该目录重新运行，先停止并保留日志、状态及已经成功的其他 Seed；提交错误定位报告供下一轮决策。
+
+## G. 训练后立即分析（只读旧九组）
+
+只有 c3_selective/formal_completed.json 存在且通过校验时运行：
+
+  & "D:\app\minicondaaa\envs\xiaoju\python.exe" -B -u analyze_c3.py
+
+分析必须以固定 Epoch=30 为主，主要对照：
+- C3−C1：关闭 Many 直接扰动的效果，重点 Many/Few/Overall；
+- C3−C2：仅 Medium/Few 扰动的剩余收益；
+- C3−C0：整体相对基础分类器变化；
+- C1−C2：原始完整扰动的参照。
+
+必须输出三个 Stage-II seeds 的逐 Seed 指标和配对差异、均值和样本标准差、Many/MediumN/Few（按原 TRAIN count）、额外的 Head/OfficialMedium/Tail 仅作为兼容性附表。
+特别检查 class 0 在训练中参与 Many 屏蔽，但验证集 class 0 缺失，不能宣称验证了该类的恢复。
+
+重点回答：
+A. C3 相对 C1 的 Many 是否恢复？恢复了多少？
+B. C3 相对 C2 的 Few 是否仍有正向收益？保留了 C1 相对 C2 的 Few 收益的多少？
+C. Overall 有没有改善？
+D. 如果 Many 仍受损，是否提示 Medium/Few 对共享分类器边界的间接影响？
+E. 哪些 Few 类原本 C1 提升但 C3 受损？注意每类验证仅20张，逐类结论只是诊断。
+F. 不宣称统计显著性，不宣称独立 TEST 性能或三个独立 Backbone；不夸大成论文方法创新。
+
+## H. 产物归档并推送 GitHub
+
+生成并保留：
+- c3_selective/preflight_report.json
+- c3_selective/smoke_report.json
+- c3_selective/formal_completed.json
+- c3_selective/c3_final_epoch_metrics.csv
+- c3_selective/c3_paired_deltas.csv
+- c3_selective/c3_per_class.csv
+- c3_selective/c3_summary.json
+- c3_selective/C3_RESULTS.md
+- 三个 C3 results/seed_*/C3_NO_MANY_PERTURB/metrics.csv、status.json
+- 三个 C3 final_classifier.pth、batch_trace.csv 保存在本机，不要强行推 GitHub。产出 SHA256 清单并存 GitHub。
+- 一个 C3_EXECUTION_REPORT.md，包含命令、时间、退出码、3 seed/30 epoch/15,300 steps 完成情况、配对哈希、原始九组保护结果及 TEST=0。
+- git diff --check、git status、分支名及 HEAD、完整修改文件清单、受保护文件变更数必须为0。
+
+先将全部可追踪的小型结果和报告提交推送到工作分支：
+experiment/ccsam-c3-no-many-perturb-20261108
+不要 push、merge 到原始实验分支或 main。
+不要上传数据集、TRAIN 原始数据、个人路径下的敏感文件。
+本地 ignored 的权重和轨迹必须保留，报告中记录其 SHA 和实际路径。
+
+完成后明确返回：
+C3_FINAL_STATE=PASS 或 FAIL
+C3_SEEDS_COMPLETED=?
+C3_EPOCHS_COMPLETED=?
+C3_OPTIMIZER_STEPS=?
+C3_C1_MANY_DELTA_PP=?
+C3_C2_FEW_DELTA_PP=?
+C3_C2_OVERALL_DELTA_PP=?
+ORIGINAL_NINE_RUNS_UNCHANGED=true/false
+OFFICIAL_TEST_USED=false
+GITHUB_BRANCH=...
+GITHUB_COMMIT=...
+
+最后停止，不增加新实验、不调参、不自行解释论文创新性；等我基于 GitHub 结果进行第一性原理深度分析。
