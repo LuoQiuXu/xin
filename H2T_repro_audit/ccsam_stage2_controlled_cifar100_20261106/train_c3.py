@@ -7,6 +7,7 @@ Only the C3 arm may be newly trained. Official CIFAR TEST is forbidden.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from datetime import datetime
 from pathlib import Path
@@ -91,6 +92,24 @@ def baseline_file_snapshot():
         if not file.is_file():
             raise FileNotFoundError(f"Missing sealed original analysis: {file}")
         snapshots[filename] = sha256_file(file)
+
+    # Anchor the original nine local/ignored batch traces and checkpoints to
+    # the previously published independent SHA256 index, not just to metadata
+    # from the same local directory.
+    sealed_index = ROOT / "formal_launch_20261106_01" / "ARTIFACT_SHA256.csv"
+    if not sealed_index.is_file():
+        raise FileNotFoundError("Published original artifact checksum index missing")
+    with sealed_index.open("r", encoding="utf-8", newline="") as fp:
+        expected = {row["path"].replace("\\", "/"): row["sha256"]
+                    for row in csv.DictReader(fp)}
+    for key, actual in snapshots.items():
+        published = expected.get(key)
+        if published is None:
+            if key.startswith("results/"):
+                raise RuntimeError(f"Original result missing from published checksum index: {key}")
+            continue
+        if actual != published:
+            raise RuntimeError(f"Original artifact differs from published formal run: {key}")
     return snapshots
 
 
@@ -101,7 +120,7 @@ def preflight(manifest):
     checkpoint = resolve_checkpoint(manifest["checkpoint_path"])
     if sha256_file(checkpoint) != EXPECTED_CLEAN_SHA256:
         raise RuntimeError("Clean Stage I checkpoint bytes changed")
-    required = ["train_images.npy", "train_labels.npy",
+    required = ["train_images.npy", "train_labels.npy", "validation_images.npy",
                 "validation_gap_features.npy", "validation_labels.npy"]
     for name in required:
         if not (ROOT / "prepared" / name).is_file():
@@ -259,6 +278,7 @@ def smoke_c3(manifest, train_images, train_labels, transform, device):
         "three_seeds": list(SEEDS), "original_formal_training_repeated": False,
         "only_disposable_updates": True, "checks": results,
         "source_sha256": sha256_file(ROOT / "train_ccsam.py"),
+        "runner_sha256": sha256_file(ROOT / "train_c3.py"),
         "prepared_manifest_sha256": sha256_file(ROOT / "prepared" / "prepared_manifest.json"),
         "test_guard": guard_pass(), "official_TEST_used": False,
     }
@@ -311,6 +331,7 @@ def main():
     smoke = read_json(smoke_path)
     if (smoke.get("passed") is not True
             or smoke.get("source_sha256") != sha256_file(ROOT / "train_ccsam.py")
+            or smoke.get("runner_sha256") != sha256_file(ROOT / "train_c3.py")
             or smoke.get("prepared_manifest_sha256") != sha256_file(manifest_path)
             or smoke.get("official_TEST_used") is not False):
         raise RuntimeError("C3 Smoke report is invalid or source/prepared differs")
