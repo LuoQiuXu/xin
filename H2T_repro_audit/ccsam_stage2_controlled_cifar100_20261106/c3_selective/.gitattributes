@@ -1,0 +1,8 @@
+# Preserve the exact bytes of the archived C3 artifacts for SHA256 verification.
+.gitattributes -text
+*.json -text
+*.csv -text
+C3_RESULTS.md -text
+C3_EXECUTION_REPORT.md -text
+C3_PRODUCTION_DIFF.patch -text
+C3_EXECUTION.log -text

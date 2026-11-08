@@ -1,0 +1,67 @@
+diff --git a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+index 26e4687..a7cc60b 100644
+--- a/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
++++ b/H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+@@ -20,0 +21,3 @@ from ccsam_common import (
++C3_ARM = "C3_NO_MANY_PERTURB"
++
++
+@@ -106 +109,42 @@ def autograd_reference_delta(gap, labels, classifier_fc, class_weights):
+-def compute_arm_loss(arm, gap, labels, classifier_fc, class_weights, epoch_index):
++def mask_many_feature_delta(delta, gap, labels, train_counts):
++    """C3 intervention: zero ONLY the input feature perturbation for Many (n_c > 100).
++
++    Non-Many perturbations are taken bitwise unchanged from C1. The weighted
++    adversarial-CE and clean-CE objectives are intentionally left untouched.
++    This does NOT freeze classifier weights or remove Many examples from loss.
++    """
++    if delta.shape != gap.shape or delta.ndim != 2 or gap.shape[1] != FEATURE_DIM:
++        raise ValueError("C3 expects identical nonempty [B,64] delta and GAP shapes")
++    if labels.shape != (gap.shape[0],) or labels.dtype != torch.long:
++        raise ValueError("C3 expects one int64 label per feature row")
++    counts = torch.as_tensor(train_counts, dtype=torch.long, device=labels.device)
++    if counts.shape != (NUM_CLASSES,) or bool((counts <= 0).any().item()):
++        raise ValueError("C3 requires the sealed positive 100-class TRAIN counts")
++    if bool(((labels < 0) | (labels >= NUM_CLASSES)).any().item()):
++        raise ValueError("C3 label outside class range")
++    if delta.device != labels.device or gap.device != labels.device:
++        raise ValueError("C3 features, delta and labels must share a device")
++
++    many_mask = counts[labels] > 100
++    selected = delta.masked_fill(many_mask.unsqueeze(1), 0.0)
++    if bool((selected[many_mask] != 0).any().item()):
++        raise RuntimeError("C3 leaked nonzero perturbation into a Many example")
++    if not torch.equal(selected[~many_mask], delta[~many_mask]):
++        raise RuntimeError("C3 changed a non-Many perturbation")
++
++    delta_l2 = torch.linalg.vector_norm(selected, dim=1)
++    gap_l2 = torch.linalg.vector_norm(gap.detach(), dim=1).clamp_min(1e-12)
++    stats = {
++        "c3_many_examples_masked": int(many_mask.sum().item()),
++        "c3_nonmany_examples_kept": int((~many_mask).sum().item()),
++        "c3_many_count_threshold_exclusive": 100,
++        "mean_delta_l2_per_sample": float(delta_l2.mean().detach().cpu()),
++        "mean_relative_delta_l2": float((delta_l2 / gap_l2).mean().detach().cpu()),
++        "max_delta_l2_per_sample": float(delta_l2.max().detach().cpu()),
++    }
++    if not torch.isfinite(selected).all():
++        raise RuntimeError("Non-finite C3 selective feature delta")
++    return selected.detach(), stats
++
++
++def compute_arm_loss(arm, gap, labels, classifier_fc, class_weights, epoch_index, train_counts=None):
+@@ -137 +181 @@ def compute_arm_loss(arm, gap, labels, classifier_fc, class_weights, epoch_index
+-    elif arm == "C1_CCSAM_FEATURE_GRAD":
++    elif arm in ("C1_CCSAM_FEATURE_GRAD", C3_ARM):
+@@ -140,0 +185,7 @@ def compute_arm_loss(arm, gap, labels, classifier_fc, class_weights, epoch_index
++        if arm == C3_ARM:
++            if train_counts is None:
++                raise ValueError("C3 needs the original sealed TRAIN class counts")
++            delta, selective_stats = mask_many_feature_delta(
++                delta, gap_for_clean, labels, train_counts
++            )
++            perturb_stats.update(selective_stats)
+@@ -418 +469,2 @@ def train_one_arm(seed, arm, manifest, train_images, train_labels, validation_ga
+-                    arm, gap, target, classifier.module.fc, class_weights, epoch
++                    arm, gap, target, classifier.module.fc, class_weights, epoch,
++                    train_counts=counts if arm == C3_ARM else None,

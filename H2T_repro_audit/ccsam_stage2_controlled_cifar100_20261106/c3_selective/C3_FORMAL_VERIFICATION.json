@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "actual_seeds_completed": 3,
+  "actual_epochs": 90,
+  "actual_optimizer_steps": 15300,
+  "actual_train_samples_seen": 976230,
+  "runs": [
+    {
+      "seed": 123,
+      "epochs": 30,
+      "many_class_0_samples_masked": 3254,
+      "optimizer_steps": 5100,
+      "train_samples_seen": 325410,
+      "classifier_updated": true,
+      "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+      "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+      "backbone_bn_bitwise_frozen_every_epoch": true,
+      "batch_trace_path": "results/seed_123/C3_NO_MANY_PERTURB/batch_trace.csv",
+      "batch_trace_sha256": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+      "matched_c0_batches": 5100,
+      "classifier_path": "results/seed_123/C3_NO_MANY_PERTURB/final_classifier.pth",
+      "classifier_sha256": "045bc61ff1c9d633c4b958a0d29639a290ccb11bbf1101a137a5e1a2a65f0a69",
+      "last_epoch_mean_delta_l2": 0.9721585600081815,
+      "last_epoch_metrics": {
+        "Overall": 46.16161616161616,
+        "Many": 57.5,
+        "MediumN": 48.857142857142854,
+        "Few": 30.166666666666668
+      }
+    },
+    {
+      "seed": 124,
+      "epochs": 30,
+      "many_class_0_samples_masked": 3254,
+      "optimizer_steps": 5100,
+      "train_samples_seen": 325410,
+      "classifier_updated": true,
+      "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+      "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+      "backbone_bn_bitwise_frozen_every_epoch": true,
+      "batch_trace_path": "results/seed_124/C3_NO_MANY_PERTURB/batch_trace.csv",
+      "batch_trace_sha256": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+      "matched_c0_batches": 5100,
+      "classifier_path": "results/seed_124/C3_NO_MANY_PERTURB/final_classifier.pth",
+      "classifier_sha256": "6d805acf29aeb89389083b074492aa1cec09c87169b672470113c8e89626c16c",
+      "last_epoch_mean_delta_l2": 0.966386893558933,
+      "last_epoch_metrics": {
+        "Overall": 46.36363636363636,
+        "Many": 58.23529411764706,
+        "MediumN": 48.57142857142857,
+        "Few": 30.333333333333332
+      }
+    },
+    {
+      "seed": 125,
+      "epochs": 30,
+      "many_class_0_samples_masked": 3254,
+      "optimizer_steps": 5100,
+      "train_samples_seen": 325410,
+      "classifier_updated": true,
+      "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+      "initial_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+      "backbone_bn_bitwise_frozen_every_epoch": true,
+      "batch_trace_path": "results/seed_125/C3_NO_MANY_PERTURB/batch_trace.csv",
+      "batch_trace_sha256": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+      "matched_c0_batches": 5100,
+      "classifier_path": "results/seed_125/C3_NO_MANY_PERTURB/final_classifier.pth",
+      "classifier_sha256": "887bb240a0080b289a4ff09de8f9bb83972ddfd622e1c6bce2b58a2637a116de",
+      "last_epoch_mean_delta_l2": 0.9712831367047974,
+      "last_epoch_metrics": {
+        "Overall": 46.36363636363636,
+        "Many": 57.94117647058823,
+        "MediumN": 48.42857142857143,
+        "Few": 30.833333333333332
+      }
+    }
+  ],
+  "original_artifacts_verified": 52,
+  "sealed_inputs_verified": 16,
+  "historical_untracked_assets_verified": 140,
+  "protected_file_changes": 0,
+  "original_nine_runs_unchanged": true,
+  "official_TEST_used": false,
+  "native_formal_test_guard": {
+    "installed_at": "2026-11-08T20:57:47+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "verification_test_guard": {
+    "installed_at": "2026-11-08T21:18:32+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}

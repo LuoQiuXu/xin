@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "arm": "C3_NO_MANY_PERTURB",
+  "completed_at": "2026-11-08T21:18:14+08:00",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "epochs_per_seed": 30,
+  "only_c3_new_training": true,
+  "original_nine_runs_unchanged": true,
+  "runs": [
+    {
+      "seed": 123,
+      "epoch": 30,
+      "final_classifier_sha256": "045bc61ff1c9d633c4b958a0d29639a290ccb11bbf1101a137a5e1a2a65f0a69"
+    },
+    {
+      "seed": 124,
+      "epoch": 30,
+      "final_classifier_sha256": "6d805acf29aeb89389083b074492aa1cec09c87169b672470113c8e89626c16c"
+    },
+    {
+      "seed": 125,
+      "epoch": 30,
+      "final_classifier_sha256": "887bb240a0080b289a4ff09de8f9bb83972ddfd622e1c6bce2b58a2637a116de"
+    }
+  ],
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-08T20:57:47+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "baseline_artifact_sha256": {
+    "results/seed_123/C0_BALANCED_CE/status.json": "c149eebf20680f8c4acf5ab918f37abac62e57df2031209d09f5f50c46727034",
+    "results/seed_123/C0_BALANCED_CE/metrics.csv": "66bc2fec983dd8f460c93b40ef8f6c7b90171083dc59ffae42302fe5dc5d0901",
+    "results/seed_123/C0_BALANCED_CE/batch_trace.csv": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+    "results/seed_123/C0_BALANCED_CE/final_classifier.pth": "6e46c69110263d2df3be357ee00c593b1e21c6441fecbfd02c3c0d3bc4748c85",
+    "results/seed_123/C1_CCSAM_FEATURE_GRAD/status.json": "981b6673d6e9882df17c71956703b0136f8a899150c691c35bb6ce3430a263ab",
+    "results/seed_123/C1_CCSAM_FEATURE_GRAD/metrics.csv": "c634c236831766c350d0812ec8ff3ec84054251196e8787153de99768c9c04d3",
+    "results/seed_123/C1_CCSAM_FEATURE_GRAD/batch_trace.csv": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+    "results/seed_123/C1_CCSAM_FEATURE_GRAD/final_classifier.pth": "688d2ac3bb2e9a2e4d0c1596d12d7eb1fd2285c4250040431d78234d2bd550e2",
+    "results/seed_123/C2_WEIGHTED_CE_NO_PERTURB/status.json": "727762ff176e22717ceaf4bb1e4bf06b00279bd8c7febd1106c1fc0481e99573",
+    "results/seed_123/C2_WEIGHTED_CE_NO_PERTURB/metrics.csv": "5c7cab718c102c2188605c31986c206087740bdce20879dfa4878fdd2b7fd0a1",
+    "results/seed_123/C2_WEIGHTED_CE_NO_PERTURB/batch_trace.csv": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+    "results/seed_123/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb",
+    "results/seed_124/C0_BALANCED_CE/status.json": "8ea09746fa35b2f45794ce96c3cf839335643c68dd120efaf896cb0fc8ce74f6",
+    "results/seed_124/C0_BALANCED_CE/metrics.csv": "51da00b4677397d2cd98391525ef31e1b150da36dec1c9ed24c041230559de81",
+    "results/seed_124/C0_BALANCED_CE/batch_trace.csv": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+    "results/seed_124/C0_BALANCED_CE/final_classifier.pth": "cabce00927b185c469bb50810118bff8c92496a899b20930c795d904b7593a1d",
+    "results/seed_124/C1_CCSAM_FEATURE_GRAD/status.json": "63f6b46e73448aa86ce2319ccaaa022a3b5e91abd2deaf21cb68392eeab9909c",
+    "results/seed_124/C1_CCSAM_FEATURE_GRAD/metrics.csv": "55230d8f43353535a4b46a960b87c67588ff811e856bab8624d1298fdf46a697",
+    "results/seed_124/C1_CCSAM_FEATURE_GRAD/batch_trace.csv": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+    "results/seed_124/C1_CCSAM_FEATURE_GRAD/final_classifier.pth": "eeeb022b926fa38a12dd172a97b98d26076897412a72c3c59bcd24d35ba5d9cc",
+    "results/seed_124/C2_WEIGHTED_CE_NO_PERTURB/status.json": "bcbb30159761be1ffb4b667398816925ebf3d6913ae6200ade9e75fcd9e353ce",
+    "results/seed_124/C2_WEIGHTED_CE_NO_PERTURB/metrics.csv": "567d4ac13e18bcef2fbd56db7e46acb999a6b5ed383bdcada2534889986f390e",
+    "results/seed_124/C2_WEIGHTED_CE_NO_PERTURB/batch_trace.csv": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+    "results/seed_124/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed",
+    "results/seed_125/C0_BALANCED_CE/status.json": "799fe70bf52bc51092d346a7010d24098339e2063457895c01618793744bc45f",
+    "results/seed_125/C0_BALANCED_CE/metrics.csv": "18657695e3e0d3250f02484b2c6b05f99210f0e58c9222e9c0494c50f969625e",
+    "results/seed_125/C0_BALANCED_CE/batch_trace.csv": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+    "results/seed_125/C0_BALANCED_CE/final_classifier.pth": "3e7930fa52deeeff93e850641f4daf7e5554b3262bb82d95b9901095502704bb",
+    "results/seed_125/C1_CCSAM_FEATURE_GRAD/status.json": "cfeec105c1f6ad0feeac368d73e68a469423b182a590043c6345a99acacb18f9",
+    "results/seed_125/C1_CCSAM_FEATURE_GRAD/metrics.csv": "25ed03414dde69cf5a6334de8b249026f157367f6cfb67488ab1f56bf70a20f9",
+    "results/seed_125/C1_CCSAM_FEATURE_GRAD/batch_trace.csv": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+    "results/seed_125/C1_CCSAM_FEATURE_GRAD/final_classifier.pth": "c3516ffab68448d39bd842745cbb994a26f71cb6cce2d5333d23b9b95d93617f",
+    "results/seed_125/C2_WEIGHTED_CE_NO_PERTURB/status.json": "537f2d9fd78c7b696fd37cdc18628d71e6891a8b5227606f2b1623d6c4ce83c5",
+    "results/seed_125/C2_WEIGHTED_CE_NO_PERTURB/metrics.csv": "ed669b8cc5bcb8f13f987595599c05fcfbe63c6994c371ec3d7fa3f5d4c62d49",
+    "results/seed_125/C2_WEIGHTED_CE_NO_PERTURB/batch_trace.csv": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+    "results/seed_125/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b",
+    "formal_completed.json": "d3d94b1cbfa459f95f2fb1aeb4466a2bd2728f1b715fa4036dcba1af3a0a4c5e",
+    "formal_test_guard.json": "c9635acf049b113c00a6c0db095eba014127bbc524c545fa9e806e6eb59f1c6d",
+    "summary.json": "eba73a4dc884d11bc6ec9ce3d1acc3f003be2346cb5fe17e77aacc091a69a0a7",
+    "final_epoch_metrics.csv": "1722b3cec8bea0d647bb995e81d63c1b799e0772ed0c6d47184e684dc9aee554",
+    "paired_deltas.csv": "6c0f3bcec7a8707f185898f572b751480d4ff07b903edd964d30c26dff216318",
+    "CCSAM_STAGE2_RESULTS.md": "5fd494371ce9425c509eb7b516083f78543aced8fa76a51d46eb7e671d2f84cc"
+  },
+  "source_sha256": "076b5b6e87c7f24ae63464302cf702854982d18a1e36e8696c4c9edb9f0e17d0",
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02"
+}

@@ -1,0 +1,232 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-08T20:57:36+08:00",
+  "arm": "C3_NO_MANY_PERTURB",
+  "three_seeds": [
+    123,
+    124,
+    125
+  ],
+  "original_formal_training_repeated": false,
+  "only_disposable_updates": true,
+  "checks": [
+    {
+      "seed": 123,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_input_sha256": "fe1248b57aee486d4cc1dede58f8f3a4e58d4166102d732154469edf2819360e",
+          "gap_sha256": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee",
+          "mask_checks": {
+            "real_mixed": {
+              "many_samples": 21,
+              "nonmany_samples": 43,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 0.885816216468811,
+              "mean_delta_l2": 1.017686128616333
+            },
+            "all_many_class_0": {
+              "many_samples": 64,
+              "nonmany_samples": 0,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 5.957624435424805,
+              "mean_delta_l2": 0.0
+            },
+            "all_nonmany_class_99": {
+              "many_samples": 0,
+              "nonmany_samples": 64,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 10.15149211883545,
+              "mean_delta_l2": 0.2853885889053345
+            }
+          }
+        },
+        {
+          "batch": 1,
+          "paired_input_sha256": "903639e059e9d8f8279d1c4176ba61d343c6195d82763e5287e3c6a983e5a8ee",
+          "gap_sha256": "f1bb876c801cd766ae3542426872ea74e0a31a8e6c068620812e1c91040a37a3",
+          "mask_checks": {
+            "real_mixed": {
+              "many_samples": 24,
+              "nonmany_samples": 40,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 1.138473391532898,
+              "mean_delta_l2": 0.8671835660934448
+            },
+            "all_many_class_0": {
+              "many_samples": 64,
+              "nonmany_samples": 0,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 5.336808681488037,
+              "mean_delta_l2": 0.0
+            },
+            "all_nonmany_class_99": {
+              "many_samples": 0,
+              "nonmany_samples": 64,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 9.468985557556152,
+              "mean_delta_l2": 0.28379660844802856
+            }
+          }
+        }
+      ],
+      "disposable_classifier_updated": true,
+      "backbone_and_bn_unchanged": true
+    },
+    {
+      "seed": 124,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_input_sha256": "02c1b078f851b3147c1dc19d4c78ea873ab96d61170772de8069253994ca5447",
+          "gap_sha256": "4971099adb200dfce37ece994366abce4804de5a3ff454df5a9df1b7391ab3b8",
+          "mask_checks": {
+            "real_mixed": {
+              "many_samples": 22,
+              "nonmany_samples": 42,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 1.063810110092163,
+              "mean_delta_l2": 1.072068691253662
+            },
+            "all_many_class_0": {
+              "many_samples": 64,
+              "nonmany_samples": 0,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 5.676990032196045,
+              "mean_delta_l2": 0.0
+            },
+            "all_nonmany_class_99": {
+              "many_samples": 0,
+              "nonmany_samples": 64,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 9.557764053344727,
+              "mean_delta_l2": 0.28543543815612793
+            }
+          }
+        },
+        {
+          "batch": 1,
+          "paired_input_sha256": "3d7bdea68d338f171a9f86c0d36c9c0657f94a2d8c0d59ddd3d903439ff6859a",
+          "gap_sha256": "3b5b1f61a17dcc224c2d473f0327581ac4335f41410486a245e923a953bf4bf5",
+          "mask_checks": {
+            "real_mixed": {
+              "many_samples": 23,
+              "nonmany_samples": 41,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 0.604985237121582,
+              "mean_delta_l2": 0.806425154209137
+            },
+            "all_many_class_0": {
+              "many_samples": 64,
+              "nonmany_samples": 0,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 6.375110626220703,
+              "mean_delta_l2": 0.0
+            },
+            "all_nonmany_class_99": {
+              "many_samples": 0,
+              "nonmany_samples": 64,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 10.281963348388672,
+              "mean_delta_l2": 0.28438013792037964
+            }
+          }
+        }
+      ],
+      "disposable_classifier_updated": true,
+      "backbone_and_bn_unchanged": true
+    },
+    {
+      "seed": 125,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_input_sha256": "d09d918c9497410cad5ed1bc6a92fbc912c4201d82cfccf5b90408e986e2148a",
+          "gap_sha256": "abc8e696ec52eb7a6c66dd475bc7757edf7c31b0ca97c828fc26763a9766512a",
+          "mask_checks": {
+            "real_mixed": {
+              "many_samples": 21,
+              "nonmany_samples": 43,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 1.019431710243225,
+              "mean_delta_l2": 1.0594756603240967
+            },
+            "all_many_class_0": {
+              "many_samples": 64,
+              "nonmany_samples": 0,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 5.868225574493408,
+              "mean_delta_l2": 0.0
+            },
+            "all_nonmany_class_99": {
+              "many_samples": 0,
+              "nonmany_samples": 64,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 9.733023643493652,
+              "mean_delta_l2": 0.2839454710483551
+            }
+          }
+        },
+        {
+          "batch": 1,
+          "paired_input_sha256": "c28fa1a54748deb1f6c4ca6fc9707537ca4a5b6d3817cee561aa23bbff7410c0",
+          "gap_sha256": "97c0b75a8eeb6acec83de0563d9f972407f5ef733cb074da1f35a68b6aba7d52",
+          "mask_checks": {
+            "real_mixed": {
+              "many_samples": 26,
+              "nonmany_samples": 38,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 0.9874427914619446,
+              "mean_delta_l2": 0.8690413236618042
+            },
+            "all_many_class_0": {
+              "many_samples": 64,
+              "nonmany_samples": 0,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 5.693928241729736,
+              "mean_delta_l2": 0.0
+            },
+            "all_nonmany_class_99": {
+              "many_samples": 0,
+              "nonmany_samples": 64,
+              "many_delta_zero_exact": true,
+              "nonmany_delta_equals_C1_bitwise": true,
+              "c3_loss": 9.942580223083496,
+              "mean_delta_l2": 0.28505033254623413
+            }
+          }
+        }
+      ],
+      "disposable_classifier_updated": true,
+      "backbone_and_bn_unchanged": true
+    }
+  ],
+  "source_sha256": "076b5b6e87c7f24ae63464302cf702854982d18a1e36e8696c4c9edb9f0e17d0",
+  "runner_sha256": "8f66ecb04c663287e1754edbb7bcd96b619bbf9c93ca40e897b9894e0b01700b",
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+  "test_guard": {
+    "installed_at": "2026-11-08T20:57:33+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "official_TEST_used": false
+}

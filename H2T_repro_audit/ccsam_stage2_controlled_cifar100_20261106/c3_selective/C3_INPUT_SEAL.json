@@ -1,0 +1,97 @@
+{
+  "branch": "experiment/ccsam-c3-no-many-perturb-20261108",
+  "checked_head": "3ade5e466a33093f7d559b99e106ad4bf893803e",
+  "original_baseline_commit": "f916957ea4a7b90cf82dc5839eb193e044d881dd",
+  "original_index_sha256": "2fc1deaface1bed93ea91cb96decdaaee56346c3fa181164d6035e9ff7affa37",
+  "original_artifacts_verified": 52,
+  "original_run_directories": 9,
+  "old_untracked_assets_verified": 140,
+  "initial_git_status": [
+    "## experiment/ccsam-c3-no-many-perturb-20261108...origin/experiment/ccsam-c3-no-many-perturb-20261108",
+    "?? H2T_repro_audit/fusion_semantic_audit/",
+    "?? H2T_repro_audit/h2t_decision_20261028/",
+    "?? H2T_repro_audit/lowvs_mask_parity/",
+    "?? H2T_repro_audit/mdlt_domain_probe/",
+    "?? H2T_repro_audit/noisy_lt_cross_stage2/",
+    "?? H2T_repro_audit/noisy_lt_failure_screen/",
+    "?? H2T_repro_audit/pi_failure_screen/",
+    "?? H2T_repro_audit/pi_h2t_author_audit_20261027/",
+    "?? H2T_repro_audit/research_gap_20261026/",
+    "?? H2T_repro_audit/semantic_compatibility_screen/"
+  ],
+  "inputs": {
+    "prepared_manifest": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/prepared_manifest.json",
+      "sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02"
+    },
+    "clean_checkpoint": {
+      "path": "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/locked/clean_stage1_best.pth",
+      "sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88"
+    },
+    "TRAIN_pickle": {
+      "path": "H2T/data/cifar100/cifar-100-python/train",
+      "sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+    },
+    "TRAIN_split": {
+      "path": "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/split_indices.npz",
+      "sha256": "c8579feef60d7705472ec00aeac85fa00a66c243761e0a8d76c462c663286ca1"
+    },
+    "TRAIN_transform": {
+      "path": "H2T_repro_audit/clean_vs_stability_runs/clean_s1_seed42_s2_124_125_20261014/runtime/datasets/cifar100.py",
+      "sha256": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d"
+    },
+    "original_smoke_report": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/smoke_report.json",
+      "sha256": "7c7973531cc4158e4f9e28273eaf2446021cd766b28c5dfd204863906035968e"
+    },
+    "train_images.npy": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/train_images.npy",
+      "sha256": "851956f0a834f5a586240ce750cdbf3b30d506b90e0ed6d6528de6cca1930e64"
+    },
+    "train_labels.npy": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/train_labels.npy",
+      "sha256": "1244d78d646ff1a4e10c6913c000f83e1ea39eaa95b31455d2a2702e2084ffc9"
+    },
+    "validation_images.npy": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/validation_images.npy",
+      "sha256": "7ec7201af5b69fbda711fb515b523a19d22457a4f255a5cb9ac2e374ab903656"
+    },
+    "validation_labels.npy": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/validation_labels.npy",
+      "sha256": "87fe7e71add2f0d944ee88803f72048593fe5e5e4afa57a72df56c4fd182815e"
+    },
+    "validation_gap_features.npy": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/validation_gap_features.npy",
+      "sha256": "3e8677636f1e4f64a7823177c8d84f4f976f6dfa056f17bc0e24f17139342462"
+    },
+    "sampling_seed_123": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/sampling_plan_seed123.npy",
+      "sha256": "a461d9a5d9145d5b0fb25cac80d0e0ae671fb7675062218437ec97802298bc45"
+    },
+    "sampling_seed_124": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/sampling_plan_seed124.npy",
+      "sha256": "ec09664901142fbb40f540cc8253606ed4829fd2a18932fdfe145e42fe0f4f39"
+    },
+    "sampling_seed_125": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/prepared/sampling_plan_seed125.npy",
+      "sha256": "375607fc8aa86fa7e44f0e54b0930b1ac0baad9e045f2889e4ae35b7b518e0e2"
+    },
+    "ccsam_common.py": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py",
+      "sha256": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9"
+    },
+    "experiment_protocol.json": {
+      "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/experiment_protocol.json",
+      "sha256": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813"
+    }
+  },
+  "class_0_train_count": 500,
+  "class_0_validation_count": 0,
+  "test_guard": {
+    "installed_at": "2026-11-08T20:54:46+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}
