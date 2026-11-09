@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "arm": "C4_CCSAM_HEAD_PRESERVE",
+  "completed_at": "2026-11-09T16:05:05+08:00",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "epochs_per_seed": 30,
+  "new_epochs": 90,
+  "optimizer_steps": 15300,
+  "only_c4_new_training": true,
+  "original_c0_c1_c2_and_c3_unchanged": true,
+  "runs": [
+    {
+      "seed": 123,
+      "epoch": 30,
+      "final_classifier_sha256": "ad65932029c305e8b0a8f63a5a8e4c80a0b22dc3c84e97a27797f37bad841aea",
+      "teacher_checkpoint_sha256": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb"
+    },
+    {
+      "seed": 124,
+      "epoch": 30,
+      "final_classifier_sha256": "edae7b41ab200a32c104587fa658f7f5e6de472be5a175b32139ee64528d3333",
+      "teacher_checkpoint_sha256": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed"
+    },
+    {
+      "seed": 125,
+      "epoch": 30,
+      "final_classifier_sha256": "c752db3d1c2787fdbee8591c2f1829059c5a68e3edbdc1e509055e5a4cf0f186",
+      "teacher_checkpoint_sha256": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b"
+    }
+  ],
+  "teacher_temperature": 2.0,
+  "head_preservation_lambda": 1.0,
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-09T15:52:18+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "preflight_report_sha256": "73670fc12c0962f877dbd55eee24d4a9ac81af5538c4f5d9acbff5fef00b2d0d",
+  "smoke_report_sha256": "0f3d498e2112cdf1be534af45ba622765af52fbaa726a4681a099b196dc9f8f8",
+  "source_sha256": "7d3444bbfb74d56327e20ec3af3c1c26e5ae973d5efb4e94781df15880d806c6",
+  "protocol_sha256": "517e81eb7115e6f8bdff85cd0585997e5b78153fb2f38c79783e822030dd9e47"
+}

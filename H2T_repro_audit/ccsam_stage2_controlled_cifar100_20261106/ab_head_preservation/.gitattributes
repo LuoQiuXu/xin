@@ -1,0 +1,10 @@
+# Preserve the bytes of the new C4 archive artifacts.
+.gitattributes -text
+ARTIFACT_SHA256.csv -text
+C4_EXECUTION_REPORT.md -text
+preflight_report.json -text
+smoke_report.json -text
+formal_completed.json -text
+analysis/** -text
+results/**/metrics.csv -text
+results/**/status.json -text

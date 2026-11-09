@@ -148,7 +148,7 @@ def c3_artifact_snapshot() -> dict[str, str]:
         or marker.get("seeds") != list(SEEDS)
         or marker.get("epochs_per_seed") != STAGE2_EPOCHS
         or marker.get("official_TEST_used") is not False
-        or marker.get("original_nine_runs_untouched") is not True
+        or marker.get("original_nine_runs_unchanged") is not True
         or summary.get("official_TEST_used") is not False
         or summary.get("original_nine_runs_untouched") is not True
     ):

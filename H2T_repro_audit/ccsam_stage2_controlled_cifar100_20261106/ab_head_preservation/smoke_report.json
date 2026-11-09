@@ -1,0 +1,152 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-09T15:52:11+08:00",
+  "arm": "C4_CCSAM_HEAD_PRESERVE",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "batches_per_seed": 2,
+  "formal_training_started": false,
+  "only_disposable_student_updates": true,
+  "teacher_temperature": 2.0,
+  "head_preservation_lambda": 1.0,
+  "checks": [
+    {
+      "seed": 123,
+      "teacher_checkpoint_sha256": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb",
+      "paired_with_original_c1_batches": true,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_c1_trace_exact": true,
+          "many_samples": 21,
+          "nonmany_samples": 43,
+          "c1_base_loss": 0.8877630829811096,
+          "head_kd_loss": 0.8772026300430298,
+          "total_loss": 1.7649657726287842,
+          "mean_delta_l2": 1.1679407358169556,
+          "temperature": 2.0,
+          "lambda": 1.0,
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          }
+        },
+        {
+          "batch": 1,
+          "paired_c1_trace_exact": true,
+          "many_samples": 24,
+          "nonmany_samples": 40,
+          "c1_base_loss": 1.1402772665023804,
+          "head_kd_loss": 0.8417555689811707,
+          "total_loss": 1.9820327758789062,
+          "mean_delta_l2": 0.983207106590271,
+          "temperature": 2.0,
+          "lambda": 1.0,
+          "analytic_gradient_check": null
+        }
+      ],
+      "disposable_student_update": true,
+      "student_updated": true,
+      "teacher_frozen": true,
+      "backbone_and_bn_bitwise_unchanged": true
+    },
+    {
+      "seed": 124,
+      "teacher_checkpoint_sha256": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed",
+      "paired_with_original_c1_batches": true,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_c1_trace_exact": true,
+          "many_samples": 22,
+          "nonmany_samples": 42,
+          "c1_base_loss": 1.066469430923462,
+          "head_kd_loss": 0.7381275296211243,
+          "total_loss": 1.8045969009399414,
+          "mean_delta_l2": 1.2151803970336914,
+          "temperature": 2.0,
+          "lambda": 1.0,
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          }
+        },
+        {
+          "batch": 1,
+          "paired_c1_trace_exact": true,
+          "many_samples": 23,
+          "nonmany_samples": 41,
+          "c1_base_loss": 0.607839047908783,
+          "head_kd_loss": 0.9610764384269714,
+          "total_loss": 1.5689154863357544,
+          "mean_delta_l2": 0.9334464073181152,
+          "temperature": 2.0,
+          "lambda": 1.0,
+          "analytic_gradient_check": null
+        }
+      ],
+      "disposable_student_update": true,
+      "student_updated": true,
+      "teacher_frozen": true,
+      "backbone_and_bn_bitwise_unchanged": true
+    },
+    {
+      "seed": 125,
+      "teacher_checkpoint_sha256": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b",
+      "paired_with_original_c1_batches": true,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_c1_trace_exact": true,
+          "many_samples": 21,
+          "nonmany_samples": 43,
+          "c1_base_loss": 1.0217151641845703,
+          "head_kd_loss": 0.8576211929321289,
+          "total_loss": 1.8793363571166992,
+          "mean_delta_l2": 1.1930134296417236,
+          "temperature": 2.0,
+          "lambda": 1.0,
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          }
+        },
+        {
+          "batch": 1,
+          "paired_c1_trace_exact": true,
+          "many_samples": 26,
+          "nonmany_samples": 38,
+          "c1_base_loss": 0.9903817176818848,
+          "head_kd_loss": 0.7773944735527039,
+          "total_loss": 1.7677762508392334,
+          "mean_delta_l2": 1.0075368881225586,
+          "temperature": 2.0,
+          "lambda": 1.0,
+          "analytic_gradient_check": null
+        }
+      ],
+      "disposable_student_update": true,
+      "student_updated": true,
+      "teacher_frozen": true,
+      "backbone_and_bn_bitwise_unchanged": true
+    }
+  ],
+  "source_sha256": "7d3444bbfb74d56327e20ec3af3c1c26e5ae973d5efb4e94781df15880d806c6",
+  "protocol_sha256": "517e81eb7115e6f8bdff85cd0585997e5b78153fb2f38c79783e822030dd9e47",
+  "preflight_report_sha256": "73670fc12c0962f877dbd55eee24d4a9ac81af5538c4f5d9acbff5fef00b2d0d",
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+  "test_guard": {
+    "installed_at": "2026-11-09T15:52:08+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "official_TEST_used": false
+}
