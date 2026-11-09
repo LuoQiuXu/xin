@@ -1,0 +1,3 @@
+# Keep large local-only training artifacts out of GitHub.
+results/**/batch_trace.csv
+results/**/final_classifier.pth

@@ -1,0 +1,253 @@
+# CODEX TASK — C4: CC-SAM + Many-only head-preservation distillation
+# Branch: experiment/ccsam-head-preservation-distill-20261109
+# This branch already contains the implementation. Execute the frozen protocol; do not redesign it.
+
+## A. Scientific objective
+
+The sealed C0/C1/C2 results showed that the original C1 feature-gradient perturbation improves Few but damages Many. C3 removed direct Many perturbations but did not recover Many accuracy; it retained the Few gain.
+
+C4 is the first constructive full-method experiment:
+
+- Module A: keep the complete original C1 CC-SAM feature-gradient perturbation on every class.
+- Module B: use the corresponding seed's final C2 classifier as a frozen teacher and distill its full 100-class output distribution on Many-class original GAP features only.
+- Student: initialize from the same Clean Stage-I classifier as C0-C3, never from the C2 teacher.
+- Teacher: final epoch-30 C2 classifier for the matching Stage-II seed, frozen throughout.
+- Backbone and BN: frozen.
+- Objective: L_C4 = L_C1 + lambda_HP * L_HP.
+- T=2.0, lambda_HP=1.0, fixed for this first run. No tuning or search.
+
+Many means the sealed original TRAIN class count is strictly >100. Do not use class-ID ranges or validation counts. The KL input subset is Many-only, but the target distribution covers all 100 output classes.
+
+## B. Repository and branch
+
+Repository: LuoQiuXu/xin
+Branch: experiment/ccsam-head-preservation-distill-20261109
+Base branch: experiment/ccsam-c3-no-many-perturb-20261108
+Experiment root:
+H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/
+C4 directory:
+H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ab_head_preservation/
+
+Switch to the requested branch without destroying local files:
+
+    Set-Location D:\xiangmuxunlian\xin
+    git status --short
+    git fetch origin
+    git switch experiment/ccsam-head-preservation-distill-20261109
+    git pull --ff-only origin experiment/ccsam-head-preservation-distill-20261109
+    git rev-parse --abbrev-ref HEAD
+    git rev-parse HEAD
+
+Expected branch name must be exact. Do not run git reset --hard, git clean, checkout -- ., or delete ignored/untracked files. The previous C3 branch contains local-only checkpoints and batch traces; preserve them across the branch switch.
+
+If Git reports that switching would overwrite local files, STOP and report the exact paths. Do not stash/delete them blindly.
+
+## C. Important implementation files
+
+The C4 implementation is already committed in this branch:
+
+- ab_head_preservation/train_ab.py
+- ab_head_preservation/analyze_ab.py
+- ab_head_preservation/test_ab_distillation.py
+- ab_head_preservation/AB_PROTOCOL.md
+- ab_head_preservation/.gitignore
+
+Do not modify the sealed production files:
+- train_ccsam.py
+- ccsam_common.py
+- train_c3.py
+- experiment_protocol.json
+- prepared/*
+- results/seed_*/C0_BALANCED_CE/*
+- results/seed_*/C1_CCSAM_FEATURE_GRAD/*
+- results/seed_*/C2_WEIGHTED_CE_NO_PERTURB/*
+- results/seed_*/C3_NO_MANY_PERTURB/*
+- c3_selective/*
+- formal_launch_20261106_01/*
+
+C4 imports the original C1 loss and analytic feature-gradient function. Do not reimplement or alter that numerical path.
+
+## D. Required local inputs — stop if anything is missing
+
+The local machine must retain:
+
+1. The sealed Clean Stage-I checkpoint:
+   SHA256 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88
+2. The sealed prepared arrays and three sampling plans.
+3. The nine original C0/C1/C2 run artifacts, including local-only final_classifier.pth and batch_trace.csv.
+4. The three C3 run artifacts, including local-only final_classifier.pth and batch_trace.csv.
+5. The three C2 teacher checkpoints:
+   results/seed_123/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth
+   results/seed_124/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth
+   results/seed_125/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth
+
+The C2 teacher for a seed must match that seed's C2 status SHA and the independent original checksum index. Its checkpoint metadata must report arm=C2_WEIGHTED_CE_NO_PERTURB, epoch=30, the correct seed, the sealed Clean Stage-I SHA, and the same initial classifier SHA as the new C4 student.
+
+C4 preflight independently verifies the original C0/C1/C2 checksum index and the C3 archive checksum index, including local-only artifacts. If any required file is absent or any SHA differs, STOP. Never rerun C0-C3, reconstruct traces from metrics, regenerate plans, substitute another teacher, or skip a checksum gate.
+
+## E. Frozen protocol
+
+- CIFAR-100-LT IF=100, official TRAIN only, 10,847 samples.
+- ResNet-32 Clean Stage I, seed 42, best epoch 184.
+- 64-D GAP features through the existing clean_compatible_gap path.
+- Seeds 123, 124, 125.
+- Stage II: 30 epochs, batch size 64, 170 steps/epoch.
+- SGD(lr=0.01, momentum=0.9, weight_decay=0.0002, nesterov=False).
+- FP32 only. No AMP, MixUp, gradient accumulation, scheduler change, early stopping, or best-epoch selection.
+- Same sealed sampling plan, augmentation transform, and continuous augmentation RNG as C1.
+- Student initializes from the sealed Clean Stage-I classifier.
+- Teacher is the same seed's final C2 checkpoint and is frozen.
+- C1 perturbation remains active for Many, MediumN, and Few.
+- Distillation uses original, unperturbed GAP features for Many samples only.
+- The teacher and student both produce full 100-class logits.
+- Primary result is fixed epoch 30.
+- Official CIFAR-100 TEST is strictly prohibited. Never instantiate CIFAR100(train=False), open/decode the test pickle, or use test labels.
+
+Only C4 is newly trained: 3 seeds ×30 epochs =90 epochs and 15,300 optimizer steps.
+
+## F. Run commands in the C4 directory
+
+Use Windows PowerShell:
+
+    Set-Location D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\ab_head_preservation
+    $PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
+
+Start a complete transcript before running commands:
+
+    Start-Transcript -Path .\C4_EXECUTION.log
+
+Run one command at a time. Check $LASTEXITCODE after every command. If a command fails, stop immediately and preserve all files/logs.
+
+### Step 1 — syntax and CPU-only semantic tests
+
+    & $PY -B -m py_compile train_ab.py analyze_ab.py test_ab_distillation.py
+    if ($LASTEXITCODE -ne 0) { throw "C4 syntax check failed" }
+
+    & $PY -B -m unittest -v test_ab_distillation
+    if ($LASTEXITCODE -ne 0) { throw "C4 distillation unit tests failed" }
+
+Tests must verify:
+- Strict count threshold: 101 is Many; 100 is not.
+- KL is KL(teacher || student), with T-squared scaling.
+- KL is averaged over Many inputs only.
+- Non-Many inputs have exactly zero KL gradient.
+- Teacher logits are detached and teacher receives no gradient.
+- A no-Many batch returns a differentiable zero.
+- Equal teacher/student logits yield zero KL.
+- Invalid temperature and invalid class-count vectors are rejected.
+
+### Step 2 — preflight only
+
+    & $PY -B -u train_ab.py --preflight
+    if ($LASTEXITCODE -ne 0) { throw "C4 preflight failed" }
+
+Preflight must pass all original C0/C1/C2 checks, all C3 archive checks, all three local C2 teacher checks, prepared input checks, source checks, and TEST-free provenance.
+
+Preflight writes preflight_report.json once. Do not delete or overwrite it.
+
+### Step 3 — real-data Smoke only
+
+    & $PY -B -u train_ab.py --smoke-only
+    if ($LASTEXITCODE -ne 0) { throw "C4 Smoke failed" }
+
+Smoke runs two consecutive real batches for each seed, preserving the original augmentation RNG. It must compare the input/label, augmented-image, and GAP hashes exactly against the corresponding original C1 batch_trace.csv.
+
+Smoke performs one disposable C4 student classifier update per seed and verifies:
+- Original C1 analytic gradient still matches direct autograd with unchanged tolerances.
+- C4 total loss = C1 base loss + 1.0 × Many-only KL.
+- The second real batch contains Many samples and has finite nonzero KL.
+- Student gradients are finite and student parameters update.
+- Teacher has no gradients and remains bitwise unchanged.
+- Backbone and BN remain bitwise unchanged.
+- C0-C3 checksums remain unchanged.
+- Official TEST guard remains zero.
+
+Smoke writes smoke_report.json once. If Smoke fails or writes a report before a later check fails, STOP. Do not delete the report or rerun Smoke.
+
+### Step 4 — formal C4 training
+
+Only after syntax, unit tests, preflight, and Smoke all pass:
+
+    & $PY -B -u train_ab.py --formal
+    if ($LASTEXITCODE -ne 0) { throw "C4 formal training failed" }
+
+The script trains only C4 for seeds 123/124/125, 30 epochs each. It checks every batch against the original C1 trace:
+- indices and labels SHA;
+- augmented image SHA;
+- GAP feature SHA.
+
+Every epoch checks frozen backbone/BN and frozen teacher. Every seed saves its C4 classifier, metrics, status, and batch trace.
+
+Expected outputs only:
+- results/seed_123/C4_CCSAM_HEAD_PRESERVE/
+- results/seed_124/C4_CCSAM_HEAD_PRESERVE/
+- results/seed_125/C4_CCSAM_HEAD_PRESERVE/
+- formal_completed.json
+
+C0-C3 must remain byte-identical.
+
+If a seed fails, do not delete its directory, automatically resume, or restart it. Preserve partial files and logs and report the exact failure. Do not run analysis unless all three seeds completed and formal_completed.json passed.
+
+### Step 5 — fixed-epoch analysis
+
+    & $PY -B -u analyze_ab.py
+    if ($LASTEXITCODE -ne 0) { throw "C4 analysis failed" }
+
+Analysis must use fixed epoch 30, and compare C4 with C0/C1/C2/C3. It must report:
+- Overall, Macro, Many, MediumN, Few;
+- compatibility metrics Head, OfficialMedium, Tail;
+- per-seed results, mean, sample SD, and paired deltas;
+- C4−C1, C4−C2, C4−C3, C4−C0;
+- original C1−C2 and C3−C2 reference contrasts;
+- teacher Many accuracy, teacher-student Many KL, and teacher-student Many top-1 agreement;
+- per-class results and C4−C1/C2/C3 class-wise deltas;
+- Many recovery fraction relative to the original C1−C2 gap;
+- Few gain retention relative to the original C1−C2 gain;
+- all predeclared exploratory gates, including gates not met.
+
+Class 0 is a Many training class but is absent from the 1,980-image validation holdout. Explicitly state that it was not evaluated.
+
+Stop the transcript:
+
+    Stop-Transcript
+
+## G. Archive and GitHub delivery
+
+After all three C4 runs and analysis pass:
+
+1. Generate ab_head_preservation/ARTIFACT_SHA256.csv with relative path, bytes, SHA256, and retention.
+2. Include every C4 report, source/protocol, metrics.csv, status.json, analysis output, and formal marker.
+3. Include final_classifier.pth and batch_trace.csv in the checksum index as local_only. Keep these files on the local machine; do not force-add them to Git.
+4. Create C4_EXECUTION_REPORT.md with commands, start/end times, exit codes, three-seed completion, 90 epochs, 15,300 optimizer steps, teacher hashes, paired C1 trace verification, frozen teacher/backbone checks, original C0-C3 protection, and official TEST guard=0.
+5. Verify original C0-C3 SHA snapshots and all C3 archive SHA entries again.
+6. Run git diff --check and inspect git status.
+7. Confirm no data, checkpoint, batch trace, raw TRAIN image, private absolute path, or official TEST file is staged.
+8. Commit and push only to:
+   experiment/ccsam-head-preservation-distill-20261109
+9. Do not merge into main or any earlier experiment branch.
+
+The provided .gitignore excludes C4 final_classifier.pth and batch_trace.csv. Do not override it.
+
+## H. Final report required
+
+Return exact values:
+
+C4_FINAL_STATE=PASS or FAIL
+C4_SEEDS_COMPLETED=?
+C4_EPOCHS_COMPLETED=?
+C4_OPTIMIZER_STEPS=?
+C4_C4_MINUS_C1_MANY_PP=?
+C4_C4_MINUS_C2_FEW_PP=?
+C4_C4_MINUS_C2_OVERALL_PP=?
+MANY_RECOVERY_FRACTION=?
+FEW_GAIN_RETENTION_FRACTION=?
+TEACHER_CHECKPOINT_SHA256_SEED123=?
+TEACHER_CHECKPOINT_SHA256_SEED124=?
+TEACHER_CHECKPOINT_SHA256_SEED125=?
+ORIGINAL_C0_C1_C2_UNCHANGED=true/false
+ORIGINAL_C3_UNCHANGED=true/false
+OFFICIAL_TEST_USED=false
+GITHUB_BRANCH=experiment/ccsam-head-preservation-distill-20261109
+GITHUB_COMMIT=...
+
+Do not add C5, do not run hyperparameter sweeps, do not start another mechanism audit, and do not claim paper-level novelty. Stop after the C4 report and wait for first-principles analysis of the results.
