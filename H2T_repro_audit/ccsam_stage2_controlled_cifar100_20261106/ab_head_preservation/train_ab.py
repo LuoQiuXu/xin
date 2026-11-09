@@ -475,8 +475,8 @@ def smoke_one_seed(seed, manifest, train_images, train_labels, train_transform, 
         total_loss = c1_loss + HEAD_PRESERVE_LAMBDA * kd
         if not torch.isfinite(total_loss):
             raise RuntimeError("C4 smoke produced a non-finite total loss")
-        if many_count <= 0 and batch_id == 1:
-            raise RuntimeError("Second real smoke batch contains no Many examples for KD validation")
+        if batch_id == 1 and (many_count <= 0 or many_count >= len(target)):
+            raise RuntimeError("Second real smoke batch must contain both Many and non-Many examples")
 
         report = {
             "batch": batch_id,
@@ -748,6 +748,10 @@ def train_one_seed(seed, manifest, train_images, train_labels, validation_gap,
 
             if seen != len(train_labels) or epoch_steps != 170:
                 raise RuntimeError(f"C4 epoch accounting mismatch: samples={seen}, steps={epoch_steps}")
+            if many_seen <= 0:
+                raise RuntimeError(f"C4 head-preservation KD was inactive for the entire epoch: seed={seed}, epoch={epoch + 1}")
+            if delta_sum <= 0:
+                raise RuntimeError(f"C4 original C1 feature perturbation was inactive: seed={seed}, epoch={epoch + 1}")
             check_backbone_unchanged(backbone, frozen_backbone)
             if state_hash(teacher) != teacher_initial_hash:
                 raise RuntimeError("Frozen C2 teacher parameters changed during formal training")
@@ -911,6 +915,14 @@ def main():
         or smoke.get("source_sha256") != sha256_file(AB_DIR / "train_ab.py")
         or smoke.get("protocol_sha256") != sha256_file(AB_DIR / "AB_PROTOCOL.md")
         or smoke.get("prepared_manifest_sha256") != sha256_file(manifest_path)
+        or smoke.get("preflight_report_sha256") != sha256_file(preflight_path)
+        or len(smoke.get("checks", [])) != len(SEEDS)
+        or [item.get("seed") for item in smoke.get("checks", [])] != list(SEEDS)
+        or any(item.get("paired_with_original_c1_batches") is not True
+               or item.get("disposable_student_update") is not True
+               or item.get("teacher_frozen") is not True
+               or item.get("backbone_and_bn_bitwise_unchanged") is not True
+               for item in smoke.get("checks", []))
         or smoke_teacher_hashes != expected_teacher_hashes
         or smoke.get("official_TEST_used") is not False
     ):
