@@ -53,6 +53,7 @@ SOURCE_FILES = (
     "ccsam_common.py",
     "train_c3.py",
     "experiment_protocol.json",
+    "formal_launch_20261106_01/ARTIFACT_SHA256.csv",
     "prepared/prepared_manifest.json",
     "c3_selective/formal_completed.json",
     "c3_selective/c3_summary.json",
