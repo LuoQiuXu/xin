@@ -196,7 +196,7 @@ def compare_protected(previous: dict) -> None:
         raise RuntimeError(f"Protected C0-C4/source inputs changed: {sorted(changed)}")
 
 
-def load_c2_base(seed: int):
+def load_c2_base(seed: int, expected_initial_classifier_sha256: str | None = None):
     directory = ROOT / "results" / f"seed_{seed}" / C2_ARM
     status_path = directory / "status.json"
     checkpoint_path = directory / "final_classifier.pth"
@@ -233,6 +233,13 @@ def load_c2_base(seed: int):
         raise RuntimeError("C2 classifier tensor shapes do not match [100,64] and [100]")
     if checkpoint.get("initial_classifier_sha256") != status.get("initial_classifier_sha256"):
         raise RuntimeError(f"C2 initial-classifier provenance mismatch for seed {seed}")
+    if (
+        expected_initial_classifier_sha256 is not None
+        and checkpoint.get("initial_classifier_sha256") != expected_initial_classifier_sha256
+    ):
+        raise RuntimeError(
+            f"C2 seed {seed} was not initialized from the currently sealed Clean Stage-I classifier"
+        )
     return weight, bias, checkpoint_sha, checkpoint
 
 
@@ -488,6 +495,9 @@ def collect_preflight(manifest: dict) -> dict:
     checkpoint = resolve_checkpoint(manifest.get("checkpoint_path"))
     if sha256_file(checkpoint) != EXPECTED_CLEAN_SHA256:
         raise RuntimeError("Clean Stage-I checkpoint checksum mismatch")
+    _, clean_classifier, _ = build_models(checkpoint, torch.device("cpu"))
+    clean_initial_classifier_sha256 = state_hash(clean_classifier)
+    del clean_classifier
     counts = np.asarray(manifest.get("train_class_counts"), dtype=np.int64)
     if counts.shape != (NUM_CLASSES,) or np.any(counts <= 0):
         raise RuntimeError("Invalid sealed 100-class TRAIN counts")
@@ -508,7 +518,7 @@ def collect_preflight(manifest: dict) -> dict:
     if not np.array_equal(observed_counts, counts):
         raise RuntimeError("Prepared TRAIN labels do not match the sealed class-count manifest")
     for seed in SEEDS:
-        _, _, c2_sha, _ = load_c2_base(seed)
+        _, _, c2_sha, _ = load_c2_base(seed, clean_initial_classifier_sha256)
         c2_hashes[str(seed)] = c2_sha
         plan = np.load(
             ROOT / "prepared" / f"sampling_plan_seed{seed}.npy",
@@ -579,7 +589,8 @@ def smoke_one_seed(
     seed_everything(seed, deterministic=True)
     backbone, clean_classifier, _ = build_models(checkpoint_path, device)
     frozen_backbone_hash = state_hash(backbone)
-    base_weight, base_bias, base_sha, _ = load_c2_base(seed)
+    clean_initial_classifier_sha256 = state_hash(clean_classifier)
+    base_weight, base_bias, base_sha, _ = load_c2_base(seed, clean_initial_classifier_sha256)
     tail_ids = torch.as_tensor(
         np.asarray(graph["tail_class_ids"], dtype=np.int64),
         dtype=torch.long, device=device,
@@ -758,11 +769,14 @@ def train_one_seed(
     seed_everything(seed, deterministic=True)
     checkpoint_path = resolve_checkpoint(manifest["checkpoint_path"])
     backbone, clean_classifier, _ = build_models(checkpoint_path, device)
+    clean_initial_classifier_sha256 = state_hash(clean_classifier)
     frozen_backbone = {
         key: value.detach().cpu().clone()
         for key, value in backbone.state_dict().items()
     }
-    base_weight, base_bias, base_sha, base_checkpoint = load_c2_base(seed)
+    base_weight, base_bias, base_sha, base_checkpoint = load_c2_base(
+        seed, clean_initial_classifier_sha256
+    )
     if base_sha != base_sha_expected:
         raise RuntimeError(f"C2 base checkpoint changed after preflight for seed {seed}")
     tail_ids = torch.as_tensor(
@@ -784,6 +798,15 @@ def train_one_seed(
         model.base_weight, model.base_bias, validation_gap,
         validation_labels, counts, device,
     )
+    reference_validation = base_checkpoint.get("final_validation")
+    if not isinstance(reference_validation, dict):
+        raise RuntimeError("C2 checkpoint is missing its fixed-epoch validation metrics")
+    for metric in ("Overall", "Macro", "Many", "MediumN", "Few", "Head", "OfficialMedium", "Tail"):
+        if abs(float(base_validation[metric]) - float(reference_validation[metric])) > 1e-5:
+            raise RuntimeError(
+                f"Recomputed frozen C2 validation metric differs for {metric}: "
+                f"{base_validation[metric]} vs {reference_validation[metric]}"
+            )
     plan = np.load(ROOT / "prepared" / f"sampling_plan_seed{seed}.npy", mmap_mode="r", allow_pickle=False)
     c1_trace_path = ROOT / "results" / f"seed_{seed}" / "C1_CCSAM_FEATURE_GRAD" / "batch_trace.csv"
     reference_rows = read_trace(c1_trace_path)
