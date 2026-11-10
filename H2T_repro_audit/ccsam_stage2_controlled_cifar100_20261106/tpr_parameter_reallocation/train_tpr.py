@@ -133,7 +133,7 @@ def source_snapshot() -> dict[str, str]:
             raise FileNotFoundError(f"Missing protected source/protocol input: {relative}")
         snapshot[relative] = sha256_file(path)
     for filename in (
-        "train_tpr.py", "test_tpr.py", "analyze_tpr.py",
+        "train_tpr.py", "test_tpr.py", "analyze_tpr.py", "finalize_tpr.py",
         "TPR_PROTOCOL.md", "CODEX_TPR_PARAMETER_REALLOCATION_20261110.txt",
     ):
         path = TPR_DIR / filename
