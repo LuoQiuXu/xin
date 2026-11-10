@@ -1,0 +1,122 @@
+CODEX TASK — IMPLEMENT AND RUN CC-SAM-TPR (LOW-RANK TAIL PARAMETER REALLOCATION)
+Date: 2026-11-10
+Repository: https://github.com/LuoQiuXu/xin
+Required branch: experiment/ccsam-tpr-lowrank-20261110
+Base commit: 4ab34ad00c86bcac60d765123f153b76ff097f47
+Protocol: H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/tpr_lowrank/TPR_PROTOCOL.md
+
+READ THIS FIRST
+1. Work only on branch experiment/ccsam-tpr-lowrank-20261110. Do not switch to main, C4, C3, or the already-existing branch experiment/ccsam-tpr-20261110.
+2. Preserve every historical C0/C1/C2/C3/C4 source, checkpoint, trace, report, and checksum. Never overwrite, delete, regenerate, or retrain any prior arm.
+3. Before editing, run git status and record the current HEAD. If the worktree contains user changes, do not discard or reset them; stop and report.
+4. Read TPR_PROTOCOL.md and inspect the existing C4 implementation (ab_head_preservation/train_ab.py), C1 runner (train_ccsam.py), shared utilities (ccsam_common.py), C4 protocol/results, and the exact C2 checkpoint/status layout. Do not guess file names, paths, checkpoint keys, or CLI flags.
+5. This is a new constructive experiment, not another open-ended audit. Implement the method below, run preflight + real-data Smoke, and only then formal training if every gate passes.
+
+SCIENTIFIC IMPLEMENTATION
+A. Fixed C2 general classifier
+- For each seed 123/124/125, load its own completed C2 final-epoch classifier checkpoint as W_g,b_g.
+- Keep Clean Stage-I ResNet-32 backbone and BN frozen and bitwise unchanged.
+- Freeze C2 classifier parameters. It is the fixed base classifier, not a trainable teacher copy.
+- The effective student classifier is W_eff = W_g + M_tail * (B @ A), b_eff=b_g.
+- A shape [rank=8,64], B shape [100,rank=8]. M_tail[c]=1 iff original sealed TRAIN count <=100; Many uses strict count >100 and has zero residual row.
+- Initialize A deterministically and nonzero; initialize B exactly zero. Confirm step-0 effective logits are bitwise equal to C2 logits. No residual bias.
+- Train only A and B. This is one low-rank residual, not multiple experts or branches.
+
+B. Retain C1 feature expansion
+- Reuse the validated analytic_classwise_feature_delta and exact C1 weighted adversarial/clean CE objective.
+- Adapt the gradient computation to the effective classifier W_eff. The perturbation remains detached. Do not change its formula, normalization, ADVER_REG, class weights, alpha schedule, or reduction.
+- Preserve full C1 perturbation for all classes. Do not apply C3's Many perturbation mask.
+- Make sure effective classifier logits are used consistently for clean CE, adversarial CE, and perturbation-gradient calculation.
+
+C. Many preservation
+- Use the matching C2 base logits as the frozen teacher.
+- On original unperturbed GAP features from Many inputs only (sealed TRAIN count >100), apply full 100-way KL with T=2.0 and lambda_HP=1.0.
+- If no Many sample occurs in a batch, return a differentiable zero.
+- Teacher logits detached. Log Many count, KL, teacher-student agreement.
+
+D. MORE-inspired parameter separation, with non-degenerate implementation
+- Do NOT use full W_g/W_t orthogonality. W_g may span all 64 feature dimensions.
+- Compute deterministic FP32 SVD of W_g once per seed. Use top-8 right singular vectors V8.
+- L_sub = ||DeltaW @ V8||_F^2 / (||DeltaW||_F^2 + eps). Weight=0.01.
+- Log top-8 singular energy fraction, projection ratio, DeltaW norm, singular values.
+- Fail closed if SVD or numerical checks fail. Never silently skip the penalty.
+
+E. Tail class competition
+- Build deterministic symmetric confusion scores from matching C2 classifier predictions on the fixed TRAIN-derived validation holdout. Only select pairs where both classes are residual-eligible (count <=100).
+- Select top 5 unordered off-diagonal pairs; deterministic tie-break by class IDs. Save pair IDs, scores, validation split hash, and C2 checkpoint SHA.
+- L_div is mean squared cosine similarity between the two residual classifier rows for each selected pair; weight=0.01.
+- If no eligible pair, differentiable zero and explicit report. No synthetic pair construction.
+- Never use official TEST to construct this graph.
+
+F. Total loss (fixed; no search)
+L = L_C1 + 1.0*L_HP + 0.01*L_sub + 0.01*L_div.
+Log each unweighted and weighted component, gradient norms for A/B, and all relevant diagnostics. If either weighted regularizer exceeds 10% of L_C1 at initialization or during first 10 batches, stop and report; do not tune coefficients.
+
+ENGINEERING / FILE LAYOUT
+Create an isolated directory:
+H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/tpr_lowrank/
+Suggested files (adapt names only if there is a concrete existing convention):
+- TPR_PROTOCOL.md (already committed; preserve)
+- train_tpr.py
+- tpr_model.py (low-rank residual and effective classifier)
+- test_tpr.py
+- analyze_tpr.py
+- README.md
+- results/ (new outputs only; do not commit large checkpoints/traces if repo policy excludes them)
+Keep reusable imports pointed to the existing experiment root. Avoid editing protected baseline files. If a shared helper must be reused, import it; do not rewrite it. If an unavoidable fix is needed, make the smallest isolated new helper under tpr_lowrank and document it.
+
+CLI should expose explicit phases:
+--phase preflight
+--phase smoke
+--phase formal
+--phase analyze
+and --seeds 123 124 125 (reject any other seed list under the frozen protocol). Follow existing C4 conventions where practical. Make outputs exclusive/no-overwrite and require an explicit opt-in flag only for completing missing preparation; do not regenerate existing preparation.
+
+PRE-FLIGHT
+- Verify source and artifact checksums for all C0-C4 inputs and source files.
+- Verify all three matching C2 checkpoints are completed, final epoch 30, expected seed/arm, TEST-free, and exact checksum against sealed manifests.
+- Verify C4 completion/artifact index and C1 trace presence.
+- Verify Clean Stage-I SHA, prepared manifest/arrays, class counts, sampling plans and validation split.
+- Verify no official TEST file has been opened. Use existing test guard; do not weaken it.
+- Record preflight JSON with exact input paths, SHA256, branch, base commit, protocol hash, CUDA/PyTorch versions and timestamp.
+- Any mismatch/missing input => stop. Do not reconstruct or silently bypass.
+
+SMOKE
+- Two real batches for each seed, exact same sample indices/labels, augmented image hashes and GAP feature hashes as the C1 trace.
+- Test all mathematical/structural requirements in TPR_PROTOCOL.md.
+- Run disposable A/B update; verify both factors have finite gradients and update, Many rows remain exactly zero, base C2 classifier and backbone/BN remain bitwise unchanged, teacher has no gradients, no TEST access.
+- Verify analytic C1 perturbation against direct autograd reference.
+- Smoke creates no formal checkpoint and does not consume/rewrite formal output paths.
+- Produce smoke_report.json and test logs. Any failed gate => stop; do not run formal.
+
+FORMAL
+Only after all three seed Smoke checks pass:
+- 3 seeds x 30 epochs x 170 steps = 15,300 new optimizer steps.
+- Match each seed's sealed sampling plan and continuous augmentation RNG.
+- Match C1 trace exactly for all batches.
+- Fixed epoch-30 evaluation on existing TRAIN-derived validation holdout.
+- No scheduler, AMP, MixUp, gradient accumulation, early stopping, best epoch, hyperparameter search, auto-resume, or overwrite.
+- Save periodic metrics and a final checkpoint containing A/B, frozen C2 provenance, seed, epoch, optimizer config, protocol/source hashes.
+- On failure: preserve partial run and logs, mark failed, stop. Never silently restart.
+
+ANALYSIS
+- Only fixed epoch 30 primary. Compare C0/C1/C2/C3/C4/TPR.
+- Per seed, mean and sample SD (ddof=1), paired deltas vs C2/C1/C4 for Overall/Macro/Many/MediumN/Few/Head/OfficialMedium/Tail.
+- Include per-class accuracy, confusion graph, residual row norms, rank, SVD spectrum, subspace projection, loss/gradient curves, Many KL/agreement, exact checkpoint/source checksums.
+- State validation is TRAIN-derived; class 0 has no validation examples if applicable. Do not report official TEST accuracy or significance/generalization claims.
+- Output final_epoch_metrics.csv, paired_deltas.csv, per_class.csv, summary.json, TPR_RESULTS.md, ARTIFACT_SHA256.csv, formal_completed.json, and TEST guard evidence.
+
+RUN ORDER
+1. git status / branch / HEAD / worktree protection.
+2. Read sources and protocol.
+3. Implement isolated files and CPU unit tests.
+4. Run unit tests + syntax/static checks.
+5. Run --phase preflight.
+6. Run --phase smoke for all 3 seeds.
+7. If and only if every gate passes, run --phase formal --seeds 123 124 125.
+8. Run --phase analyze.
+9. Commit implementation and reports on experiment/ccsam-tpr-lowrank-20261110; do not push changes to any other branch.
+10. Final response to user: branch, commit, exact commands, smoke/formal status, artifact paths, per-seed metrics, failures/caveats. Do not claim training ran unless logs and formal_completed.json prove it.
+
+IMPORTANT INTERPRETATION
+This experiment tests whether a low-rank tail-only parameter residual can preserve C2 general knowledge while retaining C1 feature-expansion gains. It does not assume the hypothesis is true. Do not call the method SOTA, novel, or solved before seeing results.
