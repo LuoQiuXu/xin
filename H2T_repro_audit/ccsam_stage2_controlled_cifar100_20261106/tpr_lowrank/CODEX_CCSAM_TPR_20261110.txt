@@ -42,8 +42,8 @@ D. MORE-inspired parameter separation, with non-degenerate implementation
 - Fail closed if SVD or numerical checks fail. Never silently skip the penalty.
 
 E. Tail class competition
-- Build deterministic symmetric confusion scores from matching C2 classifier predictions on the fixed TRAIN-derived validation holdout. Only select pairs where both classes are residual-eligible (count <=100).
-- Select top 5 unordered off-diagonal pairs; deterministic tie-break by class IDs. Save pair IDs, scores, validation split hash, and C2 checkpoint SHA.
+- Build deterministic symmetric confusion scores from matching C2 classifier predictions on all 10,847 prepared Stage-II TRAIN examples, using clean unaugmented images and frozen Clean Stage-I GAP features. Do not use validation or official TEST. Only select pairs where both classes are residual-eligible (count <=100).
+- Select top 5 unordered off-diagonal pairs; deterministic tie-break by class IDs. Save pair IDs, scores, TRAIN labels/image hash, Clean Stage-I checkpoint hash, and C2 checkpoint SHA.
 - L_div is mean squared cosine similarity between the two residual classifier rows for each selected pair; weight=0.01.
 - If no eligible pair, differentiable zero and explicit report. No synthetic pair construction.
 - Never use official TEST to construct this graph.
@@ -84,7 +84,7 @@ PRE-FLIGHT
 SMOKE
 - Two real batches for each seed, exact same sample indices/labels, augmented image hashes and GAP feature hashes as the C1 trace.
 - Test all mathematical/structural requirements in TPR_PROTOCOL.md.
-- Run disposable A/B update; verify both factors have finite gradients and update, Many rows remain exactly zero, base C2 classifier and backbone/BN remain bitwise unchanged, teacher has no gradients, no TEST access.
+- Run two-step disposable A/B update; at exact zero residual the first-step B gradient must be finite/nonzero while A's gradient is finite (mathematically zero); after B becomes nonzero, the second-step A gradient must be finite/nonzero. Verify both factors update across the two steps, Many rows remain exactly zero, base C2 classifier and backbone/BN remain bitwise unchanged, teacher has no gradients, no TEST access.
 - Verify analytic C1 perturbation against direct autograd reference.
 - Smoke creates no formal checkpoint and does not consume/rewrite formal output paths.
 - Produce smoke_report.json and test logs. Any failed gate => stop; do not run formal.
