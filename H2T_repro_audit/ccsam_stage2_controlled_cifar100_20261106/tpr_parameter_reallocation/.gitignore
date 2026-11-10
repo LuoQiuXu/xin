@@ -1,0 +1,6 @@
+# Keep large/local execution artifacts out of Git.
+results/**/final_classifier.pth
+results/**/batch_trace.csv
+*.log
+__pycache__/
+*.py[cod]
