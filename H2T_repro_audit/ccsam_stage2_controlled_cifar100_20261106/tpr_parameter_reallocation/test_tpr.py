@@ -94,7 +94,7 @@ class TPRSemanticsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             sinusoidal_more_weight(0, 1)
 
-    def test_rowwise_orthogonality_and_neighbor_diversity_are_differentiable(self):
+    def test_rowwise_orthogonality_and_neighbor_residual_diversity_are_differentiable(self):
         edges = torch.tensor([[0, 1], [1, 2], [2, 3]], dtype=torch.long)
         orth = self.model.orthogonality_loss()
         diversity = self.model.diversity_loss(edges)
@@ -105,6 +105,33 @@ class TPRSemanticsTests(unittest.TestCase):
         self.assertIsNotNone(self.model.B.grad)
         self.assertTrue(torch.isfinite(self.model.A.grad).all())
         self.assertTrue(torch.isfinite(self.model.B.grad).all())
+
+    def test_diversity_penalty_uses_effective_residual_rows_not_B_coefficients(self):
+        # Make A strongly anisotropic so the B-space and (B @ A)-space angles differ.
+        with torch.no_grad():
+            self.model.A.zero_()
+            self.model.B.zero_()
+            self.model.A[0, 0] = 10.0
+            self.model.A[1, 1] = 1.0
+            self.model.B[0, 0] = 1.0
+            self.model.B[1, 0] = 1.0
+            self.model.B[1, 1] = 1.0
+
+        edges = torch.tensor([[0, 1]], dtype=torch.long)
+        actual = self.model.diversity_loss(edges)
+
+        residual_rows = F.normalize(self.model.tail_residual(), dim=1, eps=1e-8)
+        expected_residual = (
+            residual_rows[edges[:, 0]] * residual_rows[edges[:, 1]]
+        ).sum(dim=1).square().mean()
+
+        coefficient_rows = F.normalize(self.model.B, dim=1, eps=1e-8)
+        coefficient_only = (
+            coefficient_rows[edges[:, 0]] * coefficient_rows[edges[:, 1]]
+        ).sum(dim=1).square().mean()
+
+        self.assertTrue(torch.allclose(actual, expected_residual, rtol=1e-6, atol=1e-8))
+        self.assertGreater(float(torch.abs(actual - coefficient_only)), 0.1)
 
     def test_merged_classifier_matches_adapter_forward(self):
         features = torch.randn(13, FEATURE_DIM)
