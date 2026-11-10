@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import csv
-import hashlib
+import sys
 from pathlib import Path
 
-from ccsam_common import SEEDS, read_json, sha256_file, STAGE2_EPOCHS
-
 TPR_DIR = Path(__file__).resolve().parent
+EXPERIMENT_ROOT = TPR_DIR.parents[0]
+if str(EXPERIMENT_ROOT) not in sys.path:
+    sys.path.insert(0, str(EXPERIMENT_ROOT))
+
+from ccsam_common import SEEDS, read_json, sha256_file, STAGE2_EPOCHS  # noqa: E402
 ARM = "CCSAM_TPR"
 
 
