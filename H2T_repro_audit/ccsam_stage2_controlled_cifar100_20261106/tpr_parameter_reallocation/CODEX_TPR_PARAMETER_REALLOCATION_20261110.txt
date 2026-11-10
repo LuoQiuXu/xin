@@ -173,7 +173,13 @@ After every command, check $LASTEXITCODE. If a command fails, stop immediately, 
     & $PY -B -m unittest -v test_tpr
     if ($LASTEXITCODE -ne 0) { throw "TPR semantic unit tests failed" }
 
+Before running any stage, verify these two source-level regressions are fixed:
+- `train_tpr.py` imports `c3_artifact_snapshot` from `ab_head_preservation.train_ab`, not `from train_ab`;
+- `smoke_all(..., protected_inputs)` passes that mapping directly to `compare_protected(protected_inputs)`; it must not index `protected_inputs["protected_inputs"]`.
+
 Tests must verify:
+- importing `test_tpr` imports `train_tpr` without ModuleNotFoundError;
+- `c3_artifact_snapshot` is callable and its module is `ab_head_preservation.train_ab`;
 - only non-Many classifier output rows can receive the low-rank residual;
 - the residual has the expected low-rank shape;
 - MORE loss exactly matches the class-prior-weighted squared L2 formula;
@@ -207,7 +213,8 @@ Smoke:
 - performs one disposable A/B update;
 - checks finite adapter gradients and actual adapter update;
 - verifies C2 base weights/bias, Many output rows, backbone and BN remain unchanged;
-- verifies the official TEST guard is clean.
+- verifies the official TEST guard is clean;
+- verifies `compare_protected` receives the protected snapshot mapping directly, with no second `["protected_inputs"]` lookup.
 
 Smoke writes tail_neighbor_graph.json and smoke_report.json. If graph construction or Smoke fails, STOP and preserve the files. Do not delete the graph/report and rerun Smoke.
 
