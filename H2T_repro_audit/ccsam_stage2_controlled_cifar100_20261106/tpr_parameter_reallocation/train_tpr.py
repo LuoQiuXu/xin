@@ -39,7 +39,7 @@ from train_ccsam import (  # noqa: E402
     load_prepared, compute_arm_loss, read_trace, verify_analytic_gradient,
 )
 from train_c3 import baseline_file_snapshot  # noqa: E402
-from train_ab import c3_artifact_snapshot  # noqa: E402
+from ab_head_preservation.train_ab import c3_artifact_snapshot  # noqa: E402
 
 
 TPR_DIR = Path(__file__).resolve().parent
@@ -713,7 +713,7 @@ def smoke_one_seed(
     return result
 
 
-def smoke_all(manifest, train_images, train_labels, train_transform, eval_transform, device, preflight):
+def smoke_all(manifest, train_images, train_labels, train_transform, eval_transform, device, protected_inputs: dict):
     graph_path = TPR_DIR / "tail_neighbor_graph.json"
     smoke_path = TPR_DIR / "smoke_report.json"
     if graph_path.exists() or smoke_path.exists():
@@ -739,7 +739,7 @@ def smoke_all(manifest, train_images, train_labels, train_transform, eval_transf
         smoke_one_seed(seed, manifest, train_images, train_labels, train_transform, graph, device)
         for seed in SEEDS
     ]
-    compare_protected(preflight["protected_inputs"])
+    compare_protected(protected_inputs)
     guard = guard_pass()
     if guard.get("official_TEST_used") or guard.get("blocked_attempts"):
         raise RuntimeError("Official TEST guard violation during TPR smoke")
