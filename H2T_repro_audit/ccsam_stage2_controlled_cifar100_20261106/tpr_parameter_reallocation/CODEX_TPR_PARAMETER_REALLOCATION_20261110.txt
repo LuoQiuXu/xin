@@ -180,6 +180,7 @@ Before running any stage, verify these two source-level regressions are fixed:
 Tests must verify:
 - importing `test_tpr` imports `train_tpr` without ModuleNotFoundError;
 - `c3_artifact_snapshot` is callable and its module is `ab_head_preservation.train_ab`;
+- `smoke_all` accepts a `protected_inputs` argument and calls `compare_protected(protected_inputs)` without a second nested-key lookup;
 - only non-Many classifier output rows can receive the low-rank residual;
 - the residual has the expected low-rank shape;
 - MORE loss exactly matches the class-prior-weighted squared L2 formula;
