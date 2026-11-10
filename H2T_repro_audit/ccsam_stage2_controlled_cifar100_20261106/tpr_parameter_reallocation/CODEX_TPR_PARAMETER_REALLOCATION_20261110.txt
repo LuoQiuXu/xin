@@ -1,0 +1,277 @@
+# CODEX TASK — CC-SAM-TPR: MORE-inspired Tail Parameter Reallocation
+# Repository: LuoQiuXu/xin
+# Branch: experiment/ccsam-tpr-20261110
+# Base branch: experiment/ccsam-head-preservation-distill-20261109
+# This branch contains the implementation. Execute the frozen protocol; do not redesign it.
+
+## A. Objective
+
+Implement and run the next classifier-stage method iteration after the sealed C0-C4 study.
+
+The method is CC-SAM-TPR:
+
+1. Keep the original validated C1 CC-SAM feature-gradient perturbation and loss unchanged.
+2. Use the matching seed's completed C2 classifier as a frozen general classifier.
+3. Add a low-rank residual only to non-Many output rows:
+       W_t = D_tail B A
+4. Apply the MORE class-prior-weighted squared L2 logit discrepancy:
+       L_MORE = mean_i[(N_yi/N) * ||z_TPR(f_i)-z_C2(f_i)||_2^2]
+5. Apply the MORE sinusoidal schedule:
+       alpha_MORE(t) = A sin(pi*t/(T-1))
+       A/C = 2.0, C=100, so A=200; T=5100 steps.
+6. Address MORE's two Further Discussions:
+   - intra-tail competition: class-specific B_c rows and a train-only top-2 clean-GAP neighbor graph with coefficient separation;
+   - general/tail parameter overlap: soft row-wise orthogonality between W_g[c] and W_t[c] for each non-Many class.
+7. Final inference uses one merged classifier. This is not a multi-expert method.
+
+The total objective and all fixed settings are in TPR_PROTOCOL.md. Do not add C4's KL loss: MORE's paper reports better performance from L2 discrepancy than KL for its reallocation objective.
+
+This is a classifier-stage MORE-inspired adaptation, not a full reproduction of MORE's network-wide decomposition. The backbone and C2 classifier remain frozen. Do not claim that dynamic layer-wise decomposition or cross-modal generalization has been solved.
+
+## B. Repository and safe branch switch
+
+Local repository:
+    D:\xiangmuxunlian\xin
+
+Before switching:
+    Set-Location D:\xiangmuxunlian\xin
+    git status --short
+    git fetch origin
+
+Switch to the exact branch. If it already exists locally:
+    git switch experiment/ccsam-tpr-20261110
+
+If it does not exist locally:
+    git switch --track -c experiment/ccsam-tpr-20261110 origin/experiment/ccsam-tpr-20261110
+
+Then:
+    git pull --ff-only origin experiment/ccsam-tpr-20261110
+    git rev-parse --abbrev-ref HEAD
+    git rev-parse HEAD
+    git status --short
+
+The current branch must be experiment/ccsam-tpr-20261110.
+
+Do not run:
+- git reset --hard
+- git clean
+- git checkout -- .
+- commands that delete ignored/untracked files
+- stash/drop operations that could discard local-only C0-C4 artifacts
+
+If switching branches would overwrite any local files, STOP and report the exact paths. Do not delete, move, or stash them blindly. The previous C0-C4 experiment contains local-only checkpoints, traces and logs; preserve them.
+
+## C. Protected files and scope
+
+TPR directory:
+    H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\tpr_parameter_reallocation
+
+New implementation files:
+- train_tpr.py
+- test_tpr.py
+- analyze_tpr.py
+- finalize_tpr.py
+- TPR_PROTOCOL.md
+- README.md
+- CODEX_TPR_PARAMETER_REALLOCATION_20261110.txt
+- .gitignore
+
+Do not modify any of the following:
+- train_ccsam.py
+- ccsam_common.py
+- train_c3.py
+- experiment_protocol.json
+- prepared/*
+- results/seed_*/C0_BALANCED_CE/*
+- results/seed_*/C1_CCSAM_FEATURE_GRAD/*
+- results/seed_*/C2_WEIGHTED_CE_NO_PERTURB/*
+- c3_selective/*
+- ab_head_preservation/*
+- formal_launch_20261106_01/*
+
+C0-C4 are read-only references. TPR writes only inside tpr_parameter_reallocation/.
+
+## D. Required local inputs — stop if any are missing
+
+The local machine must retain:
+
+1. Sealed Clean Stage-I checkpoint:
+   SHA256 7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88
+2. Sealed prepared arrays and all three official sampling plans.
+3. Original C0/C1/C2 run artifacts, including local-only checkpoints and traces.
+4. Archived C3 artifacts, including local-only checkpoint and trace files.
+5. Completed C4 artifacts, including local-only checkpoints and traces.
+6. Matching-seed C2 base checkpoints:
+   results/seed_123/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth
+   results/seed_124/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth
+   results/seed_125/C2_WEIGHTED_CE_NO_PERTURB/final_classifier.pth
+7. Original C1 and C4 batch_trace.csv for all three seeds.
+8. Pinned official sampler and audited transform source.
+
+Preflight independently verifies the C0-C4 artifact indexes, local-only checkpoint/trace hashes, C2 base metadata, prepared-array hashes, sampling-plan equality with the pinned official sampler, transform source, and all code/protocol hashes.
+
+If any required artifact is missing or any checksum/provenance gate fails, STOP. Do not retrain C0-C4, regenerate sampling plans, reconstruct traces from metrics, substitute a different C2 seed, skip a hash check, or relax a test.
+
+## E. Frozen method and settings
+
+- Dataset: CIFAR-100-LT IF=100, official TRAIN only, 10,847 samples.
+- Backbone: sealed Clean Stage-I ResNet-32, seed 42, best epoch 184.
+- Feature: existing clean_compatible_gap, 64-D.
+- Seeds: 123, 124, 125.
+- Base classifier: matching seed's final epoch-30 C2 classifier.
+- Trainable parameters: low-rank A and B only.
+- Rank: 8.
+- Tail output rows: sealed TRAIN count <=100 (all MediumN + Few classes).
+- Many output rows: sealed TRAIN count >100; these rows are bitwise fixed to C2.
+- C2 classifier bias: frozen.
+- Backbone and BN: frozen.
+- Batch size: 64; 170 steps/epoch.
+- Epochs: 30 per seed.
+- Optimizer: SGD(lr=0.01, momentum=0.9, weight_decay=0.0002, nesterov=False).
+- Precision: FP32; no AMP, MixUp, gradient accumulation, LR schedule change, or early stopping.
+- Sampling plan and augmentation RNG: exactly the existing per-seed sealed plan and C1 continuous augmentation RNG.
+- MORE amplitude: A/C=2.0, hence A=200 for C=100. Fixed first-run setting; do not tune.
+- Row-wise orthogonality lambda: 0.1.
+- Tail-neighbor coefficient separation lambda: 0.1.
+- Tail-neighbor graph: symmetric top-2 cosine neighbors between non-Many clean-GAP TRAIN class centroids only.
+- Primary epoch: fixed epoch 30.
+- Official CIFAR-100 TEST: strictly prohibited.
+
+Do not add a separate KL distillation term. The MORE L2 discrepancy is the reallocation/preservation term.
+
+Only TPR is newly trained:
+- 3 seeds × 30 epochs = 90 epochs.
+- 170 steps/epoch.
+- 15,300 optimizer steps total.
+
+## F. Commands — run one at a time
+
+Use Windows PowerShell:
+
+    Set-Location D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_stage2_controlled_cifar100_20261106\tpr_parameter_reallocation
+    $PY = "D:\app\minicondaaa\envs\xiaoju\python.exe"
+
+Start a transcript before any execution:
+    Start-Transcript -Path .\TPR_EXECUTION.log
+
+After every command, check $LASTEXITCODE. If a command fails, stop immediately, preserve all outputs and logs, and report the exact error. Do not continue to the next stage after a failure.
+
+### Step 1 — syntax and CPU-only semantic tests
+
+    & $PY -B -m py_compile train_tpr.py test_tpr.py analyze_tpr.py finalize_tpr.py
+    if ($LASTEXITCODE -ne 0) { throw "TPR syntax check failed" }
+
+    & $PY -B -m unittest -v test_tpr
+    if ($LASTEXITCODE -ne 0) { throw "TPR semantic unit tests failed" }
+
+Tests must verify:
+- only non-Many classifier output rows can receive the low-rank residual;
+- the residual has the expected low-rank shape;
+- MORE loss exactly matches the class-prior-weighted squared L2 formula;
+- gradients reach A/B but not the frozen C2 base;
+- sinusoidal schedule starts/ends at zero and peaks at the midpoint;
+- row-wise orthogonality and neighbor coefficient separation are differentiable;
+- merged inference weights exactly reproduce the adapter forward pass;
+- invalid graph indices are rejected.
+
+### Step 2 — preflight only
+
+    & $PY -B -u train_tpr.py --preflight
+    if ($LASTEXITCODE -ne 0) { throw "TPR preflight failed" }
+
+Preflight must pass all C0-C4 checksum checks, local-only artifact checks, C2 base checks, prepared-array hashes, official sampling-plan validation, transform/sampler provenance, and TEST-free provenance.
+
+Preflight writes preflight_report.json once. Do not delete or overwrite it.
+
+### Step 3 — real-data Smoke only
+
+    & $PY -B -u train_tpr.py --smoke-only
+    if ($LASTEXITCODE -ne 0) { throw "TPR Smoke failed" }
+
+Smoke:
+- computes a symmetric top-2 tail-neighbor graph from clean GAP centroids of official TRAIN images only;
+- runs the first two real batches for each seed;
+- requires exact match with both original C1 and C4 traces for indices/labels, augmented images, and GAP features;
+- checks the original C1 analytic feature gradient against direct autograd;
+- checks finite C1, MORE, orthogonality, diversity and total losses;
+- performs one disposable A/B update;
+- checks finite adapter gradients and actual adapter update;
+- verifies C2 base weights/bias, Many output rows, backbone and BN remain unchanged;
+- verifies the official TEST guard is clean.
+
+Smoke writes tail_neighbor_graph.json and smoke_report.json. If graph construction or Smoke fails, STOP and preserve the files. Do not delete the graph/report and rerun Smoke.
+
+### Step 4 — formal TPR training
+
+Only after syntax, unit tests, preflight, and Smoke all pass:
+
+    & $PY -B -u train_tpr.py --formal
+    if ($LASTEXITCODE -ne 0) { throw "TPR formal training failed" }
+
+The script trains only TPR for seeds 123/124/125, 30 epochs each. Every batch is checked against the original C1 trace:
+- indices and labels SHA;
+- augmented image SHA;
+- clean GAP feature SHA.
+
+Every epoch checks:
+- frozen Clean Stage-I backbone and BN;
+- frozen matching-seed C2 base classifier;
+- Many classifier output rows unchanged;
+- finite losses and adapter gradients.
+
+Expected new run directories:
+- results/seed_123/CCSAM_TPR/
+- results/seed_124/CCSAM_TPR/
+- results/seed_125/CCSAM_TPR/
+
+Each contains metrics.csv, status.json, final_classifier.pth, and batch_trace.csv.
+
+The final formal marker is formal_completed.json.
+
+No automatic resume, overwrite, or restart is allowed. If a seed fails, preserve its partial directory and logs and report the exact failure. Do not delete the partial run or silently rerun it.
+
+### Step 5 — fixed epoch-30 analysis
+
+Only after formal_completed.json passes:
+
+    & $PY -B -u analyze_tpr.py
+    if ($LASTEXITCODE -ne 0) { throw "TPR analysis failed" }
+
+Analysis must compare TPR with C0, C1, C2, C3 and C4. It must report:
+- Overall, Macro, Many, MediumN, Few;
+- compatibility metrics Head, OfficialMedium, Tail;
+- per-seed results, means, sample standard deviations and paired deltas;
+- TPR-C2, TPR-C4, TPR-C1, TPR-C3, TPR-C0;
+- per-class results and class-wise deltas;
+- MORE discrepancy and regularization diagnostics;
+- all predeclared gates, including failed gates.
+
+Class 0 is a Many training class but absent from the 1,980-image validation holdout. State this explicitly. Do not claim independent-backbone replication, statistical significance, or official TEST performance.
+
+### Step 6 — artifact checksum index
+
+After analysis succeeds:
+
+    & $PY -B -u finalize_tpr.py
+    if ($LASTEXITCODE -ne 0) { throw "TPR artifact finalization failed" }
+
+This creates ARTIFACT_SHA256.csv and marks final_classifier.pth, batch_trace.csv, and logs as local_only.
+
+The .gitignore already excludes large/local-only files. Never force-add local-only checkpoints, traces, or logs. The reports, metrics, statuses, analysis, protocol, graph, and checksum index may be committed/pushed normally.
+
+Stop the transcript:
+    Stop-Transcript
+
+## G. Expected scientific output
+
+The experiment should answer whether the combination of:
+- C1 feature-gradient tail enhancement;
+- a frozen C2 general classifier;
+- a masked low-rank tail residual;
+- MORE's class-prior-weighted L2 discrepancy and sinusoidal schedule;
+- train-only local tail coefficient separation;
+- soft row-wise orthogonality;
+
+can retain a Few improvement while keeping Many near C2.
+
+Do not pre-judge the result. A failed gate is a valid scientific outcome. After the run, upload the TPR analysis and reports to GitHub and provide the commit/branch. The next analysis must use actual metrics and class-wise outputs, not only the aggregate Overall score.
