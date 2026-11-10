@@ -35,7 +35,7 @@ The paper's Further Discussions identify two specific issues:
 
 This experiment targets those two issues with:
 - one shared low-rank basis A and class-specific coefficient rows B_c;
-- a train-only nearest-neighbor graph between tail-class clean-GAP centroids, with a local coefficient-decorrelation penalty on graph edges;
+- a train-only nearest-neighbor graph between tail-class clean-GAP centroids, with a local effective-residual-row decorrelation penalty on graph edges;
 - a soft, per-tail-class row-wise orthogonality penalty between the frozen general classifier row and its learned residual row.
 
 The paper also notes static layer-wise decomposition as a limitation. Here the backbone is intentionally frozen and decomposition is restricted to the final 64-D classifier because the preceding C0-C4 evidence isolates the current failure at classifier-stage optimization. This is a scope restriction, not a claim that dynamic layer allocation has been solved. Cross-modal generalization is outside this visual-recognition project.
@@ -65,6 +65,8 @@ This is a single classifier, not a multi-expert architecture. At inference, W_g 
 
 Fixed rank: r=8. The rank is deliberately small relative to the 64-D classifier feature dimension.
 
+This is a structured shared low-rank residual, not a collection of independent tail-class parameter subspaces: all non-Many classes share A and only their B_c rows differ. "Structural decoupling" here means separating the frozen general classifier from a masked, trainable tail residual and restricting which output rows can change. It does not mean that the complete general and tail parameter subspaces are globally orthogonal or that each tail class owns an independent basis.
+
 ## 4. CC-SAM objective and MORE reallocation objective
 
 The original, numerically validated C1 feature-gradient perturbation and loss are reused without changing its gradient calculation, class weights, alpha schedule, normalization, or data path:
@@ -93,7 +95,11 @@ The normalized amplitude A/C=2.0 follows the scale reported in the MORE amplitud
 
 ### 5.1 Intra-tail competition
 
-All non-Many classes share A, but each class has its own B_c coefficient vector. To discourage nearby tail classes from collapsing to similar coefficient directions:
+All non-Many classes share A, but each class has its own B_c coefficient vector. The actual classifier update for class c is the effective residual row:
+
+       Delta W_c = B_c A
+
+Because A is learned and is not constrained to be orthogonal, the angle between B_c and B_c' is generally not the angle between the classifier updates Delta W_c and Delta W_c'. The regularizer must therefore operate on the effective residual rows, not on B alone.
 
 1. Extract clean GAP features for official TRAIN images using the frozen Clean Stage-I backbone and deterministic evaluation transform.
 2. Compute one feature centroid per class.
@@ -101,9 +107,9 @@ All non-Many classes share A, but each class has its own B_c coefficient vector.
 4. The graph is built from official TRAIN images and labels only. No validation labels or official TEST data are used.
 5. Apply:
 
-       L_div = mean_(c,c') in E [ cos(B_c, B_c')^2 ]
+       L_div = mean_(c,c') in E [ cos(Delta W_c, Delta W_c')^2 ]
 
-This is a lightweight local coefficient-separation constraint. It is not a semantic oracle and does not guarantee that all tail classes become mutually orthogonal.
+This is a local effective-residual-direction separation constraint on graph edges. The graph encodes feature proximity, not a proof that neighboring classes should be orthogonal; whether this local decorrelation helps or hurts is a testable hypothesis. It neither creates independent per-class subspaces nor guarantees that all tail classes become mutually orthogonal.
 
 ### 5.2 General/tail parameter overlap
 
@@ -113,7 +119,7 @@ A global W_g^T W_t orthogonality penalty is unsuitable for this 64-D classifier 
         cos(W_g[c,:], W_t[c,:])^2
     ]
 
-This penalizes same-class parameter-direction overlap without imposing a hard orthogonal projection. The constraint is soft because the MORE authors note that strict orthogonality can impede convergence.
+This penalizes only same-class row-wise overlap between the frozen general classifier and its residual. It is not a global cross-class subspace-orthogonality constraint. The constraint is soft because the MORE authors note that strict orthogonality can impede convergence.
 
 ### 5.3 Unified objective
 
@@ -221,6 +227,6 @@ These are iteration gates, not statistical-significance tests. Report failed gat
 - This experiment isolates classifier-stage parameter reallocation; it does not test dynamic decomposition across backbone layers.
 - The low-rank residual is restricted to non-Many output rows, which is a deliberate adaptation to the observed C1/C4 classifier-stage failure.
 - The train-centroid neighbor graph represents feature proximity under the frozen Clean Stage-I model, not guaranteed semantic similarity.
-- The orthogonality and coefficient-separation penalties are new hypotheses; the experiment must determine whether they help or impede learning.
+- The orthogonality and effective-residual-row separation penalty are new hypotheses; the experiment must determine whether they help or impede learning.
 - The method is MORE-inspired and not a reproduction of MORE's full layer-wise decomposition and joint optimization.
 - No claim of novelty, SOTA, or paper-level significance is justified by this one controlled CIFAR-100-LT experiment.
