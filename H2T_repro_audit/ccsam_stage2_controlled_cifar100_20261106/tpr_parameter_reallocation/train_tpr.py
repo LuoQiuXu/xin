@@ -307,15 +307,22 @@ class LowRankTailClassifier(nn.Module):
         return cosine.square().mean()
 
     def diversity_loss(self, edge_rows: torch.Tensor) -> torch.Tensor:
+        """Decorrelate neighboring classes' *effective classifier residual rows*.
+
+        The learned classifier update is Delta W = B @ A. Since A is trainable
+        and is not constrained to be an isometry, cosine(B_i, B_j) need not
+        equal cosine(Delta W_i, Delta W_j). The penalty therefore acts on the
+        actual 64-D rows added to the frozen general classifier.
+        """
         if edge_rows.ndim != 2 or edge_rows.shape[1] != 2:
             raise ValueError("edge_rows must have shape [E,2]")
         if edge_rows.numel() == 0:
-            return self.B.sum() * 0.0
+            return self.tail_residual().sum() * 0.0
         if int(edge_rows.min()) < 0 or int(edge_rows.max()) >= self.B.shape[0]:
             raise ValueError("Tail-neighbor edge index is out of range")
-        coefficients = F.normalize(self.B, dim=1, eps=1e-8)
+        residual_rows = F.normalize(self.tail_residual(), dim=1, eps=1e-8)
         cosine = (
-            coefficients[edge_rows[:, 0]] * coefficients[edge_rows[:, 1]]
+            residual_rows[edge_rows[:, 0]] * residual_rows[edge_rows[:, 1]]
         ).sum(dim=1)
         return cosine.square().mean()
 
@@ -831,7 +838,7 @@ def train_one_seed(
         "mean_feature_delta_l2", "mean_logit_delta_l2",
         "mean_logit_delta_l2_many", "mean_logit_delta_l2_medium",
         "mean_logit_delta_l2_few", "mean_tail_weight_norm",
-        "mean_orthogonality_cosine_squared", "mean_neighbor_cosine_squared",
+        "mean_orthogonality_cosine_squared", "mean_neighbor_residual_cosine_squared",
         "steps", "samples",
     ]
     status = {
@@ -879,7 +886,7 @@ def train_one_seed(
                 "orth": 0.0, "div": 0.0, "feature_delta": 0.0,
                 "logit_delta": 0.0, "logit_many": 0.0,
                 "logit_medium": 0.0, "logit_few": 0.0,
-                "tail_weight_norm": 0.0, "orth_cos2": 0.0, "neighbor_cos2": 0.0,
+                "tail_weight_norm": 0.0, "orth_cos2": 0.0, "neighbor_residual_cos2": 0.0,
             }
             group_counts = {"many": 0, "medium": 0, "few": 0}
             correct = 0
@@ -953,9 +960,8 @@ def train_one_seed(
                 base_rows = F.normalize(model.base_weight[model.tail_indices], dim=1, eps=1e-8)
                 residual_rows = F.normalize(model.tail_residual(), dim=1, eps=1e-8)
                 sums["orth_cos2"] += float(((base_rows * residual_rows).sum(1).square().mean()).detach().cpu())
-                coefficients = F.normalize(model.B, dim=1, eps=1e-8)
-                sums["neighbor_cos2"] += float((
-                    (coefficients[edge_rows[:, 0]] * coefficients[edge_rows[:, 1]]).sum(1).square().mean()
+                sums["neighbor_residual_cos2"] += float((
+                    (residual_rows[edge_rows[:, 0]] * residual_rows[edge_rows[:, 1]]).sum(1).square().mean()
                 ).detach().cpu())
                 correct += int((logits_clean.detach().argmax(dim=1) == target).sum().item())
                 seen += batch_size
@@ -1003,7 +1009,7 @@ def train_one_seed(
                 "mean_logit_delta_l2_few": sums["logit_few"] / max(group_counts["few"], 1),
                 "mean_tail_weight_norm": sums["tail_weight_norm"] / epoch_steps,
                 "mean_orthogonality_cosine_squared": sums["orth_cos2"] / epoch_steps,
-                "mean_neighbor_cosine_squared": sums["neighbor_cos2"] / epoch_steps,
+                "mean_neighbor_residual_cosine_squared": sums["neighbor_residual_cos2"] / epoch_steps,
                 "steps": epoch_steps,
                 "samples": seen,
             }
