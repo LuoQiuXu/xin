@@ -13,10 +13,15 @@ from train_tpr import (
     MORE_PEAK,
     NUM_CLASSES,
     FEATURE_DIM,
+    c3_artifact_snapshot,
 )
 
 
 class TPRSemanticsTests(unittest.TestCase):
+    def test_c3_snapshot_helper_is_imported_from_archived_c4_module(self):
+        self.assertTrue(callable(c3_artifact_snapshot))
+        self.assertEqual(c3_artifact_snapshot.__module__, "ab_head_preservation.train_ab")
+
     def setUp(self):
         torch.manual_seed(20261110)
         self.counts = np.full(NUM_CLASSES, 5, dtype=np.int64)
