@@ -32,7 +32,8 @@ from ccsam_common import (  # noqa: E402
     install_test_guard, guard_pass, resolve_checkpoint, build_transforms,
     build_models, seed_everything, augment_batch, class_weights_from_counts,
     alpha_for_epoch, check_backbone_unchanged, clean_compatible_gap,
-    metrics_from_predictions,
+    metrics_from_predictions, RUNTIME, OFFICIAL_SAMPLER_SOURCE,
+    OFFICIAL_SAMPLER_SHA256, validate_class_aware_plan,
 )
 from train_ccsam import (  # noqa: E402
     load_prepared, compute_arm_loss, read_trace, verify_analytic_gradient,
@@ -68,6 +69,7 @@ SOURCE_FILES = (
     "c3_selective/c3_summary.json",
     "c3_selective/C3_RESULTS.md",
     "c3_selective/ARTIFACT_SHA256.csv",
+    "official_reference/Samplers.py",
     "ab_head_preservation/train_ab.py",
     "ab_head_preservation/AB_PROTOCOL.md",
     "ab_head_preservation/formal_completed.json",
@@ -125,6 +127,22 @@ def c4_artifact_snapshot() -> dict[str, str]:
     return snapshot
 
 
+def prepared_snapshot() -> dict[str, str]:
+    names = (
+        "train_images.npy", "train_labels.npy", "validation_images.npy",
+        "validation_gap_features.npy", "validation_labels.npy",
+        "sampling_plan_seed123.npy", "sampling_plan_seed124.npy",
+        "sampling_plan_seed125.npy",
+    )
+    result = {}
+    for name in names:
+        path = ROOT / "prepared" / name
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing protected prepared array: {name}")
+        result[name] = sha256_file(path)
+    return result
+
+
 def source_snapshot() -> dict[str, str]:
     snapshot = {}
     for relative in SOURCE_FILES:
@@ -132,9 +150,19 @@ def source_snapshot() -> dict[str, str]:
         if not path.is_file():
             raise FileNotFoundError(f"Missing protected source/protocol input: {relative}")
         snapshot[relative] = sha256_file(path)
+    for name, path in (
+        ("runtime_cifar100_transform", RUNTIME / "datasets" / "cifar100.py"),
+        ("pinned_official_sampler", OFFICIAL_SAMPLER_SOURCE),
+    ):
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing pinned runtime source: {path}")
+        snapshot[name] = sha256_file(path)
+    if snapshot["pinned_official_sampler"] != OFFICIAL_SAMPLER_SHA256:
+        raise RuntimeError("Pinned official sampler source checksum mismatch")
     for filename in (
         "train_tpr.py", "test_tpr.py", "analyze_tpr.py", "finalize_tpr.py",
-        "TPR_PROTOCOL.md", "CODEX_TPR_PARAMETER_REALLOCATION_20261110.txt",
+        "TPR_PROTOCOL.md", "README.md", ".gitignore",
+        "CODEX_TPR_PARAMETER_REALLOCATION_20261110.txt",
     ):
         path = TPR_DIR / filename
         if not path.is_file():
@@ -148,6 +176,7 @@ def protected_snapshot() -> dict:
         "c0_c1_c2": baseline_file_snapshot(),
         "c3": c3_artifact_snapshot(),
         "c4": c4_artifact_snapshot(),
+        "prepared": prepared_snapshot(),
         "sources": source_snapshot(),
     }
 
@@ -156,7 +185,7 @@ def compare_protected(previous: dict) -> None:
     current = protected_snapshot()
     if current != previous:
         changed = []
-        for section in ("c0_c1_c2", "c3", "c4", "sources"):
+        for section in ("c0_c1_c2", "c3", "c4", "prepared", "sources"):
             before = previous.get(section, {})
             after = current.get(section, {})
             keys = set(before) | set(after)
@@ -474,6 +503,10 @@ def collect_preflight(manifest: dict) -> dict:
         if not (ROOT / "prepared" / filename).is_file():
             raise FileNotFoundError(f"Missing sealed prepared input: {filename}")
     c2_hashes = {}
+    train_labels = np.load(ROOT / "prepared" / "train_labels.npy", allow_pickle=False)
+    observed_counts = np.bincount(np.asarray(train_labels, dtype=np.int64), minlength=NUM_CLASSES)
+    if not np.array_equal(observed_counts, counts):
+        raise RuntimeError("Prepared TRAIN labels do not match the sealed class-count manifest")
     for seed in SEEDS:
         _, _, c2_sha, _ = load_c2_base(seed)
         c2_hashes[str(seed)] = c2_sha
@@ -481,10 +514,11 @@ def collect_preflight(manifest: dict) -> dict:
             ROOT / "prepared" / f"sampling_plan_seed{seed}.npy",
             mmap_mode="r", allow_pickle=False,
         )
-        if plan.shape != (STAGE2_EPOCHS, len(np.load(ROOT / "prepared" / "train_labels.npy", allow_pickle=False))):
+        if plan.shape != (STAGE2_EPOCHS, len(train_labels)):
             raise RuntimeError(f"Invalid sealed sampling plan shape for seed {seed}")
         if plan.dtype != np.int32:
             raise RuntimeError(f"Invalid sealed sampling plan dtype for seed {seed}")
+        validate_class_aware_plan(train_labels, seed, plan)
         c1_trace = ROOT / "results" / f"seed_{seed}" / "C1_CCSAM_FEATURE_GRAD" / "batch_trace.csv"
         c4_trace = AB_DIR / "results" / f"seed_{seed}" / C4_ARM / "batch_trace.csv"
         if len(read_trace(c1_trace)) != STAGE2_EPOCHS * 170:
@@ -501,7 +535,7 @@ def collect_preflight(manifest: dict) -> dict:
         "epochs_per_seed": STAGE2_EPOCHS,
         "batch_size": BATCH_SIZE,
         "steps_per_epoch": 170,
-        "train_samples": int(len(np.load(ROOT / "prepared" / "train_labels.npy", allow_pickle=False))),
+        "train_samples": int(len(train_labels)),
         "validation_samples": 1980,
         "many_rule": "sealed TRAIN count strictly greater than 100",
         "many_class_ids": np.flatnonzero(counts > MANY_THRESHOLD).tolist(),
