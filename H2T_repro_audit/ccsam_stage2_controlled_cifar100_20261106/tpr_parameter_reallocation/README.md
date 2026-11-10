@@ -35,3 +35,9 @@ If preflight/Smoke artifacts were created with the earlier coefficient-space dra
 6. Run finalize_tpr.py.
 
 Do not skip a stage. The official CIFAR-100 TEST split is prohibited. C0-C4 are protected read-only inputs. Local-only final checkpoints and batch traces must remain on the local machine and must not be force-added to Git.
+
+
+**Execution gate note (2026-11-10):** The runner imports the C3 snapshot helper from
+`ab_head_preservation.train_ab`. Smoke receives the `protected_inputs` mapping
+directly (not the enclosing preflight report). Run the CPU unit tests before
+Preflight or any GPU work.
