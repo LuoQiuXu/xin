@@ -229,4 +229,5 @@ These are iteration gates, not statistical-significance tests. Report failed gat
 - The train-centroid neighbor graph represents feature proximity under the frozen Clean Stage-I model, not guaranteed semantic similarity.
 - The orthogonality and effective-residual-row separation penalty are new hypotheses; the experiment must determine whether they help or impede learning.
 - The method is MORE-inspired and not a reproduction of MORE's full layer-wise decomposition and joint optimization.
+- The corrected protocol computes tail-neighbor diversity on the effective residual rows B @ A. Any results from an earlier draft that computed this term on B alone are a distinct coefficient-space variant and must not be pooled with the corrected residual-space results.
 - No claim of novelty, SOTA, or paper-level significance is justified by this one controlled CIFAR-100-LT experiment.
