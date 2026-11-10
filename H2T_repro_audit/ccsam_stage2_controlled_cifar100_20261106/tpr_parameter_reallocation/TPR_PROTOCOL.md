@@ -231,3 +231,19 @@ These are iteration gates, not statistical-significance tests. Report failed gat
 - The method is MORE-inspired and not a reproduction of MORE's full layer-wise decomposition and joint optimization.
 - The corrected protocol computes tail-neighbor diversity on the effective residual rows B @ A. Any results from an earlier draft that computed this term on B alone are a distinct coefficient-space variant and must not be pooled with the corrected residual-space results.
 - No claim of novelty, SOTA, or paper-level significance is justified by this one controlled CIFAR-100-LT experiment.
+
+
+## 10. Implementation gate corrections (2026-11-10)
+
+The TPR runner imports the archived C3 checksum helper from its actual module path:
+`ab_head_preservation.train_ab`. Do not use a top-level `from train_ab import ...`,
+because `train_ab.py` is stored inside the `ab_head_preservation/` subdirectory.
+
+The Smoke interface receives the protected snapshot mapping itself:
+`smoke_all(..., protected_inputs=saved_preflight["protected_inputs"])`.
+Inside `smoke_all`, pass that mapping directly to `compare_protected(protected_inputs)`;
+do not index it again as though it were the full preflight report.
+
+The CPU unit-test gate must import `train_tpr` and assert that the C3 helper is
+callable and comes from `ab_head_preservation.train_ab`. This catches the import
+regression before any Preflight, Smoke, or training command is allowed to run.
