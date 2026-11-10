@@ -133,6 +133,13 @@ class TPRSemanticsTests(unittest.TestCase):
         self.assertTrue(torch.allclose(actual, expected_residual, rtol=1e-6, atol=1e-8))
         self.assertGreater(float(torch.abs(actual - coefficient_only)), 0.1)
 
+        self.model.zero_grad(set_to_none=True)
+        actual.backward()
+        self.assertIsNotNone(self.model.A.grad)
+        self.assertIsNotNone(self.model.B.grad)
+        self.assertTrue(torch.isfinite(self.model.A.grad).all())
+        self.assertTrue(torch.isfinite(self.model.B.grad).all())
+
     def test_merged_classifier_matches_adapter_forward(self):
         features = torch.randn(13, FEATURE_DIM)
         logits = self.model(features)
