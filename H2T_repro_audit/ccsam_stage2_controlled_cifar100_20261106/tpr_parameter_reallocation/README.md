@@ -8,10 +8,13 @@ This directory contains the next classifier-stage method iteration after the sea
 - Use the matching seed's completed C2 classifier as a frozen general classifier.
 - Add a low-rank residual only to non-Many output rows: W_t = D_tail B A.
 - Use the MORE class-prior-weighted squared L2 logit discrepancy with a sinusoidal schedule.
+- Compute tail-neighbor diversity on the effective classifier residual rows B @ A (not on B coefficients alone).
 - Address MORE's two discussion issues with train-only tail-neighbor effective-residual-row separation and a soft same-class row-wise general/residual orthogonality term.
 - Merge the residual into one classifier at inference. No experts or additional inference branch.
 
 This is a classifier-stage MORE-inspired adaptation, not a full reproduction of the network-wide MORE method. Read TPR_PROTOCOL.md before execution.
+
+If preflight/Smoke artifacts were created with the earlier coefficient-space draft, archive them before rerunning the corrected protocol; never delete or overwrite them. If any formal TPR output already exists, stop and preserve it rather than overwriting it.
 
 ## Files
 
