@@ -18,18 +18,24 @@ This is an isolated experiment branch based on the completed C4 implementation.
 - `CODEX_CCSAM_TPR_20261110.txt`: complete Codex implementation/run task.
 - `tpr_model.py`: isolated low-rank residual, dominant-subspace regularizer, confusion-pair selection/diversity penalty, and Many-only KD.
 - `test_tpr_model.py`: CPU unit tests for the core model/loss semantics.
-- Codex is instructed to add the isolated training runner and analysis code under this directory. Do not modify sealed C0-C4 sources or outputs.
+- `train_tpr.py`, `tpr_inputs.py`, and `analyze_tpr.py` implement the gated TPR run, sealed input checks, and fixed-epoch analysis.
 
 ## Local execution
 
-From the repository root, read the Codex task file and follow its strict order:
-1. verify branch/worktree and all input hashes;
-2. run CPU unit tests and static checks;
-3. run preflight;
-4. run real-data Smoke for all three seeds;
-5. only if every gate passes, run the three-seed 30-epoch formal experiment;
-6. analyze fixed epoch 30.
+From the TPR directory on the branch above, run the phases in order. Check each exit code before continuing.
 
-The exact CLI commands are to be finalized by Codex after inspecting the existing C4 runner and local environment; do not guess checkpoint paths or run arguments.
+```powershell
+$TPRPython = 'D:\app\minicondaaa\envs\xiaoju\python.exe'
+& $TPRPython -B -m py_compile tpr_model.py tpr_inputs.py train_tpr.py analyze_tpr.py test_tpr_model.py
+& $TPRPython -B -m pytest -q -p no:cacheprovider test_tpr_model.py
+& $TPRPython -B -u train_tpr.py --phase preflight --seeds 123 124 125
+& $TPRPython -B -u train_tpr.py --phase smoke --seeds 123 124 125 --prepare-missing
+& $TPRPython -B -u train_tpr.py --phase formal --seeds 123 124 125
+& $TPRPython -B -u train_tpr.py --phase analyze --seeds 123 124 125
+```
 
-Large checkpoints and batch traces should follow the repository's existing local-only artifact policy. Record SHA256 hashes and include the artifact manifest in the final report.
+The one-time Smoke flag authorizes the TPR confusion and SVD preparation. The graph uses all 10,847 clean Stage II TRAIN images, as specified by the task and protocol section 3. Section 5 item 8 still refers to the holdout. Positive edges use the mean of the two row-normalized confusion rates, ordered by descending score and then ascending class IDs. Scores select the pairs. The diversity penalty averages their squared cosines with equal weight.
+
+Each seed initializes A with the existing orthogonal initializer and B with exact zeros. The fixed top-8 basis comes from one FP32 CPU SVD per seed. The ratio denominator and cosine normalization use epsilon 1e-12. Batch diagnostics contain all loss components and both factor gradient norms. Epoch CSVs report batch means for those scalars and sample-weighted Many top-1 agreement.
+
+The final factor checkpoints, complete pairing traces, batch diagnostics and transcript stay local. Their paths and checksums are recorded in the artifact manifest.

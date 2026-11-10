@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-10T14:56:04+08:00",
+  "arm": "TPR_LOW_RANK_TAIL",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "runs": [
+    {
+      "seed": 123,
+      "final_epoch": 30,
+      "optimizer_steps": 5100,
+      "samples_seen": 325410,
+      "base_checkpoint_sha256": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb",
+      "batch_trace_sha256": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+      "final_classifier_sha256": "6908b4b6feb6d87bb433db351dc3047c4f454eb0c494025ad5275d2426c99a0f",
+      "frozen_bitwise_all_epochs": true
+    },
+    {
+      "seed": 124,
+      "final_epoch": 30,
+      "optimizer_steps": 5100,
+      "samples_seen": 325410,
+      "base_checkpoint_sha256": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed",
+      "batch_trace_sha256": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+      "final_classifier_sha256": "87a361731823ec7abe0f25fb84375c367c59030f0be8a78d0725244e4d0c658a",
+      "frozen_bitwise_all_epochs": true
+    },
+    {
+      "seed": 125,
+      "final_epoch": 30,
+      "optimizer_steps": 5100,
+      "samples_seen": 325410,
+      "base_checkpoint_sha256": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b",
+      "batch_trace_sha256": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+      "final_classifier_sha256": "09eada258212b0838529960c6c452b098ab7c921289b6453b4ff971f662305c9",
+      "frozen_bitwise_all_epochs": true
+    }
+  ],
+  "epochs_completed": 90,
+  "optimizer_steps": 15300,
+  "train_samples_seen": 976230,
+  "protected_C0_C4_unchanged": true,
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-10T14:43:02+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "preflight_sha256": "26a1fe143b58fbcad6ab0a2d218f04a50c83c5a99f4a040c171b827bd1150ea1",
+  "smoke_sha256": "c5433e5509bbe28440192a7bbf87b87de40928a33a05951fe2a86dbf32ac091f",
+  "preparation_sha256": "286ad1337116ef1b3cf4072098ad911aab31690c0bcde5077e958e36d58f9079",
+  "protocol_sha256": "c508c81f2f1c095436033d26f6322490f2a686b0140281a662254b71a7665462"
+}

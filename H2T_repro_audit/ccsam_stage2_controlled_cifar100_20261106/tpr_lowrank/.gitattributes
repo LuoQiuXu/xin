@@ -1,0 +1,12 @@
+# Preserve the exact bytes of new TPR result artifacts for SHA256 verification.
+.gitattributes -text
+ARTIFACT_SHA256.csv -text
+TPR_EXECUTION_REPORT.md -text
+preflight_report.json -text
+smoke_report.json -text
+train_confusion_graphs.json -text
+formal_completed.json -text
+formal_test_guard.json -text
+failure_*.json -text
+analysis/** -text
+results/** -text

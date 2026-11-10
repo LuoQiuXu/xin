@@ -1,0 +1,274 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-10T14:42:58+08:00",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "checks": [
+    {
+      "seed": 123,
+      "base_checkpoint_sha256": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb",
+      "clean_initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+      "step0_bitwise_equal_to_C2": true,
+      "paired_with_C1": true,
+      "frozen_and_many_rows_verified": true,
+      "disposable_steps": 2,
+      "batches": [
+        {
+          "trace": {
+            "epoch": "1",
+            "batch": "0",
+            "batch_size": "64",
+            "indices_labels_sha256": "54868a36cc03bb37f44d0b30726ac573d5137398b9a4538cc741627917e4c1f2",
+            "augmented_images_sha256": "856f4274c898407ec6c07c60de61902b9b86bd81f403ec077cb099596d9e20c1",
+            "gap_features_sha256": "35340f51e7494d3da8cbe1787250a352815ae32f887485649b2eb236a0e2bfee"
+          },
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          },
+          "a_updated": true,
+          "b_updated": true,
+          "total": 0.2727452218532562,
+          "c1": 0.2727452218532562,
+          "hp": 1.224023993273704e-08,
+          "sub": 0.0,
+          "div": 0.0,
+          "weighted_hp": 1.224023993273704e-08,
+          "weighted_sub": 0.0,
+          "weighted_div": 0.0,
+          "many_count": 21,
+          "many_agreement_count": 21,
+          "correct": 63,
+          "delta_weight_norm": 0.0,
+          "mean_feature_delta_l2": 1.1679407358169556,
+          "mean_relative_feature_delta_l2": 0.15183024108409882,
+          "alpha": 0.03333333333333333,
+          "grad_norm_a": 0.0,
+          "grad_norm_b": 0.08780134469270706
+        },
+        {
+          "trace": {
+            "epoch": "1",
+            "batch": "1",
+            "batch_size": "64",
+            "indices_labels_sha256": "ea006fd60d7238d805e8b919a6f0c05f7193ff18673a005b093879da3f72a158",
+            "augmented_images_sha256": "33b636de205df154131bf996367870e85e9fea2f023a5c4903ad16fd6fd9d0a2",
+            "gap_features_sha256": "f1bb876c801cd766ae3542426872ea74e0a31a8e6c068620812e1c91040a37a3"
+          },
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          },
+          "a_updated": true,
+          "b_updated": true,
+          "total": 0.388529896736145,
+          "c1": 0.3820328414440155,
+          "hp": -9.992800187319517e-08,
+          "sub": 0.20351584255695343,
+          "div": 0.4461982846260071,
+          "weighted_hp": -9.992800187319517e-08,
+          "weighted_sub": 0.0020351584535092115,
+          "weighted_div": 0.004461982753127813,
+          "many_count": 24,
+          "many_agreement_count": 24,
+          "correct": 61,
+          "delta_weight_norm": 0.0008780117495916784,
+          "mean_feature_delta_l2": 0.9637311697006226,
+          "mean_relative_feature_delta_l2": 0.13020743429660797,
+          "alpha": 0.03333333333333333,
+          "grad_norm_a": 0.008764601312577724,
+          "grad_norm_b": 254.5769500732422
+        }
+      ],
+      "empty_graph": false
+    },
+    {
+      "seed": 124,
+      "base_checkpoint_sha256": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed",
+      "clean_initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+      "step0_bitwise_equal_to_C2": true,
+      "paired_with_C1": true,
+      "frozen_and_many_rows_verified": true,
+      "disposable_steps": 2,
+      "batches": [
+        {
+          "trace": {
+            "epoch": "1",
+            "batch": "0",
+            "batch_size": "64",
+            "indices_labels_sha256": "64ad67b0b5105357298ee90a0a14bc29a53de568d4c3303816aa16adc7b24189",
+            "augmented_images_sha256": "2ce5432b009c079efb71a37aa17c810cb3252de2cb1d2b517903d7b12c3fe83b",
+            "gap_features_sha256": "4971099adb200dfce37ece994366abce4804de5a3ff454df5a9df1b7391ab3b8"
+          },
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          },
+          "a_updated": true,
+          "b_updated": true,
+          "total": 0.3190802037715912,
+          "c1": 0.31908029317855835,
+          "hp": -8.89201388076799e-08,
+          "sub": 0.0,
+          "div": 0.0,
+          "weighted_hp": -8.89201388076799e-08,
+          "weighted_sub": 0.0,
+          "weighted_div": 0.0,
+          "many_count": 22,
+          "many_agreement_count": 22,
+          "correct": 63,
+          "delta_weight_norm": 0.0,
+          "mean_feature_delta_l2": 1.2151803970336914,
+          "mean_relative_feature_delta_l2": 0.1604183465242386,
+          "alpha": 0.03333333333333333,
+          "grad_norm_a": 0.0,
+          "grad_norm_b": 0.08334184437990189
+        },
+        {
+          "trace": {
+            "epoch": "1",
+            "batch": "1",
+            "batch_size": "64",
+            "indices_labels_sha256": "712fbc9855eb67bfed0763b282d1350fba555a549744382c8a98d71be19495db",
+            "augmented_images_sha256": "b17c15c5579556544b38282e79f58fd885817a5413ba73d227601c72684bd510",
+            "gap_features_sha256": "3b5b1f61a17dcc224c2d473f0327581ac4335f41410486a245e923a953bf4bf5"
+          },
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          },
+          "a_updated": true,
+          "b_updated": true,
+          "total": 0.25878164172172546,
+          "c1": 0.2501187324523926,
+          "hp": 4.4377014063456954e-08,
+          "sub": 0.10769792646169662,
+          "div": 0.7585926055908203,
+          "weighted_hp": 4.4377014063456954e-08,
+          "weighted_sub": 0.0010769792133942246,
+          "weighted_div": 0.007585925981402397,
+          "many_count": 23,
+          "many_agreement_count": 23,
+          "correct": 61,
+          "delta_weight_norm": 0.0008334167650900781,
+          "mean_feature_delta_l2": 0.9019640684127808,
+          "mean_relative_feature_delta_l2": 0.10960068553686142,
+          "alpha": 0.03333333333333333,
+          "grad_norm_a": 0.005183439236134291,
+          "grad_norm_b": 141.33570861816406
+        }
+      ],
+      "empty_graph": false
+    },
+    {
+      "seed": 125,
+      "base_checkpoint_sha256": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b",
+      "clean_initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+      "step0_bitwise_equal_to_C2": true,
+      "paired_with_C1": true,
+      "frozen_and_many_rows_verified": true,
+      "disposable_steps": 2,
+      "batches": [
+        {
+          "trace": {
+            "epoch": "1",
+            "batch": "0",
+            "batch_size": "64",
+            "indices_labels_sha256": "a294ab8bdf40ed576529e60630626b90177f2a2757f1d2317c6fb8f915381443",
+            "augmented_images_sha256": "c1a50ce76e3ece73c410f36541ce1249e1271a1ff876d4f548b44f39a3cc6681",
+            "gap_features_sha256": "abc8e696ec52eb7a6c66dd475bc7757edf7c31b0ca97c828fc26763a9766512a"
+          },
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          },
+          "a_updated": true,
+          "b_updated": true,
+          "total": 0.3286745250225067,
+          "c1": 0.3286744952201843,
+          "hp": 2.0666492517307233e-08,
+          "sub": 0.0,
+          "div": 0.0,
+          "weighted_hp": 2.0666492517307233e-08,
+          "weighted_sub": 0.0,
+          "weighted_div": 0.0,
+          "many_count": 21,
+          "many_agreement_count": 21,
+          "correct": 63,
+          "delta_weight_norm": 0.0,
+          "mean_feature_delta_l2": 1.1930134296417236,
+          "mean_relative_feature_delta_l2": 0.15787674486637115,
+          "alpha": 0.03333333333333333,
+          "grad_norm_a": 0.0,
+          "grad_norm_b": 0.07912831008434296
+        },
+        {
+          "trace": {
+            "epoch": "1",
+            "batch": "1",
+            "batch_size": "64",
+            "indices_labels_sha256": "a849038d2dadecc5ff19fa74743099f3a9c888ed7ffdaa4f989e6396157f6550",
+            "augmented_images_sha256": "ebcf78e10caf5a837f3543b43c06ab154e2fe4b11277f38a01b7e71e964c240a",
+            "gap_features_sha256": "97c0b75a8eeb6acec83de0563d9f972407f5ef733cb074da1f35a68b6aba7d52"
+          },
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          },
+          "a_updated": true,
+          "b_updated": true,
+          "total": 0.3789016604423523,
+          "c1": 0.37393200397491455,
+          "hp": -3.463355824351311e-08,
+          "sub": 0.09194573760032654,
+          "div": 0.40502119064331055,
+          "weighted_hp": -3.463355824351311e-08,
+          "weighted_sub": 0.0009194573503918946,
+          "weighted_div": 0.0040502119809389114,
+          "many_count": 26,
+          "many_agreement_count": 26,
+          "correct": 60,
+          "delta_weight_norm": 0.0007912814617156982,
+          "mean_feature_delta_l2": 1.0028436183929443,
+          "mean_relative_feature_delta_l2": 0.12725648283958435,
+          "alpha": 0.03333333333333333,
+          "grad_norm_a": 0.004604284651577473,
+          "grad_norm_b": 134.2224884033203
+        }
+      ],
+      "empty_graph": false
+    }
+  ],
+  "formal_training_started": false,
+  "preflight_sha256": "26a1fe143b58fbcad6ab0a2d218f04a50c83c5a99f4a040c171b827bd1150ea1",
+  "preparation_sha256": "286ad1337116ef1b3cf4072098ad911aab31690c0bcde5077e958e36d58f9079",
+  "protocol_sha256": "c508c81f2f1c095436033d26f6322490f2a686b0140281a662254b71a7665462",
+  "environment": {
+    "torch_version": "2.14.1+cu132",
+    "cuda_version": "13.2",
+    "cudnn_version": 92400,
+    "cuda_available": true,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "device": "NVIDIA GeForce RTX 5070 Laptop GPU"
+  },
+  "test_guard": {
+    "installed_at": "2026-11-10T14:42:52+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "official_TEST_used": false
+}

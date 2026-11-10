@@ -57,7 +57,7 @@ class TailLowRankResidual(nn.Module):
         self.B = nn.Parameter(torch.zeros(100, rank, dtype=torch.float32))
 
     def delta_weight(self) -> torch.Tensor:
-        return self.tail_mask[:, None] * (self.B @ self.A)
+        return (self.B @ self.A).masked_fill(self.tail_mask[:, None] == 0, 0.0)
 
     def effective_weight(self, base_weight: torch.Tensor) -> torch.Tensor:
         if base_weight.shape != (self.num_classes, self.feature_dim):
@@ -81,7 +81,8 @@ class TailLowRankResidual(nn.Module):
     @torch.no_grad()
     def assert_many_rows_zero(self) -> None:
         many = self.tail_mask == 0
-        if not torch.equal(self.delta_weight()[many], torch.zeros_like(self.delta_weight()[many])):
+        rows = self.delta_weight()[many]
+        if bool(rows.contiguous().view(torch.int32).any()):
             raise RuntimeError("Many residual rows must be exactly zero")
 
 
@@ -112,8 +113,8 @@ def dominant_subspace_overlap(
         raise ValueError("basis must have shape [64,k]")
     if delta_weight.device != basis.device:
         raise ValueError("delta_weight and basis must share a device")
-    numerator = torch.linalg.matrix_norm(delta_weight @ basis, ord="fro").square()
-    denominator = torch.linalg.matrix_norm(delta_weight, ord="fro").square() + eps
+    numerator = (delta_weight @ basis).square().sum()
+    denominator = delta_weight.square().sum() + eps
     return numerator / denominator
 
 
@@ -124,25 +125,24 @@ def select_confusion_pairs(
 ) -> list[tuple[int, int, float]]:
     """Select top symmetric off-diagonal confusion pairs among tail classes.
 
-    confusion[i,j] is the number of validation examples with true class i and
-    predicted class j. Scores average row-normalized i->j and j->i confusion.
+    confusion[i,j] counts clean Stage-II TRAIN examples with true class i and
+    prediction j. Scores average the two row-normalized directions. A pair
+    requires an observed confusion in at least one direction.
     """
     if confusion.shape != (100, 100) or tail_mask.shape != (100,):
         raise ValueError("expected confusion [100,100] and tail_mask [100]")
     if not torch.isfinite(confusion).all() or bool((confusion < 0).any().item()):
         raise ValueError("confusion matrix must be finite and non-negative")
+    confusion = confusion.detach().to(device="cpu", dtype=torch.float64)
     row_totals = confusion.sum(dim=1)
+    normalized = confusion / row_totals.clamp_min(1)[:, None]
     pairs: list[tuple[int, int, float]] = []
     eligible = torch.nonzero(tail_mask.to(torch.bool), as_tuple=False).flatten().tolist()
     for pos, c in enumerate(eligible):
         for cp in eligible[pos + 1:]:
             if row_totals[c] <= 0 or row_totals[cp] <= 0:
                 continue
-            score = 0.5 * (
-                confusion[c, cp] / row_totals[c]
-                + confusion[cp, c] / row_totals[cp]
-            )
-            value = float(score.detach().cpu())
+            value = float(0.5 * (normalized[c, cp] + normalized[cp, c]))
             if value > 0.0:
                 pairs.append((int(c), int(cp), value))
     # Stable deterministic tie break: descending score, then ascending IDs.
@@ -161,16 +161,15 @@ def confusion_aware_diversity_loss(
     pair_list = list(pairs)
     if not pair_list:
         return delta_weight.sum() * 0.0
+    normalized = F.normalize(delta_weight, p=2, dim=1, eps=eps)
     terms = []
     for c, cp, score in pair_list:
         if not (0 <= c < 100 and 0 <= cp < 100 and c != cp):
             raise ValueError(f"invalid confusion pair {(c, cp)}")
         if not (0.0 <= float(score) <= 1.0):
             raise ValueError("confusion score must lie in [0,1]")
-        wc, wcp = delta_weight[c], delta_weight[cp]
-        denom = wc.norm().clamp_min(eps) * wcp.norm().clamp_min(eps)
-        cosine = torch.dot(wc, wcp) / denom
-        terms.append(float(score) * cosine.square())
+        cosine = torch.dot(normalized[c], normalized[cp])
+        terms.append(cosine.square())
     return torch.stack(terms).mean()
 
 
