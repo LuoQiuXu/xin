@@ -71,8 +71,15 @@ def run_directory(seed: int, arm: str) -> Path:
             ROOT / "c3_selective" / "results" / f"seed_{seed}" / arm,
         )
         for candidate in candidates:
-            if (candidate / "status.json").is_file():
-                return candidate
+            status_path = candidate / "status.json"
+            if status_path.is_file():
+                candidate_status = read_json(status_path)
+                if (
+                    candidate_status.get("state") == "completed"
+                    and candidate_status.get("seed") == seed
+                    and candidate_status.get("arm") == arm
+                ):
+                    return candidate
         raise FileNotFoundError(f"Cannot locate archived C3 result for seed {seed}")
     return ROOT / "results" / f"seed_{seed}" / arm
 
