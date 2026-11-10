@@ -1,0 +1,10 @@
+# Preserve bytes of new TPR evidence for archive verification.
+.gitattributes -text
+ARTIFACT_SHA256.csv -text
+TPR_EXECUTION_REPORT.md -text
+preflight_report.json -text
+tail_neighbor_graph.json -text
+smoke_report.json -text
+formal_completed.json -text
+analysis/** -text
+results/** -text

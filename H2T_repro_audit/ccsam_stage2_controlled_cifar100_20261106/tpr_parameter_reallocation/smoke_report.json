@@ -1,0 +1,173 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-10T20:54:49+08:00",
+  "arm": "CCSAM_TPR",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "batches_per_seed": 2,
+  "formal_training_started": false,
+  "graph_sha256": "5191d706c66b42ff4ebb80ca7dcb20208902f17604130f1171ab1c2afd0b5592",
+  "graph_centroid_sha256": "c706e295d6422e00a3cd430da31b7c7341079b0c95e4c9de51cf81ad6f570cc9",
+  "rank": 8,
+  "more_peak": 200.0,
+  "orthogonality_lambda": 0.1,
+  "tail_diversity_lambda": 0.1,
+  "checks": [
+    {
+      "seed": 123,
+      "c2_base_checkpoint_sha256": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb",
+      "paired_with_c1_and_c4": true,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_c1_and_c4_trace_exact": true,
+          "c1_base_loss": 0.27270743250846863,
+          "more_loss": 1.1517204256961122e-06,
+          "more_weight": 0.0,
+          "weighted_more_loss": 0.0,
+          "orthogonality_loss": 0.014721302315592766,
+          "tail_diversity_loss": 0.14929986000061035,
+          "total_loss": 0.2891095280647278,
+          "many_samples": 21,
+          "nonmany_samples": 43,
+          "mean_feature_delta_l2": 1.1679407358169556,
+          "mean_logit_delta_l2": 0.011968109756708145,
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          }
+        },
+        {
+          "batch": 1,
+          "paired_c1_and_c4_trace_exact": true,
+          "c1_base_loss": 0.3820178806781769,
+          "more_loss": 1.4745405678695533e-06,
+          "more_weight": 0.12322386565326897,
+          "weighted_more_loss": 1.8169858151395601e-07,
+          "orthogonality_loss": 0.014721302315592766,
+          "tail_diversity_loss": 0.14929986000061035,
+          "total_loss": 0.39842015504837036,
+          "many_samples": 24,
+          "nonmany_samples": 40,
+          "mean_feature_delta_l2": 0.9637278318405151,
+          "mean_logit_delta_l2": 0.011256134137511253,
+          "analytic_gradient_check": null
+        }
+      ],
+      "adapter_updated": true,
+      "c2_base_bitwise_unchanged": true,
+      "many_output_rows_unchanged": true,
+      "backbone_and_bn_bitwise_unchanged": true
+    },
+    {
+      "seed": 124,
+      "c2_base_checkpoint_sha256": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed",
+      "paired_with_c1_and_c4": true,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_c1_and_c4_trace_exact": true,
+          "c1_base_loss": 0.31913530826568604,
+          "more_loss": 9.31141471482988e-07,
+          "more_weight": 0.0,
+          "weighted_more_loss": 0.0,
+          "orthogonality_loss": 0.019014909863471985,
+          "tail_diversity_loss": 0.12101715803146362,
+          "total_loss": 0.33313849568367004,
+          "many_samples": 22,
+          "nonmany_samples": 42,
+          "mean_feature_delta_l2": 1.2151803970336914,
+          "mean_logit_delta_l2": 0.01056772843003273,
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          }
+        },
+        {
+          "batch": 1,
+          "paired_c1_and_c4_trace_exact": true,
+          "c1_base_loss": 0.2500639259815216,
+          "more_loss": 1.2733693210975616e-06,
+          "more_weight": 0.12322386565326897,
+          "weighted_more_loss": 1.569094933984161e-07,
+          "orthogonality_loss": 0.019014909863471985,
+          "tail_diversity_loss": 0.12101715803146362,
+          "total_loss": 0.26406726241111755,
+          "many_samples": 23,
+          "nonmany_samples": 41,
+          "mean_feature_delta_l2": 0.9019702672958374,
+          "mean_logit_delta_l2": 0.011853259988129139,
+          "analytic_gradient_check": null
+        }
+      ],
+      "adapter_updated": true,
+      "c2_base_bitwise_unchanged": true,
+      "many_output_rows_unchanged": true,
+      "backbone_and_bn_bitwise_unchanged": true
+    },
+    {
+      "seed": 125,
+      "c2_base_checkpoint_sha256": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b",
+      "paired_with_c1_and_c4": true,
+      "batches": [
+        {
+          "batch": 0,
+          "paired_c1_and_c4_trace_exact": true,
+          "c1_base_loss": 0.32860174775123596,
+          "more_loss": 6.76925253628724e-07,
+          "more_weight": 0.0,
+          "weighted_more_loss": 0.0,
+          "orthogonality_loss": 0.014060629531741142,
+          "tail_diversity_loss": 0.12861034274101257,
+          "total_loss": 0.3428688645362854,
+          "many_samples": 21,
+          "nonmany_samples": 43,
+          "mean_feature_delta_l2": 1.1930134296417236,
+          "mean_logit_delta_l2": 0.009032167494297028,
+          "analytic_gradient_check": {
+            "passed": true,
+            "max_abs_difference": 0.0,
+            "comparison": "actual Clean Stage I batch/head vectorized gradient vs direct autograd reference"
+          }
+        },
+        {
+          "batch": 1,
+          "paired_c1_and_c4_trace_exact": true,
+          "c1_base_loss": 0.37388911843299866,
+          "more_loss": 8.121022005980194e-07,
+          "more_weight": 0.12322386565326897,
+          "weighted_more_loss": 1.0007037332115942e-07,
+          "orthogonality_loss": 0.014060629531741142,
+          "tail_diversity_loss": 0.12861034274101257,
+          "total_loss": 0.38815632462501526,
+          "many_samples": 26,
+          "nonmany_samples": 38,
+          "mean_feature_delta_l2": 1.002840518951416,
+          "mean_logit_delta_l2": 0.009434034116566181,
+          "analytic_gradient_check": null
+        }
+      ],
+      "adapter_updated": true,
+      "c2_base_bitwise_unchanged": true,
+      "many_output_rows_unchanged": true,
+      "backbone_and_bn_bitwise_unchanged": true
+    }
+  ],
+  "graph_file_sha256": "101dc3748322795690fe2da8c438ad9602157da566b96ebe8a34b44def84014b",
+  "preflight_report_sha256": "f1eae18253a35235a420de6875bbe534b2421e5547b2bbb77cba2a186524d670",
+  "source_sha256": "afc58cf196f908646c734057ed6b0e53595ad15d617b4695ac6860d19bdf67e2",
+  "protocol_sha256": "10682cc149604f2751d0a5dcf2e8d1fcad1adf5d6e6748117c41d215dd8a7720",
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-10T20:54:45+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  }
+}

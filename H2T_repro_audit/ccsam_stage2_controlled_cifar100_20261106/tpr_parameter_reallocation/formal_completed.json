@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "arm": "CCSAM_TPR",
+  "completed_at": "2026-11-10T21:08:24+08:00",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "epochs_per_seed": 30,
+  "new_epochs": 90,
+  "optimizer_steps": 15300,
+  "only_tpr_new_training": true,
+  "original_c0_c1_c2_c3_c4_unchanged": true,
+  "runs": [
+    {
+      "seed": 123,
+      "epoch": 30,
+      "final_classifier_sha256": "32f9ce871f49f8597e4f497c04b7ad65fb18fe9652828fad19f5ec8566fa616c",
+      "base_checkpoint_sha256": "e4a935871c80d6f62a09ecb34b070348f1b11687fef0e59184cd8cf49c9970fb"
+    },
+    {
+      "seed": 124,
+      "epoch": 30,
+      "final_classifier_sha256": "ce5c34cf6672eef75025c02b4f65f8aa40f9951f0f03ccf4f133f9b0014079ab",
+      "base_checkpoint_sha256": "0da2c30eff7d7de1b2eafdb963690d128cde72a30557cc33ddbc0625d96a5eed"
+    },
+    {
+      "seed": 125,
+      "epoch": 30,
+      "final_classifier_sha256": "8fe8908aeb66b593d3c19f22bc0ebc5c960dd1597289c59c54c8b9170eac834b",
+      "base_checkpoint_sha256": "9613a92beb407fd9fc7b10158f3e8235a32701dfd0435dc001670c67a6d17c6b"
+    }
+  ],
+  "rank": 8,
+  "more_peak": 200.0,
+  "orthogonality_lambda": 0.1,
+  "tail_diversity_lambda": 0.1,
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-10T20:54:54+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "preflight_report_sha256": "f1eae18253a35235a420de6875bbe534b2421e5547b2bbb77cba2a186524d670",
+  "smoke_report_sha256": "8cfcbec39971fd5590e560566d335aa7130dcbf885c5a476261b7429829bbadd",
+  "graph_file_sha256": "101dc3748322795690fe2da8c438ad9602157da566b96ebe8a34b44def84014b",
+  "source_sha256": "afc58cf196f908646c734057ed6b0e53595ad15d617b4695ac6860d19bdf67e2",
+  "protocol_sha256": "10682cc149604f2751d0a5dcf2e8d1fcad1adf5d6e6748117c41d215dd8a7720"
+}
