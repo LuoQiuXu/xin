@@ -8,6 +8,15 @@
 
 Implement and run the next classifier-stage method iteration after the sealed C0-C4 study.
 
+### Residual-space correction and artifact safety
+
+The corrected tail-neighbor diversity term is computed from the effective classifier residual rows Delta W = B @ A, not from B alone. This changes the TPR source/protocol hashes.
+
+Before rerunning:
+- If preflight_report.json, smoke_report.json, or tail_neighbor_graph.json already exists from the earlier coefficient-space draft, move each existing file unchanged into archive/pre_residual_space_diversity_fix/ (preserve its original filename). Do not delete or overwrite those artifacts.
+- If formal_completed.json or any results/seed_*/CCSAM_TPR output exists from the earlier draft, STOP. Preserve the old run as a coefficient-space variant; do not overwrite it or mix it with corrected residual-space results. Request a separately named run arm before proceeding.
+- After archiving stale preflight/Smoke artifacts, rerun syntax tests, preflight, and Smoke from the corrected source. Do not reuse an old preflight or Smoke report because their source hashes describe the earlier implementation.
+
 The method is CC-SAM-TPR:
 
 1. Keep the original validated C1 CC-SAM feature-gradient perturbation and loss unchanged.
