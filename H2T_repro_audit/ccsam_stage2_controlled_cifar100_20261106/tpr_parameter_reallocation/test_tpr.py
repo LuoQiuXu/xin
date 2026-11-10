@@ -1,4 +1,5 @@
 """CPU-only semantic tests for CC-SAM-TPR."""
+import inspect
 import math
 import unittest
 
@@ -14,6 +15,7 @@ from train_tpr import (
     NUM_CLASSES,
     FEATURE_DIM,
     c3_artifact_snapshot,
+    smoke_all,
 )
 
 
@@ -21,6 +23,14 @@ class TPRSemanticsTests(unittest.TestCase):
     def test_c3_snapshot_helper_is_imported_from_archived_c4_module(self):
         self.assertTrue(callable(c3_artifact_snapshot))
         self.assertEqual(c3_artifact_snapshot.__module__, "ab_head_preservation.train_ab")
+
+    def test_smoke_compares_direct_protected_snapshot_mapping(self):
+        parameters = inspect.signature(smoke_all).parameters
+        self.assertIn("protected_inputs", parameters)
+        self.assertNotIn("preflight", parameters)
+        source = inspect.getsource(smoke_all)
+        self.assertIn("compare_protected(protected_inputs)", source)
+        self.assertNotIn('["protected_inputs"]', source)
 
     def setUp(self):
         torch.manual_seed(20261110)
