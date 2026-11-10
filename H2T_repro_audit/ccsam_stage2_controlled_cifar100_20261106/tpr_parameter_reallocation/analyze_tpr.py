@@ -300,7 +300,7 @@ def main():
             "Three Stage-II seeds share one frozen Clean Stage-I backbone and one reused TRAIN-derived development holdout; these are not independent-backbone replications.",
             "Class 0 is a Many training class but is absent from the validation holdout.",
             "Fixed epoch 30 is primary; no best-epoch selection, hyperparameter search, or official TEST evaluation is used.",
-            "The row-wise orthogonality and neighbor-coefficient separation terms are proposed responses to MORE's discussion of parameter overlap and intra-tail competition; their effectiveness must be judged empirically.",
+            "The row-wise same-class orthogonality and train-graph effective-residual-row separation terms are proposed responses to MORE's discussion of parameter overlap and intra-tail competition; their effectiveness must be judged empirically.",
         ],
     }
 
