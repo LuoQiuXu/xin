@@ -117,7 +117,7 @@ class TPRSemanticsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.model.diversity_loss(torch.tensor([[0, 98]], dtype=torch.long))
         with self.assertRaises(ValueError):
-            self.model.diversity_loss(torch.tensor([[0, 0]], dtype=torch.long).reshape(0, 2))
+            self.model.diversity_loss(torch.tensor([0, 1, 2], dtype=torch.long))
 
 
 if __name__ == "__main__":
