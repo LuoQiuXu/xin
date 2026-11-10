@@ -140,6 +140,9 @@ def prepared_snapshot() -> dict[str, str]:
         if not path.is_file():
             raise FileNotFoundError(f"Missing protected prepared array: {name}")
         result[name] = sha256_file(path)
+    manifest = read_json(ROOT / "prepared" / "prepared_manifest.json")
+    clean_checkpoint = resolve_checkpoint(manifest.get("checkpoint_path"))
+    result["clean_stage1_checkpoint"] = sha256_file(clean_checkpoint)
     return result
 
 
