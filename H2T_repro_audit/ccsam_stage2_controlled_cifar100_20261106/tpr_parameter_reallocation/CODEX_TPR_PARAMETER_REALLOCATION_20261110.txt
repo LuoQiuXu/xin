@@ -20,7 +20,7 @@ The method is CC-SAM-TPR:
        alpha_MORE(t) = A sin(pi*t/(T-1))
        A/C = 2.0, C=100, so A=200; T=5100 steps.
 6. Address MORE's two Further Discussions:
-   - intra-tail competition: class-specific B_c rows and a train-only top-2 clean-GAP neighbor graph with coefficient separation;
+   - intra-tail competition: class-specific B_c rows and a train-only top-2 clean-GAP neighbor graph with effective residual-row direction separation (Delta W = B @ A);
    - general/tail parameter overlap: soft row-wise orthogonality between W_g[c] and W_t[c] for each non-Many class.
 7. Final inference uses one merged classifier. This is not a multi-expert method.
 
@@ -132,7 +132,7 @@ If any required artifact is missing or any checksum/provenance gate fails, STOP.
 - Sampling plan and augmentation RNG: exactly the existing per-seed sealed plan and C1 continuous augmentation RNG.
 - MORE amplitude: A/C=2.0, hence A=200 for C=100. Fixed first-run setting; do not tune.
 - Row-wise orthogonality lambda: 0.1.
-- Tail-neighbor coefficient separation lambda: 0.1.
+- Tail-neighbor effective-residual-row diversity lambda: 0.1.
 - Tail-neighbor graph: symmetric top-2 cosine neighbors between non-Many clean-GAP TRAIN class centroids only.
 - Primary epoch: fixed epoch 30.
 - Official CIFAR-100 TEST: strictly prohibited.
@@ -170,7 +170,8 @@ Tests must verify:
 - MORE loss exactly matches the class-prior-weighted squared L2 formula;
 - gradients reach A/B but not the frozen C2 base;
 - sinusoidal schedule starts/ends at zero and peaks at the midpoint;
-- row-wise orthogonality and neighbor coefficient separation are differentiable;
+- row-wise orthogonality and neighbor effective-residual-row diversity are differentiable;
+- the neighbor-diversity loss is computed from normalized rows of B @ A, not normalized rows of B;
 - merged inference weights exactly reproduce the adapter forward pass;
 - invalid graph indices are rejected.
 
@@ -269,7 +270,7 @@ The experiment should answer whether the combination of:
 - a frozen C2 general classifier;
 - a masked low-rank tail residual;
 - MORE's class-prior-weighted L2 discrepancy and sinusoidal schedule;
-- train-only local tail coefficient separation;
+- train-only local effective-residual-row separation;
 - soft row-wise orthogonality;
 
 can retain a Few improvement while keeping Many near C2.
