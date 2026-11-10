@@ -46,9 +46,9 @@ This discourages residual energy from duplicating the dominant classifier direct
 
 ### Confusion-aware tail-row separation
 
-Construct a symmetric confusion graph using the frozen C2 classifier's predictions on the fixed TRAIN-derived validation holdout only (never official TEST). Include only pairs where both classes are tail-eligible (count <=100), and select the top 5 unordered off-diagonal confusion pairs by symmetric normalized confusion; deterministic tie-break by class IDs. For each selected pair (c,c'), penalize squared cosine similarity between their residual classifier rows `DeltaW[c]` and `DeltaW[c']`, with eps-safe normalization. Use `L_div` as the mean over selected pairs. If fewer than one eligible pair exists, record that fact and set L_div to differentiable zero; do not fabricate pairs.
+Construct a symmetric confusion graph using the frozen C2 classifier's predictions on all 10,847 prepared Stage-II TRAIN examples, using the clean unaugmented view and frozen Clean Stage-I GAP features (never validation or official TEST). Include only pairs where both classes are tail-eligible (count <=100), and select the top 5 unordered off-diagonal confusion pairs by symmetric normalized confusion; deterministic tie-break by class IDs. For each selected pair (c,c'), penalize squared cosine similarity between their residual classifier rows `DeltaW[c]` and `DeltaW[c']`, with eps-safe normalization. Use `L_div` as the mean over selected pairs. If fewer than one eligible pair exists, record that fact and set L_div to differentiable zero; do not fabricate pairs.
 
-This is an explicit hypothesis, not a claim that all semantically similar classes should be orthogonal. Save the exact pair list, confusion scores, validation split hash, and C2 teacher checkpoint hash before training. The validation holdout is TRAIN-derived development data and must not be used for hyperparameter search.
+This is an explicit hypothesis, not a claim that all semantically similar classes should be orthogonal. Save the exact pair list, confusion scores, TRAIN labels/image hash, Clean Stage-I checkpoint hash, and C2 teacher checkpoint hash before training. The validation holdout is TRAIN-derived development data and must not be used for hyperparameter search.
 
 Unified objective:
 
