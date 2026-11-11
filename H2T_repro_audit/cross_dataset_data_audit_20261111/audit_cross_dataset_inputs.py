@@ -21,7 +21,7 @@ from io import BytesIO
 from pathlib import Path, PurePosixPath
 from typing import Any, Dict, List, Optional, Tuple
 
-SCRIPT_VERSION = "1.0.0"
+SCRIPT_VERSION = "1.0.2"
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"}
 EXCLUDED_DIRS = {".git", ".cache", "__pycache__", ".ipynb_checkpoints"}
 
@@ -197,7 +197,7 @@ def decode_image_bytes(payload: bytes) -> Tuple[bool, Optional[str]]:
     try:
         from PIL import Image
         with Image.open(BytesIO(payload)) as im:
-            im.verify()
+            im.load()
         return True, None
     except Exception as exc:
         return False, "%s: %s" % (type(exc).__name__, str(exc)[:180])
@@ -367,7 +367,7 @@ def audit_imagenet_parquet(root: Path, official_train: Dict[str, Any],
                                 try:
                                     from PIL import Image
                                     with Image.open(candidate) as im:
-                                        im.verify()
+                                        im.load()
                                     sample["decoded"] += 1
                                 except Exception as exc:
                                     sample["failed"] += 1
@@ -381,6 +381,12 @@ def audit_imagenet_parquet(root: Path, official_train: Dict[str, Any],
                     split_result["image_decode_sample"]["failed"] += 1
                     split_result["image_decode_sample"]["failures"].append(
                         {"file": path.name, "error": "sample read failed: %s" % str(exc)[:180]})
+            sample = split_result["image_decode_sample"]
+            if sample["failed"] or sample["skipped"] or not sample["decoded"]:
+                result["issues"].append(
+                    "ImageNet-LT %s sample decode: %d decoded, %d failures, %d skipped."
+                    % (split, sample["decoded"], sample["failed"], sample["skipped"])
+                )
 
         result["splits"][split] = split_result
 
@@ -430,8 +436,6 @@ def audit_imagenet_parquet(root: Path, official_train: Dict[str, Any],
 
     result["split_row_total"] = sum(split_totals.values())
     result["status"] = "fail" if result["issues"] else "pass"
-    if any(s.get("image_decode_sample", {}).get("failed", 0) for s in result["splits"].values()):
-        result["status"] = "fail"
     return result
 
 
@@ -496,6 +500,20 @@ def resolve_image_path(rel: str, root: Path, inventory: Dict[str, Any]) -> Tuple
     if len(matches) > 1:
         return None, "ambiguous_basename"
     return None, "missing"
+
+
+def places_class_folders(entries: List[Tuple[str, int]]) -> Dict[int, str]:
+    folders = {}
+    for rel, label in entries:
+        parts = PurePosixPath(rel).parts
+        if len(parts) < 4 or parts[0] != "data_256":
+            raise ValueError(f"Unexpected official TRAIN path {rel!r}")
+        folder = "-".join(parts[2:-1])
+        if folders.setdefault(label, folder) != folder:
+            raise ValueError(f"Label {label} maps to multiple class folders")
+    if len(set(folders.values())) != len(folders):
+        raise ValueError("Multiple labels map to the same class folder")
+    return folders
 
 
 def audit_places(root: Path, repo_root: Path, sample_per_split: int = 64) -> Dict[str, Any]:
@@ -568,20 +586,55 @@ def audit_places(root: Path, repo_root: Path, sample_per_split: int = 64) -> Dic
         "extension_counts": inventory["extension_counts"],
     }
 
+    layout_roots = [candidate for candidate in (root, root / "places-lt")
+                    if (candidate / "train").is_dir() and (candidate / "val").is_dir()]
+    layout_root = layout_roots[0] if len(layout_roots) == 1 else None
+    class_folders = {}
+    if len(layout_roots) > 1:
+        result["issues"].append("Found multiple extracted Places-LT train/val roots.")
+    if layout_root is not None:
+        try:
+            class_folders = places_class_folders(train["entries"])
+        except ValueError as exc:
+            result["issues"].append("Invalid Places-LT class folder mapping: %s" % exc)
+        result["extracted_layout"] = {
+            "relative_root": layout_root.relative_to(root).as_posix(),
+            "manifest_to_extracted_split": {"train": "train", "test": "val"},
+            "class_folders_mapped": len(class_folders),
+            "method": "Exact class folder and filename using the official label. Nested class components are joined with '-'.",
+        }
+
+    resolved_sets = {}
     for split_name, data in (("train", train), ("test", test)):
         resolved = 0
         exact = 0
         fallback = 0
+        layout_mapped = 0
         missing_examples = []
         ambiguous_examples = []
         resolved_paths: List[Path] = []
-        for rel, _label in data["entries"]:
-            path, mode = resolve_image_path(rel, root, inventory)
+        for rel, label in data["entries"]:
+            if layout_root is None:
+                path, mode = resolve_image_path(rel, root, inventory)
+            else:
+                folder = class_folders.get(label)
+                path, mode = None, "missing"
+                parts = PurePosixPath(rel).parts
+                valid_path = (len(parts) >= 4 and parts[0] == "data_256" if split_name == "train"
+                              else len(parts) == 2 and parts[0] == "val_256")
+                if folder and valid_path:
+                    split_folder = "train" if split_name == "train" else "val"
+                    expected_path = layout_root / split_folder / folder / parts[-1]
+                    path = inventory["exact"].get(normalize_relpath(expected_path.relative_to(root).as_posix()))
+                    if path is not None:
+                        mode = "class_folder"
             if path is not None:
                 resolved += 1
                 resolved_paths.append(path)
                 if mode in ("exact", "direct"):
                     exact += 1
+                elif mode == "class_folder":
+                    layout_mapped += 1
                 else:
                     fallback += 1
             elif mode.startswith("ambiguous"):
@@ -591,8 +644,10 @@ def audit_places(root: Path, repo_root: Path, sample_per_split: int = 64) -> Dic
                 missing_examples.append(rel)
 
         split_result = result["splits"][split_name]
+        resolved_sets[split_name] = set(resolved_paths)
         split_result["image_paths_resolved"] = resolved
         split_result["image_paths_exact_or_direct"] = exact
+        split_result["image_paths_layout_mapped"] = layout_mapped
         split_result["image_paths_fallback"] = fallback
         split_result["image_paths_missing_or_ambiguous"] = data["rows"] - resolved
         split_result["missing_examples"] = missing_examples
@@ -600,6 +655,8 @@ def audit_places(root: Path, repo_root: Path, sample_per_split: int = 64) -> Dic
         if resolved != data["rows"]:
             result["issues"].append("Places-LT %s: only %d/%d annotation paths resolve to local image files." %
                                     (split_name, resolved, data["rows"]))
+        if len(resolved_sets[split_name]) != resolved:
+            result["issues"].append("Places-LT %s resolves multiple annotation rows to the same file." % split_name)
 
         sample = {"attempted": 0, "decoded": 0, "failed": 0, "failures": []}
         if resolved_paths:
@@ -614,7 +671,7 @@ def audit_places(root: Path, repo_root: Path, sample_per_split: int = 64) -> Dic
                 try:
                     from PIL import Image
                     with Image.open(path) as im:
-                        im.verify()
+                        im.load()
                     sample["decoded"] += 1
                 except Exception as exc:
                     sample["failed"] += 1
@@ -624,6 +681,13 @@ def audit_places(root: Path, repo_root: Path, sample_per_split: int = 64) -> Dic
         if sample["failed"]:
             result["issues"].append("Places-LT %s sample contains %d undecodable image(s)." % (split_name, sample["failed"]))
 
+    resolved_overlap = len(resolved_sets["train"] & resolved_sets["test"])
+    result["train_test_resolved_path_overlap"] = resolved_overlap
+    if resolved_overlap:
+        result["issues"].append("Places-LT train/test annotations resolve to %d shared local files." % resolved_overlap)
+    result["image_inventory"]["unreferenced_images"] = len(
+        set(inventory["exact"].values()) - resolved_sets["train"] - resolved_sets["test"]
+    )
     result["status"] = "fail" if result["issues"] else "pass"
     return result
 
@@ -725,7 +789,11 @@ def markdown_report(report: Dict[str, Any]) -> str:
         "- Image inventory: %s" % json.dumps(places.get("image_inventory", {}), ensure_ascii=False),
         "- Archive: %s" % json.dumps(places.get("archive", {}), ensure_ascii=False),
         "- Manifest files: %s" % json.dumps(places.get("manifest_files", {}), ensure_ascii=False),
+        "- Train/test annotation path overlap: %s" % places.get("train_test_manifest_path_overlap"),
+        "- Train/test resolved path overlap: %s" % places.get("train_test_resolved_path_overlap"),
     ])
+    if places.get("extracted_layout"):
+        lines.append("- Extracted layout: %s" % json.dumps(places["extracted_layout"], ensure_ascii=False))
     for split in ("train", "test"):
         s = places.get("splits", {}).get(split, {})
         if s:
@@ -735,8 +803,8 @@ def markdown_report(report: Dict[str, Any]) -> str:
                 "- Unique classes: %s" % s.get("unique_classes"),
                 "- Class summary: %s" % json.dumps(s.get("class_summary", {}), ensure_ascii=False),
                 "- Resolved local image paths: %s/%s" % (s.get("image_paths_resolved"), s.get("manifest_rows")),
-                "- Exact/direct matches: %s; fallback matches: %s" %
-                (s.get("image_paths_exact_or_direct"), s.get("image_paths_fallback")),
+                "- Exact/direct matches %s, class-folder matches %s, fallback matches %s" %
+                (s.get("image_paths_exact_or_direct"), s.get("image_paths_layout_mapped"), s.get("image_paths_fallback")),
                 "- Sample image decode: %s" % json.dumps(s.get("image_decode_sample", {}), ensure_ascii=False),
             ])
             if s.get("missing_examples"):
