@@ -1,0 +1,113 @@
+CODEX TASK: READ-ONLY DATA AUDIT FOR IMAGENET-LT AND PLACES-LT
+Date: 2026-11-11
+Repository: LuoQiuXu/xin
+Branch: experiment/cross-dataset-data-audit-20261111
+
+GOAL
+Run the new local data-audit script against the user's already-downloaded datasets, verify the official split/class-count protocol, and return the reports for scientific review.
+
+LOCAL DATA PATHS
+- ImageNet-LT Hugging Face Parquet directory: D:\datasets\ImageNet-LT
+- Places-LT extracted image directory: D:\datasets\places-lt
+- Places-LT archive (must remain untouched): D:\datasets\places-lt.tar.gz
+- Active conda environment: 小菊
+- The user has already installed huggingface_hub in this environment. Do not download the dataset again.
+
+FILES ADDED IN THIS BRANCH
+- H2T_repro_audit/cross_dataset_data_audit_20261111/audit_cross_dataset_inputs.py
+- H2T_repro_audit/cross_dataset_data_audit_20261111/test_audit_cross_dataset_inputs.py
+- H2T_repro_audit/cross_dataset_data_audit_20261111/README.md
+
+STRICT SCOPE / NON-NEGOTIABLE RULES
+1. This is a data audit only. Do NOT start model training, smoke training, feature extraction, evaluation, benchmark, or CUDA workload.
+2. Do NOT modify CC-SAM, C0/C1/C2/C3/C4, TPR, H2T, PI-H2T, model, loss, optimizer, sampler, augmentation, or training code.
+3. Do NOT download, redownload, extract, recompress, move, rename, delete, or rewrite either dataset.
+4. Do NOT alter the official TXT manifests.
+5. Do NOT use Hugging Face Hub/network for this task. All required files are expected to be local.
+6. Do NOT upload image data, Parquet files, archives, checkpoints, or caches to GitHub. Only small text/CSV/JSON audit reports may be committed.
+7. Keep all work on branch experiment/cross-dataset-data-audit-20261111. Do not change main or another experiment branch.
+8. If a dependency or data-layout issue blocks a check, report it. Do not invent a repair or silently reinterpret a split.
+
+STEP 1 — REPOSITORY SAFETY
+- Confirm current directory is the repository root and current branch is exactly experiment/cross-dataset-data-audit-20261111.
+- Run git status --short and preserve any pre-existing user changes. Do not reset, clean, stash, or overwrite unrelated files.
+- Read the README in the audit directory before running.
+- Confirm the four official reference manifests exist in H2T/datasets/data_txt:
+  ImageNet_LT_train.txt, ImageNet_LT_test.txt, Places_LT_train.txt, Places_LT_test.txt.
+
+STEP 2 — ENVIRONMENT
+In PowerShell:
+  conda activate 小菊
+  python --version
+  python -c "import pyarrow, PIL; print('pyarrow', pyarrow.__version__); print('Pillow OK')"
+
+If and only if the import check fails because pyarrow or Pillow is missing, install the missing dependency in this active environment:
+  python -m pip install pyarrow pillow
+
+Do not install datasets, torch, CUDA packages, or other unrelated packages.
+
+STEP 3 — UNIT TESTS
+Run:
+  python -m unittest discover -s .\H2T_repro_audit\cross_dataset_data_audit_20261111 -p "test_*.py" -v
+
+If a test fails, inspect and fix only the audit script/tests on this branch. Rerun all tests. Do not touch training code.
+
+STEP 4 — RUN THE DATA AUDIT
+Run this as one PowerShell command:
+  python .\H2T_repro_audit\cross_dataset_data_audit_20261111\audit_cross_dataset_inputs.py --imagenet-root "D:\datasets\ImageNet-LT" --places-root "D:\datasets\places-lt" --repo-root "." --output-dir ".\H2T_repro_audit\cross_dataset_data_audit_20261111\results"
+
+The script is read-only with respect to the datasets. It streams ImageNet-LT label columns across all Parquet rows, checks Parquet metadata/shard counts, and decodes a small deterministic image sample. It checks every Places-LT official annotation path against the extracted local image files and decodes a deterministic sample from each split.
+
+STEP 5 — EXPECTED REFERENCE PROTOCOL
+Use these expected values from the repository's checked-in official TXT manifests:
+
+ImageNet-LT:
+- train: 115,846 rows, 1,000 classes, class counts 5 to 1,280
+- test: 50,000 rows, 1,000 classes, exactly 50 images/class
+- user's Hugging Face download plan: 25 train shards, 5 validation shards, 15 test shards
+- record validation separately. Do not call validation "test".
+- compare Parquet train/test class distributions with official TXT reference counts whenever labels can be mapped.
+
+Places-LT:
+- train: 62,500 rows, 365 classes, class counts 5 to 4,980
+- test: 36,500 rows, 365 classes, exactly 100 images/class
+- check that all official TXT paths resolve to actual local files below D:\datasets\places-lt
+- train/test annotation path overlap must be zero.
+
+IMPORTANT: These are reference expectations, not permission to alter labels or files. If observed values differ, report the exact mismatch and examples.
+
+STEP 6 — OUTPUT REVIEW
+Inspect all generated files:
+- results/audit_report.md
+- results/audit_report.json
+- results/imagenet_lt_class_counts.csv
+- results/places_lt_class_counts.csv
+- results/ARTIFACT_SHA256.csv
+
+Verify:
+- no model or training process was launched;
+- no source data changed;
+- no large dataset or cache files became staged;
+- every warning/failure is represented in the report;
+- all paths and counts are grounded in actual local files.
+
+If the script fails, preserve the traceback in results/audit_run.log, fix only the audit code if the problem is a genuine code defect, rerun tests and the audit, and document any unresolved environmental/data issue. Never convert a data problem into a PASS by weakening checks.
+
+STEP 7 — COMMIT AND PUSH SMALL REPORTS
+- Stage only the audit directory's source files and small results files.
+- Never stage D:\datasets content, Parquet files, image files, tar.gz, Python environments, caches, or unrelated user files.
+- Commit on this branch with a descriptive message such as:
+  Record ImageNet-LT and Places-LT data audit
+- Push this branch to origin.
+- Do not merge the branch.
+
+FINAL RESPONSE TO USER
+Report:
+1. branch name and commit SHA;
+2. unit-test result;
+3. ImageNet-LT train/validation/test row and shard counts, class count range, label-distribution match, and image sample decode result;
+4. Places-LT manifest counts, resolved/missing image paths, class distribution, and sample decode result;
+5. any blocking issue or caveat;
+6. exact GitHub paths to the generated report files.
+
+Do not recommend formal training yet. Wait for the user/researcher to review the audit report first.
