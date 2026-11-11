@@ -378,6 +378,7 @@ def audit_imagenet_parquet(root: Path, official_train: Dict[str, Any],
                         else:
                             sample["skipped"] += 1
                 except Exception as exc:
+                    split_result["image_decode_sample"]["failed"] += 1
                     split_result["image_decode_sample"]["failures"].append(
                         {"file": path.name, "error": "sample read failed: %s" % str(exc)[:180]})
 
