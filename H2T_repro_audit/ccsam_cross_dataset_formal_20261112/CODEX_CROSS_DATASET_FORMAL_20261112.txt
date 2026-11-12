@@ -1,0 +1,291 @@
+CODEX TASK — IMPLEMENT AND RUN THE FORMAL CC-SAM CROSS-DATASET EXPERIMENT
+Date: 2026-11-12
+Repository: LuoQiuXu/xin
+Required branch: experiment/ccsam-cross-dataset-formal-20261112
+Base branch: experiment/cross-dataset-data-audit-20261111
+Experiment directory: H2T_repro_audit/ccsam_cross_dataset_formal_20261112/
+
+============================================================
+0. HARD EXECUTION RULES
+============================================================
+
+1. Start by confirming the repository root and current Git branch. You MUST be on:
+   experiment/ccsam-cross-dataset-formal-20261112
+   If not, stop and report. Do not switch branches silently.
+2. Do not modify main, the data-audit branch, H2T source files, the original CC-SAM CIFAR experiment, C3, or C4 historical result artifacts.
+3. All new source, configs, logs, checkpoints, feature caches, and reports must remain under:
+   H2T_repro_audit/ccsam_cross_dataset_formal_20261112/
+4. Do not download, redownload, extract, rename, move, or rewrite either dataset.
+5. Do not use web downloads or pretrained model weights. Stage-I ResNet-50 must use weights=None.
+6. Do not open or instantiate either official test split until the separate final-evaluation phase after all formal training has completed.
+7. Do not use Places-LT's extracted val folder as validation. It is the official test split.
+8. Do not use ImageNet-LT test Parquet shards during preparation, Stage I, feature extraction, Stage II, or Smoke.
+9. Do not silently change any frozen hyperparameter, image resolution, architecture, seed, epoch count, class threshold, or objective.
+10. Never overwrite or auto-resume a partial/completed run. Preserve partial artifacts and stop on failure.
+11. Do not add C3, TPR, new gates, new modules, experts, multimodal components, or extra ablations.
+12. The user wants a real cross-dataset experiment, not another open-ended mechanism audit. Implement, test, then execute the frozen experiment. Do not spend time adding speculative diagnostics.
+
+============================================================
+1. AUTHORITATIVE CONTEXT AND EXISTING CODE
+============================================================
+
+Read these files first:
+- H2T_repro_audit/ccsam_cross_dataset_formal_20261112/PROTOCOL.md
+- H2T_repro_audit/ccsam_cross_dataset_formal_20261112/experiment_protocol.json
+- H2T_repro_audit/ccsam_cross_dataset_formal_20261112/cross_dataset_core.py
+- H2T_repro_audit/ccsam_cross_dataset_formal_20261112/test_cross_dataset_core.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ab_head_preservation/AB_PROTOCOL.md
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ab_head_preservation/train_ab.py
+- H2T_repro_audit/cross_dataset_data_audit_20261111/results/audit_report.md
+- H2T/datasets/data_txt/ImageNet_LT_train.txt
+- H2T/datasets/data_txt/ImageNet_LT_test.txt
+- H2T/datasets/data_txt/Places_LT_train.txt
+- H2T/datasets/data_txt/Places_LT_test.txt
+
+The accepted data-audit branch is the parent of this branch. The audited report passed:
+- ImageNet-LT: train 115,846; validation 20,000; test 50,000; 1,000 classes.
+- Places-LT: train 62,500; test 36,500; 365 classes.
+- Places-LT has 7,300 extra unreferenced images; exclude them.
+- Places-LT val directory maps to the official test manifest, not validation.
+
+The frozen arm definitions are:
+- D0 = C2_WEIGHTED_CE_NO_PERTURB.
+- D1 = C1_CCSAM_FEATURE_GRAD.
+- D2 = C4_CCSAM_HEAD_PRESERVE.
+D2's teacher is the completed D0 classifier from the same dataset and same seed. Never use a CIFAR teacher or cross-seed teacher.
+
+============================================================
+2. FROZEN TRAINING PROTOCOL
+============================================================
+
+Use the protocol file as the source of truth. Key settings:
+
+Datasets:
+- ImageNet-LT, 1,000 classes.
+- Places-LT, 365 classes.
+
+Seeds:
+- 123, 124, 125.
+- Each dataset/seed pair gets its own independently trained Stage-I backbone.
+- D0/D1/D2 for that dataset/seed share the exact same Stage-I checkpoint, feature cache, initial classifier, class counts, and sampling plan.
+
+Stage I, six independent runs:
+- torchvision ResNet-50, weights=None, random initialization.
+- 2,048-D pooled feature; linear classifier.
+- 224 x 224.
+- 90 fixed epochs.
+- Batch size 16.
+- SGD LR 0.01, momentum 0.9, weight decay 0.0002, Nesterov false.
+- Five-epoch linear warm-up then cosine decay to zero.
+- Instance sampling, CE + MixUp alpha 1.0.
+- CUDA AMP; no gradient accumulation.
+- Final epoch 90 only; no best-validation selection and no early stopping.
+- Same architecture and initialization policy on both datasets. This is a controlled transfer setup, not a claim to reproduce official H2T ImageNet/Places training recipes.
+
+Stage-II, eighteen runs:
+- Freeze Stage-I backbone and all BN buffers.
+- Extract deterministic center-crop 2,048-D float32 train features once per dataset/seed.
+- Train only a linear classifier for 30 epochs.
+- Batch size 64, SGD LR 0.01, momentum 0.9, weight decay 0.0002, FP32.
+- No MixUp, no image augmentation, no gradient accumulation.
+- Use the pinned official CC-SAM sampler at:
+  H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/official_reference/Samplers.py
+  Expected SHA256:
+  c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174
+- One stored sampling plan per dataset/seed; exactly N_train indices per epoch; same plan across D0/D1/D2.
+- Class weights: log(max_count / count_c + 0.01) / 2.0.
+- alpha(epoch) = min((epoch + 1) / 30, 0.3).
+- D0: alpha * mean(weighted clean CE) + (1-alpha) * mean(clean CE); delta exactly zero.
+- D1: same as C1, with full class-conditional feature-gradient delta and weighted adversarial CE.
+- D2: full D1 objective + Many-only KL from matching D0 teacher; T=2, lambda=1; Many means TRAIN count strictly >100; KL outputs cover all classes; teacher/student logits use clean features; teacher frozen.
+- D2 student starts from Stage-I classifier, not D0 final weights.
+
+Evaluation:
+- Fixed Stage-I epoch 90 and Stage-II epoch 30.
+- Do not select best epoch.
+- Only after all 18 Stage-II runs finish, evaluate official test splits once.
+- Metrics: Overall, Many, Medium, Few macro accuracy, per-class accuracy, optional Top-5.
+- Many >100; Medium 20..100 inclusive; Few <20, based on official TRAIN counts.
+- Report mean and sample SD across three independent end-to-end seeds.
+- Paired deltas: D1-D0, D2-D0, D2-D1.
+- No significance claims with three seeds.
+
+Resource:
+- RTX 5070 Laptop, 8 GB VRAM.
+- Stage I batch16 + AMP.
+- Stage II cached feature batch64 + FP32.
+- Default workers4, configurable to 0 for Windows debugging.
+- If OOM, stop and report. Do not silently lower resolution, batch size, epochs, or change backbone.
+
+============================================================
+3. IMPLEMENT THE REMAINING PIPELINE
+============================================================
+
+Implement only under the experiment directory. Keep modules separated and readable:
+
+A. cross_dataset_data.py
+- ImageNet-LT Parquet Dataset:
+  * Discover train/validation/test shards recursively using the audit's split naming logic.
+  * For training, pass ONLY train shard paths to the Dataset.
+  * Use PyArrow row-group metadata and process-local row-group caching for random-access map-style loading; do not read all image payloads into RAM.
+  * Resolve labels exactly as the audit does, including integer labels and nested label dicts.
+  * Resolve image payload as bytes or path using the audit's image_payload_to_bytes_or_path semantics.
+  * Decode bytes with PIL from BytesIO and convert RGB.
+  * Preserve manifest row order and original class IDs.
+  * Validate row counts, class counts, unique labels, and expected shards.
+- Places-LT Dataset:
+  * Parse only the official train TXT for training.
+  * Derive one unique folder per original class ID from official train paths. Use the audited join-with-hyphen mapping of nested class-folder components.
+  * Train path = root/train/<mapped-class-folder>/<filename>.
+  * Test path mapping is implemented only in the final evaluator: root/val/<mapped-class-folder>/<filename>, driven by official Places_LT_test.txt.
+  * Do not scan the directory to build training samples; do not include unreferenced images.
+  * Verify all 62,500 train paths resolve uniquely and labels are in [0,364].
+- All labels must be original official 0-based IDs. Do not frequency-sort/remap.
+
+B. cross_dataset_models.py
+- torchvision ResNet-50 weights=None.
+- Split encoder and a linear classifier (2048 -> class_count).
+- Encoder forward returns a 2048-D pooled vector.
+- Stage-I checkpoint must contain dataset, seed, class count, architecture, epoch, encoder state, classifier state, config, and hashes.
+- Stage-II must load the exact Stage-I checkpoint and freeze every encoder parameter and BN buffer.
+
+C. prepare_experiment.py
+- Read experiment_protocol.json.
+- Validate local roots and train split only.
+- Compute class counts from official train labels and compare to the accepted audit report.
+- Create a deterministic data-manifest fingerprint from sorted train shard SHA256s (ImageNet) or train manifest SHA256 plus resolved path inventory (Places).
+- Generate and save the 30-epoch official CC-SAM sampler plan per dataset/seed using the exact pinned sampler source. Check its SHA before import.
+- Preserve Python RNG state around plan generation; seed the sampler exactly once per run so cycles continue across epoch boundaries.
+- Save plans as int32 arrays and include plan SHA, class counts, and per-epoch class counts.
+- Never read test images or test Parquet. Do not instantiate test datasets.
+- ImageNet validation may be loaded only for end-of-run diagnostics; no checkpoint selection.
+- Do not build a Places validation loader.
+
+D. train_stage1.py
+- Train all six Stage-I models as specified.
+- Use deterministic seeds; instance shuffle; MixUp alpha1; CE.
+- Use autocast + GradScaler only for CUDA.
+- Save epoch metrics and the fixed epoch-90 checkpoint.
+- Do not select best validation checkpoint.
+- The Places training loop must never open the val directory or Places test manifest.
+- ImageNet training loop must never discover or open test Parquet shards.
+- Do not use pretrained weights.
+
+E. extract_features.py
+- Load the exact epoch-90 Stage-I checkpoint.
+- Encoder eval mode; no gradients; deterministic Resize256 + CenterCrop224 transform.
+- Extract all official train rows in original order into float32 memmap .npy files.
+- Save labels in original order and verify exact match with the training manifest.
+- Save feature shape [N_train,2048], label shape [N_train], finite values, checkpoint SHA, transform config, and feature-cache SHA.
+- Same cache reused by D0/D1/D2.
+
+F. train_stage2.py
+- Train D0, D1, D2 sequentially per dataset/seed.
+- Load the same Stage-I classifier state for every arm; verify SHA before training.
+- Load the same saved sampling plan; verify SHA and exact plan equality across arms.
+- Read cached feature batches by planned indices.
+- Use the provided cross_dataset_core.py for D0/D1/D2 losses; do not duplicate or change its equations.
+- Use FP32 only.
+- Save metrics per epoch, sampling trace/hash, final classifier, status JSON, checkpoint SHA, and full config.
+- D0 must finish and be verified before D2 starts. D2 teacher is same dataset/seed D0 final epoch-30 checkpoint.
+- D0/D1/D2 output directories must be exclusive and never overwritten.
+- Check teacher frozen/no gradients and encoder/BN frozen bitwise unchanged.
+- No best epoch, no early stopping, no auto-resume.
+
+G. evaluate_final.py
+- Separate final-only command.
+- Refuse to run unless all 18 Stage-II status files certify completed final epoch 30 and all checksums pass.
+- Then and only then instantiate official test datasets.
+- ImageNet-LT: load only the 15 official test Parquet shards; expect 50,000 rows, 1,000 classes, 50/class.
+- Places-LT: use only official Places_LT_test.txt; resolve to root/val via the class-folder map; expect 36,500 rows, 365 classes, 100/class.
+- No validation selection or hyperparameter changes after test evaluation.
+- Write per-seed/per-arm predictions and metrics; hash every output.
+
+H. analyze_results.py
+- Produce per-seed tables, mean +/- sample SD, per-class CSV, and paired deltas.
+- Write separate ImageNet-LT and Places-LT summaries plus a cross-dataset summary.
+- Report Many/Medium/Few macro accuracies based on TRAIN counts.
+- No significance claims.
+
+I. run_cross_dataset.py
+- Commands: preflight, smoke, stage1, extract, stage2, evaluate-final, analyze, run-formal.
+- run-formal should execute preflight -> Smoke -> six Stage-I -> six feature caches -> eighteen Stage-II -> final test evaluation -> analysis.
+- Smoke must finish before any formal training. If Smoke fails, stop; do not launch formal jobs.
+- Run sequentially to respect 8 GB VRAM. Do not launch parallel training processes.
+
+============================================================
+4. REQUIRED SMOKE AND TESTS
+============================================================
+
+Before formal training:
+1. Run the CPU tests:
+   python -m unittest discover -s H2T_repro_audit\ccsam_cross_dataset_formal_20261112 -p "test_*.py" -v
+2. Run preflight for both datasets:
+   python H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py preflight --all
+3. Run the real-data Smoke:
+   python H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py smoke --all
+
+Smoke must include:
+- ImageNet-LT train Parquet decode and 2-batch forward/backward using the actual train split.
+- Places-LT train manifest path resolution and 2-batch forward/backward using only official train paths.
+- Stage-I ResNet50 output shape 2048 and classifier output class count 1000/365.
+- Feature cache write/read on a small disposable subset.
+- C1 vectorized feature-gradient equivalence against direct autograd on actual feature batches: rtol=1e-5, atol=1e-7.
+- D0/D1/D2 one disposable classifier update on the same features, labels, initialization, and plan indices.
+- D2 matching D0 teacher SHA, teacher eval/frozen/no-grad, Many-only mask >100, KL full output support.
+- Frozen encoder and BN buffers unchanged.
+- No test data access or test loader construction during Smoke.
+- All losses, gradients, and features finite.
+- No formal checkpoint/output directory may be created by Smoke.
+
+If CPU tests, preflight, or Smoke fail, stop and report the exact error. Fix code defects only; do not change the frozen protocol.
+
+After Smoke passes, continue the requested formal experiment sequentially. Do not stop for another design review. Execute the six Stage-I runs, feature extraction, all eighteen Stage-II runs, final test evaluation, and analysis. If any formal run fails, preserve its partial output and stop; do not silently restart it.
+
+============================================================
+5. EXPECTED COMMANDS AND ENVIRONMENT
+============================================================
+
+Windows PowerShell, repository root:
+  conda activate 小菊
+
+Run:
+  python -m unittest discover -s .\H2T_repro_audit\ccsam_cross_dataset_formal_20261112 -p "test_*.py" -v
+  python .\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py preflight --all
+  python .\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py smoke --all
+  python .\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py run-formal --all
+
+If the implementation exposes explicit per-stage commands, they must be documented and produce the same frozen sequence. The full run must be sequential, never parallel.
+
+============================================================
+6. FINAL DELIVERABLES
+============================================================
+
+At completion, write:
+- IMPLEMENTATION_REPORT.md
+- FORMAL_EXECUTION_REPORT.md
+- final_evaluation/ImageNet_LT_metrics.csv
+- final_evaluation/Places_LT_metrics.csv
+- analysis/imagenet_lt_per_seed.csv
+- analysis/places_lt_per_seed.csv
+- analysis/paired_deltas.csv
+- analysis/per_class_accuracy.csv
+- analysis/cross_dataset_summary.json
+- analysis/CROSS_DATASET_RESULTS.md
+- ARTIFACT_SHA256.csv
+- formal_completed.json
+
+FORMAL_EXECUTION_REPORT.md must include:
+- exact Git commit and branch
+- Python/PyTorch/torchvision/PyArrow/CUDA versions
+- GPU name and peak VRAM
+- all six Stage-I run statuses and checkpoint hashes
+- all eighteen Stage-II run statuses and checkpoint hashes
+- all test-split row counts and access timing
+- Smoke/test results
+- exact fixed-epoch metrics and paired deltas
+- every failure or deviation (do not hide them)
+
+At the end, print the exact paths of the reports and the Git commit SHA. Do not claim success if any seed, arm, checksum, or test count is missing.
