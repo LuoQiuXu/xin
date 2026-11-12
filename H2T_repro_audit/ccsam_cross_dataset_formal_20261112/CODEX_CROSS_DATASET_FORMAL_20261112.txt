@@ -131,7 +131,7 @@ A. cross_dataset_data.py (initial implementation is already committed)
   * Discover train/validation/test shards recursively using the audit's split naming logic.
   * For training, pass ONLY train shard paths to the Dataset.
   * Use PyArrow row-group metadata and process-local row-group caching for random-access map-style loading; do not read all image payloads into RAM.
-  * Resolve labels exactly as the audit does, including integer labels and nested label dicts.
+  * Resolve labels exactly as the audit does, including integer labels and nested label dicts. If the Parquet label values are WNIDs or strings, build the WNID-to-original-ID map from the checked-in official ImageNet_LT_train.txt manifest and pass it to the resolver; never infer or frequency-sort labels.
   * Resolve image payload as bytes or path using the audit's image_payload_to_bytes_or_path semantics.
   * Decode bytes with PIL from BytesIO and convert RGB.
   * Preserve manifest row order and original class IDs.
