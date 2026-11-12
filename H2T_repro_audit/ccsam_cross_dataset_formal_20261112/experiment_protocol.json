@@ -1,0 +1,122 @@
+{
+  "experiment": "CC-SAM controlled cross-dataset transfer: ImageNet-LT and Places-LT",
+  "version": "1.0.0",
+  "base_branch": "experiment/cross-dataset-data-audit-20261111",
+  "implementation_branch": "experiment/ccsam-cross-dataset-formal-20261112",
+  "datasets": {
+    "imagenet_lt": {
+      "root": "D:\\datasets\\ImageNet-LT",
+      "train_images": 115846,
+      "validation_images": 20000,
+      "test_images": 50000,
+      "num_classes": 1000,
+      "train_shards": 25,
+      "validation_shards": 5,
+      "test_shards": 15,
+      "many_classes": 385,
+      "medium_classes": 479,
+      "few_classes": 136,
+      "train_split": "train",
+      "diagnostic_split": "validation",
+      "test_split": "test",
+      "test_sealed_until_final_evaluation": true
+    },
+    "places_lt": {
+      "root": "D:\\datasets\\places-lt",
+      "train_manifest": "H2T\\datasets\\data_txt\\Places_LT_train.txt",
+      "test_manifest": "H2T\\datasets\\data_txt\\Places_LT_test.txt",
+      "train_images": 62500,
+      "test_images": 36500,
+      "num_classes": 365,
+      "many_classes": 131,
+      "medium_classes": 163,
+      "few_classes": 71,
+      "train_split_folder": "train",
+      "test_split_folder": "val",
+      "unreferenced_images_excluded": 7300,
+      "test_is_not_validation": true,
+      "test_sealed_until_final_evaluation": true
+    }
+  },
+  "seeds": [123, 124, 125],
+  "arms": {
+    "D0": "C2_WEIGHTED_CE_NO_PERTURB",
+    "D1": "C1_CCSAM_FEATURE_GRAD",
+    "D2": "C4_CCSAM_HEAD_PRESERVE"
+  },
+  "stage1": {
+    "architecture": "torchvision_resnet50",
+    "pretrained": false,
+    "initialization": "random",
+    "feature_dim": 2048,
+    "input_size": 224,
+    "epochs": 90,
+    "batch_size": 16,
+    "optimizer": "SGD",
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0002,
+    "nesterov": false,
+    "schedule": "5_epoch_linear_warmup_then_cosine_to_zero",
+    "mixup": true,
+    "mixup_alpha": 1.0,
+    "loss": "cross_entropy",
+    "sampling": "instance_shuffle",
+    "amp": true,
+    "gradient_accumulation": false,
+    "checkpoint": "fixed_epoch_90",
+    "validation_model_selection": false
+  },
+  "stage2": {
+    "epochs": 30,
+    "batch_size": 64,
+    "optimizer": "SGD",
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0002,
+    "nesterov": false,
+    "precision": "FP32",
+    "mixup": false,
+    "gradient_accumulation": false,
+    "feature_dim": 2048,
+    "feature_extraction": "Resize256_CenterCrop224_ImageNetNormalize",
+    "backbone": "frozen_eval_all_bn_buffers_frozen",
+    "sampling": "pinned_official_ccsam_class_aware_sampler",
+    "samples_per_epoch": "exactly_N_train",
+    "shared_plan_across_arms": true,
+    "class_weight": "log(max_count/count_c + 0.01)/2.0",
+    "alpha_schedule": "min((epoch_index + 1)/30, 0.3)",
+    "adver_reg": 1.0,
+    "head_preservation": {
+      "temperature": 2.0,
+      "lambda": 1.0,
+      "many_threshold": "train_count_strictly_greater_than_100",
+      "teacher": "same_dataset_same_seed_D0_final_epoch_30",
+      "student_initialization": "same_stage1_classifier_as_D0_and_D1",
+      "teacher_logits": "clean_features",
+      "student_logits": "clean_features",
+      "kl_output_support": "all_classes"
+    }
+  },
+  "evaluation": {
+    "primary_stage1_epoch": 90,
+    "primary_stage2_epoch": 30,
+    "test_access": "separate_final_evaluation_only",
+    "metrics": ["Overall", "Many", "Medium", "Few", "per_class_accuracy", "optional_Top5"],
+    "aggregation": "mean_and_sample_std_over_three_end_to_end_seeds",
+    "paired_deltas": ["D1_minus_D0", "D2_minus_D0", "D2_minus_D1"],
+    "statistical_significance_claims": false
+  },
+  "official_sampler": {
+    "path": "H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/official_reference/Samplers.py",
+    "sha256": "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174"
+  },
+  "resource_target": {
+    "gpu": "RTX 5070 Laptop",
+    "vram_gb": 8,
+    "stage1_amp": true,
+    "stage1_batch_size": 16,
+    "stage2_batch_size": 64,
+    "num_workers_default": 4
+  }
+}
