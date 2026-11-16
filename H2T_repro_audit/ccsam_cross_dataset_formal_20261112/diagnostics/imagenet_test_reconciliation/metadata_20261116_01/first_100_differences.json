@@ -1,0 +1,2702 @@
+[
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00029930.JPEG",
+      "filename": "ILSVRC2012_val_00029930.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00029930.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 0
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00029930_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00029930_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00029930.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 79
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00017700.JPEG",
+      "filename": "ILSVRC2012_val_00017700.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00017700.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 1
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00017700_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00017700_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00017700.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 66
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00048969.JPEG",
+      "filename": "ILSVRC2012_val_00048969.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00048969.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 2
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00048969_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00048969_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00048969.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 2
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00037834.JPEG",
+      "filename": "ILSVRC2012_val_00037834.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00037834.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 3
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00037834_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00037834_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00037834.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 65
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00012503.JPEG",
+      "filename": "ILSVRC2012_val_00012503.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00012503.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 4
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00012503_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00012503_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00012503.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 1
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00025527.JPEG",
+      "filename": "ILSVRC2012_val_00025527.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00025527.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 5
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00025527_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00025527_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00025527.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 75
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00021740.JPEG",
+      "filename": "ILSVRC2012_val_00021740.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00021740.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 6
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00021740_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00021740_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00021740.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 4
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00048204.JPEG",
+      "filename": "ILSVRC2012_val_00048204.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00048204.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 7
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00048204_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00048204_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00048204.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 9
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00040833.JPEG",
+      "filename": "ILSVRC2012_val_00040833.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00040833.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 8
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00040833_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00040833_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00040833.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 6
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00007197.JPEG",
+      "filename": "ILSVRC2012_val_00007197.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00007197.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 9
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00007197_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00007197_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00007197.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 70
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00028158.JPEG",
+      "filename": "ILSVRC2012_val_00028158.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00028158.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 10
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00028158_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00028158_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00028158.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 8
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00010306.JPEG",
+      "filename": "ILSVRC2012_val_00010306.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00010306.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 11
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00010306_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00010306_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00010306.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 76
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00009346.JPEG",
+      "filename": "ILSVRC2012_val_00009346.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00009346.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 12
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00009346_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00009346_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00009346.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 99
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00016018.JPEG",
+      "filename": "ILSVRC2012_val_00016018.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00016018.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 13
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00016018_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00016018_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00016018.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 93
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00037861.JPEG",
+      "filename": "ILSVRC2012_val_00037861.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00037861.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 14
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00037861_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00037861_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00037861.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 91
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00009111.JPEG",
+      "filename": "ILSVRC2012_val_00009111.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00009111.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 15
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00009111_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00009111_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00009111.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 96
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00045866.JPEG",
+      "filename": "ILSVRC2012_val_00045866.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00045866.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 16
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00045866_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00045866_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00045866.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 78
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00046499.JPEG",
+      "filename": "ILSVRC2012_val_00046499.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00046499.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 17
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00046499_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00046499_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00046499.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 98
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00026397.JPEG",
+      "filename": "ILSVRC2012_val_00026397.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00026397.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 18
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00026397_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00026397_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00026397.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 86
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00006697.JPEG",
+      "filename": "ILSVRC2012_val_00006697.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00006697.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 19
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00006697_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00006697_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00006697.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 7
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00030740.JPEG",
+      "filename": "ILSVRC2012_val_00030740.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00030740.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 20
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00030740_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00030740_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00030740.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 71
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00023559.JPEG",
+      "filename": "ILSVRC2012_val_00023559.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00023559.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 21
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00023559_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00023559_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00023559.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 80
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00018317.JPEG",
+      "filename": "ILSVRC2012_val_00018317.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00018317.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 22
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00018317_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00018317_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00018317.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 97
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00003014.JPEG",
+      "filename": "ILSVRC2012_val_00003014.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00003014.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 23
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00003014_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00003014_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00003014.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 64
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00009379.JPEG",
+      "filename": "ILSVRC2012_val_00009379.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00009379.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 24
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00009379_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00009379_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00009379.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 85
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00034654.JPEG",
+      "filename": "ILSVRC2012_val_00034654.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00034654.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 25
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00034654_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00034654_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00034654.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 82
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00026064.JPEG",
+      "filename": "ILSVRC2012_val_00026064.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00026064.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 26
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00026064_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00026064_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00026064.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 13
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00002138.JPEG",
+      "filename": "ILSVRC2012_val_00002138.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00002138.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 27
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00002138_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00002138_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00002138.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 12
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00037375.JPEG",
+      "filename": "ILSVRC2012_val_00037375.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00037375.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 28
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00037375_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00037375_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00037375.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 95
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00009191.JPEG",
+      "filename": "ILSVRC2012_val_00009191.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00009191.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 29
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00009191_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00009191_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00009191.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 92
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00017472.JPEG",
+      "filename": "ILSVRC2012_val_00017472.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00017472.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 30
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00017472_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00017472_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00017472.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 90
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00024235.JPEG",
+      "filename": "ILSVRC2012_val_00024235.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00024235.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 31
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00024235_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00024235_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00024235.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 10
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00046252.JPEG",
+      "filename": "ILSVRC2012_val_00046252.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00046252.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 32
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00046252_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00046252_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00046252.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 89
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00039905.JPEG",
+      "filename": "ILSVRC2012_val_00039905.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00039905.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 33
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00039905_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00039905_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00039905.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 87
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00025129.JPEG",
+      "filename": "ILSVRC2012_val_00025129.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00025129.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 34
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00025129_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00025129_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00025129.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 72
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00037596.JPEG",
+      "filename": "ILSVRC2012_val_00037596.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00037596.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 35
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00037596_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00037596_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00037596.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 73
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00041939.JPEG",
+      "filename": "ILSVRC2012_val_00041939.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00041939.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 36
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00041939_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00041939_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00041939.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 3
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00013716.JPEG",
+      "filename": "ILSVRC2012_val_00013716.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00013716.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 37
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00013716_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00013716_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00013716.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 84
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00031333.JPEG",
+      "filename": "ILSVRC2012_val_00031333.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00031333.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 38
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00031333_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00031333_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00031333.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 83
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00011233.JPEG",
+      "filename": "ILSVRC2012_val_00011233.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00011233.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 39
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00011233_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00011233_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00011233.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 11
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00045880.JPEG",
+      "filename": "ILSVRC2012_val_00045880.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00045880.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 40
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00045880_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00045880_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00045880.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 67
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00040358.JPEG",
+      "filename": "ILSVRC2012_val_00040358.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00040358.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 41
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00040358_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00040358_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00040358.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 5
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00031094.JPEG",
+      "filename": "ILSVRC2012_val_00031094.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00031094.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 42
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00031094_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00031094_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00031094.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 81
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00037383.JPEG",
+      "filename": "ILSVRC2012_val_00037383.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00037383.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 43
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00037383_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00037383_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00037383.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 88
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00024327.JPEG",
+      "filename": "ILSVRC2012_val_00024327.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00024327.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 44
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00024327_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00024327_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00024327.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 94
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00011993.JPEG",
+      "filename": "ILSVRC2012_val_00011993.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00011993.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 45
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00011993_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00011993_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00011993.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 68
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00017995.JPEG",
+      "filename": "ILSVRC2012_val_00017995.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00017995.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 46
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00017995_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00017995_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00017995.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 77
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00009396.JPEG",
+      "filename": "ILSVRC2012_val_00009396.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00009396.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 47
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00009396_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00009396_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00009396.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 69
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00017699.JPEG",
+      "filename": "ILSVRC2012_val_00017699.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00017699.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 48
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00017699_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00017699_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00017699.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 11,
+        "row_index": 74
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01440764/ILSVRC2012_val_00000293.JPEG",
+      "filename": "ILSVRC2012_val_00000293.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00000293.JPEG",
+      "raw_label": 0,
+      "class_id": 0,
+      "wnid": "n01440764",
+      "shard": null,
+      "row_group": null,
+      "row_index": 49
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00000293_n01440764.JPEG",
+        "filename": "ILSVRC2012_val_00000293_n01440764.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00000293.JPEG",
+        "raw_label": 0,
+        "class_id": 0,
+        "wnid": "n01440764",
+        "shard": "data/test-00007-of-00015.parquet",
+        "row_group": 12,
+        "row_index": 0
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00023869.JPEG",
+      "filename": "ILSVRC2012_val_00023869.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00023869.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 50
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00023869_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00023869_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00023869.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 51
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00020785.JPEG",
+      "filename": "ILSVRC2012_val_00020785.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00020785.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 51
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00020785_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00020785_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00020785.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 60
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00032675.JPEG",
+      "filename": "ILSVRC2012_val_00032675.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00032675.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 52
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00032675_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00032675_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00032675.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 25
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00032235.JPEG",
+      "filename": "ILSVRC2012_val_00032235.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00032235.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 53
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00032235_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00032235_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00032235.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 40
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00022138.JPEG",
+      "filename": "ILSVRC2012_val_00022138.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00022138.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 54
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00022138_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00022138_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00022138.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 59
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00016962.JPEG",
+      "filename": "ILSVRC2012_val_00016962.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00016962.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 55
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00016962_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00016962_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00016962.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 43
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00032258.JPEG",
+      "filename": "ILSVRC2012_val_00032258.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00032258.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 56
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00032258_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00032258_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00032258.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 49
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00005870.JPEG",
+      "filename": "ILSVRC2012_val_00005870.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00005870.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 57
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00005870_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00005870_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00005870.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 30
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00048840.JPEG",
+      "filename": "ILSVRC2012_val_00048840.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00048840.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 58
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00048840_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00048840_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00048840.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 38
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00000307.JPEG",
+      "filename": "ILSVRC2012_val_00000307.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00000307.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 59
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00000307_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00000307_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00000307.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 33
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00004655.JPEG",
+      "filename": "ILSVRC2012_val_00004655.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00004655.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 60
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00004655_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00004655_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00004655.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 44
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00048864.JPEG",
+      "filename": "ILSVRC2012_val_00048864.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00048864.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 61
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00048864_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00048864_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00048864.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 22
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00000236.JPEG",
+      "filename": "ILSVRC2012_val_00000236.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00000236.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 62
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00000236_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00000236_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00000236.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 50
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00003735.JPEG",
+      "filename": "ILSVRC2012_val_00003735.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00003735.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 63
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00003735_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00003735_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00003735.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 62
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00000262.JPEG",
+      "filename": "ILSVRC2012_val_00000262.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00000262.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 64
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00000262_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00000262_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00000262.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 23
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00045761.JPEG",
+      "filename": "ILSVRC2012_val_00045761.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00045761.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 65
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00045761_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00045761_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00045761.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 42
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00019459.JPEG",
+      "filename": "ILSVRC2012_val_00019459.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00019459.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 66
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00019459_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00019459_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00019459.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 28
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00002848.JPEG",
+      "filename": "ILSVRC2012_val_00002848.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00002848.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 67
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00002848_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00002848_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00002848.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 52
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00046915.JPEG",
+      "filename": "ILSVRC2012_val_00046915.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00046915.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 68
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00046915_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00046915_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00046915.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 65
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00012880.JPEG",
+      "filename": "ILSVRC2012_val_00012880.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00012880.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 69
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00012880_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00012880_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00012880.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 64
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00034386.JPEG",
+      "filename": "ILSVRC2012_val_00034386.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00034386.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 70
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00034386_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00034386_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00034386.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 35
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00004677.JPEG",
+      "filename": "ILSVRC2012_val_00004677.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00004677.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 71
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00004677_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00004677_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00004677.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 24
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00006007.JPEG",
+      "filename": "ILSVRC2012_val_00006007.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00006007.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 72
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00006007_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00006007_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00006007.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 55
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00020436.JPEG",
+      "filename": "ILSVRC2012_val_00020436.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00020436.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 73
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00020436_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00020436_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00020436.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 57
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00010363.JPEG",
+      "filename": "ILSVRC2012_val_00010363.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00010363.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 74
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00010363_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00010363_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00010363.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 39
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00046969.JPEG",
+      "filename": "ILSVRC2012_val_00046969.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00046969.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 75
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00046969_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00046969_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00046969.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 41
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00000994.JPEG",
+      "filename": "ILSVRC2012_val_00000994.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00000994.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 76
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00000994_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00000994_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00000994.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 27
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00030217.JPEG",
+      "filename": "ILSVRC2012_val_00030217.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00030217.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 77
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00030217_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00030217_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00030217.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 36
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00049712.JPEG",
+      "filename": "ILSVRC2012_val_00049712.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00049712.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 78
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00049712_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00049712_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00049712.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 17
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00003150.JPEG",
+      "filename": "ILSVRC2012_val_00003150.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00003150.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 79
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00003150_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00003150_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00003150.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 37
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00018075.JPEG",
+      "filename": "ILSVRC2012_val_00018075.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00018075.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 80
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00018075_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00018075_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00018075.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 54
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00049617.JPEG",
+      "filename": "ILSVRC2012_val_00049617.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00049617.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 81
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00049617_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00049617_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00049617.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 26
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00002241.JPEG",
+      "filename": "ILSVRC2012_val_00002241.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00002241.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 82
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00002241_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00002241_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00002241.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 58
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00010509.JPEG",
+      "filename": "ILSVRC2012_val_00010509.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00010509.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 83
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00010509_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00010509_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00010509.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 18
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00028713.JPEG",
+      "filename": "ILSVRC2012_val_00028713.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00028713.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 84
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00028713_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00028713_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00028713.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 32
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00047561.JPEG",
+      "filename": "ILSVRC2012_val_00047561.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00047561.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 85
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00047561_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00047561_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00047561.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 29
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00049585.JPEG",
+      "filename": "ILSVRC2012_val_00049585.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00049585.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 86
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00049585_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00049585_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00049585.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 53
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00037846.JPEG",
+      "filename": "ILSVRC2012_val_00037846.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00037846.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 87
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00037846_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00037846_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00037846.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 47
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00031138.JPEG",
+      "filename": "ILSVRC2012_val_00031138.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00031138.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 88
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00031138_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00031138_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00031138.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 31
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00009034.JPEG",
+      "filename": "ILSVRC2012_val_00009034.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00009034.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 89
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00009034_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00009034_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00009034.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 45
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00038057.JPEG",
+      "filename": "ILSVRC2012_val_00038057.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00038057.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 90
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00038057_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00038057_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00038057.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 46
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00013623.JPEG",
+      "filename": "ILSVRC2012_val_00013623.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00013623.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 91
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00013623_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00013623_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00013623.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 20
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00020822.JPEG",
+      "filename": "ILSVRC2012_val_00020822.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00020822.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 92
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00020822_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00020822_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00020822.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 19
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00006216.JPEG",
+      "filename": "ILSVRC2012_val_00006216.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00006216.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 93
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00006216_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00006216_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00006216.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 16
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00021905.JPEG",
+      "filename": "ILSVRC2012_val_00021905.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00021905.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 94
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00021905_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00021905_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00021905.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 48
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00044095.JPEG",
+      "filename": "ILSVRC2012_val_00044095.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00044095.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 95
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00044095_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00044095_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00044095.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 21
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00011914.JPEG",
+      "filename": "ILSVRC2012_val_00011914.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00011914.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 96
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00011914_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00011914_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00011914.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 61
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00030060.JPEG",
+      "filename": "ILSVRC2012_val_00030060.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00030060.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 97
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00030060_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00030060_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00030060.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 56
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00013513.JPEG",
+      "filename": "ILSVRC2012_val_00013513.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00013513.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 98
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00013513_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00013513_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00013513.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 34
+      }
+    ]
+  },
+  {
+    "reason": "wnid_suffix",
+    "official": {
+      "raw_path": "val/n01443537/ILSVRC2012_val_00047396.JPEG",
+      "filename": "ILSVRC2012_val_00047396.JPEG",
+      "normalized_filename": "ILSVRC2012_val_00047396.JPEG",
+      "raw_label": 1,
+      "class_id": 1,
+      "wnid": "n01443537",
+      "shard": null,
+      "row_group": null,
+      "row_index": 99
+    },
+    "parquet_candidates": [
+      {
+        "raw_path": "ILSVRC2012_val_00047396_n01443537.JPEG",
+        "filename": "ILSVRC2012_val_00047396_n01443537.JPEG",
+        "normalized_filename": "ILSVRC2012_val_00047396.JPEG",
+        "raw_label": 1,
+        "class_id": 1,
+        "wnid": "n01443537",
+        "shard": "data/test-00001-of-00015.parquet",
+        "row_group": 10,
+        "row_index": 63
+      }
+    ]
+  }
+]

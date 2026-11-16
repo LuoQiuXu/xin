@@ -1,0 +1,5 @@
+# Preserve the run source fingerprints and the bytes listed in ARTIFACT_SHA256.csv.
+*.py -text
+*.md -text
+*.csv -text
+/metadata_*/** -text

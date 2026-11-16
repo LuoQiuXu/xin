@@ -43,5 +43,6 @@ Do not redownload or repeat the full data audit. Places-LT must be loaded only t
 
 ## Run records
 
-- [Training records and final-evaluation status for 2026-11-16](publication_20261116/README.md)
+- [Official test reconciliation and final ImageNet-LT and Places-LT results](diagnostics/imagenet_test_reconciliation/IMAGENET_TEST_RECONCILIATION_REPORT.md)
+- [Training records and initial final-evaluation failure on 2026-11-16](publication_20261116/README.md)
 - [Stage-I AMP gradient diagnosis](diagnostics/AMP_GRADIENT_DIAGNOSIS_REPORT.md)

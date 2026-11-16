@@ -1,0 +1,17 @@
+2026-11-16T22:09:21+08:00 Starting reconciled-final-evaluation in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\imagenet_test_reconciled_20261116_01\imagenet_lt
+2026-11-16T22:09:24+08:00 imagenet_lt: official TEST identity check passed for 50,000 rows
+2026-11-16T22:10:02+08:00 imagenet_lt: 4,000/50,000 TEST rows
+2026-11-16T22:10:23+08:00 imagenet_lt: 8,000/50,000 TEST rows
+2026-11-16T22:10:45+08:00 imagenet_lt: 12,000/50,000 TEST rows
+2026-11-16T22:11:06+08:00 imagenet_lt: 16,000/50,000 TEST rows
+2026-11-16T22:11:27+08:00 imagenet_lt: 20,000/50,000 TEST rows
+2026-11-16T22:11:49+08:00 imagenet_lt: 24,000/50,000 TEST rows
+2026-11-16T22:12:10+08:00 imagenet_lt: 28,000/50,000 TEST rows
+2026-11-16T22:12:31+08:00 imagenet_lt: 32,000/50,000 TEST rows
+2026-11-16T22:12:52+08:00 imagenet_lt: 36,000/50,000 TEST rows
+2026-11-16T22:13:14+08:00 imagenet_lt: 40,000/50,000 TEST rows
+2026-11-16T22:13:35+08:00 imagenet_lt: 44,000/50,000 TEST rows
+2026-11-16T22:13:56+08:00 imagenet_lt: 48,000/50,000 TEST rows
+2026-11-16T22:14:10+08:00 imagenet_lt: saved fixed-checkpoint metrics for 12 models
+2026-11-16T22:14:10+08:00 Completed
+EVALUATION_EXIT_CODE=0

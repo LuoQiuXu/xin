@@ -1,0 +1,62 @@
+test_alpha_schedule (test_cross_dataset_core.CrossDatasetCoreTests.test_alpha_schedule) ... ok
+test_class_weights_exact_formula (test_cross_dataset_core.CrossDatasetCoreTests.test_class_weights_exact_formula) ... ok
+test_d0_d1_d2_losses_are_finite_and_teacher_is_frozen (test_cross_dataset_core.CrossDatasetCoreTests.test_d0_d1_d2_losses_are_finite_and_teacher_is_frozen) ... ok
+test_d2_requires_matching_teacher (test_cross_dataset_core.CrossDatasetCoreTests.test_d2_requires_matching_teacher) ... ok
+test_many_only_kl_uses_strict_gt_100_and_full_output_support (test_cross_dataset_core.CrossDatasetCoreTests.test_many_only_kl_uses_strict_gt_100_and_full_output_support) ... ok
+test_no_many_batch_returns_differentiable_zero (test_cross_dataset_core.CrossDatasetCoreTests.test_no_many_batch_returns_differentiable_zero) ... D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\test_cross_dataset_core.py:90: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:821.)
+  self.assertEqual(float(loss), 0.0)
+ok
+test_vectorized_gradient_matches_autograd_reference (test_cross_dataset_core.CrossDatasetCoreTests.test_vectorized_gradient_matches_autograd_reference) ... ok
+test_official_order_and_nested_wnid_without_opening_test_shard (test_cross_dataset_data.ImageNetParquetDatasetTests.test_official_order_and_nested_wnid_without_opening_test_shard) ... ok
+test_row_group_random_access_and_rgb_decode (test_cross_dataset_data.ImageNetParquetDatasetTests.test_row_group_random_access_and_rgb_decode) ... ok
+test_duplicate_label_folder_mapping_is_rejected (test_cross_dataset_data.PlacesManifestDatasetTests.test_duplicate_label_folder_mapping_is_rejected) ... ok
+test_official_train_and_test_mapping_uses_only_manifest_rows (test_cross_dataset_data.PlacesManifestDatasetTests.test_official_train_and_test_mapping_uses_only_manifest_rows) ... ok
+test_cuda_rejects_out_of_range_index_before_selection (test_pipeline.PipelineTests.test_cuda_rejects_out_of_range_index_before_selection) ... ok
+test_cuda_without_index_resolves_the_actual_current_device (test_pipeline.PipelineTests.test_cuda_without_index_resolves_the_actual_current_device) ... ok
+test_final_evaluation_refuses_before_any_test_loader_or_output (test_pipeline.PipelineTests.test_final_evaluation_refuses_before_any_test_loader_or_output) ... ok
+2026-11-16T22:09:05+08:00 Starting regression in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\imagenet_test_reconciled_20261116_01\validation\tmpibuyzhee\run
+2026-11-16T22:09:05+08:00 Completed
+test_gpu_run_initializes_cuda_before_resetting_peak_stats (test_pipeline.PipelineTests.test_gpu_run_initializes_cuda_before_resetting_peak_stats) ... ok
+2026-11-16T22:09:05+08:00 Starting regression in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\imagenet_test_reconciled_20261116_01\validation\tmp_9iqeoq7\run
+2026-11-16T22:09:05+08:00 Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\experiment_common.py", line 224, in record_run
+    selected = initialize_cuda(device, status["cuda_diagnostics"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cuda_statistics.py", line 79, in initialize_cuda
+    torch.cuda.init()
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\unittest\mock.py", line 1139, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\unittest\mock.py", line 1143, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\unittest\mock.py", line 1198, in _execute_mock_call
+    raise effect
+RuntimeError: device initialization failed
+initialize CUDA diagnostics: {"cuda": "13.2", "cuda_available": true, "cuda_visible_devices": null, "current_device": null, "device": null, "device_count": 1, "device_index": null, "gpu": null, "gpu_memory_bytes": null, "initial_current_device": null, "pytorch": "2.14.1+cu132", "requested_device": "cuda:0", "requested_device_index": 0}
+
+test_gpu_startup_failure_is_recorded_before_entering_run (test_pipeline.PipelineTests.test_gpu_startup_failure_is_recorded_before_entering_run) ... ok
+test_metrics_use_official_train_bins_and_macro_accuracy (test_pipeline.PipelineTests.test_metrics_use_official_train_bins_and_macro_accuracy) ... ok
+test_sampler_preserves_rng_and_continues_between_epochs (test_pipeline.PipelineTests.test_sampler_preserves_rng_and_continues_between_epochs) ... ok
+test_warmup_and_cosine_endpoints (test_pipeline.PipelineTests.test_warmup_and_cosine_endpoints) ... ok
+test_stage1_amp_retry_requires_real_skip_and_finite_update (test_pipeline.Stage1AmpSmokeTests.test_stage1_amp_retry_requires_real_skip_and_finite_update) ... ok
+test_stage1_missing_gradient_is_terminal_without_backoff (test_pipeline.Stage1AmpSmokeTests.test_stage1_missing_gradient_is_terminal_without_backoff) ... ok
+test_stage1_persistent_inf_stops_after_eight_retries (test_pipeline.Stage1AmpSmokeTests.test_stage1_persistent_inf_stops_after_eight_retries) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 1.722s
+
+OK
+BASE_CPU_TEST_EXIT_CODE=0
+test_exact_rule_does_not_remove_unverified_suffixes (test_imagenet_test_reconciliation.MetadataReconciliationTest.test_exact_rule_does_not_remove_unverified_suffixes) ... ok
+test_metadata_projection_and_hf_order_check (test_imagenet_test_reconciliation.MetadataReconciliationTest.test_metadata_projection_and_hf_order_check) ... ok
+test_pairing_preserves_official_order_with_shuffled_physical_rows (test_imagenet_test_reconciliation.MetadataReconciliationTest.test_pairing_preserves_official_order_with_shuffled_physical_rows) ... ok
+test_rejects_label_conflict_even_when_filename_matches (test_imagenet_test_reconciliation.MetadataReconciliationTest.test_rejects_label_conflict_even_when_filename_matches) ... ok
+test_rejects_normalization_collision_even_if_one_label_agrees (test_imagenet_test_reconciliation.MetadataReconciliationTest.test_rejects_normalization_collision_even_if_one_label_agrees) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.258s
+
+OK
+RECONCILIATION_CPU_TEST_EXIT_CODE=0

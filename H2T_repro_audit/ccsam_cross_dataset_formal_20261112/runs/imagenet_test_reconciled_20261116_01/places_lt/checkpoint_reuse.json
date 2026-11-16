@@ -1,0 +1,182 @@
+{
+  "trained_run": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_cross_dataset_formal_20261112\\runs\\amp_gradient_fix_20261112_01",
+  "archived_artifact_index_sha256": "652e68f473fc4820e801bb0bcc1e214c1e04fd246532f8c883e8498047bb1536",
+  "dataset": "places_lt",
+  "evaluated_seeds": [
+    123,
+    124,
+    125
+  ],
+  "stage1_epoch": 90,
+  "stage2_epoch": 30,
+  "matched_training_and_failure_artifacts": {
+    "runs/amp_gradient_fix_20261112_01/stage1/imagenet_lt/seed_123/epoch_90.pt": {
+      "sha256": "eca33a8df37074b3a6b23b135dde0ed6b62114fa208754e8607a7fd7421a054c",
+      "size_bytes": 102545087
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_123/D0/final_classifier.pt": {
+      "sha256": "2ce8bfe579e7b34513c87b6f9fb8efe4d6c2be7c639fc10b617a6a12c4398e5d",
+      "size_bytes": 8198629
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_123/D1/final_classifier.pt": {
+      "sha256": "e35eff2912fd26d9d0db9f0623bc027e667f27168d64e2c5e7be86a82a853bbd",
+      "size_bytes": 8198629
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_123/D2/final_classifier.pt": {
+      "sha256": "98fd9f8780a7f3dfeb2e0642ccf4d666ff4228e8aad9dd0fa7965602eb3a97ec",
+      "size_bytes": 8198693
+    },
+    "runs/amp_gradient_fix_20261112_01/features/imagenet_lt/seed_123/train_features.npy": {
+      "sha256": "e712aca25e4cf202c71fabdfa19325fa3ff8ddf5a3d59661c4b62b7dd371188e",
+      "size_bytes": 949010560
+    },
+    "runs/amp_gradient_fix_20261112_01/features/imagenet_lt/seed_123/train_labels.npy": {
+      "sha256": "9a087049fbe5f456ddfd209576ee73dfccd37f0e31f3df999f1481f4107ee44d",
+      "size_bytes": 926896
+    },
+    "runs/amp_gradient_fix_20261112_01/stage1/imagenet_lt/seed_124/epoch_90.pt": {
+      "sha256": "7ec0f9b8a4e6da14ade93f12a28d731f47086987d61b6acb49247180fb1b2bae",
+      "size_bytes": 102545087
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_124/D0/final_classifier.pt": {
+      "sha256": "e40502ff82103f851d25ac9bd4e1bffa02cac57daedc4c33774c335ac4450a54",
+      "size_bytes": 8198629
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_124/D1/final_classifier.pt": {
+      "sha256": "6af6f4dac9b282c9250d7886f92d2af8ec977514be7e6428790105d78b1790ea",
+      "size_bytes": 8198629
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_124/D2/final_classifier.pt": {
+      "sha256": "dbf34dce2c42bb72bdef924a91464d8e9c38c10875c11e0366d629085897dde6",
+      "size_bytes": 8198693
+    },
+    "runs/amp_gradient_fix_20261112_01/features/imagenet_lt/seed_124/train_features.npy": {
+      "sha256": "e62f06027adaacc05342d75e0de7453e25799f71db00d000175d728bc85c0824",
+      "size_bytes": 949010560
+    },
+    "runs/amp_gradient_fix_20261112_01/features/imagenet_lt/seed_124/train_labels.npy": {
+      "sha256": "9a087049fbe5f456ddfd209576ee73dfccd37f0e31f3df999f1481f4107ee44d",
+      "size_bytes": 926896
+    },
+    "runs/amp_gradient_fix_20261112_01/stage1/imagenet_lt/seed_125/epoch_90.pt": {
+      "sha256": "a22fb0b48b5da48db6b195ea089a76b6bdace16be9a89cd068329255bd13d67c",
+      "size_bytes": 102545087
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_125/D0/final_classifier.pt": {
+      "sha256": "cf4b9b93a37c38bbdf1f997cc9cdb6b8f31ec7829f9ca6925d52d2f2a8bd81df",
+      "size_bytes": 8198629
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_125/D1/final_classifier.pt": {
+      "sha256": "d2d763d1d59bd04bb8ee98db413fc2489661de3cd9cd0decdf5f7d3717533982",
+      "size_bytes": 8198629
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/imagenet_lt/seed_125/D2/final_classifier.pt": {
+      "sha256": "0b7f5ddaa80ec5cb1f0f926b91249de6ecaf470e0ea713da0e8686eb4a235661",
+      "size_bytes": 8198693
+    },
+    "runs/amp_gradient_fix_20261112_01/features/imagenet_lt/seed_125/train_features.npy": {
+      "sha256": "2d9af9ef97ab2c63cd7226531df462057878ae85694f0edc5da8e8dc28e779ee",
+      "size_bytes": 949010560
+    },
+    "runs/amp_gradient_fix_20261112_01/features/imagenet_lt/seed_125/train_labels.npy": {
+      "sha256": "9a087049fbe5f456ddfd209576ee73dfccd37f0e31f3df999f1481f4107ee44d",
+      "size_bytes": 926896
+    },
+    "runs/amp_gradient_fix_20261112_01/stage1/places_lt/seed_123/epoch_90.pt": {
+      "sha256": "2147090d49e6f6e3b3bfdbaaa55f096e9d4cf190b2e668e24cef577dd6f7e439",
+      "size_bytes": 97340607
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_123/D0/final_classifier.pt": {
+      "sha256": "822e663e6d733493ed542a5aa1853b6ac59ef4ea151de429c2e178018183f820",
+      "size_bytes": 2994149
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_123/D1/final_classifier.pt": {
+      "sha256": "ef4ede6897209f40b77a1e5601221012a4b738fd9cb293a5193c40d75d54072f",
+      "size_bytes": 2994149
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_123/D2/final_classifier.pt": {
+      "sha256": "a278547a62daa72d7982b754c28df3979ebc0ed08cd57ecdfcf11f28883043e6",
+      "size_bytes": 2994213
+    },
+    "runs/amp_gradient_fix_20261112_01/features/places_lt/seed_123/train_features.npy": {
+      "sha256": "881f03c27e261bc846f2e2d80915cd5e98ed273a0fb357a35c41bc8325a28cef",
+      "size_bytes": 512000128
+    },
+    "runs/amp_gradient_fix_20261112_01/features/places_lt/seed_123/train_labels.npy": {
+      "sha256": "c70c5c4c97dd01127ca29b8a1b2e6a5dea4c65ee00873163c0fec1847ae59a26",
+      "size_bytes": 500128
+    },
+    "runs/amp_gradient_fix_20261112_01/stage1/places_lt/seed_124/epoch_90.pt": {
+      "sha256": "b6195fa59b177ab6bc36bff72f768c930c1a4db156e5f0f7dbaa630941b0790f",
+      "size_bytes": 97340607
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_124/D0/final_classifier.pt": {
+      "sha256": "c525362e7f32386ef15afe42cb67761db4ecaaf0be696d956635aea92356bb05",
+      "size_bytes": 2994149
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_124/D1/final_classifier.pt": {
+      "sha256": "3612c9c0bf20ed8c08fed2d989d1bf5783799dac62784458ebe0709d71d1fbf9",
+      "size_bytes": 2994149
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_124/D2/final_classifier.pt": {
+      "sha256": "675c6313efa14e7f3f68441b89e1c6c94c3cd26b6d56eb1c4754a94244e436da",
+      "size_bytes": 2994213
+    },
+    "runs/amp_gradient_fix_20261112_01/features/places_lt/seed_124/train_features.npy": {
+      "sha256": "46f634920265525d44306761d72c1c4ec09fe1bb3450bb406c06248e6ccf9c79",
+      "size_bytes": 512000128
+    },
+    "runs/amp_gradient_fix_20261112_01/features/places_lt/seed_124/train_labels.npy": {
+      "sha256": "c70c5c4c97dd01127ca29b8a1b2e6a5dea4c65ee00873163c0fec1847ae59a26",
+      "size_bytes": 500128
+    },
+    "runs/amp_gradient_fix_20261112_01/stage1/places_lt/seed_125/epoch_90.pt": {
+      "sha256": "03ee8235207596dbc5d51b74fdb98719c06ed936cf4b2bc832f0a69ef083e3e5",
+      "size_bytes": 97340607
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_125/D0/final_classifier.pt": {
+      "sha256": "a442bdcd63ba681de0d7306f461ccb97c98b775846bda708d8f139b121d95290",
+      "size_bytes": 2994149
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_125/D1/final_classifier.pt": {
+      "sha256": "bdfb0f3f497a2d2c1074ba00e684454995929f068019de11baaec425f0b1f34f",
+      "size_bytes": 2994149
+    },
+    "runs/amp_gradient_fix_20261112_01/stage2/places_lt/seed_125/D2/final_classifier.pt": {
+      "sha256": "88f752499a76bc75cf079a2b98bb7c012a13d8568538abb9cd7f2862a69ac3a0",
+      "size_bytes": 2994213
+    },
+    "runs/amp_gradient_fix_20261112_01/features/places_lt/seed_125/train_features.npy": {
+      "sha256": "3042d103e24b666fc93b4f6af22c26c8ca44795de7d6803a0fe20d5ed5f591ad",
+      "size_bytes": 512000128
+    },
+    "runs/amp_gradient_fix_20261112_01/features/places_lt/seed_125/train_labels.npy": {
+      "sha256": "c70c5c4c97dd01127ca29b8a1b2e6a5dea4c65ee00873163c0fec1847ae59a26",
+      "size_bytes": 500128
+    },
+    "runs/amp_gradient_fix_20261112_01/final_evaluation/config.json": {
+      "sha256": "13496685751653020d50b10850d9b9222a28b29b0df62e7b91d4d78241ee66ef",
+      "size_bytes": 8876
+    },
+    "runs/amp_gradient_fix_20261112_01/final_evaluation/run.log": {
+      "sha256": "227bf160f2d0c12c69eecd875be5d57ea0d6b9f9b614d584ce02a36841d641a7",
+      "size_bytes": 1621
+    },
+    "runs/amp_gradient_fix_20261112_01/final_evaluation/status.json": {
+      "sha256": "63ac4ed802aea42aa9f2bf7a3e41101eb38bd9081993baeda6f988b9781bfe50",
+      "size_bytes": 1002
+    },
+    "runs/amp_gradient_fix_20261112_01/formal_execution/status.json": {
+      "sha256": "e657d08014f538da8da97e705e85d960b06a0cada8fdacc58796319fc7a643cc",
+      "size_bytes": 453
+    },
+    "runs/amp_gradient_fix_20261112_01/validation/run-formal_stderr.log": {
+      "sha256": "c0f8c9a0b41b4eb4b3dd2a833d07239b7365c643ec406a49a32e33744214daae",
+      "size_bytes": 1969
+    },
+    "runs/amp_gradient_fix_20261112_01/FORMAL_EXECUTION_REPORT.md": {
+      "sha256": "7b01948016c4ac8fcefbbfe8e6d3cc4a63e7e071fbc876fb2204978393db22b6",
+      "size_bytes": 5551
+    }
+  }
+}
