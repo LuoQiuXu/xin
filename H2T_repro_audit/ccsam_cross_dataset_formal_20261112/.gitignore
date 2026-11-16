@@ -1,0 +1,13 @@
+/validation/
+/diagnostics/amp_gradient_probe/cuda_cache/
+/diagnostics/amp_gradient_probe/inductor_cache/
+/runs/
+/cuda_self_check/
+/preflight/
+/smoke/
+/stage1/
+/features/
+/stage2/
+/formal_execution/
+/final_evaluation/*.npz
+*.log

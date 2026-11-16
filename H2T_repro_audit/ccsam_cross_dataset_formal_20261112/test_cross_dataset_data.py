@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 import numpy as np
@@ -31,10 +32,10 @@ class PlacesManifestDatasetTests(unittest.TestCase):
             test_lines = []
             for class_id in range(365):
                 if class_id == 0:
-                    original_folder = "data_256/train/arena/hockey"
+                    original_folder = "data_256/a/arena/hockey"
                     disk_folder = "arena-hockey"
                 else:
-                    original_folder = "data_256/train/class_%03d" % class_id
+                    original_folder = "data_256/c/class_%03d" % class_id
                     disk_folder = "class_%03d" % class_id
                 train_name = "train_%03d.jpg" % class_id
                 test_name = "test_%03d.jpg" % class_id
@@ -66,8 +67,8 @@ class PlacesManifestDatasetTests(unittest.TestCase):
 
     def test_duplicate_label_folder_mapping_is_rejected(self):
         entries = [
-            ("data_256/train/class_a/a.jpg", 0),
-            ("data_256/train/class_b/b.jpg", 0),
+            ("data_256/c/class_a/a.jpg", 0),
+            ("data_256/c/class_b/b.jpg", 0),
         ]
         with self.assertRaises(ValueError):
             places_class_folders(entries)
@@ -97,18 +98,44 @@ class ImageNetParquetDatasetTests(unittest.TestCase):
             })
             pq.write_table(table, root / "train-00000-of-00001.parquet", row_group_size=2)
 
-            dataset = ImageNetLTParquetDataset(
+            with closing(ImageNetLTParquetDataset(
                 root, split="train", expected_rows=3, expected_shards=1,
                 num_classes=2, row_group_cache_size=1,
-            )
-            self.assertEqual(len(dataset), 3)
-            np.testing.assert_array_equal(dataset.class_counts, np.array([2, 1]))
-            image_2, label_2 = dataset[2]
-            image_0, label_0 = dataset[0]
-            self.assertEqual(label_2, 0)
-            self.assertEqual(label_0, 0)
-            self.assertEqual(image_2.mode, "RGB")
-            self.assertEqual(image_0.mode, "RGB")
+            )) as dataset:
+                self.assertEqual(len(dataset), 3)
+                np.testing.assert_array_equal(dataset.class_counts, np.array([2, 1]))
+                image_2, label_2 = dataset[2]
+                image_0, label_0 = dataset[0]
+                self.assertEqual(label_2, 0)
+                self.assertEqual(label_0, 0)
+                self.assertEqual(image_2.mode, "RGB")
+                self.assertEqual(image_0.mode, "RGB")
+
+    def test_official_order_and_nested_wnid_without_opening_test_shard(self):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        from io import BytesIO
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            rows = []
+            for name, intensity in (("dog.JPEG", 200), ("cat.JPEG", 20)):
+                buffer = BytesIO()
+                Image.new("RGB", (8, 8), (intensity,) * 3).save(buffer, format="JPEG")
+                rows.append({"bytes": buffer.getvalue(), "path": name})
+            pq.write_table(pa.table({
+                "image": pa.array(rows, type=pa.struct([("bytes", pa.binary()), ("path", pa.string())])),
+                "label": pa.array([{"id": "n00000002"}, {"id": "n00000001"}]),
+            }), root / "train-00000-of-00001.parquet", row_group_size=1)
+            (root / "test-00000-of-00001.parquet").write_bytes(b"must stay unopened")
+            entries = [("train/n00000001/cat.JPEG", 0), ("train/n00000002/dog.JPEG", 1)]
+            with closing(ImageNetLTParquetDataset(
+                root, split="train", expected_rows=2, expected_shards=1, num_classes=2,
+                wnid_to_id={"n00000001": 0, "n00000002": 1}, official_entries=entries,
+            )) as dataset:
+                self.assertEqual(dataset.labels.tolist(), [0, 1])
+                self.assertEqual(dataset[0][0].getpixel((0, 0))[0], 20)
+                self.assertEqual(dataset[1][0].getpixel((0, 0))[0], 200)
 
 
 if __name__ == "__main__":

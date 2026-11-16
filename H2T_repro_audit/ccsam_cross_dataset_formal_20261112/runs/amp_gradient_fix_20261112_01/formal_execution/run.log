@@ -1,0 +1,29 @@
+2026-11-12T21:34:51+08:00 Starting run-formal in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\amp_gradient_fix_20261112_01\formal_execution
+2026-11-12T21:34:51+08:00 Starting phase stage1
+2026-11-16T03:58:20+08:00 Starting phase extract
+2026-11-16T04:17:03+08:00 Starting phase stage2
+2026-11-16T12:04:18+08:00 Starting phase evaluate-final
+2026-11-16T12:04:28+08:00 Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\experiment_common.py", line 228, in record_run
+    yield status
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 210, in run_formal
+    fn()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 203, in <lambda>
+    ("evaluate-final", lambda: evaluate(exp, prepared, device)),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\evaluate_final.py", line 187, in evaluate
+    access["rows"] = evaluate_dataset(
+                     ^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\evaluate_final.py", line 128, in evaluate_dataset
+    with official_test_dataset(exp, name, reference_shas, mark_access) as (dataset, targets):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\evaluate_final.py", line 83, in official_test_dataset
+    dataset = ImageNetLTParquetDataset(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_data.py", line 365, in __init__
+    raise ValueError(f"ImageNet-LT {split} Parquet does not match official manifest membership; missing example {missing}")
+ValueError: ImageNet-LT test Parquet does not match official manifest membership; missing example ('ILSVRC2012_val_00029930.JPEG', 0)
+

@@ -1,0 +1,27 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-12T21:28:11+08:00",
+  "official_test_access": false,
+  "cuda_diagnostics": {
+    "pytorch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cuda_visible_devices": null,
+    "requested_device": "cuda:0",
+    "requested_device_index": 0,
+    "device": "cuda:0",
+    "device_index": 0,
+    "cuda_available": true,
+    "device_count": 1,
+    "initial_current_device": 0,
+    "current_device": 0,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "passed": true,
+  "artifacts": {
+    "config.json": "7c557c8da00b75d84b6d8113086e9656e3203c03f7663998e0c9ec5a96e2cb9d",
+    "cuda_statistics.json": "bb96f3d66074545c702b925c3f7bbb1cd9965f9db45043458e8704b3d87618a7",
+    "run.log": "15a86fbac1228574e4771727280963f97cea0c406a9575333137a7fa0a01fc94"
+  },
+  "ended_at": "2026-11-12T21:28:11+08:00"
+}

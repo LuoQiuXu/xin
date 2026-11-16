@@ -1,0 +1,9 @@
+{
+  "state": "failed",
+  "started_at": "2026-11-12T20:58:53+08:00",
+  "official_test_access": false,
+  "stage1_batches": [],
+  "current_stage1_batch": 1,
+  "error": "RuntimeError: Missing or nonfinite Stage-I Smoke gradient at AMP scale 65536.0",
+  "ended_at": "2026-11-12T20:59:12+08:00"
+}

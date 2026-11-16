@@ -1,0 +1,283 @@
+{
+  "fp32_finite": true,
+  "fp32_gradient_state": {
+    "trainable_tensors": 161,
+    "finite_tensors": 161,
+    "missing_names": [],
+    "nonfinite_names": [],
+    "not_in_optimizer_names": [],
+    "nan_values": 0,
+    "inf_values": 0
+  },
+  "reproduced_inf": true,
+  "recovered": true,
+  "attempts": [
+    {
+      "attempt": 0,
+      "initial_state_sha256": [
+        "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+        "161826c7215660321016b3409b822fb56e568daba342eb85d25803a0a6aa16ac"
+      ],
+      "forward": {
+        "features": {
+          "shape": [
+            16,
+            2048
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": 0.038177490234375,
+          "max": 5.8671875
+        },
+        "logits": {
+          "shape": [
+            16,
+            1000
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": -3.896484375,
+          "max": 4.67578125
+        },
+        "loss": 7.289465427398682,
+        "loss_finite": true
+      },
+      "scaled_loss": 477722.40625,
+      "scale_before": 65536.0,
+      "scale_after": 32768.0,
+      "gradscaler_update_called": true,
+      "optimizer_step": false,
+      "optimizer_state_entries_before": 0,
+      "optimizer_state_entries_after": 0,
+      "scaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 160,
+        "missing_names": [],
+        "nonfinite_names": [
+          "encoder.conv1.weight"
+        ],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 2630
+      },
+      "unscaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 160,
+        "missing_names": [],
+        "nonfinite_names": [
+          "encoder.conv1.weight"
+        ],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 2630
+      },
+      "update": {
+        "changed_parameter_tensors": 0,
+        "changed_parameter_elements": 0,
+        "max_abs_delta": 0.0,
+        "parameters_finite_after": true
+      }
+    },
+    {
+      "attempt": 1,
+      "initial_state_sha256": [
+        "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+        "161826c7215660321016b3409b822fb56e568daba342eb85d25803a0a6aa16ac"
+      ],
+      "forward": {
+        "features": {
+          "shape": [
+            16,
+            2048
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": 0.038177490234375,
+          "max": 5.8671875
+        },
+        "logits": {
+          "shape": [
+            16,
+            1000
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": -3.896484375,
+          "max": 4.67578125
+        },
+        "loss": 7.289465427398682,
+        "loss_finite": true
+      },
+      "scaled_loss": 238861.203125,
+      "scale_before": 32768.0,
+      "scale_after": 16384.0,
+      "gradscaler_update_called": true,
+      "optimizer_step": false,
+      "optimizer_state_entries_before": 0,
+      "optimizer_state_entries_after": 0,
+      "scaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 160,
+        "missing_names": [],
+        "nonfinite_names": [
+          "encoder.conv1.weight"
+        ],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 686
+      },
+      "unscaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 160,
+        "missing_names": [],
+        "nonfinite_names": [
+          "encoder.conv1.weight"
+        ],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 686
+      },
+      "update": {
+        "changed_parameter_tensors": 0,
+        "changed_parameter_elements": 0,
+        "max_abs_delta": 0.0,
+        "parameters_finite_after": true
+      }
+    },
+    {
+      "attempt": 2,
+      "initial_state_sha256": [
+        "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+        "161826c7215660321016b3409b822fb56e568daba342eb85d25803a0a6aa16ac"
+      ],
+      "forward": {
+        "features": {
+          "shape": [
+            16,
+            2048
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": 0.038177490234375,
+          "max": 5.8671875
+        },
+        "logits": {
+          "shape": [
+            16,
+            1000
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": -3.896484375,
+          "max": 4.67578125
+        },
+        "loss": 7.289465427398682,
+        "loss_finite": true
+      },
+      "scaled_loss": 119430.6015625,
+      "scale_before": 16384.0,
+      "scale_after": 8192.0,
+      "gradscaler_update_called": true,
+      "optimizer_step": false,
+      "optimizer_state_entries_before": 0,
+      "optimizer_state_entries_after": 0,
+      "scaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 160,
+        "missing_names": [],
+        "nonfinite_names": [
+          "encoder.conv1.weight"
+        ],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 12
+      },
+      "unscaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 160,
+        "missing_names": [],
+        "nonfinite_names": [
+          "encoder.conv1.weight"
+        ],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 12
+      },
+      "update": {
+        "changed_parameter_tensors": 0,
+        "changed_parameter_elements": 0,
+        "max_abs_delta": 0.0,
+        "parameters_finite_after": true
+      }
+    },
+    {
+      "attempt": 3,
+      "initial_state_sha256": [
+        "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+        "161826c7215660321016b3409b822fb56e568daba342eb85d25803a0a6aa16ac"
+      ],
+      "forward": {
+        "features": {
+          "shape": [
+            16,
+            2048
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": 0.038177490234375,
+          "max": 5.8671875
+        },
+        "logits": {
+          "shape": [
+            16,
+            1000
+          ],
+          "dtype": "torch.float16",
+          "finite": true,
+          "min": -3.896484375,
+          "max": 4.67578125
+        },
+        "loss": 7.289465427398682,
+        "loss_finite": true
+      },
+      "scaled_loss": 59715.30078125,
+      "scale_before": 8192.0,
+      "scale_after": 8192.0,
+      "gradscaler_update_called": true,
+      "optimizer_step": true,
+      "optimizer_state_entries_before": 0,
+      "optimizer_state_entries_after": 161,
+      "scaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 161,
+        "missing_names": [],
+        "nonfinite_names": [],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 0
+      },
+      "unscaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 161,
+        "missing_names": [],
+        "nonfinite_names": [],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 0
+      },
+      "update": {
+        "changed_parameter_tensors": 161,
+        "changed_parameter_elements": 25542567,
+        "max_abs_delta": 0.009492173790931702,
+        "parameters_finite_after": true
+      }
+    }
+  ],
+  "successful_update": true,
+  "paired_initial_state_sha256": [
+    "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+    "161826c7215660321016b3409b822fb56e568daba342eb85d25803a0a6aa16ac"
+  ],
+  "max_retries": 5,
+  "official_test_access": false
+}

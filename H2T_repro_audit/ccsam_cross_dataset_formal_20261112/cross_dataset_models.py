@@ -54,7 +54,8 @@ def freeze_encoder(encoder: nn.Module) -> Dict[str, torch.Tensor]:
 
 
 def assert_encoder_frozen(encoder: nn.Module, snapshot: Dict[str, torch.Tensor]) -> None:
-    encoder.eval()
+    if any(module.training for module in encoder.modules()):
+        raise RuntimeError("A frozen encoder module left eval mode")
     if any(parameter.requires_grad for parameter in encoder.parameters()):
         raise RuntimeError("A frozen encoder parameter became trainable")
     if any(parameter.grad is not None for parameter in encoder.parameters()):
@@ -63,5 +64,7 @@ def assert_encoder_frozen(encoder: nn.Module, snapshot: Dict[str, torch.Tensor])
     if set(current) != set(snapshot):
         raise RuntimeError("Frozen encoder state keys changed")
     for name, value in current.items():
-        if not torch.equal(value.detach().cpu(), snapshot[name]):
+        actual = value.detach().cpu().contiguous().reshape(-1).view(torch.uint8)
+        expected = snapshot[name].contiguous().reshape(-1).view(torch.uint8)
+        if not torch.equal(actual, expected):
             raise RuntimeError("Frozen encoder or BN buffer changed: " + name)

@@ -1,0 +1,8 @@
+2026-11-12T21:26:54+08:00 Starting preflight in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\amp_gradient_fix_20261112_01\preflight
+2026-11-12T21:27:06+08:00 imagenet_lt seed 123: sealed 30 x 115,846 official plan indices
+2026-11-12T21:27:09+08:00 imagenet_lt seed 124: sealed 30 x 115,846 official plan indices
+2026-11-12T21:27:12+08:00 imagenet_lt seed 125: sealed 30 x 115,846 official plan indices
+2026-11-12T21:28:02+08:00 places_lt seed 123: sealed 30 x 62,500 official plan indices
+2026-11-12T21:28:04+08:00 places_lt seed 124: sealed 30 x 62,500 official plan indices
+2026-11-12T21:28:06+08:00 places_lt seed 125: sealed 30 x 62,500 official plan indices
+2026-11-12T21:28:06+08:00 Completed

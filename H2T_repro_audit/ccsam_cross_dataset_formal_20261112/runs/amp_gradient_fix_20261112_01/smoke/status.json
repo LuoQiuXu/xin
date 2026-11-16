@@ -1,0 +1,51 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-12T21:29:27+08:00",
+  "official_test_access": false,
+  "cuda_diagnostics": {
+    "pytorch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cuda_visible_devices": null,
+    "requested_device": "cuda:0",
+    "requested_device_index": 0,
+    "device": "cuda:0",
+    "device_index": 0,
+    "cuda_available": true,
+    "device_count": 1,
+    "initial_current_device": 0,
+    "current_device": 0,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "prepared_manifest_sha256": "d01856dc8da7de302bcd8aa3540398ab242923d6e965fb4309e902bf978f2948",
+  "datasets": [
+    "imagenet_lt",
+    "places_lt"
+  ],
+  "passed": true,
+  "peak_cuda_allocated_bytes": 1076690944,
+  "peak_cuda_reserved_bytes": 1470103552,
+  "artifacts": {
+    "config.json": "91f845fac634b1031c89381baa862f90114474d79dc5d9509ecaf0e2e4b84ab5",
+    "imagenet_lt/config.json": "c5163fe453ae4a421bebd8725b21985fd2aec71cb9371eb19ddbf1652731fe98",
+    "imagenet_lt/disposable_D0_teacher/config.json": "f1005fd13db25a6e0397461d34fea9ac020fc9beaaa1cb708b86986999ff92e8",
+    "imagenet_lt/disposable_D0_teacher/final_classifier.pt": "e1cc58875b91685bbbfdc8a4a93b1590350613495288a9da6cfb697e2a3966a9",
+    "imagenet_lt/disposable_D0_teacher/run.log": "4eb2c636e399fd07162a8ac19227a20683d46038048e90aa0398ca5195169396",
+    "imagenet_lt/disposable_D0_teacher/status.json": "b9f0c4c4b1c0eff3ab4e207869d9859a23de8d3ac9e9453c9741e35a5fc65cf7",
+    "imagenet_lt/run.log": "c94ab7b724fa153bf88d301010670f0777249e00bc8e48a677d20bae077fe3ba",
+    "imagenet_lt/status.json": "1dd03c89f51a461e62c0e4459ae72f71dacbe94f55a0849356d877791eef52ef",
+    "imagenet_lt/train_features.npy": "c55ee726689e57ba483234f7aee43a894fe6ebcd933c4833bafffcd758cab2d6",
+    "imagenet_lt/train_labels.npy": "d94906189db8b408bf29aff92d9e2a20e1af5184da5b5614269e331f9e9fde15",
+    "places_lt/config.json": "d502bb7460f41d5d0e18405fac82a83cd606a275683f69e9ea1864ab5043e084",
+    "places_lt/disposable_D0_teacher/config.json": "43aef3fa01ce89cec0e7f3969d971f4b70d4e5ea91b4957e1f2a9e18adba9441",
+    "places_lt/disposable_D0_teacher/final_classifier.pt": "0f516702d6540d35c90297a65197647f9b6f788609851ab5073be9a406d783e0",
+    "places_lt/disposable_D0_teacher/run.log": "3ec5a28ab12819086e98ca11b8f8a08834e8dcd099414331b445ee042c3da31e",
+    "places_lt/disposable_D0_teacher/status.json": "e91209e099b87051d60e730d40495d96a9d36404f71994ddec8a8abc6b8ef07b",
+    "places_lt/run.log": "ad788b79f265277708fecc776a2801d19448c609c2e496643e0ef1c1db69953c",
+    "places_lt/status.json": "445f5e573d6a7b6280c8a80ad3d89f5e648531b5208cc9c39a65c232da68d515",
+    "places_lt/train_features.npy": "e9c4c3409d47ff6cf6dd514c648a5ebe9b62c08cca0e33ddcb77e955b1b6a009",
+    "places_lt/train_labels.npy": "53858c0f024624fe8d0aee8655b4d27c26908df3372ba3320a08e20e9a88e153",
+    "run.log": "1437154add3098f6063f7d6294ac2dda6e452de11f4e2335eefdef0b17a83f19"
+  },
+  "ended_at": "2026-11-12T21:31:32+08:00"
+}

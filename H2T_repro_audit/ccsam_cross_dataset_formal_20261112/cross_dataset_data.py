@@ -10,6 +10,7 @@ import bisect
 from collections import OrderedDict
 from dataclasses import dataclass
 from io import BytesIO
+import os
 from pathlib import Path, PurePosixPath
 import re
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -48,6 +49,23 @@ def classify_parquet_split(path: Path) -> Optional[str]:
         if raw not in {"train", "validation", "valid", "val", "test"}:
             return None
     return "validation" if raw in {"valid", "val"} else raw
+
+
+def discover_imagenet_shards(root: Path, split: str) -> List[Path]:
+    """Collect only paths belonging to the requested split."""
+    paths = []
+    for folder, directories, names in os.walk(root):
+        directories[:] = [
+            name for name in directories
+            if name.lower() not in EXCLUDED_DIRS
+            and classify_parquet_split(Path(name)) in (None, split)
+        ]
+        for name in names:
+            if name.lower().endswith(".parquet"):
+                path = Path(folder) / name
+                if classify_parquet_split(path) == split:
+                    paths.append(path)
+    return sorted(paths)
 
 
 def resolve_label(value, wnid_to_id: Optional[Dict[str, int]] = None) -> Optional[int]:
@@ -118,7 +136,7 @@ def places_class_folders(train_entries: Sequence[Tuple[str, int]]) -> Dict[int, 
     folders: Dict[int, str] = {}
     for rel, label in train_entries:
         parts = PurePosixPath(rel).parts
-        if len(parts) < 4 or parts[0] != "data_256" or parts[1] != "train":
+        if len(parts) < 4 or parts[0] != "data_256" or parts[1] != parts[2][0]:
             raise ValueError("Unexpected official Places-LT train path: %r" % rel)
         folder = "-".join(parts[2:-1])
         if not folder:
@@ -131,6 +149,24 @@ def places_class_folders(train_entries: Sequence[Tuple[str, int]]) -> Dict[int, 
     if set(folders) != set(range(365)):
         raise ValueError("Places-LT train manifest must cover original labels 0..364")
     return folders
+
+
+def resolve_places_root(root: Path) -> Path:
+    roots = [p for p in (root, root / "places-lt") if (p / "train").is_dir()]
+    if len(roots) != 1:
+        raise ValueError(f"Expected one extracted Places-LT train directory under {root}, found {len(roots)}")
+    return roots[0]
+
+
+def imagenet_wnid_map(train_entries: Sequence[Tuple[str, int]]) -> Dict[str, int]:
+    mapping: Dict[str, int] = {}
+    for rel, label in train_entries:
+        wnid = PurePosixPath(rel).parent.name
+        if not re.fullmatch(r"n\d{8}", wnid) or mapping.setdefault(wnid, label) != label:
+            raise ValueError(f"Invalid official ImageNet-LT WNID mapping at {rel}")
+    if len(set(mapping.values())) != len(mapping):
+        raise ValueError("Multiple official ImageNet-LT WNIDs map to the same label")
+    return mapping
 
 
 class PlacesLTManifestDataset(Dataset):
@@ -172,13 +208,11 @@ class PlacesLTManifestDataset(Dataset):
             folder = self.class_folders.get(int(label))
             if folder is None:
                 raise ValueError("No official train-derived class folder for Places-LT label %d" % label)
-            if split == "train":
-                if len(parts) < 4 or parts[0] != "data_256" or parts[1] != "train":
-                    raise ValueError("Unexpected Places-LT train manifest path: %r" % rel)
-            else:
-                if len(parts) != 2 or parts[0] != "val_256":
-                    raise ValueError("Unexpected Places-LT official test manifest path: %r" % rel)
+            if split == "test" and (len(parts) != 2 or parts[0] != "val_256"):
+                raise ValueError("Unexpected Places-LT official test manifest path: %r" % rel)
             candidate = (self.root / split_dir / folder / parts[-1]).resolve()
+            if not candidate.is_relative_to(self.root / split_dir):
+                raise ValueError(f"Places-LT {split} image escapes its split: {candidate}")
             if candidate in seen:
                 raise ValueError("Duplicate Places-LT manifest rows resolve to the same image: %s" % candidate)
             seen.add(candidate)
@@ -233,6 +267,9 @@ class ImageNetLTParquetDataset(Dataset):
         expected_shards: Optional[int] = None,
         num_classes: int = 1000,
         row_group_cache_size: int = 4,
+        shard_paths: Optional[Sequence[Path]] = None,
+        wnid_to_id: Optional[Dict[str, int]] = None,
+        official_entries: Optional[Sequence[Tuple[str, int]]] = None,
     ):
         if split not in ("train", "validation", "test"):
             raise ValueError("ImageNet-LT split must be train, validation, or test")
@@ -248,11 +285,12 @@ class ImageNetLTParquetDataset(Dataset):
         self.transform = transform
         self.num_classes = int(num_classes)
         self.row_group_cache_size = int(row_group_cache_size)
-        all_files = sorted(
-            path for path in self.root.rglob("*.parquet")
-            if not any(part in EXCLUDED_DIRS for part in path.parts)
-        )
-        self.files = [path for path in all_files if classify_parquet_split(path) == split]
+        self.files = (discover_imagenet_shards(self.root, split) if shard_paths is None
+                      else sorted(Path(path).resolve() for path in shard_paths))
+        if len(set(self.files)) != len(self.files) or any(
+            not path.is_relative_to(self.root) or classify_parquet_split(path) != split for path in self.files
+        ):
+            raise ValueError(f"ImageNet-LT {split} received duplicate or out-of-split shard paths")
         if not self.files:
             raise FileNotFoundError("No ImageNet-LT Parquet shards found for split %s under %s" %
                                     (split, self.root))
@@ -267,41 +305,67 @@ class ImageNetLTParquetDataset(Dataset):
         self.row_groups: List[_RowGroup] = []
         self._row_group_starts: List[int] = []
         labels: List[int] = []
+        physical_rows: Dict[Tuple[str, int], int] = {}
         cursor = 0
 
         for shard in self.files:
-            parquet_file = pq.ParquetFile(str(shard))
-            names = list(parquet_file.schema_arrow.names)
-            if self.label_column is None:
-                self.label_column = next(
-                    (name for name in ("label", "labels", "target", "fine_label", "class", "category_id")
-                     if name in names), None
-                )
-            if self.image_column is None:
-                self.image_column = next(
-                    (name for name in ("image", "images", "img", "pixel_values") if name in names), None
-                )
-            if self.label_column is None or self.image_column is None:
-                raise ValueError("Unrecognized ImageNet-LT Parquet schema in %s: %s" % (shard, names))
+            with pq.ParquetFile(shard) as parquet_file:
+                names = parquet_file.schema_arrow.names
+                if self.label_column is None:
+                    self.label_column = next(
+                        (name for name in ("label", "labels", "target", "fine_label", "class", "category_id")
+                         if name in names), None
+                    )
+                    if self.image_column is None:
+                        self.image_column = next(
+                            (name for name in ("image", "images", "img", "pixel_values") if name in names), None
+                        )
+                if self.label_column not in names or self.image_column not in names:
+                    raise ValueError(f"Unrecognized ImageNet-LT Parquet schema in {shard}: {names}")
+                columns = [self.label_column]
+                if official_entries is not None:
+                    # Project the filename only. The image byte column stays unopened.
+                    columns.append(f"{self.image_column}.path")
+                for rg_index in range(parquet_file.metadata.num_row_groups):
+                    row_count = int(parquet_file.metadata.row_group(rg_index).num_rows)
+                    if row_count == 0:
+                        continue
+                    self._row_group_starts.append(cursor)
+                    self.row_groups.append(_RowGroup(str(shard), rg_index, cursor, row_count))
+                    table = parquet_file.read_row_group(rg_index, columns=columns, use_threads=False)
+                    values = table[self.label_column].to_pylist()
+                    if len(values) != row_count:
+                        raise RuntimeError(f"ImageNet-LT row-group label count mismatch in {shard}")
+                    filenames = None
+                    if official_entries is not None:
+                        if self.image_column not in table.column_names:
+                            raise ValueError(f"ImageNet-LT manifest alignment needs the image.path field in {shard}")
+                        filenames = table[self.image_column].to_pylist()
+                    for offset, value in enumerate(values):
+                        label = resolve_label(value, wnid_to_id)
+                        if label is None or not 0 <= label < self.num_classes:
+                            raise ValueError(f"Invalid ImageNet-LT label in {shard}: {value!r}")
+                        labels.append(label)
+                        if filenames is not None:
+                            item = filenames[offset]
+                            if not item or not item.get("path"):
+                                raise ValueError(f"Missing ImageNet-LT filename in {shard}, row group {rg_index}")
+                            key = (PurePosixPath(normalize_relpath(item["path"])).name, label)
+                            if key in physical_rows:
+                                raise ValueError(f"Duplicate ImageNet-LT filename/label in Parquet: {key}")
+                            physical_rows[key] = cursor + offset
+                    cursor += row_count
 
-            for rg_index in range(parquet_file.metadata.num_row_groups):
-                row_count = int(parquet_file.metadata.row_group(rg_index).num_rows)
-                self._row_group_starts.append(cursor)
-                self.row_groups.append(_RowGroup(str(shard), rg_index, cursor, row_count))
-                table = parquet_file.read_row_group(rg_index, columns=[self.label_column], use_threads=False)
-                values = table.column(0).to_pylist()
-                if len(values) != row_count:
-                    raise RuntimeError("ImageNet-LT row-group label count mismatch in %s" % shard)
-                for value in values:
-                    label = resolve_label(value)
-                    if label is None:
-                        raise ValueError("Null or unrecognized ImageNet-LT label in %s" % shard)
-                    if label < 0 or label >= self.num_classes:
-                        raise ValueError("ImageNet-LT label outside [0,%d): %d" % (self.num_classes, label))
-                    labels.append(label)
-                cursor += row_count
-
-        self.labels = np.asarray(labels, dtype=np.int64)
+        labels = np.asarray(labels, dtype=np.int64)
+        self._physical_indices = None
+        if official_entries is not None:
+            ordered = [(PurePosixPath(path).name, label) for path, label in official_entries]
+            if len(ordered) != len(set(ordered)) or set(ordered) != physical_rows.keys():
+                missing = next((key for key in ordered if key not in physical_rows), None)
+                raise ValueError(f"ImageNet-LT {split} Parquet does not match official manifest membership; missing example {missing}")
+            self._physical_indices = np.fromiter((physical_rows[key] for key in ordered), dtype=np.int64)
+            labels = labels[self._physical_indices]
+        self.labels = labels
         if len(self.labels) != cursor:
             raise RuntimeError("ImageNet-LT total label count does not match row-group metadata")
         if expected_rows is None:
@@ -325,6 +389,13 @@ class ImageNetLTParquetDataset(Dataset):
     def __len__(self) -> int:
         return int(self.labels.shape[0])
 
+    def close(self) -> None:
+        """Release Arrow file handles, including on Windows."""
+        self._row_group_cache.clear()
+        for handle in self._handles.values():
+            handle.close()
+        self._handles.clear()
+
     def _get_row_group_payloads(self, record: _RowGroup):
         import pyarrow.parquet as pq
 
@@ -341,7 +412,7 @@ class ImageNetLTParquetDataset(Dataset):
         table = handle.read_row_group(
             record.row_group, columns=[self.image_column], use_threads=False
         )
-        payloads = table.column(0).to_pylist()
+        payloads = table.column(0)
         if len(payloads) != record.rows:
             raise RuntimeError("ImageNet-LT image row-group length mismatch: %s rg=%d" %
                                (record.path, record.row_group))
@@ -357,10 +428,10 @@ class ImageNetLTParquetDataset(Dataset):
             index += len(self)
         if index < 0 or index >= len(self):
             raise IndexError(index)
-        record_index = bisect.bisect_right(self._row_group_starts, index) - 1
+        physical = index if self._physical_indices is None else int(self._physical_indices[index])
+        record_index = bisect.bisect_right(self._row_group_starts, physical) - 1
         record = self.row_groups[record_index]
-        local_index = index - record.start
-        payload = self._get_row_group_payloads(record)[local_index]
+        payload = self._get_row_group_payloads(record)[physical - record.start].as_py()
         image_bytes, local_path = image_payload_to_bytes_or_path(payload)
         if image_bytes is not None:
             with Image.open(BytesIO(image_bytes)) as image:
@@ -369,6 +440,14 @@ class ImageNetLTParquetDataset(Dataset):
             candidate = Path(local_path)
             if not candidate.is_absolute():
                 candidate = self.root / candidate
+            candidate = candidate.resolve()
+            if not candidate.is_relative_to(self.root):
+                raise ValueError(f"ImageNet-LT image path escapes dataset root: {candidate}")
+            if self.split == "train" and any(
+                part.lower() in {"test", "val", "valid", "validation"}
+                for part in candidate.relative_to(self.root).parts
+            ):
+                raise ValueError(f"Out-of-split ImageNet-LT train image path: {candidate}")
             with Image.open(candidate) as image:
                 image = image.convert("RGB")
         else:

@@ -1,0 +1,47 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-16T04:06:54+08:00",
+  "official_test_access": false,
+  "cuda_diagnostics": {
+    "pytorch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cuda_visible_devices": null,
+    "requested_device": "cuda:0",
+    "requested_device_index": 0,
+    "device": "cuda:0",
+    "device_index": 0,
+    "cuda_available": true,
+    "device_count": 1,
+    "initial_current_device": 0,
+    "current_device": 0,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "feature_shape": [
+    115846,
+    2048
+  ],
+  "feature_dtype": "float32",
+  "label_shape": [
+    115846
+  ],
+  "label_dtype": "int64",
+  "finite": true,
+  "labels_sha256": "61b67184cb2ff26f4639b2db35b9c3e3e76f3fa3de2754a4862c6da03b60b38a",
+  "dataset": "imagenet_lt",
+  "seed": 125,
+  "data_fingerprint": "02397563dd5bbe23e29699d7657ec93183efc9c4f03700fe9bcb209c576b94ab",
+  "stage1_checkpoint_sha256": "a22fb0b48b5da48db6b195ea089a76b6bdace16be9a89cd068329255bd13d67c",
+  "encoder_state_sha256": "6661c794ba138dc9cf2d7df345281bc11481af7b92558e19e22540e7da3e61bf",
+  "transform": "Resize256_CenterCrop224_ImageNetNormalize",
+  "frozen_encoder_and_bn_unchanged": true,
+  "peak_cuda_allocated_bytes": 341808640,
+  "peak_cuda_reserved_bytes": 1440743424,
+  "artifacts": {
+    "config.json": "aa0447d83c979baedc554bce15d6a477e8e66a30f39d7081c65bacbcbd14db54",
+    "run.log": "93cdae1b63c77d86a7238875c2450372923c730344ecc509a351f73dcef15a71",
+    "train_features.npy": "2d9af9ef97ab2c63cd7226531df462057878ae85694f0edc5da8e8dc28e779ee",
+    "train_labels.npy": "9a087049fbe5f456ddfd209576ee73dfccd37f0e31f3df999f1481f4107ee44d"
+  },
+  "ended_at": "2026-11-16T04:11:11+08:00"
+}

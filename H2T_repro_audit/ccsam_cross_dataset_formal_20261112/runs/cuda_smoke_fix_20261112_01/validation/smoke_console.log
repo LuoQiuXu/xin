@@ -1,0 +1,39 @@
+2026-11-12T20:58:53+08:00 Starting smoke in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\cuda_smoke_fix_20261112_01\smoke
+2026-11-12T20:58:53+08:00 Starting smoke_dataset in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\cuda_smoke_fix_20261112_01\smoke\imagenet_lt
+2026-11-12T20:59:12+08:00 Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\experiment_common.py", line 227, in record_run
+    yield status
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_smoke.py", line 68, in smoke_dataset
+    result = stage1_batch(encoder, initial, sgd, scaler, x.to(device), y.to(device), rng,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\train_stage1.py", line 75, in stage1_batch
+    raise RuntimeError(f"Missing or nonfinite Stage-I Smoke gradient at AMP scale {scale_before}")
+RuntimeError: Missing or nonfinite Stage-I Smoke gradient at AMP scale 65536.0
+
+2026-11-12T20:59:12+08:00 Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\experiment_common.py", line 227, in record_run
+    yield status
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_smoke.py", line 169, in run_smoke
+    smoke_dataset(exp, name, prepared["datasets"][name], exp.seeds[0], device)
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_smoke.py", line 68, in smoke_dataset
+    result = stage1_batch(encoder, initial, sgd, scaler, x.to(device), y.to(device), rng,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\train_stage1.py", line 75, in stage1_batch
+    raise RuntimeError(f"Missing or nonfinite Stage-I Smoke gradient at AMP scale {scale_before}")
+RuntimeError: Missing or nonfinite Stage-I Smoke gradient at AMP scale 65536.0
+
+Execution report: D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\cuda_smoke_fix_20261112_01\FORMAL_EXECUTION_REPORT.md
+Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 269, in <module>
+    main()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 237, in main
+    run_smoke(exp, prepared, device)
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_smoke.py", line 169, in run_smoke
+    smoke_dataset(exp, name, prepared["datasets"][name], exp.seeds[0], device)
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_smoke.py", line 68, in smoke_dataset
+    result = stage1_batch(encoder, initial, sgd, scaler, x.to(device), y.to(device), rng,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\train_stage1.py", line 75, in stage1_batch
+    raise RuntimeError(f"Missing or nonfinite Stage-I Smoke gradient at AMP scale {scale_before}")
+RuntimeError: Missing or nonfinite Stage-I Smoke gradient at AMP scale 65536.0
+SMOKE_EXIT_CODE=1

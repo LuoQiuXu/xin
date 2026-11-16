@@ -1,0 +1,277 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-12T21:30:07+08:00",
+  "official_test_access": false,
+  "starting_stage1_state_sha256": [
+    "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+    "0fff25e31057f9d82d3aa0a1b652517dcae08e59b5e898bd7f2ea4b74569937a"
+  ],
+  "stage1_batches": [
+    {
+      "loss": 5.95571231842041,
+      "mixup_correct": 0.0,
+      "mixup_lambda": 0.9268907886795259,
+      "scale_before": 8192.0,
+      "scale_after": 8192.0,
+      "optimizer_step": true,
+      "feature_shape": [
+        16,
+        2048
+      ],
+      "logit_shape": [
+        16,
+        365
+      ],
+      "batch_identity": {
+        "input_images_finite": true,
+        "mixed_images_finite": true,
+        "images_sha256": "190cd0ab00f4b220b7a173f99577aa456b327ec129ae8d96993c13d95b49f660",
+        "labels_sha256": "90d50e6dddb5637c9b7ea71138caf2b2995f722d9d41bf67da544fa415db2a5a",
+        "mixed_images_sha256": "6e97d42f6ce686473a3bbd292bf4ddc99dcb1d380888fd6640f5ade2d42bcd72",
+        "mixup_lambda": 0.9268907886795259,
+        "mixup_permutation": [
+          6,
+          9,
+          10,
+          2,
+          13,
+          0,
+          8,
+          3,
+          4,
+          15,
+          5,
+          11,
+          14,
+          12,
+          7,
+          1
+        ]
+      },
+      "amp_attempt_count": 4,
+      "final_unscaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 161,
+        "missing_names": [],
+        "nonfinite_names": [],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 0
+      },
+      "update": {
+        "changed_parameter_tensors": 161,
+        "changed_parameter_elements": 24241986,
+        "max_abs_delta": 0.012851574458181858,
+        "parameters_finite_after": true
+      }
+    },
+    {
+      "loss": 6.053693771362305,
+      "mixup_correct": 0.0,
+      "mixup_lambda": 0.5444591609004775,
+      "scale_before": 8192.0,
+      "scale_after": 8192.0,
+      "optimizer_step": true,
+      "feature_shape": [
+        16,
+        2048
+      ],
+      "logit_shape": [
+        16,
+        365
+      ],
+      "batch_identity": {
+        "input_images_finite": true,
+        "mixed_images_finite": true,
+        "images_sha256": "c5640c2d4c6ffb31019f453ed9849012da9976e659ad5f719f52a0381217c396",
+        "labels_sha256": "04b8d6d780f88c0d26727dba68d4fa42ac9bfd51781f34e0b1ed587bf68ceefb",
+        "mixed_images_sha256": "ef7a83b4fa932bc6a3b29581167f78923ddf984170b5975af17c02493657fd23",
+        "mixup_lambda": 0.5444591609004775,
+        "mixup_permutation": [
+          11,
+          8,
+          14,
+          3,
+          2,
+          7,
+          1,
+          12,
+          5,
+          4,
+          13,
+          15,
+          9,
+          6,
+          10,
+          0
+        ]
+      },
+      "amp_attempt_count": 1,
+      "final_unscaled_gradient_state": {
+        "trainable_tensors": 161,
+        "finite_tensors": 161,
+        "missing_names": [],
+        "nonfinite_names": [],
+        "not_in_optimizer_names": [],
+        "nan_values": 0,
+        "inf_values": 0
+      },
+      "update": {
+        "changed_parameter_tensors": 161,
+        "changed_parameter_elements": 24244695,
+        "max_abs_delta": 0.01216749637387693,
+        "parameters_finite_after": true
+      }
+    }
+  ],
+  "stage1_amp_evidence": {
+    "1": [
+      {
+        "file": "places_lt/batch_01_attempt_00.json",
+        "sha256": "e86284cf41b0bb39045be3c56ba6d5bc364a9ef8c465961a005c95873f519198",
+        "outcome": "gradscaler_skipped_nonfinite",
+        "scale_before": 65536.0,
+        "scale_after": 32768.0,
+        "optimizer_step": false
+      },
+      {
+        "file": "places_lt/batch_01_attempt_01.json",
+        "sha256": "90dbfddeae22f0467f04d01cd2b52b1fd0126d70a42060996d5f5052c36afdbc",
+        "outcome": "gradscaler_skipped_nonfinite",
+        "scale_before": 32768.0,
+        "scale_after": 16384.0,
+        "optimizer_step": false
+      },
+      {
+        "file": "places_lt/batch_01_attempt_02.json",
+        "sha256": "46efca83258ee6314b8985e550fb9a0f1efc0cbe03fc4905a2a1fa9cf5a0aafe",
+        "outcome": "gradscaler_skipped_nonfinite",
+        "scale_before": 16384.0,
+        "scale_after": 8192.0,
+        "optimizer_step": false
+      },
+      {
+        "file": "places_lt/batch_01_attempt_03.json",
+        "sha256": "203006717e9f86e365afd0a2db9baacde832e0bf886a2d777f3253d263d81982",
+        "outcome": "finite_optimizer_update",
+        "scale_before": 8192.0,
+        "scale_after": 8192.0,
+        "optimizer_step": true
+      }
+    ],
+    "2": [
+      {
+        "file": "places_lt/batch_02_attempt_00.json",
+        "sha256": "baf33086bdf51067a21e2e482d85108af439f0b434c6b4b124fd96efc18f49d1",
+        "outcome": "finite_optimizer_update",
+        "scale_before": 8192.0,
+        "scale_after": 8192.0,
+        "optimizer_step": true
+      }
+    ]
+  },
+  "current_stage1_batch": 2,
+  "disposable_cache": {
+    "feature_shape": [
+      64,
+      2048
+    ],
+    "feature_dtype": "float32",
+    "label_shape": [
+      64
+    ],
+    "label_dtype": "int64",
+    "finite": true,
+    "labels_sha256": "f7ed1189aba180703423ec1b4735ccab75288792570b73ae56685f4b6a74b45f"
+  },
+  "real_gradient_equivalence": {
+    "rtol": 1e-05,
+    "atol": 1e-07,
+    "max_abs": 0.0,
+    "max_error_over_tolerance": 0.0,
+    "elements_outside_tolerance": 0,
+    "passed": true
+  },
+  "synthetic_gradient_equivalence": {
+    "rtol": 1e-05,
+    "atol": 1e-07,
+    "max_abs": 0.0,
+    "max_error_over_tolerance": 0.0,
+    "elements_outside_tolerance": 0,
+    "passed": true
+  },
+  "pairing": {
+    "dataset": "places_lt",
+    "seed": 123,
+    "num_classes": 365,
+    "initial_classifier_sha256": "455f00ae61f046d1698307f0698aed9325e648de80bb6706c3d98593240a8968",
+    "encoder_state_sha256": "1e9f24559cc4f673e9195c472366120d10685afaba865a8b07a0ff9c669c90ab",
+    "data_fingerprint": "49b706efae3d45b00874a8da716e560d4a75f56fbe110c9c00da6de61c222c5d",
+    "sampling_plan_sha256": "53928969a0faa80945c23a8be8f76b29e248cd9e6f158b00fdca4be81ec5258f",
+    "indices_sha256": "f0bcfecf4d62e5c487a44ae0f50611c4a26d6d31d2a74b090b9171e95cf32589",
+    "feature_cache_sha256": "e9c4c3409d47ff6cf6dd514c648a5ebe9b62c08cca0e33ddcb77e955b1b6a009",
+    "labels_sha256": "f7ed1189aba180703423ec1b4735ccab75288792570b73ae56685f4b6a74b45f"
+  },
+  "arms": {
+    "D0": {
+      "alpha": 0.03333333333333333,
+      "clean_ce_mean": 5.998631477355957,
+      "weighted_adv_ce_mean": 12.372574806213379,
+      "head_preservation_kl": 0.0,
+      "many_inputs_in_batch": 0,
+      "delta_mean_l2": 0.0,
+      "delta_mean_relative_l2": 0.0,
+      "delta_zero_gradient_classes": 0,
+      "loss": 6.211096286773682,
+      "one_classifier_update": true,
+      "encoder_and_bn_unchanged": true,
+      "teacher_checkpoint_sha256": null,
+      "teacher_eval_frozen_no_grad": false,
+      "kl_output_classes": null
+    },
+    "D1": {
+      "alpha": 0.03333333333333333,
+      "clean_ce_mean": 5.998631477355957,
+      "weighted_adv_ce_mean": 15.104911804199219,
+      "head_preservation_kl": 0.0,
+      "many_inputs_in_batch": 0,
+      "delta_mean_l2": 2.0617918968200684,
+      "delta_mean_relative_l2": 0.09389787912368774,
+      "delta_zero_gradient_classes": 0,
+      "loss": 6.302174091339111,
+      "one_classifier_update": true,
+      "encoder_and_bn_unchanged": true,
+      "teacher_checkpoint_sha256": null,
+      "teacher_eval_frozen_no_grad": false,
+      "kl_output_classes": null
+    },
+    "D2": {
+      "alpha": 0.03333333333333333,
+      "clean_ce_mean": 5.998631477355957,
+      "weighted_adv_ce_mean": 15.104911804199219,
+      "head_preservation_kl": 0.003733615390956402,
+      "many_inputs_in_batch": 26,
+      "delta_mean_l2": 2.0617918968200684,
+      "delta_mean_relative_l2": 0.09389787912368774,
+      "delta_zero_gradient_classes": 0,
+      "loss": 6.305907726287842,
+      "one_classifier_update": true,
+      "encoder_and_bn_unchanged": true,
+      "teacher_checkpoint_sha256": "0f516702d6540d35c90297a65197647f9b6f788609851ab5073be9a406d783e0",
+      "teacher_eval_frozen_no_grad": true,
+      "kl_output_classes": 365
+    }
+  },
+  "passed": true,
+  "artifacts": {
+    "config.json": "d502bb7460f41d5d0e18405fac82a83cd606a275683f69e9ea1864ab5043e084",
+    "disposable_D0_teacher/config.json": "43aef3fa01ce89cec0e7f3969d971f4b70d4e5ea91b4957e1f2a9e18adba9441",
+    "disposable_D0_teacher/final_classifier.pt": "0f516702d6540d35c90297a65197647f9b6f788609851ab5073be9a406d783e0",
+    "disposable_D0_teacher/run.log": "3ec5a28ab12819086e98ca11b8f8a08834e8dcd099414331b445ee042c3da31e",
+    "disposable_D0_teacher/status.json": "e91209e099b87051d60e730d40495d96a9d36404f71994ddec8a8abc6b8ef07b",
+    "run.log": "ad788b79f265277708fecc776a2801d19448c609c2e496643e0ef1c1db69953c",
+    "train_features.npy": "e9c4c3409d47ff6cf6dd514c648a5ebe9b62c08cca0e33ddcb77e955b1b6a009",
+    "train_labels.npy": "53858c0f024624fe8d0aee8655b4d27c26908df3372ba3320a08e20e9a88e153"
+  },
+  "ended_at": "2026-11-12T21:31:32+08:00"
+}

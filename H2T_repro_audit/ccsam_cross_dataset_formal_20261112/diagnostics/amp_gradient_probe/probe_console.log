@@ -1,0 +1,7 @@
+2026-11-12T21:20:23+08:00 Starting amp-gradient-probe in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\diagnostics\amp_gradient_probe\imagenet_lt_seed123_probe_01
+2026-11-12T21:20:44+08:00 AMP attempt 0, scale 65536 -> 32768, missing=0, NaN=0, Inf=2630, optimizer_step=False
+2026-11-12T21:20:44+08:00 AMP attempt 1, scale 32768 -> 16384, missing=0, NaN=0, Inf=686, optimizer_step=False
+2026-11-12T21:20:45+08:00 AMP attempt 2, scale 16384 -> 8192, missing=0, NaN=0, Inf=12, optimizer_step=False
+2026-11-12T21:20:45+08:00 AMP attempt 3, scale 8192 -> 8192, missing=0, NaN=0, Inf=0, optimizer_step=True
+2026-11-12T21:20:45+08:00 Completed
+AMP_PROBE_EXIT_CODE=0

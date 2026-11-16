@@ -1,0 +1,96 @@
+{
+  "dataset": "imagenet_lt",
+  "seed": 123,
+  "batch_one_based": 1,
+  "workers": 4,
+  "prepared_manifest_sha256": "ad2e0333a970ce92a2ee4b1aac964b882f9f7978712cae7e0f5f5f3164f7045c",
+  "initial_state_sha256": [
+    "62cc4e4bac68c40667da37fb95caebff9eddf76609cf2d35df382b3422e29eda",
+    "161826c7215660321016b3409b822fb56e568daba342eb85d25803a0a6aa16ac"
+  ],
+  "indices": [
+    64734,
+    70786,
+    71542,
+    9400,
+    68410,
+    58479,
+    63705,
+    27410,
+    77713,
+    71853,
+    89872,
+    44672,
+    64396,
+    53560,
+    70604,
+    36907
+  ],
+  "indices_sha256": "e52c1dd9a5087a8859dfaba2bce9deba7bd035a352b650b85cf554c4aff26864",
+  "labels": [
+    560,
+    597,
+    601,
+    78,
+    580,
+    512,
+    554,
+    242,
+    665,
+    602,
+    769,
+    398,
+    559,
+    468,
+    597,
+    331
+  ],
+  "labels_sha256": "4898dcfa4275c318affaa2f6f31ce728170c7acdc570790c2f6ff410a4dfce97",
+  "images_sha256": "302c8ee1526e68ff4808f9a4a2e732ec4dad421e448eea3f7ca6ca3a39768207",
+  "images": {
+    "shape": [
+      16,
+      3,
+      224,
+      224
+    ],
+    "dtype": "torch.float32",
+    "finite": true,
+    "min": -2.1179039478302,
+    "max": 2.640000104904175
+  },
+  "mixed_images_sha256": "66dfdb2b7b4b124b95d8df8558c747013e7eace76d85b443fa62ef8624f13ff7",
+  "mixed_images": {
+    "shape": [
+      16,
+      3,
+      224,
+      224
+    ],
+    "dtype": "torch.float32",
+    "finite": true,
+    "min": -2.1116440296173096,
+    "max": 2.5979502201080322
+  },
+  "mixup_lambda": 0.9268907886795259,
+  "mixup_permutation": [
+    6,
+    9,
+    10,
+    2,
+    13,
+    0,
+    8,
+    3,
+    4,
+    15,
+    5,
+    11,
+    14,
+    12,
+    7,
+    1
+  ],
+  "learning_rate": 0.002,
+  "official_test_access": false
+}

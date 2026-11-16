@@ -1,0 +1,19 @@
+Execution report: D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\FORMAL_EXECUTION_REPORT.md
+Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 242, in <module>
+    main()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 211, in main
+    run_smoke(exp, prepared, cuda_device())
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_smoke.py", line 163, in run_smoke
+    with record_run(SMOKE, exp.config("smoke"), gpu=True) as status:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\experiment_common.py", line 200, in record_run
+    torch.cuda.reset_peak_memory_stats(0)
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\site-packages\torch\cuda\memory.py", line 397, in reset_peak_memory_stats
+    return torch._C._cuda_resetPeakMemoryStats(device)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Invalid device argument 
+SMOKE_EXIT_CODE=1

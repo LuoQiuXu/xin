@@ -1,0 +1,9 @@
+{
+  "supervisor_pid": 10004,
+  "launched_at": "2026-11-12T21:33:05.7689924+08:00",
+  "branch": "experiment/ccsam-cross-dataset-formal-20261112",
+  "head": "a3977ae07f3fd33c1cac9673909a300792818c7f",
+  "attempt": "amp_gradient_fix_20261112_01",
+  "command": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe -B -u -X utf8 run_cross_dataset.py run-formal --all",
+  "console_log": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_cross_dataset_formal_20261112\\runs\\amp_gradient_fix_20261112_01\\validation\\run-formal_console.log"
+}

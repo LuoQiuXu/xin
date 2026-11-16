@@ -1,0 +1,52 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-15T22:44:50+08:00",
+  "official_test_access": false,
+  "cuda_diagnostics": {
+    "pytorch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cuda_visible_devices": null,
+    "requested_device": "cuda:0",
+    "requested_device_index": 0,
+    "device": "cuda:0",
+    "device_index": 0,
+    "cuda_available": true,
+    "device_count": 1,
+    "initial_current_device": 0,
+    "current_device": 0,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "dataset": "places_lt",
+  "seed": 125,
+  "data_fingerprint": "49b706efae3d45b00874a8da716e560d4a75f56fbe110c9c00da6de61c222c5d",
+  "epochs_completed": 90,
+  "optimizer_steps": 351496,
+  "amp_skips": 134,
+  "current_epoch": 90,
+  "current_batch": 3907,
+  "last_epoch_metrics": {
+    "epoch": 90,
+    "lr": 0.0,
+    "train_mixup_loss": 2.947284993438721,
+    "train_mixup_accuracy": 39.06968323245049,
+    "samples": 62500,
+    "batches": 3907,
+    "optimizer_steps": 3905,
+    "amp_skips": 2,
+    "amp_scale": 65536.0
+  },
+  "encoder_state_sha256": "9a821270d953cf21d90989d0c02b385fccd387c575f184a497ef28d69a62c5f1",
+  "classifier_state_sha256": "b650ac9d005063d9ac9ff814995d9f196a806350be60e3e697612d72db6e8a2d",
+  "final_epoch": 90,
+  "checkpoint": "epoch_90.pt",
+  "peak_cuda_allocated_bytes": 1061878784,
+  "peak_cuda_reserved_bytes": 1218445312,
+  "artifacts": {
+    "config.json": "998410cab5315a3755d369fbf708cd13b9cf3b3ffb1cb9e3008b0de61982e943",
+    "epoch_90.pt": "03ee8235207596dbc5d51b74fdb98719c06ed936cf4b2bc832f0a69ef083e3e5",
+    "epoch_metrics.csv": "4d35f8da573c9b581b0cb87480d0cee3d59e9d55d149aa694b87e7174c8bd27c",
+    "run.log": "d75ea09341fdefb1aae2d2ac861f4617482adb21166ccbb7a4c68681bc3542e5"
+  },
+  "ended_at": "2026-11-16T03:58:20+08:00"
+}

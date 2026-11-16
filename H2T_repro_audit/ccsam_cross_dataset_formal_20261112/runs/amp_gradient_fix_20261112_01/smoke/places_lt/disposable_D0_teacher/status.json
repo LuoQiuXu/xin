@@ -1,0 +1,25 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-12T21:31:32+08:00",
+  "official_test_access": false,
+  "dataset": "places_lt",
+  "seed": 123,
+  "num_classes": 365,
+  "initial_classifier_sha256": "455f00ae61f046d1698307f0698aed9325e648de80bb6706c3d98593240a8968",
+  "encoder_state_sha256": "1e9f24559cc4f673e9195c472366120d10685afaba865a8b07a0ff9c669c90ab",
+  "data_fingerprint": "49b706efae3d45b00874a8da716e560d4a75f56fbe110c9c00da6de61c222c5d",
+  "sampling_plan_sha256": "53928969a0faa80945c23a8be8f76b29e248cd9e6f158b00fdca4be81ec5258f",
+  "indices_sha256": "f0bcfecf4d62e5c487a44ae0f50611c4a26d6d31d2a74b090b9171e95cf32589",
+  "feature_cache_sha256": "e9c4c3409d47ff6cf6dd514c648a5ebe9b62c08cca0e33ddcb77e955b1b6a009",
+  "labels_sha256": "f7ed1189aba180703423ec1b4735ccab75288792570b73ae56685f4b6a74b45f",
+  "arm": "D0",
+  "final_epoch": 1,
+  "epochs_completed": 1,
+  "classifier_state_sha256": "6ece20325eb07bfa7d5fd5ea32d6f46e30b976d69857655467784732ee16fdf2",
+  "artifacts": {
+    "config.json": "43aef3fa01ce89cec0e7f3969d971f4b70d4e5ea91b4957e1f2a9e18adba9441",
+    "final_classifier.pt": "0f516702d6540d35c90297a65197647f9b6f788609851ab5073be9a406d783e0",
+    "run.log": "3ec5a28ab12819086e98ca11b8f8a08834e8dcd099414331b445ee042c3da31e"
+  },
+  "ended_at": "2026-11-12T21:31:32+08:00"
+}

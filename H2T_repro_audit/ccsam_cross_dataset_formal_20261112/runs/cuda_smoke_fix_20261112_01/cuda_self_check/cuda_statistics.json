@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "tensor_bytes": [
+    1024,
+    2048
+  ],
+  "cuda": {
+    "pytorch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cuda_visible_devices": null,
+    "requested_device": "cuda:0",
+    "requested_device_index": 0,
+    "device": "cuda:0",
+    "device_index": 0,
+    "cuda_available": true,
+    "device_count": 1,
+    "initial_current_device": 0,
+    "current_device": 0,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "peak_cuda_allocated_bytes": 3072,
+  "peak_cuda_reserved_bytes": 2097152
+}

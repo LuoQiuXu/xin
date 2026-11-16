@@ -1,0 +1,42 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-12T21:26:54+08:00",
+  "official_test_access": false,
+  "environment": {
+    "python": "3.12.12",
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torchvision": "0.29.1+cu132",
+    "pyarrow": "26.0.1",
+    "pillow": "12.3.0",
+    "cudnn": 92400,
+    "pytorch": "2.14.1+cu132",
+    "cuda": "13.2",
+    "cuda_visible_devices": null,
+    "requested_device": "cuda:0",
+    "requested_device_index": 0,
+    "device": "cuda:0",
+    "device_index": 0,
+    "cuda_available": true,
+    "device_count": 1,
+    "initial_current_device": 0,
+    "current_device": 0,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "datasets": [
+    "imagenet_lt",
+    "places_lt"
+  ],
+  "artifacts": {
+    "config.json": "af369e3014cf3cb164dd043c2b310a73fa7ec4940765390a9b8ee0b7b4e98582",
+    "imagenet_lt_plan_seed123.npy": "9a8a53e7f9319e3fc8be0aeb86958fe9c0702aaca3efa1490af6215871a28a9a",
+    "imagenet_lt_plan_seed124.npy": "861994908a7cac0e002c66815b4d4a45c04ffa03868637ad5fde4f08ed226328",
+    "imagenet_lt_plan_seed125.npy": "769c5939ba2d82015953b66d262add49cc478d0e1858f167ed3781624ba3f293",
+    "places_lt_plan_seed123.npy": "53928969a0faa80945c23a8be8f76b29e248cd9e6f158b00fdca4be81ec5258f",
+    "places_lt_plan_seed124.npy": "04587f4f8f5a1be10eab049a2685e3eea08fa3a30b60461986b3a33a7895b0d4",
+    "places_lt_plan_seed125.npy": "7c39f90d441b2362f200cd9e723b57592d684826d2148e2f9f246edd3d8bb82c",
+    "prepared_manifest.json": "d01856dc8da7de302bcd8aa3540398ab242923d6e965fb4309e902bf978f2948",
+    "run.log": "c5a2acfbf9f9339bf4517270e95df9e687fa3afd124f2e45683060a656b45ffa"
+  },
+  "ended_at": "2026-11-12T21:28:06+08:00"
+}

@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 269, in <module>
+    main()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 231, in main
+    run_formal(exp)
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 210, in run_formal
+    fn()
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\run_cross_dataset.py", line 203, in <lambda>
+    ("evaluate-final", lambda: evaluate(exp, prepared, device)),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\evaluate_final.py", line 187, in evaluate
+    access["rows"] = evaluate_dataset(
+                     ^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\evaluate_final.py", line 128, in evaluate_dataset
+    with official_test_dataset(exp, name, reference_shas, mark_access) as (dataset, targets):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\app\minicondaaa\envs\xiaoju\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\evaluate_final.py", line 83, in official_test_dataset
+    dataset = ImageNetLTParquetDataset(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\cross_dataset_data.py", line 365, in __init__
+    raise ValueError(f"ImageNet-LT {split} Parquet does not match official manifest membership; missing example {missing}")
+ValueError: ImageNet-LT test Parquet does not match official manifest membership; missing example ('ILSVRC2012_val_00029930.JPEG', 0)

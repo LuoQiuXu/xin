@@ -1,0 +1,10 @@
+# Preserve the bytes recorded in the run and publication SHA256 indexes.
+/runs/** -text
+/validation/** -text
+/diagnostics/amp_gradient_probe/**/*.json -text
+/diagnostics/amp_gradient_probe/**/*.log -text
+/diagnostics/AMP_GRADIENT_DIAGNOSIS_REPORT.md -text
+/CUDA_SMOKE_FIX_REPORT.md -text
+/FORMAL_EXECUTION_REPORT.md -text
+/IMPLEMENTATION_REPORT.md -text
+/publication_20261116/** -text

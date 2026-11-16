@@ -1,0 +1,59 @@
+{
+  "state": "stopped_at_smoke_startup",
+  "git_branch": "experiment/ccsam-cross-dataset-formal-20261112",
+  "git_head": "a3977ae07f3fd33c1cac9673909a300792818c7f",
+  "environment": {
+    "python": "3.12.12",
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "pytorch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "pyarrow": "26.0.1",
+    "pillow": "12.3.0",
+    "cuda": "13.2",
+    "cudnn": 92400,
+    "cuda_available": true,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu_memory_bytes": 8546484224
+  },
+  "preflight": {
+    "exit_code": 0,
+    "manifest_sha256": "c5e7cea735d81ead18d3c946b286475393b410dba61c7576068b39dce459ee58",
+    "verified_sampling_plans": 6,
+    "train_rows": {
+      "imagenet_lt": 115846,
+      "places_lt": 62500
+    }
+  },
+  "smoke": {
+    "exit_code": 1,
+    "error": "RuntimeError: Invalid device argument",
+    "location": "torch.cuda.reset_peak_memory_stats(0) before PyTorch CUDA initialization",
+    "model_batches_completed": 0,
+    "peak_cuda_allocated_bytes": null
+  },
+  "repair": {
+    "source_sha256": {
+      "H2T_repro_audit/ccsam_cross_dataset_formal_20261112/experiment_common.py": {
+        "attempt_sha256": "6224ef8bf84dc8737aa3fa046c77e5ce1da3e7ceb1494dbff7ad78d7b7e3b58a",
+        "repaired_sha256": "628cfe17aaa3f844d1329857376ef2f0712e0b7e864abd2bd77799edd99f7032"
+      },
+      "H2T_repro_audit/ccsam_cross_dataset_formal_20261112/run_cross_dataset.py": {
+        "attempt_sha256": "342d5a011dc9921d935f3fd2b8c3d3f1dccf4387e5f650e02e4b94b1285c9dbc",
+        "repaired_sha256": "f1999cd906a99da53b2fbfe60d801017dc3675d18515dd88e48f9bce7eded407"
+      },
+      "H2T_repro_audit/ccsam_cross_dataset_formal_20261112/test_pipeline.py": {
+        "attempt_sha256": "cbcf915decf768f5f6506f41d4832b24cae9f25633ef9af2e7d97503b19b0e58",
+        "repaired_sha256": "ad57adab04df06775265a65388e4957458d73d63ed22f3bed15353664a20c1cd"
+      }
+    },
+    "python_files_compiled": 15,
+    "cpu_tests_passed": 17,
+    "gpu_smoke_reverified": false,
+    "fresh_preflight_needed_for_repaired_source": true
+  },
+  "stage1_completed": 0,
+  "stage2_completed": 0,
+  "feature_caches_completed": 0,
+  "official_test_dataset_access": false,
+  "formal_completed": false
+}

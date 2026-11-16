@@ -1,0 +1,25 @@
+{
+  "state": "completed",
+  "started_at": "2026-11-12T21:30:07+08:00",
+  "official_test_access": false,
+  "dataset": "imagenet_lt",
+  "seed": 123,
+  "num_classes": 1000,
+  "initial_classifier_sha256": "8299e974cfdbc9daef8abc81de15412b39969cbab8c749f52af885721b373bdd",
+  "encoder_state_sha256": "eb38f428554bc64cde0b7eee35656beb5adc72550d05934fe0e84ec3fcb2826a",
+  "data_fingerprint": "02397563dd5bbe23e29699d7657ec93183efc9c4f03700fe9bcb209c576b94ab",
+  "sampling_plan_sha256": "9a8a53e7f9319e3fc8be0aeb86958fe9c0702aaca3efa1490af6215871a28a9a",
+  "indices_sha256": "edf36b69f8e4e2b66dbe96b4a31147dbfa2dc2367a82dfa6410d13288399e131",
+  "feature_cache_sha256": "c55ee726689e57ba483234f7aee43a894fe6ebcd933c4833bafffcd758cab2d6",
+  "labels_sha256": "0ec8cf5359013e57d0f2b6d8caa07fde163cfda26ff82616c072c734597af42a",
+  "arm": "D0",
+  "final_epoch": 1,
+  "epochs_completed": 1,
+  "classifier_state_sha256": "889c9d41eee85bd02a4e515bb1574e738709c0bb0967ad6efbe05ad53e68113e",
+  "artifacts": {
+    "config.json": "f1005fd13db25a6e0397461d34fea9ac020fc9beaaa1cb708b86986999ff92e8",
+    "final_classifier.pt": "e1cc58875b91685bbbfdc8a4a93b1590350613495288a9da6cfb697e2a3966a9",
+    "run.log": "4eb2c636e399fd07162a8ac19227a20683d46038048e90aa0398ca5195169396"
+  },
+  "ended_at": "2026-11-12T21:30:07+08:00"
+}

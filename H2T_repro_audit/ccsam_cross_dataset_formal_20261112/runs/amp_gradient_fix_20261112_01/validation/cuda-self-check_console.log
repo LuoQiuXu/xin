@@ -1,0 +1,6 @@
+2026-11-12T21:28:11+08:00 Starting cuda-self-check in D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\amp_gradient_fix_20261112_01\cuda_self_check
+2026-11-12T21:28:11+08:00 Completed
+CUDA allocation and peak statistics PASS: D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\runs\amp_gradient_fix_20261112_01\cuda_self_check\cuda_statistics.json
+Git HEAD: a3977ae07f3fd33c1cac9673909a300792818c7f
+D:\xiangmuxunlian\xin\H2T_repro_audit\ccsam_cross_dataset_formal_20261112\IMPLEMENTATION_REPORT.md
+CUDA_SELF_CHECK_EXIT_CODE=0
