@@ -30,7 +30,7 @@ from cross_dataset_models import assert_encoder_frozen, freeze_encoder, state_di
 from experiment_common import (
     OUTPUT_ROOT, REPO as EXPERIMENT_REPO, METRICS, cuda_device, make_sgd, now,
     read_json, record_run, require_complete, run_log, run_path, save_status,
-    sha256_file, write_json,
+    sha256_file, write_json, git,
 )
 from extract_features import open_cache
 from margin_guard_core import selective_many_tail_margin_guard
@@ -87,6 +87,12 @@ def require_runtime_contract(exp) -> None:
         raise RuntimeError(
             "Base experiment has uncommitted source changes; commit or restore them before SMG:\n"
             + "\n".join(exp.dirty_sources)
+        )
+    smg_paths = [path.relative_to(REPO).as_posix() for path in SMG_SOURCE_FILES]
+    dirty_smg = git("status", "--porcelain=v1", "--untracked-files=all", "--", *smg_paths)
+    if dirty_smg:
+        raise RuntimeError(
+            "SMG implementation/protocol files must be committed before execution:\n" + dirty_smg
         )
     if not SMG_CONFIG_PATH.is_file():
         raise FileNotFoundError(SMG_CONFIG_PATH)
