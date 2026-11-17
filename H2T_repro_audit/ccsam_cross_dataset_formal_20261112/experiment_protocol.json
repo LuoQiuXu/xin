@@ -38,7 +38,11 @@
       "test_sealed_until_final_evaluation": true
     }
   },
-  "seeds": [123, 124, 125],
+  "seeds": [
+    123,
+    124,
+    125
+  ],
   "arms": {
     "D0": "C2_WEIGHTED_CE_NO_PERTURB",
     "D1": "C1_CCSAM_FEATURE_GRAD",
@@ -60,7 +64,7 @@
     "nesterov": false,
     "schedule": "5_epoch_linear_warmup_then_cosine_to_zero",
     "mixup": true,
-    "mixup_alpha": 1.0,
+    "mixup_alpha": 1,
     "loss": "cross_entropy",
     "sampling": "instance_shuffle",
     "amp": true,
@@ -87,10 +91,10 @@
     "shared_plan_across_arms": true,
     "class_weight": "log(max_count/count_c + 0.01)/2.0",
     "alpha_schedule": "min((epoch_index + 1)/30, 0.3)",
-    "adver_reg": 1.0,
+    "adver_reg": 1,
     "head_preservation": {
-      "temperature": 2.0,
-      "lambda": 1.0,
+      "temperature": 2,
+      "lambda": 1,
       "many_threshold": "train_count_strictly_greater_than_100",
       "teacher": "same_dataset_same_seed_D0_final_epoch_30",
       "student_initialization": "same_stage1_classifier_as_D0_and_D1",
@@ -103,9 +107,23 @@
     "primary_stage1_epoch": 90,
     "primary_stage2_epoch": 30,
     "test_access": "separate_final_evaluation_only",
-    "metrics": ["Overall", "Many", "Medium", "Few", "per_class_accuracy", "optional_Top5"],
+    "metrics": [
+      "Overall",
+      "Many",
+      "Medium",
+      "Few",
+      "per_class_accuracy",
+      "optional_Top5"
+    ],
     "aggregation": "mean_and_sample_std_over_three_end_to_end_seeds",
-    "paired_deltas": ["D1_minus_D0", "D2_minus_D0", "D2_minus_D1", "D3_minus_D0", "D3_minus_D1", "D3_minus_D2"],
+    "paired_deltas": [
+      "D1_minus_D0",
+      "D2_minus_D0",
+      "D2_minus_D1",
+      "D3_minus_D0",
+      "D3_minus_D1",
+      "D3_minus_D2"
+    ],
     "statistical_significance_claims": false
   },
   "official_sampler": {
@@ -119,5 +137,23 @@
     "stage1_batch_size": 16,
     "stage2_batch_size": 64,
     "num_workers_default": 4
+  },
+  "selective_margin_guard": {
+    "base_arm": "D1",
+    "new_arm": "D3",
+    "many_threshold": "official train_count strictly greater than 100",
+    "non_many_outputs": "official train_count less than or equal to 100",
+    "teacher": "matching same-dataset same-seed D0 final epoch-30 classifier, frozen",
+    "eligible_inputs": "Many true-label inputs with positive D0 teacher Many-to-non-Many margin greater than 1e-6",
+    "logits": "student and teacher logits on clean cached features",
+    "retained_margin_fraction": 0.5,
+    "epsilon": 0.000001,
+    "coefficient": 1,
+    "objective": "unchanged D1 objective plus coefficient times selective margin guard",
+    "full_logit_distillation": false,
+    "tail_input_guard": false,
+    "stage1_retraining": false,
+    "feature_reextraction": false,
+    "sampling_plan_regeneration": false
   }
 }
