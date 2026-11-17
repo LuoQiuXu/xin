@@ -1,8 +1,8 @@
 {
   "experiment": "CC-SAM controlled cross-dataset transfer: ImageNet-LT and Places-LT",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "base_branch": "experiment/cross-dataset-data-audit-20261111",
-  "implementation_branch": "experiment/ccsam-cross-dataset-formal-20261112",
+  "implementation_branch": "experiment/ccsam-selective-margin-guard-20261117",
   "datasets": {
     "imagenet_lt": {
       "root": "D:\\datasets\\ImageNet-LT",
@@ -42,7 +42,8 @@
   "arms": {
     "D0": "C2_WEIGHTED_CE_NO_PERTURB",
     "D1": "C1_CCSAM_FEATURE_GRAD",
-    "D2": "C4_CCSAM_HEAD_PRESERVE"
+    "D2": "C4_CCSAM_HEAD_PRESERVE",
+    "D3": "D1_CCSAM_PLUS_SELECTIVE_MANY_TO_TAIL_MARGIN_GUARD"
   },
   "stage1": {
     "architecture": "torchvision_resnet50",
@@ -104,7 +105,7 @@
     "test_access": "separate_final_evaluation_only",
     "metrics": ["Overall", "Many", "Medium", "Few", "per_class_accuracy", "optional_Top5"],
     "aggregation": "mean_and_sample_std_over_three_end_to_end_seeds",
-    "paired_deltas": ["D1_minus_D0", "D2_minus_D0", "D2_minus_D1"],
+    "paired_deltas": ["D1_minus_D0", "D2_minus_D0", "D2_minus_D1", "D3_minus_D0", "D3_minus_D1", "D3_minus_D2"],
     "statistical_significance_claims": false
   },
   "official_sampler": {
