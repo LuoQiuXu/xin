@@ -1,0 +1,146 @@
+CC-MIA CODEX EXECUTION INSTRUCTIONS
+Branch: experiment/ccsam-cross-class-margin-influence-audit-20261117
+Repository: LuoQiuXu/xin
+Experiment directory:
+H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia
+
+OBJECTIVE
+Implement, test, and run the frozen CC-MIA paired C2/C3 audit already committed in this branch. Do not redesign the experiment. The purpose is to quantify source-class-specific direct perturbation gradients, Many-vs-non-Many margin effects, training-state feedback, and SGD momentum/weight-decay contributions.
+
+A. GIT SAFETY AND BRANCH
+1. Confirm repository root and run git status --short.
+2. If the working tree has unrelated uncommitted changes, STOP and report them. Do not stash, reset, clean, checkout over, or overwrite user changes.
+3. Fetch origin and switch to exactly:
+   experiment/ccsam-cross-class-margin-influence-audit-20261117
+4. Verify the branch contains ccmia_core.py, train_ccmia.py, analyze_ccmia.py, test_ccmia_core.py, CCMIA_PROTOCOL.md and this instruction file.
+5. Do not create another branch. Do not merge into main or any prior C0-C4/TPR/SMG branch.
+
+B. STRICT PROTECTED FILES
+Treat all existing files outside the ccmia/ directory as read-only, especially:
+- ccsam_common.py
+- train_ccsam.py
+- train_c3.py
+- prepare_ccsam.py and prepared/
+- C0-C4 results, protocols, reports and checkpoints
+- tpr_lowrank/
+- the SMG branch/files
+Do not alter original sampler, data, class weights, alpha schedule, CC-SAM perturbation, optimizer, seeds, epoch count, or historical results.
+All new code and generated outputs must remain under the ccmia/ directory.
+Do not access, instantiate, load, decode, or evaluate official CIFAR-100 TEST.
+
+C. REVIEW THE COMMITTED IMPLEMENTATION BEFORE EXECUTION
+Read CCMIA_PROTOCOL.md and inspect all four Python files.
+The frozen definitions are:
+- Many: original TRAIN count > 100.
+- MediumN: 20 <= count <= 100.
+- Few: count < 20.
+- C2: original weighted-clean CE objective with no feature perturbation.
+- C3: existing CC-SAM objective, with feature delta exactly zero only for Many input examples.
+- Seeds 123/124/125, 30 epochs, batch size 64, 170 batches/epoch.
+- Frozen Clean Stage-I ResNet-32, 64-D GAP, FP32.
+- SGD lr 0.01, momentum 0.9, weight_decay 0.0002, nesterov false.
+- Same per-seed sampling plan, augmented images and GAP features for paired C2/C3.
+- Every batch trace must match the completed C0 reference trace exactly.
+
+The direct gradient term is grad(L_C3 at W3) - grad(L_C2 at W3), decomposed by source label. The state-feedback term is grad(L_C2 at W3) - grad(L_C2 at W2). Their sum must match the actual paired gradient difference. The SGD tracker propagates direct-source, state-feedback and weight-decay terms through the same momentum recurrence and checks the result against actual parameter and momentum-buffer differences. This is an ordered path decomposition; do not describe it as unique/order-independent causal attribution.
+
+D. ENVIRONMENT
+Use the existing Windows Conda environment named xiaoju (小菊) with the project's installed PyTorch/torchvision/NumPy dependencies. Use the active environment's python executable; do not install/upgrade packages unless a missing dependency is demonstrated and reported first.
+Run commands from:
+H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia
+
+E. SYNTAX AND UNIT TESTS
+Run:
+python -B -m py_compile ccmia_core.py train_ccmia.py analyze_ccmia.py test_ccmia_core.py
+python -B -m unittest -v test_ccmia_core
+
+If any test fails:
+- Stop immediately.
+- Do not edit the committed experiment to make the test pass.
+- Report the exact failing test, traceback, Python/PyTorch versions and git status.
+- Do not run preflight, smoke or formal.
+
+F. PREFLIGHT
+Run:
+python -B -u train_ccmia.py --phase preflight
+
+Preflight must pass all of the following:
+- prepared/prepared_manifest.json exists and is TEST-free;
+- Clean Stage-I checkpoint SHA256 equals the sealed protocol value;
+- prepared TRAIN image/label shapes and class counts match;
+- validation GAP shape is exactly 1,980 x 64;
+- all three official class-aware sampling plans match the pinned official sampler;
+- each seed has a completed, TEST-free C0 status;
+- each C0 batch_trace.csv contains exactly 5,100 rows with all required trace fields;
+- code/protocol hashes are recorded;
+- TEST guard records zero official TEST access attempts.
+If preflight fails, STOP. Do not regenerate prepared files, sampling plans or reference traces.
+
+G. REAL-DATA SMOKE
+Only after preflight passes, run:
+python -B -u train_ccmia.py --phase smoke
+
+Smoke performs two real paired batches for each seed, with updates discarded. It must verify:
+- C2/C3 initial classifier states match;
+- both arms use the exact C0 batch indices/labels, augmented-image hashes and GAP-feature hashes;
+- C2 has zero feature perturbation;
+- C3 Many input perturbation is bitwise zero;
+- direct source-class gradient contributions sum to the autograd gradient difference;
+- Many source-class direct contributions are exactly zero;
+- clean-gradient analytic formula matches autograd;
+- direct + state-feedback gradients reproduce the total paired gradient difference;
+- source-resolved margin pressure is additive;
+- SGD momentum/weight-decay components reconstruct actual paired parameter and momentum-buffer differences within the frozen tolerance;
+- frozen backbone and BN buffers remain bitwise unchanged;
+- TEST guard remains clean.
+No formal results directory or checkpoint may be created during Smoke.
+If Smoke fails, STOP. Do not loosen tolerances, edit the experiment, or run Formal.
+
+H. FORMAL TRAINING
+Only if Preflight and Smoke both pass, run:
+python -B -u train_ccmia.py --phase formal
+
+This executes exactly three seeds x 30 epochs, with 5,100 paired batch updates per seed. C2 and C3 are trained side-by-side from identical initial classifier weights and share one frozen-backbone feature extraction per batch.
+Do not resume, restart, overwrite, skip a seed, choose a best epoch, or change any hyperparameter.
+If a seed fails, preserve its partial status/logs, stop the full run, and report the error. Do not rerun into the same output directory.
+Expected per-seed batch trace length: 5,100.
+Expected paired total: 15,300 batch steps, with two classifier optimizer updates per paired batch.
+The original official TEST must remain untouched.
+
+I. ANALYSIS
+Only after formal_completed.json confirms all three seeds completed, run:
+python -B -u analyze_ccmia.py
+
+Review:
+- CCMIA_RESULTS.md
+- analysis/summary.json
+- analysis/final_paired_metrics.csv
+- analysis/source_class_direct_margin_epoch30.csv
+- analysis/source_to_many_margin_pairs_epoch30.csv
+- each seed's margin_metrics.csv, margin_decomposition.csv, source_margin_influence.csv (both cumulative parameter contribution and per-step source/target pressure), source_target_group_gradient.csv and step_influence.csv
+Check exact row counts, finite values, three-seed coverage, source/target group definitions, and parameter/momentum reconstruction residuals.
+Do not call the TRAIN-derived holdout an independent test set. Explicitly note that class 0 has no holdout examples.
+Do not claim statistical significance or paper-level novelty.
+
+J. VERSION CONTROL AND DELIVERABLES
+Do not commit .pth binary checkpoints. They are local artifacts.
+After successful analysis, review git diff --check and git status --short. Confirm no protected file changed.
+Commit and push only the ccmia/ source/protocol and the generated compact audit reports/CSVs/JSON/Markdown. Keep local checkpoint files and temporary logs out of Git.
+Push to the exact branch:
+experiment/ccsam-cross-class-margin-influence-audit-20261117
+
+If any stage fails, do not push a misleading success report. Preserve the failure artifacts locally and report the exact stop point.
+
+FINAL CODEX RESPONSE
+Report:
+1. branch and final commit SHA;
+2. syntax/unit-test results;
+3. preflight and smoke results;
+4. formal status per seed and actual steps;
+5. output paths and row counts;
+6. C2/C3 final Many/Few/Overall and fixed-margin deltas;
+7. direct perturbation vs state-feedback vs weight-decay margin decomposition;
+8. source classes and Many target classes with the strongest negative direct margin contributions;
+9. maximum parameter/momentum reconstruction residual;
+10. TEST guard counts and git diff/protected-file integrity result.
+Do not infer scientific conclusions beyond the generated evidence.
