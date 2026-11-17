@@ -1,0 +1,217 @@
+CODEX TASK — CC-SAM SELECTIVE MANY-TO-TAIL MARGIN GUARD
+Date: 2026-11-17
+Repository: LuoQiuXu/xin
+Required branch: experiment/ccsam-selective-margin-guard-20261117
+
+READ FIRST
+1. H2T_repro_audit/ccsam_selective_margin_guard_20261117/PROTOCOL.md
+2. H2T_repro_audit/ccsam_selective_margin_guard_20261117/margin_guard_core.py
+3. H2T_repro_audit/ccsam_selective_margin_guard_20261117/test_margin_guard_core.py
+4. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/PROTOCOL.md
+5. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/experiment_common.py
+6. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/prepare_experiment.py
+7. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/extract_features.py
+8. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/train_stage1.py
+9. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/train_stage2.py
+10. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/cross_dataset_core.py
+11. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/evaluate_final.py
+12. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/analyze_results.py
+13. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/diagnostics/imagenet_test_reconciliation/IMAGENET_TEST_RECONCILIATION_REPORT.md
+14. The archived C3, C4, and TPR reports named in the GitHub history. They are completed experiments; do not repeat them.
+
+SCIENTIFIC GOAL
+Run exactly one new candidate arm, D3 = original D1 + selective Many-to-Tail margin guard (SMG), on ImageNet-LT and Places-LT. This is a targeted method iteration, not another mechanism audit.
+
+The hypothesis is that some D1 tail-directed updates reduce useful Many-vs-non-Many decision margins. SMG protects only positive Many-to-non-Many margins already present in the frozen same-dataset/same-seed D0 teacher. It does not match the full teacher distribution.
+
+FIXED OBJECTIVE
+Use the already implemented function:
+  margin_guard_core.selective_many_tail_margin_guard
+
+D1 remains completely unchanged:
+  L_D1 = alpha * mean(w_y * CE(classifier(f + delta), y))
+       + (1-alpha) * mean(CE(classifier(f), y))
+
+D3:
+  L_D3 = L_D1 + 1.0 * L_SMG
+
+SMG fixed values:
+- Many threshold: train_count > 100
+- Non-Many outputs: train_count <= 100
+- Eligible inputs: true label is Many AND frozen D0 teacher Many-to-non-Many margin > 1e-6
+- Retained teacher-margin fraction: 0.5
+- Epsilon: 1e-6
+- Guard coefficient: 1.0
+- Guard logits are computed on clean cached features, not perturbed features.
+- Teacher logits are detached; D0 teacher is frozen.
+- No D2 KL term is included in D3.
+- No parameter residual, no new backbone, no extra expert, no extra loss, no hyperparameter sweep.
+
+REPOSITORY / SOURCE CHANGES
+A. Confirm current branch is exactly experiment/ccsam-selective-margin-guard-20261117. Do not switch branches or create another branch.
+B. Update the base experiment's branch guard:
+   H2T_repro_audit/ccsam_cross_dataset_formal_20261112/experiment_common.py
+   Set BRANCH to experiment/ccsam-selective-margin-guard-20261117.
+C. Update experiment_protocol.json:
+   - implementation_branch = experiment/ccsam-selective-margin-guard-20261117
+   - add D3 to arms with a clear description, while retaining D0/D1/D2 unchanged.
+   - Do not alter Stage-I or Stage-II optimizer, sampler, epochs, batch size, alpha, class weights, or data settings.
+D. Update analyze_results.py contrasts to include:
+   D3-D0, D3-D1, D3-D2, in addition to the existing D1-D0, D2-D0, D2-D1.
+E. Do not edit the mathematical implementation of D0/D1/D2 in cross_dataset_core.py. Do not modify the existing D0/D1/D2 checkpoint files, feature caches, sampling plans, or old final-evaluation records.
+F. Implement the new integration under:
+   H2T_repro_audit/ccsam_selective_margin_guard_20261117/
+   At minimum add train_margin_guard.py, tests for the integration, and a machine-readable run protocol/config. Keep the already committed margin_guard_core.py and its tests.
+
+BASE ARTIFACTS — REUSE, DO NOT RECREATE
+The existing completed baseline attempt is:
+  H2T_repro_audit/ccsam_cross_dataset_formal_20261112/runs/amp_gradient_fix_20261112_01
+
+It contains:
+- 6 Stage-I ResNet-50 epoch-90 checkpoints;
+- 6 official TRAIN feature caches (115,846x2,048 ImageNet-LT and 62,500x2,048 Places-LT);
+- 6 sealed 30-epoch official sampler plans;
+- 18 completed D0/D1/D2 epoch-30 classifier checkpoints and traces.
+
+Use:
+  $env:CCSAM_CROSS_DATASET_ATTEMPT = 'amp_gradient_fix_20261112_01'
+
+Important compatibility detail:
+- load_experiment() must run on the new branch after the BRANCH and protocol fields above are updated.
+- The old preflight prepared_manifest.json contains the source hashes from the original cross-dataset branch. Therefore do NOT call load_prepared(exp), because that correctly rejects changed implementation hashes.
+- Instead, verify the existing preflight status and read its prepared_manifest.json directly, then validate every dataset seal, sampling plan, Stage-I checkpoint, feature cache, D0/D1/D2 checkpoint, and file hash using the existing stage1_status/load_stage1, open_cache, open_plan, head_status/load_head and pairing_binding helpers.
+- The environment variable above must be set before importing experiment_common so its OUTPUT_ROOT/PREFLIGHT resolve to the existing baseline attempt.
+- No Stage-I training and no feature extraction are permitted.
+
+D3 TRAINING IMPLEMENTATION
+Create train_margin_guard.py. Reuse existing base functions wherever possible:
+- load_experiment, cuda_device, read_json, record_run, run_path, make_sgd, seed_everything, save_status;
+- stage1_status/load_stage1;
+- open_cache/open_plan;
+- pairing_binding;
+- D0/D1 status and checkpoint helpers from train_stage2;
+- class_weights_from_counts, compute_method_loss, finite_gradients;
+- selective_many_tail_margin_guard from the new module.
+
+For each dataset in [imagenet_lt, places_lt] and seed in [123,124,125]:
+
+1. Verify the matching Stage-I epoch-90 checkpoint, frozen encoder state, feature cache, ordered labels, official sampler plan, and D0/D1/D2 completed status.
+2. Load the matching same-dataset/same-seed D0 final epoch-30 classifier as frozen teacher. Verify its artifact SHA and classifier-state SHA. Set eval(), requires_grad=False, and assert it remains bitwise unchanged with no gradients.
+3. Initialize the D3 student from the original Stage-I classifier state, exactly as D1 does. Do NOT initialize D3 from the final D0 classifier.
+4. Use the same official 30-epoch sampling plan as D1. For every epoch, assert D3's consumed index hash exactly equals both the sealed plan hash and the matching D1 sampling_trace hash.
+5. Use the existing D1 loss function without changing its implementation:
+     d1_loss, d1_diag = compute_method_loss(
+         'D1', features, labels, classifier, class_weights,
+         epoch_index, train_counts, teacher=None
+     )
+6. On the same clean feature batch:
+     student_clean_logits = classifier(features)
+     with torch.no_grad():
+         teacher_clean_logits = frozen_d0_teacher(features)
+     guard_loss, guard_diag = selective_many_tail_margin_guard(
+         student_clean_logits, teacher_clean_logits, labels, train_counts
+     )
+   The total loss is d1_loss + 1.0*guard_loss.
+7. Backpropagate once through the total loss. Require finite gradients for every trainable classifier parameter. Apply the exact existing Stage-II SGD configuration.
+8. Keep all feature inputs FP32. No AMP, MixUp, image augmentation, gradient accumulation, or backbone update.
+9. Assert the encoder and every BN buffer remain bitwise unchanged.
+10. Save final_classifier.pt using the same checkpoint schema expected by train_stage2.load_head:
+    binding fields, arm='D3', epoch=30, teacher_checkpoint_sha256 (matching D0 artifact SHA), classifier_state_sha256, classifier_state.
+11. Save status.json with the fields required by train_stage2.head_status:
+    dataset, seed, num_classes, data_fingerprint, stage1_checkpoint_sha256,
+    initial_classifier_sha256, feature_cache_sha256, sampling_plan_sha256,
+    labels_sha256, arm='D3', final_epoch=30, epochs_completed=30,
+    official_test_access=false, classifier_state_sha256,
+    teacher_checkpoint_sha256, frozen_encoder_and_bn_unchanged=true,
+    teacher_frozen_and_unchanged=true, epoch_indices_sha256.
+12. Store epoch_metrics.csv and sampling_trace.csv. Epoch metrics must include at least:
+    epoch, alpha, d1_loss, guard_loss, total_loss, delta_mean_l2,
+    many_inputs, eligible_many_inputs, active_guard_inputs,
+    eligible_fraction_of_many, active_fraction_of_eligible,
+    teacher_margin_mean, student_margin_mean,
+    student_to_teacher_margin_ratio_mean, optimizer_steps, samples.
+13. Save config and SHA256 artifacts. Never overwrite a D3 run directory. No auto-resume or silent retry.
+
+D3 output locations:
+  H2T_repro_audit/ccsam_cross_dataset_formal_20261112/runs/amp_gradient_fix_20261112_01/stage2/<dataset>/seed_<seed>/D3
+
+Only these six new D3 directories may be created under the old baseline attempt. All pre-existing Stage-I, features, D0, D1, and D2 paths must remain byte-identical. Record before/after hashes for the protected files.
+
+PREFLIGHT AND SMOKE
+Implement explicit phases in train_margin_guard.py:
+- preflight: read-only verification of all reused inputs, plans, teacher/student initialization, output-directory absence, branch, source hashes, and test guard.
+- smoke: for every dataset/seed, use two actual paired TRAIN batches; run a disposable forward/backward/optimizer update and verify finite loss/gradients, positive/zero guard semantics, teacher frozen, backbone frozen, and exact batch identity/sampling. Do not save any formal checkpoint or create a D3 final run directory during Smoke.
+- formal: allowed only if every preflight and smoke gate passed. Train the six D3 jobs sequentially. Stop at the first failure and preserve partial logs; do not continue to the next seed.
+
+TEST ISOLATION
+During preflight, Smoke, and D3 formal training:
+- Do not instantiate or open ImageNet-LT TEST Parquet shards.
+- Do not read ImageNet-LT test labels or images.
+- Do not open Places-LT val (it is the official TEST split).
+- Do not create a test DataLoader.
+- Do not use ImageNet-LT validation for model selection or hyperparameter selection.
+Record official_test_access=false in all training statuses. If any test access is detected, stop.
+
+FINAL EVALUATION AND ANALYSIS
+Only after all six D3 runs are complete and all D0-D3 checkpoint/provenance checks pass:
+1. Reuse the existing audited final evaluator and data adapters, including the accepted ImageNet-LT WNID filename reconciliation. Do not write a new dataset adapter.
+2. Evaluate fixed epoch-90 Stage-I and fixed epoch-30 D0/D1/D2/D3 checkpoints. This is the first point in this extension where official TEST may be opened.
+3. Write final predictions and metrics to a NEW extension output folder:
+   H2T_repro_audit/ccsam_selective_margin_guard_20261117/runs/smg_extension_20261117_01/final_evaluation
+   Do not overwrite the old failed final_evaluation directory or the successful imagenet_test_reconciled_20261116_01 outputs.
+4. Because the base run_path must continue to resolve Stage-I/D0/D1/D2/D3 checkpoints under amp_gradient_fix_20261112_01, override only the final evaluator's FINAL output path to the new extension directory before calling evaluate().
+5. Similarly direct analyze_results.FINAL to the new final_evaluation directory and analyze_results.ANALYSIS to:
+   H2T_repro_audit/ccsam_selective_margin_guard_20261117/runs/smg_extension_20261117_01/analysis
+6. Analyze D0/D1/D2/D3 together with paired D3-D0, D3-D1, D3-D2 contrasts. Report Overall, Many, Medium, Few, mean +/- sample SD across the three paired seeds, per-seed values, per-class changes, and guard diagnostics.
+7. Do not tune SMG or change any method after seeing official TEST results.
+
+EXECUTION COMMANDS (PowerShell)
+Use the user's existing xiaoju environment:
+  $python = 'D:/app/minicondaaa/envs/xiaoju/python.exe'
+  $env:CCSAM_CROSS_DATASET_ATTEMPT = 'amp_gradient_fix_20261112_01'
+  $script = 'H2T_repro_audit/ccsam_selective_margin_guard_20261117/train_margin_guard.py'
+  $env:PYTHONHASHSEED = '123'
+  $env:PYTHONIOENCODING = 'utf-8'
+
+Run in order; stop immediately on any nonzero exit:
+  & $python -B -m unittest discover -s H2T_repro_audit/ccsam_selective_margin_guard_20261117 -p 'test_*.py' -v
+  if ($LASTEXITCODE -ne 0) { throw 'SMG unit tests failed' }
+
+  & $python -B -m py_compile H2T_repro_audit/ccsam_selective_margin_guard_20261117/*.py
+  if ($LASTEXITCODE -ne 0) { throw 'SMG syntax check failed' }
+
+  & $python -B -u $script --phase preflight
+  if ($LASTEXITCODE -ne 0) { throw 'SMG preflight failed' }
+
+  & $python -B -u $script --phase smoke
+  if ($LASTEXITCODE -ne 0) { throw 'SMG smoke failed' }
+
+  & $python -B -u $script --phase formal
+  if ($LASTEXITCODE -ne 0) { throw 'SMG formal training failed' }
+
+  & $python -B -u $script --phase evaluate
+  if ($LASTEXITCODE -ne 0) { throw 'SMG final evaluation failed' }
+
+  & $python -B -u $script --phase analyze
+  if ($LASTEXITCODE -ne 0) { throw 'SMG analysis failed' }
+
+REQUIRED DELIVERABLES
+- train_margin_guard.py and integration/unit tests;
+- preflight, Smoke, formal execution, and final evaluation reports;
+- six D3 epoch-30 checkpoints, epoch metrics, sampling traces, and status files;
+- D0/D1/D2 protected-artifact before/after verification;
+- final-evaluation metrics, per-class accuracy, paired deltas, guard-activation diagnostics;
+- SHA256 manifest and a concise SMG_RESULTS.md;
+- exact command transcript and exit codes.
+
+STOP CONDITIONS
+Stop without improvising if:
+- any baseline checkpoint/cache/plan hash is missing or mismatched;
+- D1 and D3 sample-index traces differ;
+- teacher or backbone changes;
+- any nonfinite loss/gradient/parameter occurs;
+- a D3 output directory already exists;
+- any official TEST access occurs before the final-evaluation phase;
+- any protected D0/D1/D2 artifact changes.
+
+Do not add more modules, sweep coefficients, retrain Stage I, repeat C3/C4/TPR, or turn this into an open-ended audit. The only research question in this task is whether this one fixed, selective Many-to-Tail margin guard improves the D1 head/tail trade-off on ImageNet-LT and Places-LT.
