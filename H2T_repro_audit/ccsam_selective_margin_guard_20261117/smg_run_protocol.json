@@ -83,7 +83,7 @@
     "few_gain_over_d0": "positive in at least 2/3 seeds on each dataset",
     "many_recovery_over_d2": "positive paired mean on each dataset",
     "overall_floor": "D3-D0 paired mean >= -0.2 percentage points on each dataset",
-    "guard_activation": "eligible and active guard examples must be nonzero; report rates"
+    "guard_activation": "eligible and active guard examples must be nonzero separately on ImageNet-LT and Places-LT; report per-dataset rates"
   },
   "outputs": {
     "d3_checkpoints": "H2T_repro_audit/ccsam_cross_dataset_formal_20261112/runs/amp_gradient_fix_20261112_01/stage2/<dataset>/seed_<seed>/D3",
