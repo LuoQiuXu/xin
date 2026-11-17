@@ -169,7 +169,7 @@ def _validate_job(exp, prepared: dict, name: str, seed: int, device: torch.devic
 
         loaded = load_head(
             directory, status, binding, arm, exp.protocol["stage2"]["epochs"],
-            device, frozen=(arm == D0),
+            device, frozen=True,
         )
         if arm == D0:
             teacher = loaded
@@ -507,8 +507,8 @@ def train_d3_job(exp, prepared: dict, name: str, seed: int, device: torch.device
                     student_margin_sum += float(guard_diag["student_margin_mean"]) * eligible
                     ratio_sum += float(guard_diag["student_to_teacher_margin_ratio_mean"]) * eligible
 
-                    assert_teacher_frozen(teacher, teacher_state_sha)
-                    assert_encoder_frozen(job["encoder"], job["encoder_snapshot"])
+                assert_teacher_frozen(teacher, teacher_state_sha)
+                assert_encoder_frozen(job["encoder"], job["encoder_snapshot"])
 
                 trace_hash = digest.hexdigest()
                 expected_hash = job["plan_record"]["per_epoch_indices_sha256"][epoch_index]
@@ -524,7 +524,7 @@ def train_d3_job(exp, prepared: dict, name: str, seed: int, device: torch.device
                 many_denominator = max(many_total, 1)
                 row = {
                     "epoch": epoch_index + 1,
-                    "alpha": min((epoch_index + 1) / 30.0, 0.3),
+                    "alpha": float(d1_diag["alpha"]),
                     "d1_loss": d1_sum / samples,
                     "guard_loss": guard_sum / eligible_denominator,
                     "total_loss": total_sum / samples,
@@ -614,6 +614,10 @@ def run_formal(exp, device: torch.device) -> None:
     prepared = load_existing_prepared()
     protected = read_json(PROTECTED_FILE)
     verify_protected_artifacts(protected)
+    for name, seed in exp.jobs():
+        existing_d3 = run_path("stage2", name, seed, NEW_ARM)
+        if existing_d3.exists():
+            raise FileExistsError(f"Refusing to start formal training with an existing D3 directory: {existing_d3}")
 
     config = exp.config(
         "smg-formal", smg_source_sha256=smg_source_hashes(),
