@@ -1,4 +1,5 @@
-CODEX TASK — CC-SAM SELECTIVE MANY-TO-TAIL MARGIN GUARD
+ARCHIVED IMPLEMENTATION SPEC — CC-SAM SELECTIVE MANY-TO-TAIL MARGIN GUARD
+Status: implementation is committed in train_margin_guard.py. This file preserves the original implementation contract; do not rerun it as a coding task. For validation and execution, use CODEX_EXECUTE_SELECTIVE_MARGIN_GUARD_20261117.txt.
 Date: 2026-11-17
 Repository: LuoQiuXu/xin
 Required branch: experiment/ccsam-selective-margin-guard-20261117
