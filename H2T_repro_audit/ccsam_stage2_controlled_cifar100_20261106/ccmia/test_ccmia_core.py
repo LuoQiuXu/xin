@@ -97,10 +97,25 @@ class CCMIACoreTests(unittest.TestCase):
         )
         self.assertTrue(torch.allclose(by_source["margin_step"].sum(0), total["margin_step"], rtol=1e-5, atol=1e-7))
 
-    def test_sgd_component_tracker_reconstructs_paired_optimizer(self):
+    def _assert_sgd_reconstruction(self, actual, predicted, atol, rtol):
+        max_abs, relative = max_abs_and_relative_error(actual, predicted)
+        if max_abs < atol and relative < rtol:
+            return
+
+        residual = (actual.to(torch.float64) - predicted.to(torch.float64)).abs()
+        index = tuple(axis.item() for axis in torch.unravel_index(residual.argmax(), residual.shape))
+        self.fail(
+            f"max_abs={max_abs:.17g} (limit {atol:g}), relative={relative:.17g} (limit {rtol:g}), "
+            f"actual_scale={actual.abs().max().item():.17g}, "
+            f"predicted_scale={predicted.abs().max().item():.17g}, "
+            f"max_error_index={index}, actual_at_index={actual[index].item():.17g}, "
+            f"predicted_at_index={predicted[index].item():.17g}"
+        )
+
+    def _check_paired_sgd(self, dtype, *, atol, rtol, gradient_atol, gradient_rtol):
         torch.manual_seed(99)
-        head2 = torch.nn.Linear(self.feature_dim, self.num_classes)
-        head3 = torch.nn.Linear(self.feature_dim, self.num_classes)
+        head2 = torch.nn.Linear(self.feature_dim, self.num_classes, dtype=dtype)
+        head3 = torch.nn.Linear(self.feature_dim, self.num_classes, dtype=dtype)
         head3.load_state_dict(head2.state_dict())
         opt2 = torch.optim.SGD(head2.parameters(), lr=0.013, momentum=0.9, weight_decay=0.002)
         opt3 = torch.optim.SGD(head3.parameters(), lr=0.013, momentum=0.9, weight_decay=0.002)
@@ -109,11 +124,11 @@ class CCMIACoreTests(unittest.TestCase):
             momentum=0.9, learning_rate=0.013, weight_decay=0.002
         )
 
-        for step in range(4):
-            x = torch.randn(self.batch, self.feature_dim)
+        w = torch.linspace(0.4, 1.7, self.num_classes, dtype=dtype)
+        for step in range(1, 5):
+            x = torch.randn(self.batch, self.feature_dim, dtype=dtype)
             y = torch.randint(0, self.num_classes, (self.batch,))
             d = 0.04 * torch.randn_like(x)
-            w = self.weights
             z2 = head2(x)
             z3 = head3(x)
             clean2 = F.cross_entropy(z2, y, reduction="none")
@@ -136,48 +151,47 @@ class CCMIACoreTests(unittest.TestCase):
             loss2.backward()
             loss3.backward()
             direct_sum_w, direct_sum_b = source_w.sum(0), source_b.sum(0)
-            self.assertTrue(torch.allclose(head3.weight.grad - clean3_w, direct_sum_w, rtol=1e-5, atol=1e-7))
-            self.assertTrue(torch.allclose(head3.bias.grad - clean3_b, direct_sum_b, rtol=1e-5, atol=1e-7))
-            self.assertTrue(torch.allclose(head2.weight.grad, clean2_w, rtol=1e-5, atol=1e-7))
-            self.assertTrue(torch.allclose(head2.bias.grad, clean2_b, rtol=1e-5, atol=1e-7))
+            with self.subTest(dtype=dtype, step=step, check="autograd"):
+                torch.testing.assert_close(
+                    head3.weight.grad - clean3_w, direct_sum_w, rtol=gradient_rtol, atol=gradient_atol
+                )
+                torch.testing.assert_close(
+                    head3.bias.grad - clean3_b, direct_sum_b, rtol=gradient_rtol, atol=gradient_atol
+                )
+                torch.testing.assert_close(head2.weight.grad, clean2_w, rtol=gradient_rtol, atol=gradient_atol)
+                torch.testing.assert_close(head2.bias.grad, clean2_b, rtol=gradient_rtol, atol=gradient_atol)
 
             tracker.advance(source_w, source_b, state_w, state_b, before_dw, before_db)
             opt2.step()
             opt3.step()
 
-            components = tracker.parameter_components()
-            predicted_w = components["direct_weight"] + components["state_weight"] + components["decay_weight"]
-            predicted_b = components["direct_bias"] + components["state_bias"] + components["decay_bias"]
-            actual_w = head3.weight.detach() - head2.weight.detach()
-            actual_b = head3.bias.detach() - head2.bias.detach()
-            max_w, rel_w = max_abs_and_relative_error(actual_w, predicted_w)
-            max_b, rel_b = max_abs_and_relative_error(actual_b, predicted_b)
-            self.assertLess(max_w, 2e-6)
-            self.assertLess(max_b, 2e-6)
-            self.assertLess(rel_w, 2e-5)
-            self.assertLess(rel_b, 2e-5)
-
+            parameter_components = tracker.parameter_components()
             buffer_components = tracker.buffer_components()
-            predicted_buffer_w = (
-                buffer_components["direct_weight"]
-                + buffer_components["state_weight"]
-                + buffer_components["decay_weight"]
-            )
-            predicted_buffer_b = (
-                buffer_components["direct_bias"]
-                + buffer_components["state_bias"]
-                + buffer_components["decay_bias"]
-            )
-            actual_buffer_w = (
-                opt3.state[head3.weight]["momentum_buffer"]
-                - opt2.state[head2.weight]["momentum_buffer"]
-            )
-            actual_buffer_b = (
-                opt3.state[head3.bias]["momentum_buffer"]
-                - opt2.state[head2.bias]["momentum_buffer"]
-            )
-            self.assertLess(max_abs_and_relative_error(actual_buffer_w, predicted_buffer_w)[0], 2e-6)
-            self.assertLess(max_abs_and_relative_error(actual_buffer_b, predicted_buffer_b)[0], 2e-6)
+            for name in ("weight", "bias"):
+                param2 = getattr(head2, name)
+                param3 = getattr(head3, name)
+                parameter_difference = param3.detach() - param2.detach()
+                buffer_difference = opt3.state[param3]["momentum_buffer"] - opt2.state[param2]["momentum_buffer"]
+                for quantity, actual, components in (
+                    ("parameter", parameter_difference, parameter_components),
+                    ("momentum_buffer", buffer_difference, buffer_components),
+                ):
+                    predicted = (
+                        components[f"direct_{name}"] + components[f"state_{name}"] + components[f"decay_{name}"]
+                    )
+                    with self.subTest(dtype=dtype, step=step, quantity=quantity, tensor=name):
+                        self._assert_sgd_reconstruction(actual, predicted, atol, rtol)
+
+        return tracker
+
+    def test_sgd_component_tracker_reconstructs_paired_optimizer_fp64(self):
+        self._check_paired_sgd(torch.float64, atol=1e-13, rtol=1e-10, gradient_atol=1e-14, gradient_rtol=1e-12)
+
+    def test_sgd_component_tracker_reconstructs_paired_optimizer_fp32(self):
+        # Match train_ccmia.MOMENTUM_RECONSTRUCTION_REL_TOL for FP32 updates.
+        tracker = self._check_paired_sgd(
+            torch.float32, atol=2e-6, rtol=5e-3, gradient_atol=1e-7, gradient_rtol=1e-5
+        )
 
         # Parameter-component projections accept FP32 validation features and FP64 trackers.
         validation_features = torch.randn(6, self.feature_dim)
