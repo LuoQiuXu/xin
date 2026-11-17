@@ -1,4 +1,4 @@
-"""Evaluate fixed checkpoints only after all 18 Stage-II runs are verified."""
+"""Evaluate fixed checkpoints only after all 24 D0-D3 Stage-II runs are verified."""
 from __future__ import annotations
 
 from contextlib import contextmanager
