@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "method": "CC-SAM D3: Selective Many-to-Tail Margin Guard",
+  "baseline_attempt": "amp_gradient_fix_20261112_01",
+  "extension_attempt": "smg_extension_20261117_01",
+  "datasets": [
+    "imagenet_lt",
+    "places_lt"
+  ],
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "baseline_arms": [
+    "D0",
+    "D1",
+    "D2"
+  ],
+  "new_arm": "D3",
+  "reuse_policy": {
+    "retrain_stage1": false,
+    "reextract_features": false,
+    "regenerate_sampling_plans": false,
+    "modify_d0_d1_d2": false,
+    "reuse_stage1_checkpoints": 6,
+    "reuse_train_feature_caches": 6,
+    "reuse_completed_stage2_checkpoints": 18,
+    "new_d3_stage2_runs": 6
+  },
+  "official_sampler_sha256": "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174",
+  "stage2": {
+    "epochs": 30,
+    "batch_size": 64,
+    "precision": "FP32",
+    "optimizer": "SGD",
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0002,
+    "nesterov": false,
+    "mixup": false,
+    "gradient_accumulation": false,
+    "sampling": "exact sealed official CC-SAM plan; per-epoch hashes must equal D1"
+  },
+  "selective_margin_guard": {
+    "many_threshold": 100,
+    "non_many_outputs": "official train_count <= 100",
+    "eligible_inputs": "true label is Many and matching frozen D0 teacher Many-to-non-Many margin > epsilon",
+    "retained_margin_fraction": 0.5,
+    "epsilon": 0.000001,
+    "coefficient": 1,
+    "teacher": "matching same-dataset same-seed D0 final epoch-30 classifier; frozen",
+    "logits": "student and teacher logits on clean cached TRAIN features",
+    "teacher_margin": "teacher_logit[y] - max(teacher_logits[:, non_many_classes])",
+    "student_margin": "student_logit[y] - max(student_logits[:, non_many_classes])",
+    "loss": "mean((relu(retained_fraction * teacher_margin - student_margin) / (teacher_margin + epsilon)) ** 2)",
+    "objective": "unchanged D1 objective + coefficient * selective_margin_guard",
+    "no_full_logit_distillation": true,
+    "no_tail_input_guard": true,
+    "no_hyperparameter_sweep": true
+  },
+  "evaluation": {
+    "fixed_stage1_epoch": 90,
+    "fixed_stage2_epoch": 30,
+    "evaluate_stage1_and_d0_d1_d2_d3": true,
+    "official_test_access": "only in the separate evaluate phase after all six D3 jobs and provenance checks",
+    "metrics": [
+      "Overall",
+      "Many",
+      "Medium",
+      "Few",
+      "per_class_accuracy"
+    ],
+    "paired_contrasts": [
+      "D3-D0",
+      "D3-D1",
+      "D3-D2"
+    ],
+    "seeds_are_descriptive_only": true
+  },
+  "decision_gates": {
+    "many_improves_over_d1": "positive paired mean and positive in at least 2/3 seeds on each dataset",
+    "few_gain_over_d0": "positive in at least 2/3 seeds on each dataset",
+    "many_recovery_over_d2": "positive paired mean on each dataset",
+    "overall_floor": "D3-D0 paired mean >= -0.2 percentage points on each dataset",
+    "guard_activation": "eligible and active guard examples must be nonzero; report rates"
+  },
+  "outputs": {
+    "d3_checkpoints": "H2T_repro_audit/ccsam_cross_dataset_formal_20261112/runs/amp_gradient_fix_20261112_01/stage2/<dataset>/seed_<seed>/D3",
+    "extension_root": "H2T_repro_audit/ccsam_selective_margin_guard_20261117/runs/smg_extension_20261117_01",
+    "final_evaluation": "runs/smg_extension_20261117_01/final_evaluation",
+    "analysis": "runs/smg_extension_20261117_01/analysis"
+  },
+  "stop_conditions": [
+    "any baseline checkpoint, feature cache, manifest, or sampling-plan hash mismatch",
+    "any D1/D3 sampling-trace mismatch",
+    "any teacher or encoder/BN state change",
+    "any nonfinite loss, gradient, or parameter",
+    "any pre-existing D3 output directory",
+    "any official TEST access before the evaluate phase",
+    "any change to D0/D1/D2 artifacts"
+  ]
+}
