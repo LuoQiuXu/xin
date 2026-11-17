@@ -24,7 +24,7 @@ from cuda_statistics import DEFAULT_CUDA_DEVICE, initialize_cuda
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[1]
 PROTOCOL = ROOT / "experiment_protocol.json"
-BRANCH = "experiment/ccsam-cross-dataset-formal-20261112"
+BRANCH = "experiment/ccsam-selective-margin-guard-20261117"
 TRAIN_MANIFESTS = {
     "imagenet_lt": REPO / "H2T/datasets/data_txt/ImageNet_LT_train.txt",
     "places_lt": REPO / "H2T/datasets/data_txt/Places_LT_train.txt",
