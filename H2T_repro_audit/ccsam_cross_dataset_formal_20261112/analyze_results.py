@@ -10,7 +10,7 @@ from evaluate_final import DISPLAY, FINAL, STAGE1, classification_metrics
 from experiment_common import METRICS, OUTPUT_ROOT, record_run, require_complete, write_csv, write_json
 
 ANALYSIS = OUTPUT_ROOT / "analysis"
-CONTRASTS = (("D1", "D0"), ("D2", "D0"), ("D2", "D1"))
+CONTRASTS = (("D1", "D0"), ("D2", "D0"), ("D2", "D1"), ("D3", "D0"), ("D3", "D1"), ("D3", "D2"))
 
 
 def aggregate(rows: list[dict]) -> dict:
