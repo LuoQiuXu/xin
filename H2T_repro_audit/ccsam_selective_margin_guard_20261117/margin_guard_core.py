@@ -93,9 +93,9 @@ def selective_many_tail_margin_guard(
     eligible_count = int(eligible.sum().item())
 
     if eligible_count:
-        reference_margin = teacher_margin[eligible].detach().clamp_min(float(eps))
+        reference_margin = teacher_margin[eligible].detach()
         target_margin = float(retained_fraction) * reference_margin
-        normalized_shortfall = F.relu(target_margin - student_margin[eligible]) / reference_margin
+        normalized_shortfall = F.relu(target_margin - student_margin[eligible]) / (reference_margin + float(eps))
         loss = normalized_shortfall.square().mean()
         active = target_margin > student_margin[eligible].detach()
         active_count = int(active.sum().item())
