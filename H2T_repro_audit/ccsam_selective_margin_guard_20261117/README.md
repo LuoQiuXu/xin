@@ -10,11 +10,14 @@ This branch adds one targeted candidate to the completed CC-SAM D0/D1/D2 cross-d
 
 Read `PROTOCOL.md` and `CODEX_SELECTIVE_MARGIN_GUARD_20261117.txt` before running.
 
-The pure loss implementation and CPU tests are already present:
+The implementation is now present:
 
-- `margin_guard_core.py`
-- `test_margin_guard_core.py`
+- `margin_guard_core.py`: pure selective-margin loss and diagnostics.
+- `train_margin_guard.py`: read-only baseline preflight, paired TRAIN Smoke, six D3 jobs, protected-artifact verification, separate fixed-checkpoint evaluation and analysis.
+- `smg_run_protocol.json`: machine-readable frozen method and execution settings.
+- `test_margin_guard_core.py` and `test_margin_guard_integration.py`: loss semantics and D3 objective integration tests.
+- `CODEX_EXECUTE_SELECTIVE_MARGIN_GUARD_20261117.txt`: Codex validation and execution instructions.
 
-The Codex task wires the module into the existing paired Stage-II pipeline, adds strict provenance and no-TEST gates, performs Smoke, runs the six D3 jobs, and evaluates/analyzes fixed checkpoints once.
+The D3 training uses the unchanged D1 objective plus the fixed SMG term. It does not retrain Stage I, re-extract features, regenerate sampling plans, modify D0/D1/D2, or access official TEST before the dedicated evaluation phase.
 
 No claim is made that SMG improves accuracy until the experiment completes.
