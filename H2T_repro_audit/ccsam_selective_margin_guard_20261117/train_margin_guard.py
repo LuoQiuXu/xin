@@ -772,14 +772,34 @@ def build_smg_report(exp, summary: dict) -> tuple[str, dict]:
             totals["eligible_many_inputs"] > 0 and totals["active_guard_inputs"] > 0
         ),
     }
-    gates["guard_diagnostics"] = diagnostics_summary
+    per_dataset_diagnostics = {}
+    for name in datasets:
+        values = [value for key, value in diagnostics.items() if key.startswith(name + "/")]
+        dataset_totals = {
+            key: sum(value[key] for value in values)
+            for key in ("many_inputs", "eligible_many_inputs", "active_guard_inputs")
+        }
+        dataset_summary = {
+            **dataset_totals,
+            "eligible_fraction_of_many": dataset_totals["eligible_many_inputs"] / max(dataset_totals["many_inputs"], 1),
+            "active_fraction_of_eligible": dataset_totals["active_guard_inputs"] / max(dataset_totals["eligible_many_inputs"], 1),
+            "guard_active_on_measurable_subset": (
+                dataset_totals["eligible_many_inputs"] > 0 and dataset_totals["active_guard_inputs"] > 0
+            ),
+        }
+        per_dataset_diagnostics[name] = dataset_summary
+        gates[name]["guard_active_on_measurable_subset"] = dataset_summary["guard_active_on_measurable_subset"]
+    gates["guard_diagnostics"] = {
+        "combined": diagnostics_summary,
+        "by_dataset": per_dataset_diagnostics,
+    }
 
     sections.extend([
         "",
         "## Predeclared decision gates",
         "",
-        "| Dataset | Many improves over D1 | Few gain over D0 retained | Many recovery over D2 | Overall floor |",
-        "|---|---|---|---|---|",
+        "| Dataset | Many improves over D1 | Few gain over D0 retained | Many recovery over D2 | Overall floor | Guard active |",
+        "|---|---|---|---|---|---|",
     ])
     for name in datasets:
         g = gates[name]
@@ -787,18 +807,26 @@ def build_smg_report(exp, summary: dict) -> tuple[str, dict]:
             f"| {name} | {'PASS' if g['many_improves_over_d1_mean_and_at_least_2_of_3_seeds'] else 'FAIL'} "
             f"| {'PASS' if g['few_gain_over_d0_in_at_least_2_of_3_seeds'] else 'FAIL'} "
             f"| {'PASS' if g['many_recovery_over_d2_mean'] else 'FAIL'} "
-            f"| {'PASS' if g['overall_not_below_d0_by_more_than_0_2pp'] else 'FAIL'} |"
+            f"| {'PASS' if g['overall_not_below_d0_by_more_than_0_2pp'] else 'FAIL'} "
+            f"| {'PASS' if g['guard_active_on_measurable_subset'] else 'FAIL'} |"
         )
     sections.extend([
         "",
         "## Guard activation",
         "",
-        f"- Many inputs: {diagnostics_summary['many_inputs']:,}",
-        f"- Eligible Many inputs: {diagnostics_summary['eligible_many_inputs']:,}",
-        f"- Active guard inputs: {diagnostics_summary['active_guard_inputs']:,}",
-        f"- Eligible / Many: {diagnostics_summary['eligible_fraction_of_many']:.4%}",
-        f"- Active / eligible: {diagnostics_summary['active_fraction_of_eligible']:.4%}",
-        f"- Guard active on a measurable subset: {diagnostics_summary['guard_active_on_measurable_subset']}",
+        f"- Combined Many inputs: {diagnostics_summary['many_inputs']:,}",
+        f"- Combined eligible Many inputs: {diagnostics_summary['eligible_many_inputs']:,}",
+        f"- Combined active guard inputs: {diagnostics_summary['active_guard_inputs']:,}",
+        f"- Combined eligible / Many: {diagnostics_summary['eligible_fraction_of_many']:.4%}",
+        f"- Combined active / eligible: {diagnostics_summary['active_fraction_of_eligible']:.4%}",
+    ])
+    for name, item in per_dataset_diagnostics.items():
+        sections.append(
+            f"- {name}: eligible {item['eligible_many_inputs']:,}/{item['many_inputs']:,} "
+            f"({item['eligible_fraction_of_many']:.4%}); active {item['active_guard_inputs']:,}/"
+            f"{item['eligible_many_inputs']:,} ({item['active_fraction_of_eligible']:.4%})"
+        )
+    sections.extend([
         "",
         "A failed gate is a negative experimental result, not a reason to tune SMG on the same official TEST split. Any next experiment must be justified using the current evidence and a newly declared protocol.",
     ])
