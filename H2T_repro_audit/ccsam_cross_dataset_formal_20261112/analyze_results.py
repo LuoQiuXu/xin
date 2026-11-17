@@ -123,7 +123,7 @@ def analyze(exp, prepared):
         })
         header = (
             "# CC-SAM cross-dataset results\n\n"
-            "Three independent Stage-I initializations per dataset and three paired Stage-II arms per seed. "
+            "Three independent Stage-I initializations per dataset and four paired Stage-II arms per seed. "
             "The tables describe fixed-checkpoint effects in percentage points. Inference is descriptive with three seeds.\n\n"
         )
         sections = [dataset_markdown(name, summaries[name]).replace("# ", "## ", 1) for name in exp.datasets]
