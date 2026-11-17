@@ -369,7 +369,10 @@ def run_smoke(exp, device: torch.device) -> None:
                 total.backward()
                 if not finite_gradients(student):
                     raise RuntimeError(f"Nonfinite D3 Smoke gradient: {name} seed {seed}")
+                student_before_update = state_dict_sha256(student)
                 optimizer.step()
+                if state_dict_sha256(student) == student_before_update:
+                    raise RuntimeError(f"D3 Smoke optimizer update had no effect: {name} seed {seed}")
                 if any(not bool(torch.isfinite(p).all()) for p in student.parameters()):
                     raise RuntimeError(f"Nonfinite D3 Smoke parameter: {name} seed {seed}")
                 assert_teacher_frozen(job["teacher"], job["teacher_state_sha"])
