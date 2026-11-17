@@ -8,7 +8,7 @@ This branch adds one targeted candidate to the completed CC-SAM D0/D1/D2 cross-d
 - Seeds: 123, 124, 125.
 - New formal work: six D3 classifier runs only. Stage-I and TRAIN feature caches are reused.
 
-Read `PROTOCOL.md` and `CODEX_SELECTIVE_MARGIN_GUARD_20261117.txt` before running.
+Read `PROTOCOL.md`, `smg_run_protocol.json`, and `CODEX_EXECUTE_SELECTIVE_MARGIN_GUARD_20261117.txt` before running.
 
 The implementation is now present:
 
