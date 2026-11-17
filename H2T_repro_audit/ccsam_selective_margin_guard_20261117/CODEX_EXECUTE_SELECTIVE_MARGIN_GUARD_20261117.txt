@@ -1,0 +1,189 @@
+CODEX EXECUTION TASK — CC-SAM D3 SELECTIVE MANY-TO-TAIL MARGIN GUARD
+Date: 2026-11-17
+Repository: LuoQiuXu/xin
+Required branch: experiment/ccsam-selective-margin-guard-20261117
+
+PURPOSE
+The D3 implementation is already committed on this branch. Your task is to validate and execute it exactly as written. Do not redesign the method, add modules, tune coefficients, retrain Stage I, re-extract features, regenerate sampling plans, or modify D0/D1/D2.
+
+READ FIRST
+1. H2T_repro_audit/ccsam_selective_margin_guard_20261117/PROTOCOL.md
+2. H2T_repro_audit/ccsam_selective_margin_guard_20261117/smg_run_protocol.json
+3. H2T_repro_audit/ccsam_selective_margin_guard_20261117/train_margin_guard.py
+4. H2T_repro_audit/ccsam_selective_margin_guard_20261117/margin_guard_core.py
+5. H2T_repro_audit/ccsam_selective_margin_guard_20261117/test_margin_guard_core.py
+6. H2T_repro_audit/ccsam_selective_margin_guard_20261117/test_margin_guard_integration.py
+7. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/PROTOCOL.md
+8. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/experiment_protocol.json
+9. H2T_repro_audit/ccsam_cross_dataset_formal_20261112/diagnostics/imagenet_test_reconciliation/IMAGENET_TEST_RECONCILIATION_REPORT.md
+
+SCIENTIFIC SCOPE
+- D0: original weighted CE, no feature perturbation.
+- D1: original full CC-SAM class-conditional feature-gradient perturbation.
+- D2: D1 plus Many-input-only full-distribution KL preservation.
+- D3: unchanged D1 objective plus the one fixed Selective Many-to-Tail Margin Guard (SMG).
+
+SMG fixed settings:
+- Many threshold: official TRAIN count > 100.
+- Non-Many outputs: official TRAIN count <= 100.
+- Teacher: matching same-dataset/same-seed D0 epoch-30 classifier, frozen.
+- Eligible input: Many true label and positive D0 teacher Many-to-non-Many margin > 1e-6.
+- Retained margin fraction: 0.5.
+- Epsilon: 1e-6.
+- Guard coefficient: 1.0.
+- Teacher/student logits are evaluated on clean cached features.
+- D3 = unchanged D1 loss + 1.0 * SMG loss.
+- No D2 KL term is used in D3.
+
+FROZEN BASELINE — REUSE ONLY
+Baseline attempt:
+  amp_gradient_fix_20261112_01
+
+Reuse:
+- 6 Stage-I ResNet-50 epoch-90 checkpoints;
+- 6 TRAIN feature caches;
+- 6 sealed official 30-epoch sampling plans;
+- 18 completed D0/D1/D2 epoch-30 classifiers.
+
+New formal workload:
+- Exactly 6 D3 classifier runs: 2 datasets x 3 seeds.
+- Do not train Stage I.
+- Do not extract features.
+- Do not regenerate sampling plans.
+- Do not modify any D0/D1/D2 source, checkpoint, cache, plan, trace, or old evaluation output.
+
+DATASETS AND SEEDS
+- ImageNet-LT
+- Places-LT
+- Seeds: 123, 124, 125
+- Reuse the audited local data roots and the accepted TRAIN-only baseline preparation.
+- Places-LT val is the official TEST split and must remain sealed until the evaluate phase.
+
+REPOSITORY SAFETY
+1. Confirm the repository root and exact branch.
+2. Inspect git status --short before updating. If there are pre-existing user changes, stop and report; never discard them.
+3. Fetch and fast-forward the required branch only if the worktree is clean.
+4. Do not switch branches with uncommitted changes.
+5. Do not edit the committed implementation unless a reproducible defect is found. If a defect is found, stop before formal training and report the exact file, line, failing test, and proposed minimal correction.
+6. Never use the base cross-dataset run_cross_dataset.py runner on this extension branch. Use only train_margin_guard.py.
+7. Never invoke the official TEST loader during preflight, Smoke, or formal D3 training.
+
+EXECUTION ENVIRONMENT — POWERSHELL
+Use the existing xiaoju environment:
+
+  $python = 'D:/app/minicondaaa/envs/xiaoju/python.exe'
+  $env:CCSAM_CROSS_DATASET_ATTEMPT = 'amp_gradient_fix_20261112_01'
+  $env:PYTHONHASHSEED = '123'
+  $env:PYTHONIOENCODING = 'utf-8'
+  $script = 'H2T_repro_audit/ccsam_selective_margin_guard_20261117/train_margin_guard.py'
+  $extension = 'H2T_repro_audit/ccsam_selective_margin_guard_20261117/runs/smg_extension_20261117_01'
+
+Before starting, confirm that the baseline attempt exists locally and contains:
+  preflight/prepared_manifest.json
+  stage1/imagenet_lt/seed_123/
+  stage1/places_lt/seed_123/
+  features/imagenet_lt/seed_123/
+  features/places_lt/seed_123/
+  stage2/<dataset>/seed_<seed>/D0
+  stage2/<dataset>/seed_<seed>/D1
+  stage2/<dataset>/seed_<seed>/D2
+
+Do not redownload datasets. Do not rerun the accepted dataset audit.
+
+TESTS AND SYNTAX
+Run from the repository root. Stop on any nonzero exit:
+
+  & $python -B -m unittest discover -s H2T_repro_audit/ccsam_selective_margin_guard_20261117 -p 'test_*.py' -v
+  if ($LASTEXITCODE -ne 0) { throw 'SMG unit/integration tests failed; do not continue' }
+
+  & $python -B -m py_compile H2T_repro_audit/ccsam_selective_margin_guard_20261117/margin_guard_core.py H2T_repro_audit/ccsam_selective_margin_guard_20261117/train_margin_guard.py H2T_repro_audit/ccsam_selective_margin_guard_20261117/test_margin_guard_integration.py
+  if ($LASTEXITCODE -ne 0) { throw 'SMG syntax check failed; do not continue' }
+
+PHASE 1 — READ-ONLY PREFLIGHT
+  & $python -B -u $script --phase preflight --workers 4
+  if ($LASTEXITCODE -ne 0) { throw 'SMG preflight failed; do not continue' }
+
+Preflight must:
+- validate all six Stage-I checkpoints and initial classifier bindings;
+- validate all six TRAIN feature caches and ordered labels;
+- validate all six official sampling plans;
+- validate all 18 D0/D1/D2 checkpoints and their epoch sampling traces;
+- verify D2 teacher-to-D0 provenance;
+- verify that all six D3 output directories are absent;
+- write a protected-artifact SHA256 map;
+- not create a D3 checkpoint or open official TEST data.
+
+PHASE 2 — REAL-TRAIN-BATCH SMOKE
+  & $python -B -u $script --phase smoke --workers 4
+  if ($LASTEXITCODE -ne 0) { throw 'SMG Smoke failed; do not continue' }
+
+Smoke must use two actual batches from the sealed TRAIN sampling plan for every dataset/seed pair. It must verify:
+- finite D1, SMG, and total losses;
+- finite classifier gradients and an effective disposable optimizer update;
+- teacher frozen and unchanged;
+- encoder and BN buffers frozen and unchanged;
+- D3 batch indices come from the same sealed plan used by D1.
+
+Smoke must not create formal D3 run directories or access official TEST.
+
+PHASE 3 — SIX FORMAL D3 RUNS
+  & $python -B -u $script --phase formal --workers 4
+  if ($LASTEXITCODE -ne 0) { throw 'SMG formal training failed; preserve partial artifacts and stop' }
+
+Formal training must:
+- run exactly six D3 jobs sequentially;
+- initialize each D3 classifier from its matching Stage-I classifier, not from D0;
+- use the matching same-dataset/same-seed frozen D0 teacher;
+- use the exact same sealed sampling plan as D1 and verify each epoch hash;
+- use the unchanged D1 objective plus the fixed SMG term;
+- use FP32, SGD LR 0.01, momentum 0.9, weight decay 0.0002, 30 epochs, batch 64;
+- save epoch metrics, sampling trace, final_classifier.pt, status/config/log files;
+- verify all six D3 runs and all 18 original D0/D1/D2 runs;
+- verify protected baseline artifact hashes are unchanged.
+
+Stop at the first failure. Do not auto-resume, silently retry, or continue to later seeds after a failed job.
+
+PHASE 4 — ONE SEPARATE OFFICIAL TEST EVALUATION
+Only after all six D3 jobs and protected-artifact checks pass:
+
+  & $python -B -u $script --phase evaluate --workers 4
+  if ($LASTEXITCODE -ne 0) { throw 'SMG official TEST evaluation failed; preserve artifacts and stop' }
+
+This phase evaluates fixed Stage-I epoch-90 and D0/D1/D2/D3 epoch-30 checkpoints on the two official test splits. It writes to the new extension directory. It must not overwrite the earlier successful D0/D1/D2 evaluation or the original failed evaluation directory.
+
+PHASE 5 — ANALYSIS
+  & $python -B -u $script --phase analyze --workers 4
+  if ($LASTEXITCODE -ne 0) { throw 'SMG analysis failed; preserve artifacts and stop' }
+
+Required outputs:
+- SMG_RESULTS.md
+- decision_gates.json
+- analysis/cross_dataset_summary.json
+- analysis/CROSS_DATASET_RESULTS.md
+- analysis/paired_deltas.csv
+- analysis/per_class_accuracy.csv
+- per-seed Overall/Many/Medium/Few results;
+- D3-D0, D3-D1, D3-D2 paired contrasts;
+- per-class accuracy changes;
+- guard eligibility and activation diagnostics;
+- protected baseline artifact verification;
+- exact run logs and exit codes.
+
+DECISION RULE
+Use the predeclared gates in PROTOCOL.md and smg_run_protocol.json. Report pass/fail separately for ImageNet-LT and Places-LT. Three seeds are descriptive evidence; do not claim statistical significance.
+
+If a gate fails, report the result and stop. Do not tune the guard coefficient, retained fraction, threshold, or add another module using the same official TEST results.
+
+FINAL CODEX RESPONSE
+Return:
+1. branch and HEAD;
+2. unit-test and syntax-check results;
+3. preflight and Smoke results;
+4. all six D3 run states and completed epochs;
+5. whether D0/D1/D2 and Stage-I protected hashes remained unchanged;
+6. final test-evaluation state and test row counts;
+7. D3-D0/D1/D2 Overall/Many/Medium/Few paired means and per-seed values;
+8. guard eligibility/activation rates;
+9. exact paths to all reports and logs.
+
+Do not report the method as successful merely because all scripts exited with code 0. The scientific conclusion must follow the measured decision gates.
