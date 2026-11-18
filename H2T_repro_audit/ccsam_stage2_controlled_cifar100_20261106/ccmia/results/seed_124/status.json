@@ -1,0 +1,55 @@
+{
+  "state": "completed",
+  "seed": 124,
+  "started_at": "2026-11-18T16:47:22+08:00",
+  "official_TEST_used": false,
+  "clean_stage1_sha256": "7ced9d07f71335357c08623573f038acd0dfdcdeadb55d95d57b332a14f83a88",
+  "prepared_manifest_sha256": "c4ecbd487c33052fdc20f642325d8c86d9f18efa6e75622d52e8055d85806e02",
+  "epochs_completed": 30,
+  "paired_batch_steps_completed": 5100,
+  "last_epoch": {
+    "epoch": 30,
+    "c2_train_loss": 0.2519951302290644,
+    "c3_train_loss": 0.8927169494764304,
+    "c2_train_accuracy": 95.31667742232875,
+    "c3_train_accuracy": 93.11330321747948,
+    "c2_validation_many_accuracy": 62.794117647058826,
+    "c3_validation_many_accuracy": 58.23529411764706,
+    "c2_validation_few_accuracy": 25.833333333333332,
+    "c3_validation_few_accuracy": 30.333333333333332,
+    "c2_fixed_many_margin": 2.153681516647339,
+    "c3_fixed_many_margin": 1.6242018938064575,
+    "actual_c3_minus_c2_fixed_margin": -0.5294797631355599,
+    "direct_perturbation_margin_component": -19.87528567722484,
+    "state_feedback_margin_component": 19.306094564351234,
+    "weight_decay_margin_component": 0.039711105263346126,
+    "parameter_writeback_rounding_margin_component": 8.691218875246698e-08,
+    "max_gradient_decomposition_error": 2.514570951461792e-08,
+    "max_source_margin_additivity_error": 1.862645149230957e-09,
+    "max_sgd_reconstruction_relative": 1.3778321074985994e-06
+  },
+  "completed_at": "2026-11-18T16:53:38+08:00",
+  "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+  "final_c2_classifier_sha256": "d8a19a3b85b31d8bba8513327f1e9127b7b67b7905cfd988b8b14ab0a09e4cb4",
+  "final_c3_classifier_sha256": "fc694c509308c39de77fd84ff668298ef1a4a4bea7b43a994b006c33c397e301",
+  "final_backbone_sha256": "0bbad69196a7e6be527cd436ccaa951816fdd5e846b981ef096b19d571e7d8b6",
+  "backbone_and_bn_bitwise_unchanged": true,
+  "paired_C0_trace_batches_matched": 5100,
+  "optimizer": {
+    "type": "SGD",
+    "lr": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0002,
+    "nesterov": false
+  },
+  "checkpoints": {
+    "C2": {
+      "path": "final_classifier_C2.pth",
+      "sha256": "0f585e563c80b51ff6059a5bd792603021cdf28936ea2fcbc802461d188cf124"
+    },
+    "C3": {
+      "path": "final_classifier_C3.pth",
+      "sha256": "fa6e4c1a5b92e2ae2bb3d8d83dc1ca81da7f18454a8fdc5464a5490677847b08"
+    }
+  }
+}

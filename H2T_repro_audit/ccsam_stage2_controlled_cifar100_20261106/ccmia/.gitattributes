@@ -1,0 +1,3 @@
+# Recognize CRLF in the inherited byte-preserved formal JSON artifacts.
+formal_completed.json whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+analysis/summary.json whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

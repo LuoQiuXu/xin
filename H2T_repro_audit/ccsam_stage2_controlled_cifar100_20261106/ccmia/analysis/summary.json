@@ -1,0 +1,165 @@
+{
+  "state": "analyzed",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "primary_epoch": 30,
+  "official_TEST_used": false,
+  "validation_partition": "1,980-image TRAIN-derived holdout; development diagnostic, not an independent test set",
+  "missing_validation_class": 0,
+  "paired_C2_C3_accuracy_and_margin_deltas": {
+    "overall": {
+      "mean": -0.6060606060606114,
+      "sample_sd": 0.22014641128993112
+    },
+    "macro": {
+      "mean": -0.6060606060606067,
+      "sample_sd": 0.2201464112899352
+    },
+    "many_accuracy": {
+      "mean": -5.343137254901964,
+      "sample_sd": 0.6792356108113241
+    },
+    "mediumN_accuracy": {
+      "mean": -0.4285714285714306,
+      "sample_sd": 0.7423074889580937
+    },
+    "few_accuracy": {
+      "mean": 4.555555555555556,
+      "sample_sd": 0.09622504486493831
+    },
+    "fixed_margin_mean": {
+      "mean": -0.5402551889419556,
+      "sample_sd": 0.009334413625050527
+    },
+    "fixed_margin_median": {
+      "mean": -0.5683112144470215,
+      "sample_sd": 0.07003598184592279
+    },
+    "fixed_margin_p10": {
+      "mean": -0.3294996420542399,
+      "sample_sd": 0.032474855375076404
+    },
+    "fixed_margin_negative_fraction": {
+      "mean": 0.055392165978749595,
+      "sample_sd": 0.004727275640098669
+    },
+    "dynamic_margin_mean": {
+      "mean": -0.7818845709164938,
+      "sample_sd": 0.004065985249248062
+    },
+    "dynamic_margin_negative_fraction": {
+      "mean": 0.07892157634099324,
+      "sample_sd": 0.003700888156998065
+    }
+  },
+  "epoch30_parameter_margin_decomposition": {
+    "actual_c3_minus_c2_fixed_margin_mean": {
+      "mean": -0.5402551563212366,
+      "sample_sd": 0.009334266691508143
+    },
+    "direct_perturbation_component_mean": {
+      "mean": -19.92306308773567,
+      "sample_sd": 0.12289030740458112
+    },
+    "state_feedback_component_mean": {
+      "mean": 19.343030078048773,
+      "sample_sd": 0.11976221977076637
+    },
+    "weight_decay_component_mean": {
+      "mean": 0.03977768313627236,
+      "sample_sd": 0.0001041386914696201
+    },
+    "parameter_writeback_rounding_component_mean": {
+      "mean": 7.474344597701735e-08,
+      "sample_sd": 8.457380683722186e-07
+    },
+    "reconstruction_residual_component_mean": {
+      "mean": 9.548594120667696e-08,
+      "sample_sd": 6.951892670143046e-08
+    },
+    "direct_negative_fraction": {
+      "mean": 0.9112745324770609,
+      "sample_sd": 0.0008490659708807252
+    },
+    "state_negative_fraction": {
+      "mean": 0.08921568840742111,
+      "sample_sd": 0.0008490444629071589
+    },
+    "actual_negative_fraction": {
+      "mean": 0.906862755616506,
+      "sample_sd": 0.00740177631399613
+    },
+    "margin_reconstruction_rmse": {
+      "mean": 1.8257620193236326e-06,
+      "sample_sd": 8.056803594529564e-09
+    }
+  },
+  "step_level_gradient_summary": [
+    {
+      "seed": 123,
+      "direct_step_mean": -0.00038963181923743466,
+      "direct_step_negative_batch_fraction": 0.6748039342083183,
+      "state_step_mean": 0.0003781469482881078,
+      "total_gradient_step_mean": -1.1484873285051498e-05,
+      "max_gradient_decomposition_error": 3.818422555923462e-08,
+      "max_parameter_reconstruction_relative": 5.284567442484037e-06,
+      "max_momentum_buffer_reconstruction_relative": 1.2003509126634828e-05
+    },
+    {
+      "seed": 124,
+      "direct_step_mean": -0.00039051197798266465,
+      "direct_step_negative_batch_fraction": 0.6749749261257695,
+      "state_step_mean": 0.0003792705193678038,
+      "total_gradient_step_mean": -1.124145759237663e-05,
+      "max_gradient_decomposition_error": 3.818422555923462e-08,
+      "max_parameter_reconstruction_relative": 7.3342794596291375e-06,
+      "max_momentum_buffer_reconstruction_relative": 1.1420705217667267e-05
+    },
+    {
+      "seed": 125,
+      "direct_step_mean": -0.0003941305821309898,
+      "direct_step_negative_batch_fraction": 0.6760037619226119,
+      "state_step_mean": 0.0003825974989547766,
+      "total_gradient_step_mean": -1.1533083950543856e-05,
+      "max_gradient_decomposition_error": 3.725290298461914e-08,
+      "max_parameter_reconstruction_relative": 6.391669891708483e-06,
+      "max_momentum_buffer_reconstruction_relative": 1.3284356821838673e-05
+    }
+  ],
+  "source_to_target_group_gradient_summary": [
+    {
+      "target_classifier_group": "Many",
+      "source_class_rows": 195,
+      "mean_source_to_target_group_gradient_frobenius": 0.0030227364948813736,
+      "sd_across_source_seed_rows": 0.0021207868423718046
+    },
+    {
+      "target_classifier_group": "MediumN",
+      "source_class_rows": 195,
+      "mean_source_to_target_group_gradient_frobenius": 0.01044909431165123,
+      "sd_across_source_seed_rows": 0.004780771650262126
+    },
+    {
+      "target_classifier_group": "Few",
+      "source_class_rows": 195,
+      "mean_source_to_target_group_gradient_frobenius": 0.015477501226340845,
+      "sd_across_source_seed_rows": 0.013021703351878904
+    }
+  ],
+  "direct_negative_component_seeds": 3,
+  "actual_negative_margin_seeds": 3,
+  "many_accuracy_negative_seeds": 3,
+  "max_parameter_reconstruction_relative": 4.960612095775647e-07,
+  "interpretation": "SUPPORTIVE: the direct perturbation component and the observed fixed-pair Many margin shift are negative in at least two of three seeds; inspect source/target consistency before making a causal claim.",
+  "important_scope": [
+    "The direct component is defined at the current C3 classifier state: grad(L_C3 at W3)-grad(L_C2 at W3).",
+    "The state-feedback component is grad(L_C2 at W3)-grad(L_C2 at W2).",
+    "Momentum and coupled weight decay are propagated separately; reconstruction residual is reported.",
+    "Measured parameter-writeback rounding is reported as an independent numerical component.",
+    "The decomposition is an ordered path decomposition, not a unique causal attribution independent of decomposition order.",
+    "The audit does not establish independent-test generalization, statistical significance or paper-level novelty."
+  ]
+}
