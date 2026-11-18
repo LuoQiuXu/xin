@@ -3,3 +3,7 @@ __pycache__/
 *.log
 *.tmp
 results/**/*.pth
+
+# Local validation snapshots are indexed by diagnostics/final_rounding_ledger.json.
+/diagnostics/rounding_ledger_validation_20261118_01/
+/diagnostics/rounding_ledger_validation_20261118_02/

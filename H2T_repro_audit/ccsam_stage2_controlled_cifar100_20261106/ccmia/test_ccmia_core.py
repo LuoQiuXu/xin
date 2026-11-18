@@ -1,9 +1,11 @@
 import unittest
+from unittest.mock import patch
 
 import torch
 import torch.nn.functional as F
 
 from ccmia_core import (
+    ParameterWritebackRoundingLedger,
     SGDInfluenceTracker,
     clean_weighted_ce_gradient,
     decompose_perturbation_gradient_by_source,
@@ -211,6 +213,153 @@ class CCMIACoreTests(unittest.TestCase):
             clean_weighted_ce_gradient(
                 bad, self.labels, self.head(bad).detach(), self.weights, self.alpha
             )
+
+
+class WritebackRoundingLedgerTests(unittest.TestCase):
+    @staticmethod
+    def make_head(dtype=torch.float32):
+        head = torch.nn.Linear(3, 2, dtype=dtype)
+        with torch.no_grad():
+            head.weight.fill_(0.75)
+            head.bias.fill_(-0.5)
+        return head
+
+    def test_fp64_dyadic_updates_have_zero_writeback_residual(self):
+        head = self.make_head(torch.float64)
+        optimizer = torch.optim.SGD(head.parameters(), lr=0.125, momentum=0.5, weight_decay=0.25)
+        ledger = ParameterWritebackRoundingLedger()
+        for _ in range(4):
+            for parameter in head.parameters():
+                parameter.grad = torch.full_like(parameter, 0.125)
+            ledger.capture(head.named_parameters(), optimizer)
+            optimizer.step()
+            measured = ledger.record()
+            for name in ("weight", "bias"):
+                self.assertEqual(torch.count_nonzero(measured[name]["residual"]).item(), 0)
+                self.assertEqual(torch.count_nonzero(ledger.cumulative[name]).item(), 0)
+                self.assertTrue(measured[name]["replay_bitwise_equal"])
+
+    def test_fp32_residual_uses_individual_update_operands_and_rounding_bound(self):
+        head = self.make_head()
+        optimizer = torch.optim.SGD(head.parameters(), lr=0.01)
+        ledger = ParameterWritebackRoundingLedger()
+        before = {name: p.detach().clone() for name, p in head.named_parameters()}
+        for parameter in head.parameters():
+            parameter.grad = torch.full_like(parameter, 1e-6)
+        ledger.capture(head.named_parameters(), optimizer)
+        optimizer.step()
+        for name, values in ledger.record().items():
+            actual = getattr(head, name).detach().double()
+            expected = actual - (before[name].double() - 0.01 * values["update_direction"].double())
+            torch.testing.assert_close(values["residual"], expected, rtol=0, atol=0)
+            self.assertGreater(values["residual"].abs().max().item(), 0)
+            self.assertTrue(torch.all(values["residual"].abs() <= values["bound"]))
+            self.assertEqual(getattr(head, name).dtype, torch.float32)
+
+    def test_paired_ledger_reconstructs_weight_and_bias_with_strict_precision(self):
+        heads = [self.make_head(), self.make_head()]
+        optimizers = [torch.optim.SGD(head.parameters(), lr=0.125, momentum=0.5) for head in heads]
+        ledgers = [ParameterWritebackRoundingLedger(), ParameterWritebackRoundingLedger()]
+        tracker = SGDInfluenceTracker(2, 3, torch.device("cpu"), 0.5, 0.125, 0.0)
+        raw_relative = []
+        for _ in range(4):
+            for arm, head in enumerate(heads):
+                for parameter in head.parameters():
+                    parameter.grad = torch.full_like(parameter, 2.0 ** -20 + arm * 2.0 ** -24)
+            source_w = torch.zeros(2, 2, 3, dtype=torch.float64)
+            source_b = torch.zeros(2, 2, dtype=torch.float64)
+            source_w[0] = heads[1].weight.grad.double() - heads[0].weight.grad.double()
+            source_b[0] = heads[1].bias.grad.double() - heads[0].bias.grad.double()
+            tracker.advance(
+                source_w, source_b, torch.zeros(2, 3), torch.zeros(2),
+                heads[1].weight.detach() - heads[0].weight.detach(),
+                heads[1].bias.detach() - heads[0].bias.detach(),
+            )
+            scientific_before = {name: value.clone() for name, value in tracker.parameter_components().items()}
+            for head, optimizer, ledger in zip(heads, optimizers, ledgers):
+                ledger.capture(head.named_parameters(), optimizer)
+                optimizer.step()
+                ledger.record()
+            for name, value in tracker.parameter_components().items():
+                torch.testing.assert_close(value, scientific_before[name], rtol=0, atol=0)
+            for name in ("weight", "bias"):
+                components = tracker.parameter_components()
+                predicted = sum(components[f"{term}_{name}"] for term in ("direct", "state", "decay"))
+                actual = getattr(heads[1], name).detach().double() - getattr(heads[0], name).detach().double()
+                raw_relative.append(max_abs_and_relative_error(actual, predicted)[1])
+                corrected = predicted + ledgers[1].cumulative[name] - ledgers[0].cumulative[name]
+                self.assertLess(max_abs_and_relative_error(actual, corrected)[0], 1e-13)
+                self.assertLess(max_abs_and_relative_error(actual, corrected)[1], 1e-10)
+                buffers = tracker.buffer_components()
+                predicted_buffer = sum(buffers[f"{term}_{name}"] for term in ("direct", "state", "decay"))
+                actual_buffer = (
+                    optimizers[1].state[getattr(heads[1], name)]["momentum_buffer"].double()
+                    - optimizers[0].state[getattr(heads[0], name)]["momentum_buffer"].double()
+                )
+                torch.testing.assert_close(actual_buffer, predicted_buffer, rtol=1e-12, atol=1e-14)
+        self.assertGreater(max(raw_relative), 5e-3)
+        self.assertEqual([ledger.steps for ledger in ledgers], [4, 4])
+
+    def test_actual_direction_includes_nesterov_decay_and_maximize(self):
+        for foreach in (False, True):
+            with self.subTest(foreach=foreach):
+                head = self.make_head()
+                optimizer = torch.optim.SGD(
+                    head.parameters(), lr=0.013, momentum=0.9, weight_decay=0.002,
+                    nesterov=True, maximize=True, foreach=foreach,
+                )
+                ledger = ParameterWritebackRoundingLedger()
+                for _ in range(2):
+                    before = {name: p.detach().clone() for name, p in head.named_parameters()}
+                    for parameter in head.parameters():
+                        parameter.grad = torch.full_like(parameter, 0.015625)
+                    ledger.capture(head.named_parameters(), optimizer)
+                    optimizer.step()
+                    measured = ledger.record()
+                    for name, values in measured.items():
+                        parameter = getattr(head, name)
+                        coupled = parameter.grad.neg().add(before[name], alpha=0.002)
+                        expected_direction = coupled.add(optimizer.state[parameter]["momentum_buffer"], alpha=0.9)
+                        torch.testing.assert_close(values["update_direction"], expected_direction, rtol=0, atol=0)
+                        self.assertTrue(values["replay_bitwise_equal"])
+                        self.assertTrue(torch.all(values["residual"].abs() <= values["bound"]))
+
+    def test_ledger_record_is_independent_of_reconstruction_comparison(self):
+        head = self.make_head()
+        optimizer = torch.optim.SGD(head.parameters(), lr=0.01)
+        ledger = ParameterWritebackRoundingLedger()
+        for parameter in head.parameters():
+            parameter.grad = torch.full_like(parameter, 1e-6)
+        ledger.capture(head.named_parameters(), optimizer)
+        optimizer.step()
+        with patch("ccmia_core.max_abs_and_relative_error", side_effect=AssertionError("reconstruction accessed")):
+            measured = ledger.record()
+        self.assertEqual(set(measured), {"weight", "bias"})
+        self.assertEqual(ledger.steps, 1)
+
+    def test_corrupted_real_writeback_is_rejected_before_ledger_commit(self):
+        head = self.make_head()
+        optimizer = torch.optim.SGD(head.parameters(), lr=0.01)
+        ledger = ParameterWritebackRoundingLedger()
+        for parameter in head.parameters():
+            parameter.grad = torch.full_like(parameter, 0.125)
+        ledger.capture(head.named_parameters(), optimizer)
+        optimizer.step()
+        with torch.no_grad():
+            head.bias[0].add_(0.01)
+        with self.assertRaisesRegex(RuntimeError, "parameter-writeback replay differs"):
+            ledger.record()
+        self.assertEqual(ledger.steps, 0)
+        self.assertEqual(ledger.cumulative, {})
+
+    def test_nonfinite_writeback_inputs_fail_closed(self):
+        head = self.make_head()
+        optimizer = torch.optim.SGD(head.parameters(), lr=0.01)
+        ledger = ParameterWritebackRoundingLedger()
+        for parameter in head.parameters():
+            parameter.grad = torch.full_like(parameter, float("inf"))
+        with self.assertRaisesRegex(RuntimeError, "Nonfinite input"):
+            ledger.capture(head.named_parameters(), optimizer)
 
 
 if __name__ == "__main__":

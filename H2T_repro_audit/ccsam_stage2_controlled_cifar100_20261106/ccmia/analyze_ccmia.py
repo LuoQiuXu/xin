@@ -294,13 +294,18 @@ def analyze():
         "direct_perturbation_component_mean",
         "state_feedback_component_mean",
         "weight_decay_component_mean",
+        "parameter_writeback_rounding_component_mean",
         "reconstruction_residual_component_mean",
         "direct_negative_fraction",
         "state_negative_fraction",
         "actual_negative_fraction",
         "margin_reconstruction_rmse",
     ):
-        mean, sd = mean_sd([float(row[key]) for row in decomp_final])
+        if key == "parameter_writeback_rounding_component_mean":
+            values = [float(row.get(key, 0.0)) for row in decomp_final]
+        else:
+            values = [float(row[key]) for row in decomp_final]
+        mean, sd = mean_sd(values)
         decomp_summary[key] = {"mean": mean, "sample_sd": sd}
 
     direct_negative_seeds = sum(float(row["direct_perturbation_component_mean"]) < 0 for row in decomp_final)
@@ -340,6 +345,7 @@ def analyze():
             "The direct component is defined at the current C3 classifier state: grad(L_C3 at W3)-grad(L_C2 at W3).",
             "The state-feedback component is grad(L_C2 at W3)-grad(L_C2 at W2).",
             "Momentum and coupled weight decay are propagated separately; reconstruction residual is reported.",
+            "Measured parameter-writeback rounding is reported as an independent numerical component.",
             "The decomposition is an ordered path decomposition, not a unique causal attribution independent of decomposition order.",
             "The audit does not establish independent-test generalization, statistical significance or paper-level novelty.",
         ],
@@ -384,6 +390,7 @@ def analyze():
         ("direct_perturbation_component_mean", "直接扰动分量"),
         ("state_feedback_component_mean", "训练状态反馈分量"),
         ("weight_decay_component_mean", "权重衰减分量"),
+        ("parameter_writeback_rounding_component_mean", "参数写回舍入分量"),
         ("reconstruction_residual_component_mean", "重构残差"),
     ):
         value = decomp_summary[key]

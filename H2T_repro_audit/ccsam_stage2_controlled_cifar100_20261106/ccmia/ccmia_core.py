@@ -361,3 +361,164 @@ def max_abs_and_relative_error(actual: torch.Tensor, predicted: torch.Tensor):
     predicted_scale = float(predicted.detach().to(torch.float64).abs().max().item())
     denom = max(actual_scale, predicted_scale, 1e-8)
     return max_abs, max_abs / denom
+
+
+class ParameterWritebackRoundingLedger:
+    """Track one optimizer's parameter writeback using its own step operands."""
+
+    def __init__(self):
+        self.cumulative = {}
+        self.last_step = {}
+        self.steps = 0
+        self._pending = None
+
+    @torch.no_grad()
+    def capture(self, named_parameters, optimizer):
+        from torch.optim.optimizer import _default_to_fused_or_foreach
+
+        if self._pending is not None:
+            raise RuntimeError("The previous writeback capture has not been recorded")
+        if not isinstance(optimizer, torch.optim.SGD):
+            raise TypeError("Writeback replay requires torch.optim.SGD")
+        names = {id(parameter): name for name, parameter in named_parameters}
+        groups = []
+        for group in optimizer.param_groups:
+            params = group["params"]
+            if group["differentiable"] or group["fused"]:
+                raise ValueError("Writeback replay supports nondifferentiable, unfused SGD")
+            if group["foreach"] is None and group["fused"] is None:
+                _, foreach = _default_to_fused_or_foreach(params, differentiable=False, use_fused=False)
+            else:
+                foreach = bool(group["foreach"])
+            settings = {key: group[key] for key in (
+                "lr", "momentum", "weight_decay", "dampening", "nesterov", "maximize"
+            )}
+            if not isinstance(settings["lr"], (float, int)):
+                raise TypeError("Writeback replay requires a scalar learning rate")
+            entries = []
+            for parameter in params:
+                if id(parameter) not in names:
+                    raise ValueError("Every SGD parameter must have a ledger name")
+                grad = parameter.grad
+                if parameter.dtype not in (torch.float32, torch.float64):
+                    raise TypeError("Writeback replay requires FP32 or FP64 parameters")
+                if grad is None or grad.is_sparse or grad.dtype != parameter.dtype:
+                    raise ValueError("Writeback replay requires dense gradients for every parameter")
+                buffer = optimizer.state.get(parameter, {}).get("momentum_buffer")
+                values = [parameter, grad] + ([] if buffer is None else [buffer])
+                if not all(torch.isfinite(value).all() for value in values):
+                    raise RuntimeError("Nonfinite input to parameter writeback replay")
+                entries.append({
+                    "name": names[id(parameter)],
+                    "parameter": parameter,
+                    "before": parameter.detach().clone(),
+                    "grad": grad.detach().clone(),
+                    "buffer": None if buffer is None else buffer.detach().clone(),
+                })
+            groups.append({"settings": settings, "foreach": foreach, "entries": entries, "group": group})
+        if not groups or not any(group["entries"] for group in groups):
+            raise ValueError("Writeback replay requires at least one parameter")
+        if len(names) != sum(len(group["entries"]) for group in groups):
+            raise ValueError("Ledger names and optimizer parameters must match exactly")
+        self._pending = (optimizer, groups)
+
+    @staticmethod
+    def _directions(group, optimizer):
+        settings = group["settings"]
+        entries = group["entries"]
+        before = [entry["before"] for entry in entries]
+        grads = [entry["grad"].clone() for entry in entries]
+        if settings["maximize"]:
+            grads = [grad.neg() for grad in grads]
+        if settings["weight_decay"]:
+            if group["foreach"]:
+                grads = torch._foreach_add(grads, before, alpha=settings["weight_decay"])
+            else:
+                grads = [grad.add(value, alpha=settings["weight_decay"]) for grad, value in zip(grads, before)]
+        if not settings["momentum"]:
+            return grads
+
+        old_buffers = [entry["buffer"] for entry in entries]
+        if group["foreach"] and all(buffer is not None for buffer in old_buffers):
+            expected_buffers = [buffer.clone() for buffer in old_buffers]
+            torch._foreach_mul_(expected_buffers, settings["momentum"])
+            torch._foreach_add_(expected_buffers, grads, alpha=1.0 - settings["dampening"])
+        else:
+            expected_buffers = [
+                grad.clone() if previous is None else previous.mul(settings["momentum"]).add(
+                    grad, alpha=1.0 - settings["dampening"]
+                )
+                for grad, previous in zip(grads, old_buffers)
+            ]
+        actual_buffers = [optimizer.state[entry["parameter"]]["momentum_buffer"].detach() for entry in entries]
+        for expected, actual in zip(expected_buffers, actual_buffers):
+            if not torch.equal(expected.view(torch.uint8), actual.contiguous().view(torch.uint8)):
+                raise RuntimeError("Independent SGD momentum-buffer replay differs from the real optimizer")
+        if settings["nesterov"]:
+            if group["foreach"]:
+                torch._foreach_add_(grads, actual_buffers, alpha=settings["momentum"])
+                return grads
+            return [grad.add(buffer, alpha=settings["momentum"]) for grad, buffer in zip(grads, actual_buffers)]
+        return actual_buffers
+
+    @staticmethod
+    def _rounding_bound(before, direction, learning_rate):
+        """Bound scalar conversion, multiply and add, including an FMA path."""
+        info = torch.finfo(before.dtype)
+        unit_roundoff = info.eps / 2.0
+        min_subnormal = info.tiny * info.eps
+        native_lr = torch.tensor(learning_rate, dtype=before.dtype).item()
+        p, u = before.double().abs(), direction.double().abs()
+        product = abs(native_lr) * u
+        product_error = unit_roundoff * product + min_subnormal
+        coefficient_error = abs(float(learning_rate) - native_lr) * u
+        add_error = unit_roundoff * (p + product + product_error) + min_subnormal
+        return coefficient_error + product_error + add_error
+
+    @torch.no_grad()
+    def record(self):
+        if self._pending is None:
+            raise RuntimeError("Capture parameters before the real optimizer step")
+        optimizer, groups = self._pending
+        measured = {}
+        for group in groups:
+            settings = group["settings"]
+            if any(group["group"][key] != value for key, value in settings.items()):
+                raise RuntimeError("SGD settings changed during the captured step")
+            direction = self._directions(group, optimizer)
+            replay = [entry["before"].clone() for entry in group["entries"]]
+            if group["foreach"]:
+                torch._foreach_add_(replay, direction, alpha=-settings["lr"])
+            else:
+                for value, update in zip(replay, direction):
+                    value.add_(update, alpha=-settings["lr"])
+            for entry, replayed, update in zip(group["entries"], replay, direction):
+                actual = entry["parameter"].detach()
+                if not torch.isfinite(actual).all() or not torch.isfinite(update).all():
+                    raise RuntimeError("Nonfinite SGD parameter or update direction")
+                if not torch.equal(replayed.view(torch.uint8), actual.contiguous().view(torch.uint8)):
+                    raise RuntimeError("Independent SGD parameter-writeback replay differs from the real optimizer")
+                ideal = entry["before"].double() - float(settings["lr"]) * update.double()
+                residual = actual.double() - ideal
+                bound = self._rounding_bound(entry["before"], update, settings["lr"])
+                if torch.any(residual.abs() > bound):
+                    raise RuntimeError("Parameter writeback residual exceeds its operator-based rounding bound")
+                measured[entry["name"]] = {
+                    "residual": residual,
+                    "bound": bound,
+                    "before": entry["before"],
+                    "after": actual.clone(),
+                    "update_direction": update.clone(),
+                    "learning_rate": float(settings["lr"]),
+                    "foreach": group["foreach"],
+                    "nesterov": settings["nesterov"],
+                    "momentum_buffer_initialized": bool(settings["momentum"] and entry["buffer"] is None),
+                    "replay_bitwise_equal": True,
+                }
+        for name, values in measured.items():
+            previous = self.cumulative.get(name, torch.zeros_like(values["residual"]))
+            self.cumulative[name] = previous + values["residual"]
+        self.last_step = measured
+        self.steps += 1
+        self._pending = None
+        return measured

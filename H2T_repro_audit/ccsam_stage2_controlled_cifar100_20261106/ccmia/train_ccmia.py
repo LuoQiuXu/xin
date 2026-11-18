@@ -45,6 +45,7 @@ from ccsam_common import (  # noqa: E402
 )
 from train_ccsam import C3_ARM, compute_arm_loss, load_prepared  # noqa: E402
 from ccmia_core import (  # noqa: E402
+    ParameterWritebackRoundingLedger,
     SGDInfluenceTracker,
     clean_weighted_ce_gradient,
     decompose_perturbation_gradient_by_source,
@@ -68,6 +69,7 @@ TRACE_FIELDS = (
 MANY_THRESHOLD_EXCLUSIVE = 100
 MEDIUM_MIN_INCLUSIVE = 20
 MOMENTUM_RECONSTRUCTION_REL_TOL = 5e-3
+MOMENTUM_RECONSTRUCTION_ABS_TOL = 2e-6
 GRADIENT_DECOMPOSITION_ATOL = 2e-5
 GRADIENT_DECOMPOSITION_RTOL = 2e-4
 
@@ -469,28 +471,91 @@ def compute_paired_gradients(classifier2, classifier3, gap, labels, class_weight
     }
 
 
-def reconstruction_diagnostics(tracker, classifier2, classifier3, optimizer2, optimizer3):
+def rounding_tensor_record(value, include_values):
+    flat_index = value.abs().argmax()
+    index = [int(axis) for axis in torch.unravel_index(flat_index, value.shape)]
+    record = {
+        "shape": list(value.shape),
+        "max_abs": value.abs().max().item(),
+        "rms": value.square().mean().sqrt().item(),
+        "max_abs_index": index,
+        "value_at_max_abs": value.flatten()[flat_index].item(),
+    }
+    if include_values:
+        record["values"] = value.detach().cpu().tolist()
+    return record
+
+
+def writeback_rounding_diagnostics(ledger2, ledger3, include_values):
+    report = {"steps": ledger2.steps}
+    for name in ("weight", "bias"):
+        values = {}
+        for arm, ledger in (("C2", ledger2), ("C3", ledger3)):
+            step = ledger.last_step[name]
+            residual, bound = step["residual"], step["bound"]
+            denominator = torch.where(bound > 0, bound, torch.ones_like(bound))
+            values[arm] = {
+                **rounding_tensor_record(residual, include_values),
+                "bound_max_abs": bound.abs().max().item(),
+                "maximum_residual_over_bound": (residual.abs() / denominator).max().item(),
+                "replay_bitwise_equal": step["replay_bitwise_equal"],
+                "learning_rate": step["learning_rate"],
+                "foreach": step["foreach"],
+                "nesterov": step["nesterov"],
+                "momentum_buffer_initialized": step["momentum_buffer_initialized"],
+                "before_sha256": hash_arrays(step["before"].cpu().numpy()),
+                "after_sha256": hash_arrays(step["after"].cpu().numpy()),
+                "update_direction_sha256": hash_arrays(step["update_direction"].cpu().numpy()),
+            }
+        values["step_delta_R"] = rounding_tensor_record(
+            ledger3.last_step[name]["residual"] - ledger2.last_step[name]["residual"], include_values
+        )
+        values["cumulative_delta_R"] = rounding_tensor_record(
+            ledger3.cumulative[name] - ledger2.cumulative[name], include_values
+        )
+        report[name] = values
+    return report
+
+
+def reconstruction_diagnostics(tracker, classifier2, classifier3, optimizer2, optimizer3,
+                               writeback_ledgers=None, include_rounding_values=False):
     fc2 = classifier2.module.fc
     fc3 = classifier3.module.fc
     components = tracker.parameter_components()
     buffer_components = tracker.buffer_components()
 
-    actual_weight = fc3.weight.detach() - fc2.weight.detach()
-    actual_bias = fc3.bias.detach() - fc2.bias.detach()
+    actual_weight = fc3.weight.detach().double() - fc2.weight.detach().double()
+    actual_bias = fc3.bias.detach().double() - fc2.bias.detach().double()
     predicted_weight = (
         components["direct_weight"] + components["state_weight"] + components["decay_weight"]
     )
     predicted_bias = (
         components["direct_bias"] + components["state_bias"] + components["decay_bias"]
     )
+    raw_weight_abs, raw_weight_rel = max_abs_and_relative_error(
+        fc3.weight.detach() - fc2.weight.detach(), predicted_weight
+    )
+    raw_bias_abs, raw_bias_rel = max_abs_and_relative_error(fc3.bias.detach() - fc2.bias.detach(), predicted_bias)
+    if writeback_ledgers is not None:
+        ledger2, ledger3 = writeback_ledgers
+        if ledger2 is ledger3 or ledger2.steps == 0 or ledger2.steps != ledger3.steps:
+            raise RuntimeError("Writeback ledgers must contain matching independent paired steps")
+        for name in ("weight", "bias"):
+            for ledger, fc in ((ledger2, fc2), (ledger3, fc3)):
+                if not torch.equal(ledger.last_step[name]["after"], getattr(fc, name).detach()):
+                    raise RuntimeError("Writeback ledger does not belong to the current classifier state")
+        predicted_weight = predicted_weight + ledger3.cumulative["weight"] - ledger2.cumulative["weight"]
+        predicted_bias = predicted_bias + ledger3.cumulative["bias"] - ledger2.cumulative["bias"]
     weight_abs, weight_rel = max_abs_and_relative_error(actual_weight, predicted_weight)
     bias_abs, bias_rel = max_abs_and_relative_error(actual_bias, predicted_bias)
 
     actual_buffer_weight = (
-        optimizer3.state[fc3.weight]["momentum_buffer"] - optimizer2.state[fc2.weight]["momentum_buffer"]
+        optimizer3.state[fc3.weight]["momentum_buffer"].double()
+        - optimizer2.state[fc2.weight]["momentum_buffer"].double()
     )
     actual_buffer_bias = (
-        optimizer3.state[fc3.bias]["momentum_buffer"] - optimizer2.state[fc2.bias]["momentum_buffer"]
+        optimizer3.state[fc3.bias]["momentum_buffer"].double()
+        - optimizer2.state[fc2.bias]["momentum_buffer"].double()
     )
     predicted_buffer_weight = (
         buffer_components["direct_weight"] + buffer_components["state_weight"] + buffer_components["decay_weight"]
@@ -498,6 +563,10 @@ def reconstruction_diagnostics(tracker, classifier2, classifier3, optimizer2, op
     predicted_buffer_bias = (
         buffer_components["direct_bias"] + buffer_components["state_bias"] + buffer_components["decay_bias"]
     )
+    for value in (actual_weight, actual_bias, predicted_weight, predicted_bias,
+                  actual_buffer_weight, actual_buffer_bias, predicted_buffer_weight, predicted_buffer_bias):
+        if not torch.isfinite(value).all():
+            raise RuntimeError("Nonfinite parameter or momentum reconstruction")
     buffer_weight_abs, buffer_weight_rel = max_abs_and_relative_error(
         actual_buffer_weight, predicted_buffer_weight
     )
@@ -507,11 +576,12 @@ def reconstruction_diagnostics(tracker, classifier2, classifier3, optimizer2, op
     parameter_max_rel = max(weight_rel, bias_rel)
     buffer_max_rel = max(buffer_weight_rel, buffer_bias_rel)
     max_rel = max(parameter_max_rel, buffer_max_rel)
-    if max_rel > MOMENTUM_RECONSTRUCTION_REL_TOL:
+    max_abs = max(weight_abs, bias_abs, buffer_weight_abs, buffer_bias_abs)
+    if max_rel > MOMENTUM_RECONSTRUCTION_REL_TOL or max_abs > MOMENTUM_RECONSTRUCTION_ABS_TOL:
         raise RuntimeError(
             "SGD momentum/weight-decay attribution failed reconstruction: "
             f"weight_rel={weight_rel:.6g}, bias_rel={bias_rel:.6g}, "
-            f"buffer_weight_rel={buffer_weight_rel:.6g}, buffer_bias_rel={buffer_bias_rel:.6g}"
+            f"buffer_weight_rel={buffer_weight_rel:.6g}, buffer_bias_rel={buffer_bias_rel:.6g}, max_abs={max_abs:.6g}"
         )
     return {
         "parameter_weight_max_abs": weight_abs,
@@ -525,6 +595,15 @@ def reconstruction_diagnostics(tracker, classifier2, classifier3, optimizer2, op
         "momentum_buffer_bias_relative": buffer_bias_rel,
         "momentum_buffer_max_relative": buffer_max_rel,
         "max_relative_reconstruction_error": max_rel,
+        "max_absolute_reconstruction_error": max_abs,
+        "raw_parameter_weight_max_abs": raw_weight_abs,
+        "raw_parameter_weight_relative": raw_weight_rel,
+        "raw_parameter_bias_max_abs": raw_bias_abs,
+        "raw_parameter_bias_relative": raw_bias_rel,
+        "parameter_writeback_rounding": (
+            writeback_rounding_diagnostics(*writeback_ledgers, include_values=include_rounding_values)
+            if writeback_ledgers is not None else None
+        ),
     }
 
 
@@ -607,6 +686,7 @@ def run_seed_smoke(seed, context, device):
     tracker = SGDInfluenceTracker(NUM_CLASSES, FEATURE_DIM, device, MOMENTUM, STAGE2_LR, WEIGHT_DECAY)
 
     initial_classifier_sha = state_hash(classifier3)
+    writeback2, writeback3 = ParameterWritebackRoundingLedger(), ParameterWritebackRoundingLedger()
     checked = []
     for batch_index in range(2):
         indices = np.asarray(plan[0, batch_index * BATCH_SIZE:min((batch_index + 1) * BATCH_SIZE, len(context["train_labels"]))], dtype=np.int64)
@@ -638,9 +718,16 @@ def run_seed_smoke(seed, context, device):
             classifier3.module.fc.weight.detach() - classifier2.module.fc.weight.detach(),
             classifier3.module.fc.bias.detach() - classifier2.module.fc.bias.detach(),
         )
+        writeback2.capture(classifier2.module.fc.named_parameters(), optimizer2)
+        writeback3.capture(classifier3.module.fc.named_parameters(), optimizer3)
         optimizer2.step()
         optimizer3.step()
-        reconstruction = reconstruction_diagnostics(tracker, classifier2, classifier3, optimizer2, optimizer3)
+        writeback2.record()
+        writeback3.record()
+        reconstruction = reconstruction_diagnostics(
+            tracker, classifier2, classifier3, optimizer2, optimizer3,
+            writeback_ledgers=(writeback2, writeback3), include_rounding_values=True,
+        )
         checked.append({
             "batch": batch_index,
             "batch_trace_matches_C0": True,
@@ -667,7 +754,16 @@ def run_seed_smoke(seed, context, device):
     }
 
 
-def run_preflight():
+def validation_directory(directory=None):
+    if directory is None:
+        return CCMIA_ROOT
+    resolved = (CCMIA_ROOT / directory).resolve()
+    if not resolved.is_relative_to((CCMIA_ROOT / "diagnostics").resolve()):
+        raise ValueError("Independent validation reports must remain under ccmia/diagnostics/")
+    return resolved
+
+
+def run_preflight(validation_dir=None):
     context = prepare_context()
     audit = validate_inputs(context)
     guard = require_test_guard()
@@ -677,7 +773,7 @@ def run_preflight():
         "test_guard": guard,
         "source_branch_note": "CC-MIA is isolated from C0-C4 and TPR production code; no protected source file is modified.",
     }
-    path = CCMIA_ROOT / "preflight_report.json"
+    path = validation_directory(validation_dir) / "preflight_report.json"
     if path.exists():
         raise FileExistsError(f"Refusing to overwrite {path}")
     write_json(path, report)
@@ -685,13 +781,14 @@ def run_preflight():
     return report
 
 
-def run_smoke():
+def run_smoke(validation_dir=None):
     context = prepare_context()
     audit = validate_inputs(context)
-    report_path = CCMIA_ROOT / "smoke_report.json"
+    report_root = validation_directory(validation_dir)
+    report_path = report_root / "smoke_report.json"
     if report_path.exists():
         raise FileExistsError(f"Refusing to overwrite {report_path}")
-    preflight_path = CCMIA_ROOT / "preflight_report.json"
+    preflight_path = report_root / "preflight_report.json"
     if not preflight_path.is_file():
         raise RuntimeError("Run --phase preflight first.")
     preflight = read_json(preflight_path)
@@ -826,12 +923,17 @@ def source_group_gradient_rows(seed, epoch, acc, counts):
 
 
 def decomposition_epoch_rows(seed, epoch, tracker, classifier2, classifier3, context, val_features_t,
-                             val_labels_t, fixed_q, many_mask, epoch_acc):
+                             val_labels_t, fixed_q, many_mask, epoch_acc, writeback_ledgers=None):
     fc2 = classifier2.module.fc
     fc3 = classifier3.module.fc
     components = tracker.parameter_components()
-    actual_w = fc3.weight.detach() - fc2.weight.detach()
-    actual_b = fc3.bias.detach() - fc2.bias.detach()
+    actual_w = fc3.weight.detach().double() - fc2.weight.detach().double()
+    actual_b = fc3.bias.detach().double() - fc2.bias.detach().double()
+    rounding_w, rounding_b = torch.zeros_like(actual_w), torch.zeros_like(actual_b)
+    if writeback_ledgers is not None:
+        ledger2, ledger3 = writeback_ledgers
+        rounding_w = ledger3.cumulative["weight"] - ledger2.cumulative["weight"]
+        rounding_b = ledger3.cumulative["bias"] - ledger2.cumulative["bias"]
 
     direct_source = project_source_parameter_delta_to_fixed_margin(
         tracker.direct_parameter_weight, tracker.direct_parameter_bias,
@@ -848,8 +950,11 @@ def decomposition_epoch_rows(seed, epoch, tracker, classifier2, classifier3, con
     actual = project_parameter_delta_to_fixed_margin(
         actual_w, actual_b, val_features_t, val_labels_t, fixed_q, many_mask
     )
+    writeback = project_parameter_delta_to_fixed_margin(
+        rounding_w, rounding_b, val_features_t, val_labels_t, fixed_q, many_mask
+    )
     direct_margin = direct_source["margin_delta"].sum(dim=0)
-    predicted_margin = direct_margin + state["margin_delta"] + decay["margin_delta"]
+    predicted_margin = direct_margin + state["margin_delta"] + decay["margin_delta"] + writeback["margin_delta"]
     residual_margin = actual["margin_delta"] - predicted_margin
 
     direct_target = direct_source["target_logit_delta"].sum(dim=0)
@@ -864,6 +969,7 @@ def decomposition_epoch_rows(seed, epoch, tracker, classifier2, classifier3, con
         "direct_perturbation_component_mean": float(direct_margin.mean().item()),
         "state_feedback_component_mean": float(state["margin_delta"].mean().item()),
         "weight_decay_component_mean": float(decay["margin_delta"].mean().item()),
+        "parameter_writeback_rounding_component_mean": float(writeback["margin_delta"].mean().item()),
         "reconstruction_residual_component_mean": float(residual_margin.mean().item()),
         "actual_target_logit_delta_mean": float(actual_target.mean().item()),
         "actual_competitor_logit_delta_mean": float(actual_comp.mean().item()),
@@ -876,10 +982,10 @@ def decomposition_epoch_rows(seed, epoch, tracker, classifier2, classifier3, con
         "margin_reconstruction_rmse": float(torch.sqrt(torch.mean(residual_margin.square())).item()),
         "parameter_reconstruction_relative": max(
             max_abs_and_relative_error(
-                actual_w, components["direct_weight"] + components["state_weight"] + components["decay_weight"]
+                actual_w, components["direct_weight"] + components["state_weight"] + components["decay_weight"] + rounding_w
             )[1],
             max_abs_and_relative_error(
-                actual_b, components["direct_bias"] + components["state_bias"] + components["decay_bias"]
+                actual_b, components["direct_bias"] + components["state_bias"] + components["decay_bias"] + rounding_b
             )[1],
         ),
     }
@@ -989,6 +1095,7 @@ def train_seed(seed, context, device):
         tracker = SGDInfluenceTracker(
             NUM_CLASSES, FEATURE_DIM, device, MOMENTUM, STAGE2_LR, WEIGHT_DECAY
         )
+        writeback2, writeback3 = ParameterWritebackRoundingLedger(), ParameterWritebackRoundingLedger()
         metric_rows = []
         per_class_rows = []
         initial_logits2, initial_logits3, initial_diag2, initial_diag3 = evaluate_epoch(
@@ -1021,6 +1128,8 @@ def train_seed(seed, context, device):
             "state_feedback_gradient_weight_norm", "total_gradient_weight_norm",
             "source_additivity_max_abs", "gradient_decomposition_max_abs",
             "parameter_reconstruction_relative", "momentum_buffer_reconstruction_relative",
+            "raw_parameter_weight_relative", "raw_parameter_bias_relative",
+            "writeback_weight_delta_R_max_abs", "writeback_bias_delta_R_max_abs",
         )
         group_fields = (
             "seed", "epoch", "source_class", "source_train_count", "source_group",
@@ -1044,6 +1153,7 @@ def train_seed(seed, context, device):
             "seed", "epoch", "many_validation_samples", "actual_c3_minus_c2_fixed_margin_mean",
             "direct_perturbation_component_mean", "state_feedback_component_mean",
             "weight_decay_component_mean", "reconstruction_residual_component_mean",
+            "parameter_writeback_rounding_component_mean",
             "actual_target_logit_delta_mean", "actual_competitor_logit_delta_mean",
             "direct_target_logit_component_mean", "direct_competitor_logit_component_mean",
             "direct_negative_fraction", "state_negative_fraction", "actual_negative_fraction",
@@ -1140,10 +1250,15 @@ def train_seed(seed, context, device):
                         pack["state_grad_weight"], pack["state_grad_bias"],
                         before_dw, before_db
                     )
+                    writeback2.capture(classifier2.module.fc.named_parameters(), optimizer2)
+                    writeback3.capture(classifier3.module.fc.named_parameters(), optimizer3)
                     optimizer2.step()
                     optimizer3.step()
+                    writeback2.record()
+                    writeback3.record()
                     reconstruction = reconstruction_diagnostics(
-                        tracker, classifier2, classifier3, optimizer2, optimizer3
+                        tracker, classifier2, classifier3, optimizer2, optimizer3,
+                        writeback_ledgers=(writeback2, writeback3),
                     )
                     epoch_max_reconstruction = max(
                         epoch_max_reconstruction, reconstruction["max_relative_reconstruction_error"]
@@ -1175,6 +1290,10 @@ def train_seed(seed, context, device):
                         "gradient_decomposition_max_abs": gradient_error,
                         "parameter_reconstruction_relative": reconstruction["parameter_max_relative"],
                         "momentum_buffer_reconstruction_relative": reconstruction["momentum_buffer_max_relative"],
+                        "raw_parameter_weight_relative": reconstruction["raw_parameter_weight_relative"],
+                        "raw_parameter_bias_relative": reconstruction["raw_parameter_bias_relative"],
+                        "writeback_weight_delta_R_max_abs": reconstruction["parameter_writeback_rounding"]["weight"]["step_delta_R"]["max_abs"],
+                        "writeback_bias_delta_R_max_abs": reconstruction["parameter_writeback_rounding"]["bias"]["step_delta_R"]["max_abs"],
                     })
 
                     batch_size = end - start
@@ -1201,7 +1320,8 @@ def train_seed(seed, context, device):
                 write_csv_rows(group_path, group_fields, group_rows, append=True)
                 decomp_row, cumulative_source_rows = decomposition_epoch_rows(
                     seed, epoch + 1, tracker, classifier2, classifier3, context,
-                    val_features_t, val_labels_t, fixed_q, many_mask, epoch_acc
+                    val_features_t, val_labels_t, fixed_q, many_mask, epoch_acc,
+                    writeback_ledgers=(writeback2, writeback3),
                 )
                 write_csv_rows(source_path, source_fields, cumulative_source_rows, append=True)
                 write_csv_rows(decomposition_path, decomposition_fields, [decomp_row], append=True)
@@ -1224,6 +1344,7 @@ def train_seed(seed, context, device):
                     "direct_perturbation_margin_component": decomp_row["direct_perturbation_component_mean"],
                     "state_feedback_margin_component": decomp_row["state_feedback_component_mean"],
                     "weight_decay_margin_component": decomp_row["weight_decay_component_mean"],
+                    "parameter_writeback_rounding_margin_component": decomp_row["parameter_writeback_rounding_component_mean"],
                     "max_gradient_decomposition_error": epoch_max_gradient_error,
                     "max_source_margin_additivity_error": epoch_max_source_error,
                     "max_sgd_reconstruction_relative": epoch_max_reconstruction,
@@ -1293,13 +1414,14 @@ def train_seed(seed, context, device):
         raise
 
 
-def run_formal():
+def run_formal(validation_dir=None):
     context = prepare_context()
     audit = validate_inputs(context)
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is required; CPU fallback is intentionally disabled.")
-    preflight_path = CCMIA_ROOT / "preflight_report.json"
-    smoke_path = CCMIA_ROOT / "smoke_report.json"
+    report_root = validation_directory(validation_dir)
+    preflight_path = report_root / "preflight_report.json"
+    smoke_path = report_root / "smoke_report.json"
     if not preflight_path.is_file() or not smoke_path.is_file():
         raise RuntimeError("Formal run requires successful preflight and Smoke reports.")
     preflight = read_json(preflight_path)
@@ -1344,13 +1466,17 @@ def main():
         description="CC-MIA: paired C2/C3 source-conditioned cross-class margin influence audit."
     )
     parser.add_argument("--phase", choices=("preflight", "smoke", "formal"), required=True)
+    parser.add_argument(
+        "--validation-dir", type=Path,
+        help="Use independent preflight/Smoke reports under ccmia/diagnostics/.",
+    )
     args = parser.parse_args()
     if args.phase == "preflight":
-        run_preflight()
+        run_preflight(args.validation_dir)
     elif args.phase == "smoke":
-        run_smoke()
+        run_smoke(args.validation_dir)
     else:
-        run_formal()
+        run_formal(args.validation_dir)
 
 
 if __name__ == "__main__":
