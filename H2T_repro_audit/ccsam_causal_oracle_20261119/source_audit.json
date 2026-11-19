@@ -1,0 +1,536 @@
+{
+  "passed": true,
+  "parent_commit": "63ae0ec84ff6b6579d682aec230811effc7a0ae7",
+  "start_head": "398200c263fff2c6130bd1d12428b559af5c4a68",
+  "current_head": "398200c263fff2c6130bd1d12428b559af5c4a68",
+  "branch": "experiment/ccmia-causal-oracle-20261119",
+  "reused_source_and_artifact_sha256": {
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\ccmia_core.py": "4e80be24f58b5be469a8cff8e26b02e398406a9f779f109b87cd99e1644bf920",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\train_ccmia.py": "663c02dee70a36f703f32d69f66e22c05e8c322838bb1853c63c137cc5a920ae",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analyze_ccmia.py": "805d955a4ce1559665d9c6c055cca8032c3565a17b737674172d2fc364acf540",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\test_ccmia_core.py": "502da248df618998ea71f5f1e594f489c9905594622b3495da0260dcc9a7f896",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\CCMIA_PROTOCOL.md": "3eb7aded2e909b7572bbaa566df110ed6fb1f834122cbd7f1a4be722249e640b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\train_ccsam.py": "076b5b6e87c7f24ae63464302cf702854982d18a1e36e8696c4c9edb9f0e17d0",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccsam_common.py": "1e912c8fab9eb49b1088f5fefbb448c17ac952672ca9d78c1dc78280431189e9",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\experiment_protocol.json": "8e7c28a7fd9c0110e60525c873bb3fdc6cfa15bc2c92759d7408bae17bb36813",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\c3_selective\\C3_PROTOCOL.md": "982bd0d4cf28f80c46a21836fe0e29dd94420d2bcf2d6d13e3ccbb3abc3e7fae",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\tpr_lowrank\\TPR_PROTOCOL.md": "c508c81f2f1c095436033d26f6322490f2a686b0140281a662254b71a7665462",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\final_paired_metrics.csv": "5cea4c69625fefc2746ea011b825ef891f25e6dacafacb87507540039865b105",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\source_class_direct_margin_epoch30.csv": "8cd5be9392ce74e0692ffdba87ee08e408a7d059b14ee805133be890897782a1",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\source_to_many_margin_pairs_epoch30.csv": "d1ee742be4cd45f0a67d35ff095a3111b0d881d6395faae8c3f0ebde4614fbc5",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\summary.json": "7bb4015196511c3dc9587b76634835ed3475e35cb7271da49169f726914c5006",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\CCMIA_RESULTS.md": "556922d974f6ac15527274a5689ed92a3193ed5561a96121e2d0025cabe1c3c8",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\diagnostics\\analysis_execution_20261118_01.log": "0406ab6b65cc9465177dddc29afce5e664bb2937ddbcd89e46fe22526d2cc4a8",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\diagnostics\\formal_execution_20261118_01.log": "c509e66c33be53e80e9a3da5621760328de65143feead564469b31130c297fac",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\formal_completed.json": "fef66e4992dced96729f8331d3936df28b929381114d70da39cfce6ace087021",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\FORMAL_EXECUTION_REPORT.md": "06e0cd095c2c6ccb1500f43920abc6257da0c668fa886ba348e69289103ee23a",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\batch_trace.csv": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\final_classifier_C2.pth": "4823d792c8d9120e7fa738a054c0cf9e674cd04708dfe53e566a99a7fc2748f6",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\final_classifier_C3.pth": "aec57aff265c2e9dd8b1becb93381cff3ff36618f8673f0f609c9b43be71c778",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\fixed_competitors.csv": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\margin_decomposition.csv": "c00348b356c06c43b0568a363c0d10bc8aeb32f7e391a76ddae10aabbecc586c",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\margin_metrics.csv": "fdb4f6be7b7132f2ecc72dc1e3dbfeb39f94fa29ccdbffcff4d6f9c95b548a7f",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\per_class_margin.csv": "3f5045b4debcc990fb2ef4ed6c697a0a19c90b5ee44d2e3847c5f8bb43ff2a98",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\source_margin_influence.csv": "6b120973c98da1bd529372a6d774e4ff93875d4bc665c6091dd9320f5901ac96",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\source_target_group_gradient.csv": "feb0a57803831b2314a7bbc9772a5414e316c0c62fb18516479aecaefc10ea2f",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\status.json": "6c8e27273a669ac5d718c65c00f29a3d8893c2e3c286db022df781b844832d9c",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\step_influence.csv": "64ee4b3ee2e854fd03554cd3391d47d35efb47b5cdf7dbffb541ae9b80cc2229",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\batch_trace.csv": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\final_classifier_C2.pth": "0f585e563c80b51ff6059a5bd792603021cdf28936ea2fcbc802461d188cf124",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\final_classifier_C3.pth": "fa6e4c1a5b92e2ae2bb3d8d83dc1ca81da7f18454a8fdc5464a5490677847b08",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\fixed_competitors.csv": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\margin_decomposition.csv": "9692dd82cb163167acaec324af1cee24c12be3b48036f8d46c2cdc47cc6a8e39",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\margin_metrics.csv": "a6b94b80b692efd826d775b4c1bdccd0c89aa4b3f93e95d9e9db1df2d174ba5f",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\per_class_margin.csv": "acac2729f606897f14b7258b9b5379827b77bb88b74f8502a73c4a8960e38d88",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\source_margin_influence.csv": "fc75759011e41d706c988f4393689c912ea944d0cd4ab36bb74d5637816be750",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\source_target_group_gradient.csv": "eae8d2eca4de28f4bb68205a0a6e666edb4d3342ea814c89beb890c1c6d9678a",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\status.json": "7da50176d01358ba9831070d7a2e1cce686f0bb77142527fb3d8eb4807db4cb3",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\step_influence.csv": "dd2e17b3b3ad6d41f964af5a649798f8fe7a63aa6a0ae8bf044d7974977c19f4",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\batch_trace.csv": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\final_classifier_C2.pth": "e8f4d55950f69383906f0d8587311ada5ec17f354563e2cc0d6a3fdcefdd6faa",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\final_classifier_C3.pth": "239ae9f38633707938681d46a8fb6dfba1fb7bf782bbc1c766de93d67d62666b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\fixed_competitors.csv": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\margin_decomposition.csv": "50519d90b0d8ec0414937d982f461d653cef91c7bfeeff1362d0b695cae4f000",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\margin_metrics.csv": "491ba322b6a3596ab422752168edc75fe9944c47fd1124f2e673295d8fd7f940",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\per_class_margin.csv": "2409da5dce9516b5094aae2245bc3ca6ec0423ef336672d6680b4ef30d3eabd1",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\source_margin_influence.csv": "257bfef335c0f04d81934755edc34f04b3e874ae1068aeefd637661724c2f0ed",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\source_target_group_gradient.csv": "7951756e8fc7c5e63b0d78f70152fa16292b62a9500a0961800eb7dfe0ff99d9",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\status.json": "28f3344c83d77d6ca3327fcb77e43ce693cbd519ff77bfd062a091ec854efd1b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\step_influence.csv": "72233012020dd97f1b65f56084b65bccfcb3395d322823ed34fb4719e0e1cd0c",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\RUN_VALIDATION.json": "6c8df0803f555fdcc725829bb164f83a5d5529e9f3d0c1f764b9e3d39221f931",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\.gitattributes": "f8259bb94d042765d0603d18f7f548e7c9c566c22bd1b22a746e343e3aca9cb0",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\diagnostics\\formal_git_whitespace_20261118_01.log": "c2a9b2c155fc6fe6d50380318b41d92acd6e72f1eaf72877be2d33830573f52c",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\ARTIFACT_SHA256.csv": "a80e26d875efbcbf52e1616ccd4639c7a156cb5525e24cf301341417381ca912",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\cifar10.py": "74d06a6548723c91021d44f97c740a1d16801555d0e945fc5c812ba64b96b9dc",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\cifar100.py": "7e97d7e565cc7744642553fe5d828c4a1f91ae7f02777a3e195c8609404c615d",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\imagenet.py": "38dd579a1d7da90ee22053329461bd20b4cbe1289b9b6baa08b9fcb789beae5d",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\ina2018.py": "3ad6e8f15d2d5bcb125478986ae8086198275a1971912c742876f96bf1e7a67b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\places.py": "f64b7e35ae78d6bd64da6d33f4dc9674926ca6d54e97f6b02329d01e73ff548b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\datasets\\sampler.py": "b5acc56eee2a6f622944d65320315beb1385a5278cf81867744b9ee66b999908",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\eval-modifed.py": "d2de389002f6ed9ceae1a8292931b1c5e67db46759786d2f29df686ec1e90abe",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\loss.py": "01f6dd3eec61f63927a1a9a7d89bdfbe92fb7ed0a3c3c406e108ea6d8f099a07",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\methods.py": "d8266450190511f60771d7e632280c37a4d38a190daf4e5e55898656b00461a1",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\resnet.py": "3c4ac4b66fd4aad2e6682103684605b9e2bf783fc5742e64ea7c1ebdfa4cb2b4",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\resnet_cifar.py": "5da74ceeefded52a721a710a71765edd5d26f6183622b41ff5d3413456d3f42b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\resnet_places.py": "712eb3ba5ce4bd317f23d774ab6ec72faf46c50f3b7fcbbad6dbe70970a3f2f6",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\EAResNet.py": "4666e23b6771933cb317dc510151a1642e425a2e7d6ead494ec08f3ced399d48",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\EAResNeXt.py": "af2a8e4611e87ca4cc139c8fa6c5c139d0a1ab2c01fad333f93d5a83fc7115b3",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\ResNet.py": "6345f25ee6e5f9bc9eb42b7323220b5ce91774229493bac9f2f295a2f5d166dc",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\ResNeXt.py": "d80edad478136c5771b0a7f4cb32864e09692d05cb09d9ba4bd906a7cf607807",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\RIDEResNet.py": "548e48e0773b3a2fa4f78f6d8d9f8e3f268abdc6750365938bbd9672d08c060b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\fb_resnets\\RIDEResNeXt.py": "65bd50df409d992e11dd6f0508e9b847b4aee32d09afdf6b0845084f2b1fba1e",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\ldam_drw_resnets\\ride_resnet.py": "511a1d171a6ef51bc093dd5d269b3f6ce3eb358443ff0fbfd2a860db59328ff4",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\ldam_drw_resnets\\ride_resnet_cifar.py": "3f11e7e6ae0dccfe6f39805f0f528d5ab32a80a59328a32d6d22a546985887e6",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\ldam_drw_resnets\\ride_resnet_places.py": "26b483f18d4c3b73db54b88b467325847a997fce8cac999ee0be42b1c2ce69d3",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\loss.py": "b6b320c0d9b2ec9c9a65a013338eddf0d12cd5c30916fb417517e36af373eab5",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\metric.py": "e0c729b40b20bc610245bf57b4ae583d124332c5f56d2be5f791a208c4a7fbf0",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\models\\ride_model\\model.py": "b7930fadfb702895eec562e3e9d1896bab51f6635cbb157280cc125fb639f29b",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\train_stage1.py": "ec3a3bb3029bbb948ed7bbc975a1006e0392d40549b125dbf9e95712b45e0782",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\train_stage2.py": "af44ab86a3873717b8287919f5c3c2f0b4e168198a48d295ca00e3a10225f8f9",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\__init__.py": "7ee7c19e09851641a41f8182330f3514c61f050021b3ccdf4a5869d2beb21977",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\logger.py": "bdfdbd54036e57be3306c8ee95b98dd49754bb25d01d33426a382c2fa66aef88",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\meter.py": "6d70adc2be7f5884da2688faac671fa57ef542584c9b3a1dbf9aa7e980aeed7e",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\metric.py": "d5da5eb30abd9328f5342182f3c23b4ca44253f89fa17c3efeffe1fee8c9933e",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\Unzip.py": "db6badce518b786b45695a43276e355edb9bba84b6aa8d2ee47349d281c6d4cf",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\clean_vs_stability_runs\\clean_s1_seed42_s2_124_125_20261014\\runtime\\utils\\util.py": "f06ba80b0b9e8d96c91a61e31660baf0411eb0209dfd93f5b27a89c0502de0d2",
+    "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\official_reference\\Samplers.py": "c84dfcb46c747a2ed1131df533184b2f9bf1724bc855a3d774830e795f60e174"
+  },
+  "parent_artifact_checks": [
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\final_paired_metrics.csv",
+      "actual_sha256": "5cea4c69625fefc2746ea011b825ef891f25e6dacafacb87507540039865b105",
+      "historical_sha256": "5cea4c69625fefc2746ea011b825ef891f25e6dacafacb87507540039865b105",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\source_class_direct_margin_epoch30.csv",
+      "actual_sha256": "8cd5be9392ce74e0692ffdba87ee08e408a7d059b14ee805133be890897782a1",
+      "historical_sha256": "8cd5be9392ce74e0692ffdba87ee08e408a7d059b14ee805133be890897782a1",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\source_to_many_margin_pairs_epoch30.csv",
+      "actual_sha256": "d1ee742be4cd45f0a67d35ff095a3111b0d881d6395faae8c3f0ebde4614fbc5",
+      "historical_sha256": "d1ee742be4cd45f0a67d35ff095a3111b0d881d6395faae8c3f0ebde4614fbc5",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\analysis\\summary.json",
+      "actual_sha256": "7bb4015196511c3dc9587b76634835ed3475e35cb7271da49169f726914c5006",
+      "historical_sha256": "7bb4015196511c3dc9587b76634835ed3475e35cb7271da49169f726914c5006",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\CCMIA_RESULTS.md",
+      "actual_sha256": "556922d974f6ac15527274a5689ed92a3193ed5561a96121e2d0025cabe1c3c8",
+      "historical_sha256": "556922d974f6ac15527274a5689ed92a3193ed5561a96121e2d0025cabe1c3c8",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\diagnostics\\analysis_execution_20261118_01.log",
+      "actual_sha256": "0406ab6b65cc9465177dddc29afce5e664bb2937ddbcd89e46fe22526d2cc4a8",
+      "historical_sha256": "0406ab6b65cc9465177dddc29afce5e664bb2937ddbcd89e46fe22526d2cc4a8",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\diagnostics\\formal_execution_20261118_01.log",
+      "actual_sha256": "c509e66c33be53e80e9a3da5621760328de65143feead564469b31130c297fac",
+      "historical_sha256": "c509e66c33be53e80e9a3da5621760328de65143feead564469b31130c297fac",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\formal_completed.json",
+      "actual_sha256": "fef66e4992dced96729f8331d3936df28b929381114d70da39cfce6ace087021",
+      "historical_sha256": "fef66e4992dced96729f8331d3936df28b929381114d70da39cfce6ace087021",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\FORMAL_EXECUTION_REPORT.md",
+      "actual_sha256": "06e0cd095c2c6ccb1500f43920abc6257da0c668fa886ba348e69289103ee23a",
+      "historical_sha256": "06e0cd095c2c6ccb1500f43920abc6257da0c668fa886ba348e69289103ee23a",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\batch_trace.csv",
+      "actual_sha256": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+      "historical_sha256": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\final_classifier_C2.pth",
+      "actual_sha256": "4823d792c8d9120e7fa738a054c0cf9e674cd04708dfe53e566a99a7fc2748f6",
+      "historical_sha256": "4823d792c8d9120e7fa738a054c0cf9e674cd04708dfe53e566a99a7fc2748f6",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\final_classifier_C3.pth",
+      "actual_sha256": "aec57aff265c2e9dd8b1becb93381cff3ff36618f8673f0f609c9b43be71c778",
+      "historical_sha256": "aec57aff265c2e9dd8b1becb93381cff3ff36618f8673f0f609c9b43be71c778",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\fixed_competitors.csv",
+      "actual_sha256": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+      "historical_sha256": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\margin_decomposition.csv",
+      "actual_sha256": "c00348b356c06c43b0568a363c0d10bc8aeb32f7e391a76ddae10aabbecc586c",
+      "historical_sha256": "c00348b356c06c43b0568a363c0d10bc8aeb32f7e391a76ddae10aabbecc586c",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\margin_metrics.csv",
+      "actual_sha256": "fdb4f6be7b7132f2ecc72dc1e3dbfeb39f94fa29ccdbffcff4d6f9c95b548a7f",
+      "historical_sha256": "fdb4f6be7b7132f2ecc72dc1e3dbfeb39f94fa29ccdbffcff4d6f9c95b548a7f",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\per_class_margin.csv",
+      "actual_sha256": "3f5045b4debcc990fb2ef4ed6c697a0a19c90b5ee44d2e3847c5f8bb43ff2a98",
+      "historical_sha256": "3f5045b4debcc990fb2ef4ed6c697a0a19c90b5ee44d2e3847c5f8bb43ff2a98",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\source_margin_influence.csv",
+      "actual_sha256": "6b120973c98da1bd529372a6d774e4ff93875d4bc665c6091dd9320f5901ac96",
+      "historical_sha256": "6b120973c98da1bd529372a6d774e4ff93875d4bc665c6091dd9320f5901ac96",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\source_target_group_gradient.csv",
+      "actual_sha256": "feb0a57803831b2314a7bbc9772a5414e316c0c62fb18516479aecaefc10ea2f",
+      "historical_sha256": "feb0a57803831b2314a7bbc9772a5414e316c0c62fb18516479aecaefc10ea2f",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\status.json",
+      "actual_sha256": "6c8e27273a669ac5d718c65c00f29a3d8893c2e3c286db022df781b844832d9c",
+      "historical_sha256": "6c8e27273a669ac5d718c65c00f29a3d8893c2e3c286db022df781b844832d9c",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_123\\step_influence.csv",
+      "actual_sha256": "64ee4b3ee2e854fd03554cd3391d47d35efb47b5cdf7dbffb541ae9b80cc2229",
+      "historical_sha256": "64ee4b3ee2e854fd03554cd3391d47d35efb47b5cdf7dbffb541ae9b80cc2229",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\batch_trace.csv",
+      "actual_sha256": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+      "historical_sha256": "ffa484e36bcb88d1e1c889a49a34c315602de38f105e67ee24a11049d55e44e9",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\final_classifier_C2.pth",
+      "actual_sha256": "0f585e563c80b51ff6059a5bd792603021cdf28936ea2fcbc802461d188cf124",
+      "historical_sha256": "0f585e563c80b51ff6059a5bd792603021cdf28936ea2fcbc802461d188cf124",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\final_classifier_C3.pth",
+      "actual_sha256": "fa6e4c1a5b92e2ae2bb3d8d83dc1ca81da7f18454a8fdc5464a5490677847b08",
+      "historical_sha256": "fa6e4c1a5b92e2ae2bb3d8d83dc1ca81da7f18454a8fdc5464a5490677847b08",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\fixed_competitors.csv",
+      "actual_sha256": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+      "historical_sha256": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\margin_decomposition.csv",
+      "actual_sha256": "9692dd82cb163167acaec324af1cee24c12be3b48036f8d46c2cdc47cc6a8e39",
+      "historical_sha256": "9692dd82cb163167acaec324af1cee24c12be3b48036f8d46c2cdc47cc6a8e39",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\margin_metrics.csv",
+      "actual_sha256": "a6b94b80b692efd826d775b4c1bdccd0c89aa4b3f93e95d9e9db1df2d174ba5f",
+      "historical_sha256": "a6b94b80b692efd826d775b4c1bdccd0c89aa4b3f93e95d9e9db1df2d174ba5f",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\per_class_margin.csv",
+      "actual_sha256": "acac2729f606897f14b7258b9b5379827b77bb88b74f8502a73c4a8960e38d88",
+      "historical_sha256": "acac2729f606897f14b7258b9b5379827b77bb88b74f8502a73c4a8960e38d88",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\source_margin_influence.csv",
+      "actual_sha256": "fc75759011e41d706c988f4393689c912ea944d0cd4ab36bb74d5637816be750",
+      "historical_sha256": "fc75759011e41d706c988f4393689c912ea944d0cd4ab36bb74d5637816be750",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\source_target_group_gradient.csv",
+      "actual_sha256": "eae8d2eca4de28f4bb68205a0a6e666edb4d3342ea814c89beb890c1c6d9678a",
+      "historical_sha256": "eae8d2eca4de28f4bb68205a0a6e666edb4d3342ea814c89beb890c1c6d9678a",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\status.json",
+      "actual_sha256": "7da50176d01358ba9831070d7a2e1cce686f0bb77142527fb3d8eb4807db4cb3",
+      "historical_sha256": "7da50176d01358ba9831070d7a2e1cce686f0bb77142527fb3d8eb4807db4cb3",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_124\\step_influence.csv",
+      "actual_sha256": "dd2e17b3b3ad6d41f964af5a649798f8fe7a63aa6a0ae8bf044d7974977c19f4",
+      "historical_sha256": "dd2e17b3b3ad6d41f964af5a649798f8fe7a63aa6a0ae8bf044d7974977c19f4",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\batch_trace.csv",
+      "actual_sha256": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+      "historical_sha256": "abbab224efec845ea9297005938a0aeaabb055c8221bb0b11feaee9b38637888",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\final_classifier_C2.pth",
+      "actual_sha256": "e8f4d55950f69383906f0d8587311ada5ec17f354563e2cc0d6a3fdcefdd6faa",
+      "historical_sha256": "e8f4d55950f69383906f0d8587311ada5ec17f354563e2cc0d6a3fdcefdd6faa",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\final_classifier_C3.pth",
+      "actual_sha256": "239ae9f38633707938681d46a8fb6dfba1fb7bf782bbc1c766de93d67d62666b",
+      "historical_sha256": "239ae9f38633707938681d46a8fb6dfba1fb7bf782bbc1c766de93d67d62666b",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\fixed_competitors.csv",
+      "actual_sha256": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+      "historical_sha256": "027bbe1a5ab1cf455e92a8e724c0394a82f7e9fac79235a5977525774c0bf368",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\margin_decomposition.csv",
+      "actual_sha256": "50519d90b0d8ec0414937d982f461d653cef91c7bfeeff1362d0b695cae4f000",
+      "historical_sha256": "50519d90b0d8ec0414937d982f461d653cef91c7bfeeff1362d0b695cae4f000",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\margin_metrics.csv",
+      "actual_sha256": "491ba322b6a3596ab422752168edc75fe9944c47fd1124f2e673295d8fd7f940",
+      "historical_sha256": "491ba322b6a3596ab422752168edc75fe9944c47fd1124f2e673295d8fd7f940",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\per_class_margin.csv",
+      "actual_sha256": "2409da5dce9516b5094aae2245bc3ca6ec0423ef336672d6680b4ef30d3eabd1",
+      "historical_sha256": "2409da5dce9516b5094aae2245bc3ca6ec0423ef336672d6680b4ef30d3eabd1",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\source_margin_influence.csv",
+      "actual_sha256": "257bfef335c0f04d81934755edc34f04b3e874ae1068aeefd637661724c2f0ed",
+      "historical_sha256": "257bfef335c0f04d81934755edc34f04b3e874ae1068aeefd637661724c2f0ed",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\source_target_group_gradient.csv",
+      "actual_sha256": "7951756e8fc7c5e63b0d78f70152fa16292b62a9500a0961800eb7dfe0ff99d9",
+      "historical_sha256": "7951756e8fc7c5e63b0d78f70152fa16292b62a9500a0961800eb7dfe0ff99d9",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\status.json",
+      "actual_sha256": "28f3344c83d77d6ca3327fcb77e43ce693cbd519ff77bfd062a091ec854efd1b",
+      "historical_sha256": "28f3344c83d77d6ca3327fcb77e43ce693cbd519ff77bfd062a091ec854efd1b",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\results\\seed_125\\step_influence.csv",
+      "actual_sha256": "72233012020dd97f1b65f56084b65bccfcb3395d322823ed34fb4719e0e1cd0c",
+      "historical_sha256": "72233012020dd97f1b65f56084b65bccfcb3395d322823ed34fb4719e0e1cd0c",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\RUN_VALIDATION.json",
+      "actual_sha256": "6c8df0803f555fdcc725829bb164f83a5d5529e9f3d0c1f764b9e3d39221f931",
+      "historical_sha256": "6c8df0803f555fdcc725829bb164f83a5d5529e9f3d0c1f764b9e3d39221f931",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\.gitattributes",
+      "actual_sha256": "f8259bb94d042765d0603d18f7f548e7c9c566c22bd1b22a746e343e3aca9cb0",
+      "historical_sha256": "f8259bb94d042765d0603d18f7f548e7c9c566c22bd1b22a746e343e3aca9cb0",
+      "declared_LF_only_conversion": false
+    },
+    {
+      "path": "D:\\xiangmuxunlian\\xin\\H2T_repro_audit\\ccsam_stage2_controlled_cifar100_20261106\\ccmia\\diagnostics\\formal_git_whitespace_20261118_01.log",
+      "actual_sha256": "c2a9b2c155fc6fe6d50380318b41d92acd6e72f1eaf72877be2d33830573f52c",
+      "historical_sha256": "c2a9b2c155fc6fe6d50380318b41d92acd6e72f1eaf72877be2d33830573f52c",
+      "declared_LF_only_conversion": false
+    }
+  ],
+  "actual_csv_schemas": {
+    "batch_trace.csv": {
+      "columns": [
+        "epoch",
+        "batch",
+        "batch_size",
+        "indices_labels_sha256",
+        "augmented_images_sha256",
+        "gap_features_sha256"
+      ],
+      "rows": 5100,
+      "bytes": 1045860
+    },
+    "fixed_competitors.csv": {
+      "columns": [
+        "validation_index",
+        "true_many_class",
+        "initial_fixed_nonmany_competitor"
+      ],
+      "rows": 680,
+      "bytes": 7257
+    },
+    "margin_decomposition.csv": {
+      "columns": [
+        "seed",
+        "epoch",
+        "many_validation_samples",
+        "actual_c3_minus_c2_fixed_margin_mean",
+        "direct_perturbation_component_mean",
+        "state_feedback_component_mean",
+        "weight_decay_component_mean",
+        "reconstruction_residual_component_mean",
+        "parameter_writeback_rounding_component_mean",
+        "actual_target_logit_delta_mean",
+        "actual_competitor_logit_delta_mean",
+        "direct_target_logit_component_mean",
+        "direct_competitor_logit_component_mean",
+        "direct_negative_fraction",
+        "state_negative_fraction",
+        "actual_negative_fraction",
+        "margin_reconstruction_max_abs",
+        "margin_reconstruction_rmse",
+        "parameter_reconstruction_relative"
+      ],
+      "rows": 30,
+      "bytes": 10786
+    },
+    "margin_metrics.csv": {
+      "columns": [
+        "seed",
+        "epoch",
+        "arm",
+        "overall",
+        "macro",
+        "many_accuracy",
+        "mediumN_accuracy",
+        "few_accuracy",
+        "many_samples",
+        "fixed_margin_mean",
+        "fixed_margin_median",
+        "fixed_margin_p10",
+        "fixed_margin_negative_fraction",
+        "dynamic_margin_mean",
+        "dynamic_margin_median",
+        "dynamic_margin_p10",
+        "dynamic_margin_negative_fraction",
+        "dynamic_competitor_changed_fraction"
+      ],
+      "rows": 62,
+      "bytes": 17002
+    },
+    "per_class_margin.csv": {
+      "columns": [
+        "seed",
+        "epoch",
+        "arm",
+        "target_many_class",
+        "validation_samples",
+        "fixed_margin_mean",
+        "fixed_margin_median",
+        "fixed_margin_negative_fraction",
+        "dynamic_margin_mean"
+      ],
+      "rows": 2108,
+      "bytes": 189771
+    },
+    "source_margin_influence.csv": {
+      "columns": [
+        "seed",
+        "epoch",
+        "source_class",
+        "source_train_count",
+        "source_group",
+        "target_many_class",
+        "target_validation_samples",
+        "cumulative_direct_margin_delta_mean",
+        "cumulative_direct_margin_negative_fraction",
+        "cumulative_direct_target_logit_delta_mean",
+        "cumulative_direct_competitor_logit_delta_mean",
+        "mean_direct_gradient_step_margin",
+        "mean_direct_gradient_step_negative_fraction",
+        "mean_direct_gradient_step_target_logit",
+        "mean_direct_gradient_step_competitor_logit",
+        "source_batch_presence_rate",
+        "mean_source_examples_per_batch"
+      ],
+      "rows": 66300,
+      "bytes": 14384215
+    },
+    "source_target_group_gradient.csv": {
+      "columns": [
+        "seed",
+        "epoch",
+        "source_class",
+        "source_train_count",
+        "source_group",
+        "target_classifier_group",
+        "mean_batch_gradient_frobenius_all_steps",
+        "mean_batch_gradient_frobenius_when_source_present",
+        "source_presence_batches",
+        "total_batches",
+        "source_batch_presence_rate"
+      ],
+      "rows": 5850,
+      "bytes": 550287
+    },
+    "step_influence.csv": {
+      "columns": [
+        "seed",
+        "epoch",
+        "batch",
+        "batch_size",
+        "alpha",
+        "learning_rate",
+        "c2_loss",
+        "c3_loss",
+        "mean_feature_delta_l2",
+        "direct_gradient_margin_step_mean",
+        "direct_gradient_margin_step_median",
+        "direct_gradient_margin_step_negative_fraction",
+        "direct_target_logit_step_mean",
+        "direct_competitor_logit_step_mean",
+        "state_feedback_margin_step_mean",
+        "state_feedback_margin_step_negative_fraction",
+        "total_gradient_margin_step_mean",
+        "total_gradient_margin_step_negative_fraction",
+        "direct_gradient_weight_norm",
+        "state_feedback_gradient_weight_norm",
+        "total_gradient_weight_norm",
+        "source_additivity_max_abs",
+        "gradient_decomposition_max_abs",
+        "parameter_reconstruction_relative",
+        "momentum_buffer_reconstruction_relative",
+        "raw_parameter_weight_relative",
+        "raw_parameter_bias_relative",
+        "writeback_weight_delta_R_max_abs",
+        "writeback_bias_delta_R_max_abs"
+      ],
+      "rows": 5100,
+      "bytes": 2638059
+    }
+  },
+  "parent_epochs": 30,
+  "parent_AMP": false,
+  "historical_rankings_used_for_mask_selection": false
+}

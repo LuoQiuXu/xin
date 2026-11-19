@@ -1,0 +1,92 @@
+{
+  "passed": true,
+  "completed_at": "2026-11-19T23:20:24+08:00",
+  "experimental_code_still_matches_CPU_receipt": true,
+  "postrun_utility_sha256": "8304d054b6c6731bc8e4084c43b882cc1ad8d1614fb525cd0dc96bb18c135dcc",
+  "phase_exit_codes": {
+    "CPU": 0,
+    "preflight": 0,
+    "calibrate": 0,
+    "smoke": 0,
+    "formal": 0,
+    "analyze": 0
+  },
+  "syntax_files": 7,
+  "CPU_tests": {
+    "causal_oracle": 23,
+    "parent_ccmia": 13
+  },
+  "source_fingerprints_rechecked": 90,
+  "historical_artifacts_rechecked": 45,
+  "seed_checks": [
+    {
+      "seed": 123,
+      "epochs_observed": 30,
+      "gradient_rows": 30600,
+      "actual_steps_by_arm": {
+        "C2": 5100,
+        "BASE_C3": 5100,
+        "TARGETED": 5100,
+        "RANDOM_MATCHED": 5100,
+        "FREQUENCY_MATCHED": 5100,
+        "ORACLE_SELECTION": 5100
+      },
+      "calibration_epoch_pair_rows": 66300,
+      "saved_classifiers_verified": 6,
+      "baseline_final_states_exact": true,
+      "gradient_max_abs": 4.470348358154297e-08,
+      "backbone_BN_bitwise_unchanged": true
+    },
+    {
+      "seed": 124,
+      "epochs_observed": 30,
+      "gradient_rows": 30600,
+      "actual_steps_by_arm": {
+        "C2": 5100,
+        "BASE_C3": 5100,
+        "TARGETED": 5100,
+        "RANDOM_MATCHED": 5100,
+        "FREQUENCY_MATCHED": 5100,
+        "ORACLE_SELECTION": 5100
+      },
+      "calibration_epoch_pair_rows": 66300,
+      "saved_classifiers_verified": 6,
+      "baseline_final_states_exact": true,
+      "gradient_max_abs": 3.725290298461914e-08,
+      "backbone_BN_bitwise_unchanged": true
+    },
+    {
+      "seed": 125,
+      "epochs_observed": 30,
+      "gradient_rows": 30600,
+      "actual_steps_by_arm": {
+        "C2": 5100,
+        "BASE_C3": 5100,
+        "TARGETED": 5100,
+        "RANDOM_MATCHED": 5100,
+        "FREQUENCY_MATCHED": 5100,
+        "ORACLE_SELECTION": 5100
+      },
+      "calibration_epoch_pair_rows": 66300,
+      "saved_classifiers_verified": 6,
+      "baseline_final_states_exact": true,
+      "gradient_max_abs": 3.725290298461914e-08,
+      "backbone_BN_bitwise_unchanged": true
+    }
+  ],
+  "actual_optimizer_updates_from_observed_gradient_rows": 91800,
+  "calibration_epoch_pair_rows_observed": 198900,
+  "all_masks_verified_against_seal": true,
+  "mask_hash_index_verified_using_actual_numpy_bool_arrays": true,
+  "calibration_evaluation_raw_ids_disjoint": true,
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-19T23:20:18+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "branch": "experiment/ccmia-causal-oracle-20261119",
+  "precommit_head": "398200c263fff2c6130bd1d12428b559af5c4a68"
+}

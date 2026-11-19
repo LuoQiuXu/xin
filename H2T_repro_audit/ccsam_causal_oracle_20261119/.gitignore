@@ -1,0 +1,15 @@
+__pycache__/
+.test_tmp/
+cache/
+logs/
+*.pth
+*.pt
+*.npy
+*.npz
+*.writing
+*.log
+results/**/batch_trace.csv
+results/**/gradient_trace.csv
+results/**/epoch_??_metrics.csv
+results/**/execution.jsonl
+calibration/**/influence_epochs.csv

@@ -1,0 +1,37 @@
+{
+  "controlled_intervention_rule": "supported_under_predeclared_controlled_intervention_rule",
+  "Gate_admission": "HUMAN_REVIEW_ONLY",
+  "supporting_evidence": [
+    "TARGETED exceeds BOTH matched controls on Many accuracy and fixed margin in all three seeds",
+    "All six leave-one-Many-class-out checks preserve positive control contrasts",
+    "Calibration/Evaluation reference-score rank correlation is 0.99855..0.99904 after mask sealing",
+    "All baselines reproduce parent final states exactly; numerical and data gates pass"
+  ],
+  "opposing_evidence": [
+    "TARGETED minus BASE_C3: Many +1.6667pp, below the 2.0pp practical headroom cutoff",
+    "TARGETED minus BASE_C3: Few -1.4444pp; Overall/Macro -0.1010pp",
+    "ORACLE_SELECTION minus BASE_C3: Few mean -1.8889pp; seed125 -2.6667pp breaches the per-seed -2pp descriptive cutoff",
+    "ORACLE_SELECTION Few conditional-bootstrap 95% interval [-3.6667,-0.1111]pp; mean below-2pp harm cannot be excluded",
+    "ORACLE_SELECTION Overall/Macro mean -0.0673pp, with mixed seed directions",
+    "Only 2..6 of 34 Many classes improve top1 accuracy per seed/control contrast; margin improvement is more widespread",
+    "Exact frequency-bin matching leaves continuous source-count SMD up to 0.1077"
+  ],
+  "preregistered_mean_effect_flags": {
+    "ORACLE_SUPPRESSION": false,
+    "ORACLE_SELECTION": true
+  },
+  "limitations": [
+    "TRAIN-derived development split; parent work already examined the original 1980 holdout examples",
+    "Clean Stage-I checkpoint was originally selected on that 1980-example holdout; this split cannot undo historical selection",
+    "class 0 absent; Many metrics cover 34 of 35 TRAIN-Many classes",
+    "conditional bootstrap uncertainty given three fixed training seeds, not population inference",
+    "local analytic direct-gradient intervention; no new end-to-end objective or global upper-bound guarantee",
+    "Oracle Selection retains K, while suppression removes K; different constraints must not be confused",
+    "BASE_C3 autograd and intervention analytic decomposition have measured FP32 rounding residuals",
+    "Bootstrap conditions on frozen masks, not uncertainty from re-estimating Calibration masks",
+    "Retain-K and suppress-K oracle families impose different intervention budgets",
+    "Train loss for intervention arms is the original C3 scalar for monitoring, not a claimed end-to-end masked loss"
+  ],
+  "recommendation": "Submit for human scientific review. Evidence supports this controlled actionability contrast, but tail tradeoffs and lack of Overall gains preclude an automatic success or Gate-admission claim. No Gate or further experiment is started.",
+  "note": "This supplements opposing tradeoff evidence; the original DECISION.json opposing_evidence field enumerates only failed primary control comparisons."
+}

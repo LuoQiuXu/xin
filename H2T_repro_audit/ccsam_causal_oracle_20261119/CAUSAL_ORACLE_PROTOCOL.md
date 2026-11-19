@@ -2,6 +2,91 @@
 
 Status: implementation protocol; do not implement Margin-aware Gate in this phase.
 
+## Frozen clarification, 2026-11-19 (user instructions)
+
+Each seed replays the parent's complete 30-epoch BASE_C3 trajectory. Record
+Calibration-only source-to-target influence at every epoch and verify the
+final BASE_C3 and paired C2 classifier states against the actual parent
+checkpoints. Historical full-holdout rankings do not determine any mask.
+Many/Medium/Few remain fixed from the original TRAIN counts (>100,
+20..100, <20); they are never redefined using either development subset.
+
+Pre-register the following practical-effect flags for each oracle relative
+to BASE_C3: mean Many accuracy gain >=2.0 percentage points, mean fixed
+Many margin gain >=0.10, mean Few accuracy change >=-2.0 percentage points,
+and both primary effects positive together in at least two of three seeds.
+Report the individual seed effects and whether each reaches these cutoffs.
+These cutoffs do not express statistical significance and do not automate
+Margin-aware Gate admission. The final structured decision must provide
+supporting evidence, opposing evidence, limitations, and a recommendation
+for human scientific review. No Gate design or implementation occurs here.
+
+### Fixed implementation definitions, before Evaluation access
+
+- Split seed: 20261119. Within each pre-existing class allocation, sort
+  original TRAIN IDs, shuffle with NumPy SeedSequence([20261119, class_id]),
+  then take 10 Calibration and 10 Evaluation. Persist row positions and raw
+  TRAIN IDs. The existing prepared order declares 20-row blocks for classes
+  1..99; validate Calibration labels immediately and Evaluation labels only
+  after all-seed mask sealing. Reject any disagreement. No full holdout
+  array, including an mmap, is loaded before sealing.
+- Eligible pairs: all original non-Many sources (classes 35..99) to Many
+  targets represented in Calibration (classes 1..34). Class 0 has no
+  Calibration data and is excluded from ranking, while its classifier row
+  remains trainable and its original gradients remain untouched. There
+  are 65*34=2210 eligible pairs; K=221 by exact half-up rounding.
+- Competitor q_y: for each represented Many class y, choose the non-Many
+  row with the largest class-mean **initial Calibration** logit. Freeze this
+  class map before Evaluation. Evaluation does not select competitors.
+- The intervention removes a **single classifier row** contribution. For
+  ranking, project each accumulated source direct contribution to its
+  eligible target row only, using the parent's fixed-margin projection
+  helper's target_logit_step output. This equals that pair's change to the
+  fixed y-vs-q_y margin because q_y is non-Many and its row is not masked.
+  Also record the parent's full source margin (including the non-Many
+  competitor-row term) as a separate diagnostic. Do not rank a one-row
+  intervention using a change to an unmodified competitor row.
+- Temporal score: cumulative direct SGD-momentum parameter contribution
+  along the original BASE_C3 trajectory at epoch 30, projected onto the
+  ten Calibration examples of each target class and averaged. Per-batch
+  direct gradients are FP32, as in the parent; the unchanged parent's FP64
+  attribution accumulator propagates them through the frozen SGD
+  recurrence. FP64 is bookkeeping, not model-training precision.
+- Oracle Selection retains exactly K eligible pairs maximizing the sum
+  of these row-local Calibration scores, suppressing the other eligible
+  pairs. All ineligible direct terms and the clean path are unchanged.
+  Oracle Suppression is an alias of TARGETED, with identical mask hash
+  and one shared training result; it is not an additional independent arm.
+- RANDOM_MATCHED uses source TRAIN bins <20, 20..49, 50..100 and exact target
+  class counts, with RNG seed seed+710001. FREQUENCY_MATCHED uses the same
+  source bins and target TRAIN bins 101..199, 200..349, >=350, with an
+  independent RNG seed seed+820001. Match exact joint counts. Report
+  continuous-count standardized mean differences and mask overlap;
+  controls may naturally overlap with TARGETED.
+- BASE_C3 uses the original autograd update exactly. Interventions use
+  the actual clean C2-autograd gradient at their **own current state** plus
+  the retained analytic source direct gradients. Validate unmasked
+  reconstruction against original C3 autograd using the parent's unchanged
+  atol=2e-5, rtol=2e-4. Report this finite-precision decomposition residual;
+  never add an observed final reconstruction residual to force a pass.
+- Use the validated parent's independent SGD parameter-writeback replay
+  ledger for each actual optimizer. Preserve its bitwise parameter/buffer
+  replay and operator-based rounding bound. Parent paired attribution
+  reconstruction retains abs=2e-6, rel=5e-3.
+- Calibration replay follows successful CPU tests and a real one-batch
+  baseline parity check. It is a reference replay for mask estimation,
+  not intervention formal training. Seal all three seeds' actual masks,
+  rankings, split, competitor maps, source hashes, and scores together.
+  Then run the production real-data Smoke for every actual arm and seed.
+  Only a passing production Smoke admits the 3x30 paired formal runs.
+- Class-stratified bootstrap: 2000 replicates, RNG seed 20261120,
+  identical resampled examples for paired arms. Cross-seed mean intervals
+  use the same sampled examples across seeds and are conditional on these
+  three seeds, not a population inference over training randomness.
+- No optional shuffled-sign arm or sensitivity sweep is added in this
+  finite experiment. No evaluation-driven remasking, early stopping,
+  hyperparameter selection, resume, or overwrite is allowed.
+
 ## Goal
 Test whether the negative source-class -> Many-target fixed-margin interactions identified by CC-MIA are causally actionable, and estimate the attainable headroom under calibration-only oracle selection.
 

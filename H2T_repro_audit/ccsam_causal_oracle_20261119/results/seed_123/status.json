@@ -1,0 +1,79 @@
+{
+  "state": "completed",
+  "seed": 123,
+  "started_at": "2026-11-19T21:42:50+08:00",
+  "completed_at": "2026-11-19T22:13:36+08:00",
+  "epochs_completed": 30,
+  "paired_batches": 5100,
+  "actual_optimizer_steps": {
+    "C2": 5100,
+    "BASE_C3": 5100,
+    "TARGETED": 5100,
+    "RANDOM_MATCHED": 5100,
+    "FREQUENCY_MATCHED": 5100,
+    "ORACLE_SELECTION": 5100
+  },
+  "checkpoints": {
+    "C2": {
+      "path": "results\\seed_123\\final_classifier_C2.pth",
+      "sha256": "d5eeafe8140f7fea073c3419515cee50d24000c61ff99789b55d1fef36d461b9",
+      "classifier_state_sha256": "67c63a7c72e11281e97dbbcff47695c035cc94a8f7b3e974e09a95aa4b93dea4",
+      "bytes": 28485
+    },
+    "BASE_C3": {
+      "path": "results\\seed_123\\final_classifier_BASE_C3.pth",
+      "sha256": "6dddba3b35ecee2808d24b0358047882920dee6c4f63a7518de19ea695e0d0ae",
+      "classifier_state_sha256": "4ed21732aa54e7f278f189184d7acc9e33ed6300891cd532d63c4b4ac40d8472",
+      "bytes": 28589
+    },
+    "TARGETED": {
+      "path": "results\\seed_123\\final_classifier_TARGETED.pth",
+      "sha256": "f3f7a2fc183e8f1edb6597ce37b49c06d7292df103fa119a5266624ab644bad1",
+      "classifier_state_sha256": "0dc3afaa5c111e9006271e56c905848ea18bb7d76c8308afb72a3e38cfd6e618",
+      "bytes": 28597
+    },
+    "RANDOM_MATCHED": {
+      "path": "results\\seed_123\\final_classifier_RANDOM_MATCHED.pth",
+      "sha256": "b4290766dfd273a29e263505ffc1cf6007613e25161dfde43dcd2fe97afc768b",
+      "classifier_state_sha256": "dbcfb98a9758c481837e44143f4af23bac476fb949f42d839d3aa6f4da4ffc08",
+      "bytes": 28645
+    },
+    "FREQUENCY_MATCHED": {
+      "path": "results\\seed_123\\final_classifier_FREQUENCY_MATCHED.pth",
+      "sha256": "ac0076788ff072c9b99d8e5770a77ac8f0c807cc0e7c1e242a05872d3152a85e",
+      "classifier_state_sha256": "6d6d6c8ba7f33615984de1a0a3e1e5a8e582c7f1f5270106fd8f5a4e3f69eede",
+      "bytes": 28669
+    },
+    "ORACLE_SELECTION": {
+      "path": "results\\seed_123\\final_classifier_ORACLE_SELECTION.pth",
+      "sha256": "f9122d4225b39d4cdd98023c403467ebe8fceeaa823e37973a38c7c841fbf9c9",
+      "classifier_state_sha256": "597f79f5404cec56a2af06bb6d91c4951e448fc4bf319ce4d723f2a2c69bfba8",
+      "bytes": 28661
+    }
+  },
+  "C2_BASE_C3_final_states_match_parent": true,
+  "paired_trace_identity": true,
+  "cache_sha256": "763dc94f841f6a2fb5d751b474dcf474e659bc274d548ee7f190c7926b0f9b7c",
+  "aliases": {
+    "ORACLE_SUPPRESSION": "TARGETED"
+  },
+  "final_logits_sha256": "390c21b6c7bf58ff27624ff7026ae30e3c87250abb269456096fc3a2b179970c",
+  "max_gradient_errors": {
+    "C2": 0.0,
+    "BASE_C3": 2.9802322387695312e-08,
+    "TARGETED": 2.9802322387695312e-08,
+    "RANDOM_MATCHED": 4.470348358154297e-08,
+    "FREQUENCY_MATCHED": 2.9802322387695312e-08,
+    "ORACLE_SELECTION": 2.9802322387695312e-08
+  },
+  "backbone_bn_bitwise_unchanged": true,
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-19T21:42:44+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18"
+}

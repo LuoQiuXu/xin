@@ -1,0 +1,299 @@
+{
+  "state": "completed",
+  "completed_at": "2026-11-19T23:15:14+08:00",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "epochs": 30,
+  "actual_arms": [
+    "C2",
+    "BASE_C3",
+    "TARGETED",
+    "RANDOM_MATCHED",
+    "FREQUENCY_MATCHED",
+    "ORACLE_SELECTION"
+  ],
+  "aliases": {
+    "ORACLE_SUPPRESSION": "TARGETED"
+  },
+  "paired_batches": 15300,
+  "actual_optimizer_steps": 91800,
+  "seed_status": [
+    {
+      "state": "completed",
+      "seed": 123,
+      "started_at": "2026-11-19T21:42:50+08:00",
+      "completed_at": "2026-11-19T22:13:36+08:00",
+      "epochs_completed": 30,
+      "paired_batches": 5100,
+      "actual_optimizer_steps": {
+        "C2": 5100,
+        "BASE_C3": 5100,
+        "TARGETED": 5100,
+        "RANDOM_MATCHED": 5100,
+        "FREQUENCY_MATCHED": 5100,
+        "ORACLE_SELECTION": 5100
+      },
+      "checkpoints": {
+        "C2": {
+          "path": "results\\seed_123\\final_classifier_C2.pth",
+          "sha256": "d5eeafe8140f7fea073c3419515cee50d24000c61ff99789b55d1fef36d461b9",
+          "classifier_state_sha256": "67c63a7c72e11281e97dbbcff47695c035cc94a8f7b3e974e09a95aa4b93dea4",
+          "bytes": 28485
+        },
+        "BASE_C3": {
+          "path": "results\\seed_123\\final_classifier_BASE_C3.pth",
+          "sha256": "6dddba3b35ecee2808d24b0358047882920dee6c4f63a7518de19ea695e0d0ae",
+          "classifier_state_sha256": "4ed21732aa54e7f278f189184d7acc9e33ed6300891cd532d63c4b4ac40d8472",
+          "bytes": 28589
+        },
+        "TARGETED": {
+          "path": "results\\seed_123\\final_classifier_TARGETED.pth",
+          "sha256": "f3f7a2fc183e8f1edb6597ce37b49c06d7292df103fa119a5266624ab644bad1",
+          "classifier_state_sha256": "0dc3afaa5c111e9006271e56c905848ea18bb7d76c8308afb72a3e38cfd6e618",
+          "bytes": 28597
+        },
+        "RANDOM_MATCHED": {
+          "path": "results\\seed_123\\final_classifier_RANDOM_MATCHED.pth",
+          "sha256": "b4290766dfd273a29e263505ffc1cf6007613e25161dfde43dcd2fe97afc768b",
+          "classifier_state_sha256": "dbcfb98a9758c481837e44143f4af23bac476fb949f42d839d3aa6f4da4ffc08",
+          "bytes": 28645
+        },
+        "FREQUENCY_MATCHED": {
+          "path": "results\\seed_123\\final_classifier_FREQUENCY_MATCHED.pth",
+          "sha256": "ac0076788ff072c9b99d8e5770a77ac8f0c807cc0e7c1e242a05872d3152a85e",
+          "classifier_state_sha256": "6d6d6c8ba7f33615984de1a0a3e1e5a8e582c7f1f5270106fd8f5a4e3f69eede",
+          "bytes": 28669
+        },
+        "ORACLE_SELECTION": {
+          "path": "results\\seed_123\\final_classifier_ORACLE_SELECTION.pth",
+          "sha256": "f9122d4225b39d4cdd98023c403467ebe8fceeaa823e37973a38c7c841fbf9c9",
+          "classifier_state_sha256": "597f79f5404cec56a2af06bb6d91c4951e448fc4bf319ce4d723f2a2c69bfba8",
+          "bytes": 28661
+        }
+      },
+      "C2_BASE_C3_final_states_match_parent": true,
+      "paired_trace_identity": true,
+      "cache_sha256": "763dc94f841f6a2fb5d751b474dcf474e659bc274d548ee7f190c7926b0f9b7c",
+      "aliases": {
+        "ORACLE_SUPPRESSION": "TARGETED"
+      },
+      "final_logits_sha256": "390c21b6c7bf58ff27624ff7026ae30e3c87250abb269456096fc3a2b179970c",
+      "max_gradient_errors": {
+        "C2": 0.0,
+        "BASE_C3": 2.9802322387695312e-08,
+        "TARGETED": 2.9802322387695312e-08,
+        "RANDOM_MATCHED": 4.470348358154297e-08,
+        "FREQUENCY_MATCHED": 2.9802322387695312e-08,
+        "ORACLE_SELECTION": 2.9802322387695312e-08
+      },
+      "backbone_bn_bitwise_unchanged": true,
+      "official_TEST_used": false,
+      "test_guard": {
+        "installed_at": "2026-11-19T21:42:44+08:00",
+        "official_test_file_open_attempts": 0,
+        "CIFAR100_train_false_attempts": 0,
+        "blocked_attempts": [],
+        "official_TEST_used": false
+      },
+      "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18"
+    },
+    {
+      "state": "completed",
+      "seed": 124,
+      "started_at": "2026-11-19T22:13:37+08:00",
+      "completed_at": "2026-11-19T22:44:58+08:00",
+      "epochs_completed": 30,
+      "paired_batches": 5100,
+      "actual_optimizer_steps": {
+        "C2": 5100,
+        "BASE_C3": 5100,
+        "TARGETED": 5100,
+        "RANDOM_MATCHED": 5100,
+        "FREQUENCY_MATCHED": 5100,
+        "ORACLE_SELECTION": 5100
+      },
+      "checkpoints": {
+        "C2": {
+          "path": "results\\seed_124\\final_classifier_C2.pth",
+          "sha256": "0754d727b455e4fe99a4477971184eab833e6cfc6c53985a14dbb0233630ab8b",
+          "classifier_state_sha256": "d8a19a3b85b31d8bba8513327f1e9127b7b67b7905cfd988b8b14ab0a09e4cb4",
+          "bytes": 28485
+        },
+        "BASE_C3": {
+          "path": "results\\seed_124\\final_classifier_BASE_C3.pth",
+          "sha256": "f7ce8d96e77335ce8b43834f7df92a8f0d2eaf4a8fcb09799ba300793574b1ee",
+          "classifier_state_sha256": "fc694c509308c39de77fd84ff668298ef1a4a4bea7b43a994b006c33c397e301",
+          "bytes": 28589
+        },
+        "TARGETED": {
+          "path": "results\\seed_124\\final_classifier_TARGETED.pth",
+          "sha256": "14b6fb94f4e9d08815166190d07877d2486a2a986d1e15f0eb966bf5bc0865ae",
+          "classifier_state_sha256": "04e1294f8682252cb17380c9c9df42abd2334c4d70c995a20c2fb8ecc859a768",
+          "bytes": 28597
+        },
+        "RANDOM_MATCHED": {
+          "path": "results\\seed_124\\final_classifier_RANDOM_MATCHED.pth",
+          "sha256": "b27378e78cdb843b2dc5a4ba34f7e42edb8b978974ee3ac51c677878b4c02530",
+          "classifier_state_sha256": "43cf7887dc7a5c306c152da8e26aae7d5ee60085d3a4c8dd65fcc2b78c1eac93",
+          "bytes": 28645
+        },
+        "FREQUENCY_MATCHED": {
+          "path": "results\\seed_124\\final_classifier_FREQUENCY_MATCHED.pth",
+          "sha256": "94ca1d55767d6682571d797723fce5edbb2148e7f5a6bff4da89e624a9061a48",
+          "classifier_state_sha256": "287092bf9f34556b201dd1b43a95a724482b4c5a910083953adc70eaad8360cc",
+          "bytes": 28669
+        },
+        "ORACLE_SELECTION": {
+          "path": "results\\seed_124\\final_classifier_ORACLE_SELECTION.pth",
+          "sha256": "5be8178e4c50c276711c3d899f638d8eb6861410dd56a3adfbaa4b2df60b1671",
+          "classifier_state_sha256": "d7c30ff9835bae62305688cd12671b5a7defc7f61fa2cd2b296364956d00bfd3",
+          "bytes": 28661
+        }
+      },
+      "C2_BASE_C3_final_states_match_parent": true,
+      "paired_trace_identity": true,
+      "cache_sha256": "5d0e4597cd9126db33d2efe7878b9dea467029dcaa783be67a297011dd6ae51f",
+      "aliases": {
+        "ORACLE_SUPPRESSION": "TARGETED"
+      },
+      "final_logits_sha256": "9bec15a2011949c5351175bd37c6cb9f65106ebc8b6d69ea838ea45e12bd265a",
+      "max_gradient_errors": {
+        "C2": 0.0,
+        "BASE_C3": 2.9802322387695312e-08,
+        "TARGETED": 2.9802322387695312e-08,
+        "RANDOM_MATCHED": 2.9802322387695312e-08,
+        "FREQUENCY_MATCHED": 3.725290298461914e-08,
+        "ORACLE_SELECTION": 2.9802322387695312e-08
+      },
+      "backbone_bn_bitwise_unchanged": true,
+      "official_TEST_used": false,
+      "test_guard": {
+        "installed_at": "2026-11-19T21:42:44+08:00",
+        "official_test_file_open_attempts": 0,
+        "CIFAR100_train_false_attempts": 0,
+        "blocked_attempts": [],
+        "official_TEST_used": false
+      },
+      "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18"
+    },
+    {
+      "state": "completed",
+      "seed": 125,
+      "started_at": "2026-11-19T22:44:59+08:00",
+      "completed_at": "2026-11-19T23:15:14+08:00",
+      "epochs_completed": 30,
+      "paired_batches": 5100,
+      "actual_optimizer_steps": {
+        "C2": 5100,
+        "BASE_C3": 5100,
+        "TARGETED": 5100,
+        "RANDOM_MATCHED": 5100,
+        "FREQUENCY_MATCHED": 5100,
+        "ORACLE_SELECTION": 5100
+      },
+      "checkpoints": {
+        "C2": {
+          "path": "results\\seed_125\\final_classifier_C2.pth",
+          "sha256": "025b603a9a9d6ba84c2816464fef4a63302eef952961b8d08a8be02ce9aedae8",
+          "classifier_state_sha256": "c6aa278e2fc48b02d6227d4c15e39f6aae2be2208a29711b83c253de8e756a0a",
+          "bytes": 28485
+        },
+        "BASE_C3": {
+          "path": "results\\seed_125\\final_classifier_BASE_C3.pth",
+          "sha256": "3b24db43098e08d6b700e4a8274846006c668607e44543e8af4b64b73fac8601",
+          "classifier_state_sha256": "58c1b2ed6f774ffd2a31f49c9b69ea23e86e04292f120d59c42f399d54563494",
+          "bytes": 28589
+        },
+        "TARGETED": {
+          "path": "results\\seed_125\\final_classifier_TARGETED.pth",
+          "sha256": "d3b8ec0ce517545ef28023d54790a634362db2a8de52487805b4aaf449b2b364",
+          "classifier_state_sha256": "f457c2194cad92da734cacb0c77d30ec67c5c32c7d565f070ba500218db904f0",
+          "bytes": 28597
+        },
+        "RANDOM_MATCHED": {
+          "path": "results\\seed_125\\final_classifier_RANDOM_MATCHED.pth",
+          "sha256": "7898e6dd63445d213f9e5b72f9a96d280d8e186a0e9160cd1aac7d7c23ffd971",
+          "classifier_state_sha256": "49f80da6269741e3a26e73decf4eb01363b1b58f49958e1f614ba4da6b4ac832",
+          "bytes": 28645
+        },
+        "FREQUENCY_MATCHED": {
+          "path": "results\\seed_125\\final_classifier_FREQUENCY_MATCHED.pth",
+          "sha256": "ee1123a4dd821e6c3faca052df7aa92af8e6493a6f4b1b9bcee491e4cc8ed7e7",
+          "classifier_state_sha256": "eaa3a3cd8e7cd33bafff7ced2953b0c1e39ecb33d6ac7b2518bc6cdae3d0c0c7",
+          "bytes": 28669
+        },
+        "ORACLE_SELECTION": {
+          "path": "results\\seed_125\\final_classifier_ORACLE_SELECTION.pth",
+          "sha256": "cfa84e74d0c3151af0113cd95997205a5d9ac8630e4eba85c87f0b7222bdbc03",
+          "classifier_state_sha256": "ce3da540975f6ba87ed3acb51398fc28234e99e8a8820473561c00c6d9d63044",
+          "bytes": 28661
+        }
+      },
+      "C2_BASE_C3_final_states_match_parent": true,
+      "paired_trace_identity": true,
+      "cache_sha256": "83f5b338c268950cdb010571aa8d3ad7e0e31babdc1d54b0fb550f047ec16e5f",
+      "aliases": {
+        "ORACLE_SUPPRESSION": "TARGETED"
+      },
+      "final_logits_sha256": "f39d18291a5109732a7cc504459ddccc4cc9c991aabd218680e6db603c922626",
+      "max_gradient_errors": {
+        "C2": 0.0,
+        "BASE_C3": 2.9802322387695312e-08,
+        "TARGETED": 2.9802322387695312e-08,
+        "RANDOM_MATCHED": 2.9802322387695312e-08,
+        "FREQUENCY_MATCHED": 2.9802322387695312e-08,
+        "ORACLE_SELECTION": 3.725290298461914e-08
+      },
+      "backbone_bn_bitwise_unchanged": true,
+      "official_TEST_used": false,
+      "test_guard": {
+        "installed_at": "2026-11-19T21:42:44+08:00",
+        "official_test_file_open_attempts": 0,
+        "CIFAR100_train_false_attempts": 0,
+        "blocked_attempts": [],
+        "official_TEST_used": false
+      },
+      "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18"
+    }
+  ],
+  "code_sha256": {
+    "analyze_causal_oracle.py": "47594cfdba3e666028cc0547d850e4109f031d806836d8d6850d8f6361bc9114",
+    "causal_core.py": "fe0596bb277039d7ec6b3a6c0021560454f7f759c4f5f6f7a0718b776940ea0a",
+    "isolated_data.py": "d7b60f40ba07c9c9f64084025136861055feaecc4853bda935d2a42be4a2d643",
+    "oracle_runtime.py": "94d8cafe1994519e8acc7902837cbe2f92735877d0573fc80fad266cbb543bb5",
+    "run_causal_oracle.py": "dac72e802f51720fa3c2d5ad26531f27538e2d0181edc01f8edb554b6b9819ce",
+    "test_causal_oracle.py": "c1a26ab691a18bdc6846fa7242cd3cf56b1dcad3fbae6127dac2d7e9743b5509",
+    "validate_cpu.py": "37177b7f33b74feef8826f443c9af256b7b3d05ce495f87f542258ed38278be0",
+    "CAUSAL_ORACLE_PROTOCOL.md": "4c1a73330c32d1d1182176615450c07c28f597e139fd931ca34a22d71c9ba33a",
+    "CODEX_CAUSAL_ORACLE_20261119.txt": "033c74550429ca8b31451b23563a9e5281c4ee0bf5adeba8e5a988f38a9b5a2a"
+  },
+  "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18",
+  "official_TEST_used": false,
+  "test_guard": {
+    "installed_at": "2026-11-19T21:42:44+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "environment": {
+    "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "python_version": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "numpy": "2.5.2",
+    "torch": "2.14.1+cu132",
+    "torch_cuda": "13.2",
+    "CUDA_VISIBLE_DEVICES": null,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "cudnn_allow_tf32": true,
+    "matmul_allow_tf32": false,
+    "AMP": false,
+    "model_dtype": "torch.float32",
+    "device_index": 0,
+    "device_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "cudnn_version": 92400
+  }
+}

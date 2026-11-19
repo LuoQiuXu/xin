@@ -1,0 +1,49 @@
+BRANCH=experiment/ccmia-causal-oracle-20261119
+HEAD=398200c263fff2c6130bd1d12428b559af5c4a68
+
+ M H2T_repro_audit/ccsam_causal_oracle_20261119/CAUSAL_ORACLE_PROTOCOL.md
+ M H2T_repro_audit/ccsam_causal_oracle_20261119/CODEX_CAUSAL_ORACLE_20261119.txt
+ M H2T_repro_audit/ccsam_causal_oracle_20261119/README.md
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/.gitattributes
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/.gitignore
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/CAUSAL_ORACLE_REPORT.md
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/MASK_HASH_INDEX.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/SCIENTIFIC_REVIEW_ZH.md
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/SOURCE_IMPLEMENTATION_AUDIT.md
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/VALIDATION_REPORT.md
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/analysis/
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/analyze_causal_oracle.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/calibration/
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/calibration_completed.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/causal_core.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/formal_completed.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/isolated_data.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/mask_seal.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/oracle_runtime.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/preflight_report.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/results/
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/run_causal_oracle.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/sampling_audit.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/smoke_report.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/source_audit.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/split_manifest.json
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/test_causal_oracle.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/validate_cpu.py
+?? H2T_repro_audit/ccsam_causal_oracle_20261119/validation/
+?? H2T_repro_audit/ccsam_cross_dataset_formal_20261112/
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/diagnostics/SGD_RECONSTRUCTION_DIAGNOSIS.md
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/diagnostics/diagnose_sgd_reconstruction.py
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/diagnostics/sgd_reconstruction_diagnostic.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/preflight_report.json
+?? H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/tpr_parameter_reallocation/
+?? H2T_repro_audit/cross_dataset_data_audit_20261111/
+?? H2T_repro_audit/fusion_semantic_audit/
+?? H2T_repro_audit/h2t_decision_20261028/
+?? H2T_repro_audit/lowvs_mask_parity/
+?? H2T_repro_audit/mdlt_domain_probe/
+?? H2T_repro_audit/noisy_lt_cross_stage2/
+?? H2T_repro_audit/noisy_lt_failure_screen/
+?? H2T_repro_audit/pi_failure_screen/
+?? H2T_repro_audit/pi_h2t_author_audit_20261027/
+?? H2T_repro_audit/research_gap_20261026/
+?? H2T_repro_audit/semantic_compatibility_screen/

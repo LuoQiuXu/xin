@@ -1,0 +1,233 @@
+[
+  {
+    "arm": "TARGETED",
+    "axis": "source",
+    "n": 221,
+    "mean_train_count": 19.036199095022624,
+    "standardized_mean_difference": 0.0
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "target",
+    "n": 221,
+    "mean_train_count": 229.26244343891403,
+    "standardized_mean_difference": 0.0
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 0,
+    "n": 78
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 1,
+    "n": 53
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 2,
+    "n": 24
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 0,
+    "n": 24
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 1,
+    "n": 10
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 2,
+    "n": 11
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 0,
+    "n": 10
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 1,
+    "n": 7
+  },
+  {
+    "arm": "TARGETED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 2,
+    "n": 4
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "source",
+    "n": 221,
+    "mean_train_count": 20.43438914027149,
+    "standardized_mean_difference": 0.07048878845850426
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "target",
+    "n": 221,
+    "mean_train_count": 229.26244343891403,
+    "standardized_mean_difference": 0.0
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 0,
+    "n": 78
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 1,
+    "n": 53
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 2,
+    "n": 24
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 0,
+    "n": 24
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 1,
+    "n": 10
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 2,
+    "n": 11
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 0,
+    "n": 10
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 1,
+    "n": 7
+  },
+  {
+    "arm": "RANDOM_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 2,
+    "n": 4
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "source",
+    "n": 221,
+    "mean_train_count": 21.20814479638009,
+    "standardized_mean_difference": 0.10767487410096357
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "target",
+    "n": 221,
+    "mean_train_count": 233.52488687782807,
+    "standardized_mean_difference": 0.038647686115753116
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 0,
+    "n": 78
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 1,
+    "n": 53
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 0,
+    "target_bin": 2,
+    "n": 24
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 0,
+    "n": 24
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 1,
+    "n": 10
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 1,
+    "target_bin": 2,
+    "n": 11
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 0,
+    "n": 10
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 1,
+    "n": 7
+  },
+  {
+    "arm": "FREQUENCY_MATCHED",
+    "axis": "joint_bin",
+    "source_bin": 2,
+    "target_bin": 2,
+    "n": 4
+  }
+]

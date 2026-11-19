@@ -1,0 +1,31 @@
+{
+  "started_at": "2026-11-19T21:42:50+08:00",
+  "code_sha256": {
+    "analyze_causal_oracle.py": "47594cfdba3e666028cc0547d850e4109f031d806836d8d6850d8f6361bc9114",
+    "causal_core.py": "fe0596bb277039d7ec6b3a6c0021560454f7f759c4f5f6f7a0718b776940ea0a",
+    "isolated_data.py": "d7b60f40ba07c9c9f64084025136861055feaecc4853bda935d2a42be4a2d643",
+    "oracle_runtime.py": "94d8cafe1994519e8acc7902837cbe2f92735877d0573fc80fad266cbb543bb5",
+    "run_causal_oracle.py": "dac72e802f51720fa3c2d5ad26531f27538e2d0181edc01f8edb554b6b9819ce",
+    "test_causal_oracle.py": "c1a26ab691a18bdc6846fa7242cd3cf56b1dcad3fbae6127dac2d7e9743b5509",
+    "validate_cpu.py": "37177b7f33b74feef8826f443c9af256b7b3d05ce495f87f542258ed38278be0",
+    "CAUSAL_ORACLE_PROTOCOL.md": "4c1a73330c32d1d1182176615450c07c28f597e139fd931ca34a22d71c9ba33a",
+    "CODEX_CAUSAL_ORACLE_20261119.txt": "033c74550429ca8b31451b23563a9e5281c4ee0bf5adeba8e5a988f38a9b5a2a"
+  },
+  "smoke_sha256": "be7493f3188a70e9de8430684d4b7c23f414f2789ed6984d9d46954cdc02ddc0",
+  "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "arms": [
+    "C2",
+    "BASE_C3",
+    "TARGETED",
+    "RANDOM_MATCHED",
+    "FREQUENCY_MATCHED",
+    "ORACLE_SELECTION"
+  ],
+  "epochs": 30,
+  "official_TEST_used": false
+}

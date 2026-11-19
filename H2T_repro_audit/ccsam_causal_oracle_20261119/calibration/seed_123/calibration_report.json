@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "seed": 123,
+  "epochs_replayed": 30,
+  "paired_steps_replayed": 5100,
+  "actual_optimizer_steps": {
+    "C2": 5100,
+    "BASE_C3": 5100
+  },
+  "c0_trace_batches_matched": 5100,
+  "final_classifier_sha256": {
+    "C2": "67c63a7c72e11281e97dbbcff47695c035cc94a8f7b3e974e09a95aa4b93dea4",
+    "C3": "4ed21732aa54e7f278f189184d7acc9e33ed6300891cd532d63c4b4ac40d8472"
+  },
+  "final_states_bitwise_match_parent": true,
+  "backbone_bn_bitwise_unchanged": true,
+  "calibration_only": true,
+  "calibration_features_sha256": "ea8712d7d441f2831486847eca78e88fc49313fcc3ea3a140808cb3716804087",
+  "calibration_labels_sha256": "0a4e4d77962601d2b0d276407eeb3fe6642caf41ba23fb96ba4732d12088d006",
+  "influence_epoch_rows": 66300,
+  "influence_epochs_sha256": "913192d7082bb924e353ccf42c01f4d1c890420ea684a7751ce904b3f889da62",
+  "source_target_frequency_checked": true,
+  "eligible_pairs": 2210,
+  "K": 221,
+  "mask_bundle_sha256": "345b54625b6704e4762dbe770e9bf0e193200236614b2d41b754cbafefdfc808",
+  "oracle_suppression_alias": "TARGETED",
+  "cache_sha256": "763dc94f841f6a2fb5d751b474dcf474e659bc274d548ee7f190c7926b0f9b7c",
+  "cache_trace_sha256": "e422f9c106cf90399831df7e9d6c6377b8d98e1d677d8ba929d120d55bf4dcdc",
+  "max_gradient_decomposition_abs": 3.818422555923462e-08,
+  "max_sgd_reconstruction_relative": 1.2003509126634828e-05
+}
