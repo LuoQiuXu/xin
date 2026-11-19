@@ -1,0 +1,37 @@
+TASK: Implement and validate the CC-MIA Causal Attribution + Oracle Upper-Bound experiment in this repository.
+
+Repository: LuoQiuXu/xin
+Branch: experiment/ccmia-causal-oracle-20261119
+Parent branch: experiment/ccsam-cross-class-margin-influence-audit-20261117
+Read first:
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/CCMIA_PROTOCOL.md
+- .../ccmia/ccmia_core.py
+- .../ccmia/train_ccmia.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+- This folder's CAUSAL_ORACLE_PROTOCOL.md
+
+IMPORTANT: Do not design or implement Margin-aware Gate. This is a finite causal-intervention and oracle-bound experiment. Do not modify parent-branch historical files or prior results. Implement only under:
+H2T_repro_audit/ccsam_causal_oracle_20261119/
+
+SCIENCE / IMPLEMENTATION REQUIREMENTS
+1) First inspect actual schemas and training flow. Do not assume CSV columns or checkpoint names. Record exact parent commit and SHA256 of every reused source file.
+2) Use only the existing sealed CIFAR-100-LT IF=100 TRAIN data and Clean Stage-I checkpoint. Preserve C2/C3 objective, batch order, augmentations, sampler, optimizer, and 30-epoch protocol. Never access official CIFAR-100 TEST.
+3) Deterministically split the existing 1,980 TRAIN-derived holdout within each represented class into 10 calibration and 10 evaluation examples (class 0 absent). Persist exact original indices and SHA256. CALIBRATION alone is allowed for pair ranking, fixed competitor selection, thresholds and masks. EVALUATION labels/features/metrics must not be read until masks and their hashes are sealed. Explicitly label evaluation as held-out development data, not an independent test set.
+4) Compute source->target-Many direct perturbation influence on CALIBRATION only. Reuse the analytic gradient decomposition and linear fixed-margin projection from ccmia_core.py. Do not reuse the parent full-holdout aggregated rankings as calibration scores; recompute on calibration subset.
+5) Intervention is an optimizer-gradient intervention: at each C3 update, decompose direct perturbation gradient by source label and target classifier row, zero only the preselected source-target pair components, sum remaining components and add them to the unchanged clean-gradient path. Do NOT mask clean CE, class weights, C2, source samples, or target rows globally. Preserve the exact C3 Many-input delta=0 rule. Clearly document that this is not an end-to-end loss intervention.
+6) Arms: BASE_C3; TARGETED suppress K most negative eligible source->Many pairs; RANDOM_MATCHED suppress same K with deterministic random selection matched on source/target TRAIN-frequency strata; FREQUENCY_MATCHED another independently seeded frequency-stratified random mask. K = round-half-up(10% of eligible pairs), fixed before evaluation. Also implement ORACLE_SUPPRESSION (calibration-only most-negative K; if identical to TARGETED, explicitly report identical masks, not as an independent result) and ORACLE_SELECTION (fixed-K optimistic selection objective, clearly distinct from suppression; document objective and avoid using evaluation).
+7) Fairness: identical initialization, sampler plan, batch/augmentation realization, update count, optimizer hyperparameters, and seeds across arms. Verify paired trace identity. Random controls must match K and frequency strata; report standardized balance differences / exact counts.
+8) Add robust CPU tests for pair masking, source/target orientation, gradient additivity, masked-gradient reconstruction, deterministic split, deterministic matched controls, mask leakage guards, and finite values. Include tests where K=0, K=all eligible, absent class, non-square feature dims, and shuffled row ordering.
+9) Before formal training run preflight and real-data smoke (at least one real paired minibatch per arm/seed). No formal outputs if any gate fails. Save logs and machine-readable reports. Use FP32 for gradient accounting; preserve parent AMP policy if any (inspect; do not invent).
+10) Formal 3 seeds (123,124,125), 30 epochs, no resume, no overwrite, no best checkpoint selection. Save checkpoints and epoch metrics per arm locally; Git-track only small text/CSV/JSON reports and scripts; do not commit large binary checkpoints.
+11) Evaluate only after mask sealing. Primary metrics on EVALUATION: Many accuracy, mean fixed Many-vs-non-Many margin with competitors frozen from calibration; also Overall, macro, Few, per-class Many accuracy/margin. Add class-stratified bootstrap 95% intervals and paired seed deltas. No unsupported p-value/significance claims.
+12) Final report must state whether TARGETED beats BOTH matched random controls in >=2/3 seeds; whether Oracle headroom is substantial; whether evidence warrants proceeding to Gate. Include negative/inconclusive outcomes without spin.
+
+ENGINEERING
+- Keep scripts modular and deterministic; no hidden globals or silent fallback.
+- Add CLI commands for preflight, smoke, formal, analyze; document exact PowerShell commands and paths.
+- Fail loudly on missing artifacts, changed parent hashes, wrong split sizes, test-set access, trace mismatch, nonfinite gradients, reconstruction residual beyond tolerance, or mask leakage.
+- Ensure all outputs live under this experiment folder and are git-ignored when large.
+- Run CPU tests and syntax checks; do not claim GPU formal run has occurred.
+- Commit implementation to this branch with clear commits. Do not merge.
+- Return a concise implementation summary, changed files, tests actually run, and exact commands for the user's Windows conda environment (小菊).
