@@ -1,0 +1,49 @@
+{
+  "state": "completed",
+  "training_performed": false,
+  "optimizer_updates": 0,
+  "official_TEST_used": false,
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "arms": [
+    "C2",
+    "BASE_C3",
+    "TARGETED",
+    "ORACLE_SELECTION"
+  ],
+  "tau_points": 61,
+  "curve_rows": 1464,
+  "geometry_pair_rows": 6630,
+  "geometry_target_rows": 102,
+  "parent_commit": "1f2615098bea731a2702f74c26cd5918b0c2945b",
+  "mask_seal_sha256": "66ea87af69d95e2d7721c10e76ebc0b9514a75eaec4effaa437f6153ae9d8d18",
+  "artifact_sha256": {
+    "DIAGNOSTIC_REPORT_ZH.md": "4290789d0cb243278558d5d0101df4c0d4eb7f63bd12256dfa5e4f7eb469e15f",
+    "geometry_source_target_pairs.csv": "59924fdf038a72001117fb807560e3c3bc786699cfc062fe8d2b0e6ff3f8d37b",
+    "geometry_summary.json": "b05cb30afcc17c0aa1d96a89f0c99a43928f02974f824dcf6132e1a5091357c4",
+    "geometry_target_rows.csv": "659049715f6daf7d2f2917e9dfece6b0989ba9d864fbb223eb7682740f253dbe",
+    "logit_adjustment_curve.csv": "5ad25350558054b76fd8739a8e9886883db6b93bd3a60230843a8101b7e88fe4",
+    "logit_adjustment_selected.csv": "edb3980484dc5bddfd232ec648824ea7a50a520d3ab9d86a26136e3bd63eb0c7",
+    "overall_vs_tau_calibration.png": "5c69181e208ed1148584bb2c804a5e032d909de8df542d8ace962500ca986c39",
+    "overall_vs_tau_evaluation.png": "a1d3e0e3626f92e25f4f2148b468e0920f10906a563f3ad9b8a0cd2418ecb43a",
+    "pareto_comparison.csv": "49bc26421bf4d66bd10fab95df901b0513b0985202594dff95f8829112882d01",
+    "pareto_many_few_calibration.png": "40fa7e96e582c5497d604cb779595e22d03a655880a669548eda4facf1b79025",
+    "pareto_many_few_evaluation.png": "112a9a02752db4f34ee8962d50bdab66facc7a151a2286ddca7c270fba266f47"
+  },
+  "test_guard": {
+    "installed_at": "2026-11-20T21:28:29+08:00",
+    "official_test_file_open_attempts": 0,
+    "CIFAR100_train_false_attempts": 0,
+    "blocked_attempts": [],
+    "official_TEST_used": false
+  },
+  "code_sha256": {
+    "run_logit_geometry_diagnostics.py": "34d8cb0b1714e9dd8d693b30c2884be6df1a68c31b126c84ba4ff72991b6422c",
+    "test_logit_geometry_diagnostics.py": "cbdcf3c1e53139751ff251f2cc4615d2da8dcd898c88039607643ba848c9818b",
+    "LOGIT_GEOMETRY_PROTOCOL.md": "4c04593ce0f0db6be57a774b639f8125e822fb6bf1ce69f43aab9ee680339128",
+    "CODEX_LOGIT_GEOMETRY_20261120.txt": "8ad1401b43ce83cec90da67d5e794f33c968041898b18cd14954c9e0a646f311"
+  }
+}
