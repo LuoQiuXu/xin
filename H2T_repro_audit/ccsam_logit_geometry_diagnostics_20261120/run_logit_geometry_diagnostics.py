@@ -598,18 +598,19 @@ def _render_report(curves, selected, pareto, target_rows, seed_status):
         )
     lines += ["", "Overall 与 Macro 在该开发划分中相同，因为每个已表示类别恰好有10个样本；两者不是独立收益。", "",
               "### Pareto 与后处理可解释性", "",
-              "| Seed | Partition | Comparison | C2 frontier dominated by C3 | C3 frontier dominated by C2 | Intervention tau=0 dominated by C3 curve | Few gap vs best C3 with >= Many |",
-              "|---:|---|---|---:|---:|---:|---:|"]
+              "| Seed | Partition | Comparison | C2 frontier dominated by C3 | C3 frontier dominated by C2 | Strictly dominated | Covered/matched by C3 | Few gap vs best C3 with >= Many |",
+              "|---:|---|---|---:|---:|---:|---:|---:|"]
     for row in pareto:
         if row["comparison"] == "BASE_C3_vs_C2_frontier":
             lines.append(
                 f"| {row['seed']} | {row['partition']} | C3 vs C2 frontier | "
                 f"{row['fraction_C2_frontier_dominated_by_BASE_C3']:.3f} | "
-                f"{row['fraction_BASE_C3_frontier_dominated_by_C2']:.3f} | — | — |")
+                f"{row['fraction_BASE_C3_frontier_dominated_by_C2']:.3f} | — | — | — |")
         else:
             gap = row.get("intervention_few_minus_best_BASE_C3_few")
             lines.append(
                 f"| {row['seed']} | {row['partition']} | {row['comparison']} | — | — | "
+                f"{row['strictly_dominated_by_BASE_C3_tau']} | "
                 f"{row['weakly_covered_or_matched_by_BASE_C3_curve']} | "
                 f"{('%.3f' % gap) if gap is not None else 'outside Many range'} |")
     lines += ["", "Pareto 支配只检验扫描的一维先验偏置族。某个点不被该曲线支配，不能证明所有类别偏置调整都无效，也不能单独证明几何机制具有因果性。", "",
