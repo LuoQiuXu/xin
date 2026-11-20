@@ -29,6 +29,11 @@ SCIENTIFIC SCOPE — DO NOT EXPAND
 This is an offline analysis of already completed Stage-II linear classifiers. It is NOT a training experiment.
 Do not train, fine-tune, replay optimizer updates, alter checkpoints, run a new Stage-I/II, or design/train a Gate.
 Do not modify any file in the parent experiment or any historical branch.
+Important local-artifact note:
+- The remote GitHub tree does NOT contain the large binary parent artifacts (final_classifier_*.pth, final_logits.npz, source_components_epoch30.npz, or the sealed prepared NPY feature arrays). They are expected to remain in the user's existing local working tree as ignored/untracked experiment outputs.
+- Before running, verify these exact parent paths exist locally and match the SHA values / dependencies in status.json and mask_seal.json.
+- Do not try to fetch them from GitHub, regenerate them, rerun parent training, or commit them.
+- If any required binary artifact is absent or hash-mismatched, stop at preflight and report the missing path; do not fabricate a replacement.
 All code and outputs remain under H2T_repro_audit/ccsam_logit_geometry_diagnostics_20261120/.
 
 A. Provenance and data isolation
