@@ -1,0 +1,218 @@
+TP-MAG EXECUTION TASK — STRICT MODE
+Repository: D:\xiangmuxunlian\xin
+Conda environment: reuse the existing PyTorch/CUDA Conda environment previously referred to as 小菊; do not create a new environment.
+Required branch: experiment/tail-preserving-margin-aware-gate-20261120
+Experiment folder: H2T_repro_audit/ccsam_tpmag_20261120
+
+GOAL
+Reliably validate and execute the frozen Tail-Preserving Margin-Aware Gate (TP-MAG) experiment. Do not redesign the method, add modules, tune parameters, or change the parent experiments.
+
+IMPORTANT SCIENTIFIC FREEZE
+Read these files before running anything:
+1. H2T_repro_audit/ccsam_tpmag_20261120/TPMAG_PROTOCOL.md
+2. H2T_repro_audit/ccsam_tpmag_20261120/README.md
+3. H2T_repro_audit/ccsam_tpmag_20261120/gate_core.py
+4. H2T_repro_audit/ccsam_tpmag_20261120/train_tpmag.py
+5. H2T_repro_audit/ccsam_tpmag_20261120/test_gate_core.py
+
+The method is frozen:
+- Only eligible non-Many source -> represented Many target direct perturbation-gradient components are gated.
+- Head benefit is the first-order increase of the target Many fixed margin.
+- Tail risk is the first-order decrease of the source class margin against the represented Many logit set.
+- For a nonzero eligible pair, g = relu(head_benefit) / (relu(head_benefit) + relu(-tail_margin_shift) + 1e-12). An exactly zero pair gradient uses identity gate 1 because there is no contribution to suppress.
+- Gate-distribution summaries use active nonzero eligible pairs; report the total eligible pair count separately.
+- Clean CE gradients, feature perturbation, class weights, non-eligible pair components, backbone, optimizer and training schedule remain unchanged.
+- No AMP. No threshold, epsilon, coefficient or reference tuning.
+- Evaluation must remain unopened until all three TP-MAG formal seed runs finish.
+- Official CIFAR-100 TEST access is prohibited.
+
+PHASE 0 — SAFE LOCAL SYNCHRONIZATION
+Open PowerShell and run:
+
+cd D:\xiangmuxunlian\xin
+conda env list
+
+Activate the already-existing project environment that contains the working PyTorch, torchvision, NumPy and PIL installation (previously referred to as 小菊). Use its exact name shown by conda env list; do not create or reinstall an environment.
+
+git status --short
+
+If the working tree has ANY non-ignored changes, STOP. Do not reset, clean, stash, checkout over, or overwrite user work. Report the status.
+
+If clean, run:
+
+git fetch origin --prune
+git switch experiment/tail-preserving-margin-aware-gate-20261120
+
+If the local branch does not exist, create the tracking branch with:
+
+git switch --track -c experiment/tail-preserving-margin-aware-gate-20261120 origin/experiment/tail-preserving-margin-aware-gate-20261120
+
+Then:
+
+git pull --ff-only origin experiment/tail-preserving-margin-aware-gate-20261120
+git status --short
+git log -1 --oneline
+git merge-base --is-ancestor bb8536273effd8a478812509a5389c6c01c154ae HEAD
+
+Do not switch to main or merge any other branch. If ancestry or branch checks fail, STOP and report.
+
+PHASE 1 — READ-ONLY SOURCE AUDIT
+Confirm the following source files exist and have not been modified by this task:
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccsam_common.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/train_ccsam.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/ccmia_core.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/train_ccmia.py
+- H2T_repro_audit/ccsam_causal_oracle_20261119/causal_core.py
+- H2T_repro_audit/ccsam_causal_oracle_20261119/isolated_data.py
+- H2T_repro_audit/ccsam_causal_oracle_20261119/oracle_runtime.py
+
+Verify the parent Causal/Oracle experiment is completed for seeds 123, 124 and 125 and that its final Evaluation rows contain C2, BASE_C3, TARGETED, RANDOM_MATCHED, FREQUENCY_MATCHED and ORACLE_SELECTION. Do not open the prepared Evaluation feature/label arrays at this phase.
+
+Do not modify any parent source or output.
+
+PHASE 2 — CPU VALIDATION (REQUIRED)
+From the repository root (keep the working directory at D:\xiangmuxunlian\xin so the parent runtime resolves any historical relative paths consistently):
+
+python H2T_repro_audit\ccsam_tpmag_20261120\validate_cpu.py
+
+This runs the TP-MAG unit tests and py_compile for every Python file. It creates validation/CPU_VALIDATION.json only on success.
+
+Required result: all tests pass and CPU_VALIDATION.json reports passed=true.
+
+If it fails:
+- STOP.
+- Read validation/CPU_FAILURE.json.
+- Report the exact failing test/traceback.
+- Do not run preflight, smoke or formal training.
+- Do not weaken tests or alter the protocol to force a pass.
+
+PHASE 3 — PREFLIGHT (CALIBRATION ONLY)
+Run:
+
+python H2T_repro_audit\ccsam_tpmag_20261120\train_tpmag.py --phase preflight
+
+Required checks include:
+- correct branch and pinned parent ancestry;
+- CPU validation receipt current for exact source hashes;
+- original Clean Stage-I checkpoint and prepared manifest hashes;
+- original TRAIN arrays and sampling plans;
+- C0 reference traces;
+- completed parent C2/BASE_C3/TARGETED/matched/oracle results;
+- exact 65 non-Many source classes x 34 represented Many targets = 2,210 eligible pairs;
+- 990 Calibration examples;
+- valid frozen initial-classifier margin references;
+- official TEST guard remains clean.
+
+Preflight must report Evaluation unopened. If it fails, STOP. Do not continue to Smoke.
+
+PHASE 4 — REAL-DATA SMOKE (REQUIRED)
+Run:
+
+python H2T_repro_audit\ccsam_tpmag_20261120\train_tpmag.py --phase smoke
+
+This performs one real minibatch and one actual optimizer update for each seed 123, 124 and 125. It must verify:
+- exact C0 trace identity;
+- original C3 direct-gradient decomposition against autograd;
+- correct source/target axes;
+- gate values finite and in [0,1];
+- all ineligible pair gates are exactly 1;
+- clean gradient remains intact;
+- gated gradients are FP32 and finite;
+- SGD writeback replay passes;
+- backbone and BatchNorm remain bitwise unchanged;
+- one actual update is recorded per seed;
+- Evaluation remains unopened;
+- official TEST remains unused.
+
+Required result: validation/smoke_report.json reports passed=true and formal_training_started=false.
+
+If Smoke fails, STOP. Do not launch formal training and do not change batch size, AMP, optimizer, code or gate formula to bypass the failure.
+
+PHASE 5 — FORMAL TRAINING
+Only after CPU validation, preflight and all three Smoke seeds pass:
+
+python H2T_repro_audit\ccsam_tpmag_20261120\train_tpmag.py --phase formal
+
+Frozen settings:
+- CIFAR-100-LT IF=100
+- frozen Clean Stage-I ResNet-32
+- 64-D Clean-compatible GAP
+- seeds 123, 124, 125
+- 30 epochs per seed
+- batch size 64
+- SGD lr=0.01, momentum=0.9, weight_decay=2e-4, Nesterov=False
+- FP32, AMP disabled
+- 5,100 actual optimizer updates per seed
+- original sealed sampling plans and exact C0 augmentation traces
+- no resume, no overwrite, no best-epoch selection, no early stopping
+
+Only the TP-MAG arm is newly trained. Do not retrain parent baselines. The script reads Evaluation only after all three TP-MAG seed runs complete.
+
+The formal script must abort on any mismatch, non-finite value, failed decomposition, changed backbone, wrong step count, changed immutable input or TEST access attempt.
+
+If CUDA OOM or any other runtime failure occurs:
+- STOP and preserve the partial run.
+- Do not change batch size, enable AMP, resume, overwrite or reduce the number of seeds.
+- Report the exact exception, traceback, completed epochs/steps and available GPU memory.
+- Wait for scientific review before any new branch or execution attempt.
+
+PHASE 6 — ANALYSIS
+Only after formal_completed.json exists:
+
+python H2T_repro_audit\ccsam_tpmag_20261120\train_tpmag.py --phase analyze
+
+Inspect:
+- analysis/decision.json
+- analysis/TPMAG_FINAL_REPORT.md
+- results/paired_comparison.csv
+- results/final_metrics.csv
+- results/per_class_evaluation_metrics.csv
+- results/seed_123/gate_trace.csv
+- results/seed_124/gate_trace.csv
+- results/seed_125/gate_trace.csv
+
+The frozen decision is GO only if all are true:
+1. Versus BASE_C3, mean Many accuracy gain >= +2.0 percentage points.
+2. Versus BASE_C3, mean fixed Many-margin gain >= +0.10.
+3. Both primary effects are positive together in at least 2/3 seeds.
+4. Versus BASE_C3, mean Few-accuracy change >= -2.0 percentage points.
+5. Versus TARGETED, TP-MAG mean Many accuracy is no worse, mean Few accuracy is no worse, and at least one is strictly better.
+
+If any criterion fails, decision is NO_GO. Do not tune epsilon, add a threshold, change the Calibration reference, add a loss or run a second Gate variant. Stop this Gate line and report the negative result.
+
+PHASE 7 — COMMIT AND PUSH SUCCESSFUL ARTIFACTS
+Only after formal training and analysis complete successfully:
+
+cd D:\xiangmuxunlian\xin
+git status --short
+
+Check that no dataset, cache, checkpoint, NPY/NPZ or unrelated file is staged. The experiment .gitignore must keep large binary artifacts out of Git.
+
+Stage only:
+
+git add H2T_repro_audit/ccsam_tpmag_20261120
+
+Review:
+
+git diff --cached --stat
+git diff --cached --check
+
+Commit and push:
+
+git commit -m "Add tail-preserving margin-aware gate experiment"
+git push origin experiment/tail-preserving-margin-aware-gate-20261120
+
+Do not use git add . and do not force-push.
+
+FINAL RESPONSE TO THE USER
+Report:
+- branch and commit SHA;
+- CPU test result;
+- preflight result;
+- Smoke result for all three seeds;
+- formal status and exact optimizer updates;
+- GO/NO_GO decision and per-seed Many/Few/margin deltas;
+- whether results were pushed;
+- any failure/partial-run path and exact blocker.
+
+Never claim a phase passed unless its report file exists and its passed/state field confirms success.
