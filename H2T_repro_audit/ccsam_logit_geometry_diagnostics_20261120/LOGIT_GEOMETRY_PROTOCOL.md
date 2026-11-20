@@ -53,7 +53,7 @@ Calibration-only selection: for each seed/model, select tau_star maximizing Cali
 Produce Many-vs-Few Pareto curves and Overall-vs-tau plots for both partitions. Include all four model curves and visibly mark tau=0. Mark the Calibration-selected tau on both plots. Report:
 - whether one curve Pareto-dominates the other;
 - the fraction of each model's non-dominated frontier points dominated by the other;
-- whether TARGETED and ORACLE_SELECTION at tau=0 are dominated by any BASE_C3 tau point;
+- whether TARGETED and ORACLE_SELECTION at tau=0 are strictly dominated or weakly covered/matched by any BASE_C3 tau point (equality means the intervention point is covered, not a Pareto escape);
 - for each unadjusted intervention point, the best BASE_C3 Few accuracy among points with at least as high Many accuracy (or report that the point is outside BASE_C3's Many range).
 
 Do not say that a single Logit Adjustment sweep proves all classifier differences are bias-only. It tests this specific one-dimensional prior-bias family.
