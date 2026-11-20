@@ -373,11 +373,18 @@ def _frontier_summary(seed, curve_rows):
             point = next(r for r in by_arm[arm] if abs(float(r["tau"])) < 1e-12)
             candidates = [r for r in base_curve if r["many_accuracy"] >= point["many_accuracy"] - 1e-12]
             best_few = max((r["few_accuracy"] for r in candidates), default=None)
+            weakly_covered = any(
+                row["many_accuracy"] >= point["many_accuracy"] - 1e-12
+                and row["few_accuracy"] >= point["few_accuracy"] - 1e-12
+                for row in base_curve
+            )
             output.append({
                 "seed": seed, "partition": partition, "comparison": arm + "_tau0_vs_BASE_C3_curve",
                 "intervention_many_at_tau0": point["many_accuracy"],
                 "intervention_few_at_tau0": point["few_accuracy"],
-                "dominated_by_any_BASE_C3_tau": is_dominated(point, base_curve),
+                "strictly_dominated_by_BASE_C3_tau": is_dominated(point, base_curve),
+                "weakly_covered_or_matched_by_BASE_C3_curve": weakly_covered,
+                "pareto_escape_from_BASE_C3_curve": not weakly_covered,
                 "base_c3_points_with_many_at_least_intervention": len(candidates),
                 "best_BASE_C3_few_at_equal_or_higher_many": best_few,
                 "intervention_few_minus_best_BASE_C3_few":
