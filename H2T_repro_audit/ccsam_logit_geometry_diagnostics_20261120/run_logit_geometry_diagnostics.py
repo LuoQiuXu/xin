@@ -610,7 +610,7 @@ def _render_report(curves, selected, pareto, target_rows, seed_status):
             gap = row.get("intervention_few_minus_best_BASE_C3_few")
             lines.append(
                 f"| {row['seed']} | {row['partition']} | {row['comparison']} | — | — | "
-                f"{row['dominated_by_any_BASE_C3_tau']} | "
+                f"{row['weakly_covered_or_matched_by_BASE_C3_curve']} | "
                 f"{('%.3f' % gap) if gap is not None else 'outside Many range'} |")
     lines += ["", "Pareto 支配只检验扫描的一维先验偏置族。某个点不被该曲线支配，不能证明所有类别偏置调整都无效，也不能单独证明几何机制具有因果性。", "",
               "## Radial / tangential / bias attribution", "",
