@@ -6,6 +6,13 @@ Parent branch: experiment/ccmia-causal-oracle-20261119
 Working directory: D:\xiangmuxunlian\xin
 Conda interpreter: D:\app\minicondaaa\envs\xiaoju\python.exe
 
+Before editing or running anything:
+- git fetch origin
+- git checkout experiment/ccmia-logit-geometry-diagnostics-20261120
+- git pull --ff-only origin experiment/ccmia-logit-geometry-diagnostics-20261120
+- Verify git branch --show-current prints exactly experiment/ccmia-logit-geometry-diagnostics-20261120.
+- Do not create a different branch and do not switch to the parent/default branch.
+
 Read first:
 - H2T_repro_audit/ccsam_causal_oracle_20261119/README.md
 - H2T_repro_audit/ccsam_causal_oracle_20261119/SCIENTIFIC_REVIEW_ZH.md
@@ -38,7 +45,7 @@ B. Logit Adjustment
 4. On both Calibration and Evaluation, compute Overall, Macro, Many (n>100), Medium (20<=n<=100), Few (n<20) and group sample counts. Validate each represented class has exactly 10 examples; expected group counts are Many=340, Medium=450, Few=200, total=990. Overall and Macro should agree because the split is class-balanced.
 5. Select tau_star only on Calibration by maximum Overall; deterministic tie-break: minimum abs(tau), then lower tau. Report Evaluation at the locked tau. Full Evaluation curve and its Evaluation-only peak are descriptive only; do not select from Evaluation.
 6. Plot Many vs Few curves and Overall vs tau for both partitions. Plot all four arms, mark tau=0, and mark Calibration-selected tau on both partitions.
-7. Compute Pareto frontiers and dominance fractions. Specifically compare C2 vs BASE_C3 curves and test whether the unadjusted tau=0 TARGETED / ORACLE_SELECTION points are dominated by any BASE_C3 tau point. Also report best BASE_C3 Few among points with Many>=the intervention point's Many. Explain that this is a one-dimensional prior-bias diagnostic, not proof that every model difference is a bias-only effect.
+7. Compute Pareto frontiers and dominance fractions. Specifically compare C2 vs BASE_C3 curves and test strict domination and weak coverage/matching of the unadjusted tau=0 TARGETED / ORACLE_SELECTION points by any BASE_C3 tau point; a point exactly on the BASE_C3 curve counts as covered, not as a Pareto escape. Also report best BASE_C3 Few among points with Many>=the intervention point's Many. Explain that this is a one-dimensional prior-bias diagnostic, not proof that every model difference is a bias-only effect.
 
 C. Radial / tangential / bias decomposition
 1. The parent source_components_epoch30.npz contains momentum-propagated, trajectory-integrated source-conditioned PARAMETER DISPLACEMENTS, not per-step raw gradients. Preserve this terminology in code, tables, plots and report.
