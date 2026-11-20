@@ -621,17 +621,20 @@ def _render_report(curves, selected, pareto, target_rows, seed_status):
                 f"{('%.3f' % gap) if gap is not None else 'outside Many range'} |")
     lines += ["", "Pareto 支配只检验扫描的一维先验偏置族。某个点不被该曲线支配，不能证明所有类别偏置调整都无效，也不能单独证明几何机制具有因果性。", "",
               "## Radial / tangential / bias attribution", "",
-              "| Seed | Many target rows | Mean direct radial signed | Mean direct tangential norm | Mean observed radial signed | Mean observed tangential norm | Mean non-direct radial signed | Mean non-direct tangential norm |",
-              "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+              "| Seed | Many target rows | Mean direct radial signed | Mean direct tangential norm | Mean direct bias | Mean observed radial signed | Mean observed tangential norm | Mean observed bias | Mean non-direct radial signed | Mean non-direct tangential norm | Mean non-direct bias |",
+              "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for seed in SEEDS:
         rows = [r for r in target_rows if r["seed"] == seed]
         lines.append(
             f"| {seed} | {len(rows)} | {np.mean([r['direct_radial_signed'] for r in rows]):.6f} | "
             f"{np.mean([r['direct_tangential_norm'] for r in rows]):.6f} | "
+            f"{np.mean([r['direct_bias_change'] for r in rows]):.6f} | "
             f"{np.mean([r['observed_radial_signed'] for r in rows]):.6f} | "
             f"{np.mean([r['observed_tangential_norm'] for r in rows]):.6f} | "
+            f"{np.mean([r['observed_bias_change'] for r in rows]):.6f} | "
             f"{np.mean([r['non_direct_remainder_radial_signed'] for r in rows]):.6f} | "
-            f"{np.mean([r['non_direct_remainder_tangential_norm'] for r in rows]):.6f} |")
+            f"{np.mean([r['non_direct_remainder_tangential_norm'] for r in rows]):.6f} | "
+            f"{np.mean([r['non_direct_remainder_bias'] for r in rows]):.6f} |")
     lines += ["", "Bias 位移单独保存在 pair/target CSV 中，没有混入径向或切向向量。非直接余项是 observed minus direct 的合并余项，不能单独解释为 state feedback。", "",
               "## 结果文件", "",
               "- logit_adjustment_curve.csv: 每个 seed/model/partition/tau 的完整指标。",
