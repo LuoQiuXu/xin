@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import subprocess
 import traceback
 
 import numpy as np
@@ -58,7 +59,7 @@ def _write_csv(path: Path, rows, fields=None) -> None:
         raise ValueError(f"Refusing output outside new experiment directory: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
     rows = list(rows)
-    fields = fields or (list(rows[0]) if rows else [])
+    fields = fields or list(dict.fromkeys(key for row in rows for key in row))
     with path.open("x", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="raise")
         writer.writeheader()
@@ -165,6 +166,22 @@ def decompose_vector(delta: np.ndarray, reference: np.ndarray) -> dict:
     }
 
 
+
+def source_target_component(source_weight: np.ndarray, source_bias: np.ndarray,
+                           source: int, target: int):
+    source_weight, source_bias = np.asarray(source_weight), np.asarray(source_bias)
+    if source_weight.ndim != 3 or source_bias.shape != source_weight.shape[:2]:
+        raise ValueError("Expected source weight [S,T,D] and source bias [S,T]")
+    if not (0 <= int(source) < source_weight.shape[0]
+            and 0 <= int(target) < source_weight.shape[1]):
+        raise IndexError("Source or target classifier-row index out of range")
+    weight = source_weight[int(source), int(target)]
+    bias = source_bias[int(source), int(target)]
+    if not np.isfinite(weight).all() or not np.isfinite(bias):
+        raise ValueError("Nonfinite source-target parameter component")
+    return weight.copy(), float(bias)
+
+
 def is_dominated(point: dict, candidates: list[dict], x_key="many_accuracy",
                  y_key="few_accuracy", eps=1e-12) -> bool:
     x, y = float(point[x_key]), float(point[y_key])
@@ -223,10 +240,18 @@ def _linear_logits(features: np.ndarray, weight: np.ndarray, bias: np.ndarray) -
 
 def _verify_parent_and_load_data():
     completion = read_json(PARENT_ROOT / "formal_completed.json")
+    branch = subprocess.run(["git", "branch", "--show-current"], cwd=REPO_ROOT,
+                            capture_output=True, text=True, check=True).stdout.strip()
+    if branch != "experiment/ccmia-logit-geometry-diagnostics-20261120":
+        raise RuntimeError(f"Wrong Git branch for diagnostics: {branch}")
     if (completion.get("state") != "completed" or completion.get("seeds") != list(SEEDS)
             or completion.get("epochs") != 30 or completion.get("actual_optimizer_steps") != 91800
             or completion.get("official_TEST_used") is not False):
         raise RuntimeError("Parent formal completion ledger is incomplete or invalid")
+    calibration_done = read_json(PARENT_ROOT / "calibration_completed.json")
+    smoke_done = read_json(PARENT_ROOT / "smoke_report.json")
+    if calibration_done.get("passed") is not True or smoke_done.get("passed") is not True:
+        raise RuntimeError("Parent Calibration/production Smoke completion receipts are invalid")
     context = load_context(read_json(PARENT_ROOT / "split_manifest.json"))
     context["vault"].verify_seal()
     eval_x, eval_y = _verify_postseal_data(context)
@@ -267,6 +292,13 @@ def _load_seed_models_and_logits(context, seed, eval_y, cal_x, cal_y, eval_x):
             or guard.get("official_test_file_open_attempts") != 0
             or guard.get("CIFAR100_train_false_attempts") != 0 or guard.get("blocked_attempts")):
         raise RuntimeError(f"Parent TEST guard was not clean for seed {seed}")
+    for checkpoint_arm, info in status["checkpoints"].items():
+        relative = Path(str(info["path"]).replace("\\", "/"))
+        if relative.is_absolute() or ".." in relative.parts:
+            raise RuntimeError("Checkpoint path escapes parent experiment")
+        checkpoint_file = PARENT_ROOT / relative
+        if not checkpoint_file.is_file() or file_sha(checkpoint_file) != info["sha256"]:
+            raise RuntimeError(f"Checkpoint SHA mismatch for seed={seed}, arm={checkpoint_arm}")
     logits_path = PARENT_ROOT / "results" / f"seed_{seed}" / "final_logits.npz"
     if not logits_path.is_file() or file_sha(logits_path) != status["final_logits_sha256"]:
         raise RuntimeError(f"Saved final logits SHA mismatch for seed {seed}")
@@ -383,7 +415,7 @@ def _plot_curves(curve_rows, selected_rows, partition, output_dir):
                        marker="D", s=38, color=line.get_color())
     ax.set_xlabel("Many accuracy (%)")
     ax.set_ylabel("Few accuracy (%)")
-    ax.set_title(f"Many–Few Pareto diagnostic ({partition}; star=tau 0, diamond=Calibration-selected tau)")
+    ax.set_title(f"Many–Few Pareto diagnostic ({partition}; mean over seeds; star=tau 0, diamond=locked tau)")
     ax.grid(True, alpha=0.25)
     ax.legend()
     fig.tight_layout()
@@ -497,13 +529,13 @@ def _geometry_seed(seed, models, cal_x, cal_y, eval_x, eval_y, counts):
             "direct_orthogonality_dot": direct_geom["orthogonality_dot"],
         })
         for source in source_ids:
-            geom = decompose_vector(source_weight[source, target], reference)
-            delta_bias = float(source_bias[source, target])
+            delta_w, delta_bias = source_target_component(source_weight, source_bias, source, target)
+            geom = decompose_vector(delta_w, reference)
             competitor = int(competitor_map[str(int(target))])
             if counts[competitor] > 100:
                 raise RuntimeError("Frozen competitor must be a non-Many classifier row")
-            competitor_delta = source_weight[source, competitor]
-            competitor_bias = float(source_bias[source, competitor])
+            competitor_delta, competitor_bias = source_target_component(
+                source_weight, source_bias, source, competitor)
             cal = _margin_shifts(cal_x, cal_y, int(target), competitor, geom, delta_bias,
                                  competitor_delta, competitor_bias)
             ev = _margin_shifts(eval_x, eval_y, int(target), competitor, geom, delta_bias,
@@ -606,14 +638,8 @@ def _render_report(curves, selected, pareto, target_rows, seed_status):
 
 
 def run_analysis():
-    if (ROOT / "analysis").exists() or (ROOT / "diagnostics_started.json").exists():
-        raise FileExistsError("Refusing to overwrite any prior diagnostic output")
-    _write_json(ROOT / "diagnostics_started.json", {
-        "branch_expected": "experiment/ccmia-logit-geometry-diagnostics-20261120",
-        "parent_branch": "experiment/ccmia-causal-oracle-20261119",
-        "training_performed": False, "optimizer_updates": 0, "official_TEST_used": False,
-        "code_sha256": _code_hashes(),
-    })
+    if (ROOT / "analysis").exists():
+        raise FileExistsError("Refusing to overwrite an existing diagnostic analysis directory")
     context, cal_x, cal_y, eval_x, eval_y, counts = _verify_parent_and_load_data()
     curve_rows, selected_rows, pareto_rows = [], [], []
     geometry_pairs, geometry_targets, seed_status = [], [], []
