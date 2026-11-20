@@ -3,7 +3,7 @@ import pytest
 
 from run_logit_geometry_diagnostics import (
     compute_metrics, decompose_vector, is_dominated, logit_adjustment,
-    pareto_frontier, select_tau,
+    pareto_frontier, select_tau, source_target_component,
 )
 
 
@@ -90,3 +90,15 @@ def test_pareto_frontier_removes_dominated_points_and_duplicates():
     frontier = pareto_frontier(rows)
     assert len(frontier) == 2
     assert all(not is_dominated(point, frontier) for point in frontier)
+
+
+def test_source_target_axis_orientation_is_explicit():
+    weight = np.zeros((3, 4, 2), dtype=np.float64)
+    bias = np.zeros((3, 4), dtype=np.float64)
+    weight[2, 1] = np.array([7.0, 11.0])
+    bias[2, 1] = 13.0
+    selected_weight, selected_bias = source_target_component(weight, bias, 2, 1)
+    np.testing.assert_array_equal(selected_weight, np.array([7.0, 11.0]))
+    assert selected_bias == 13.0
+    with pytest.raises(IndexError):
+        source_target_component(weight, bias, 4, 1)
