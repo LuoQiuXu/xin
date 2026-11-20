@@ -23,9 +23,9 @@ for _path in (PARENT_ROOT, BASE_ROOT, BASE_ROOT / "ccmia"):
         sys.path.insert(0, str(_path))
 
 from isolated_data import file_sha
-from oracle_runtime import load_context, make_models, read_json
+from oracle_runtime import load_context, read_json
 from run_causal_oracle import _verify_postseal_data
-from ccsam_common import guard_pass, state_hash
+from ccsam_common import guard_pass
 
 SEEDS = (123, 124, 125)
 ARMS = ("C2", "BASE_C3", "TARGETED", "ORACLE_SELECTION")
@@ -199,7 +199,17 @@ def pareto_frontier(rows: list[dict]) -> list[dict]:
     return [point for point in points if not is_dominated(point, points)]
 
 
-def _load_classifier(context, seed: int, arm: str, status: dict):
+def _classifier_state_hash(state: dict) -> str:
+    digest = hashlib.sha256()
+    for name, tensor in state.items():
+        if not torch.is_tensor(tensor):
+            raise TypeError(f"Classifier state entry is not a tensor: {name}")
+        digest.update(name.encode("utf-8"))
+        digest.update(tensor.detach().cpu().contiguous().numpy().tobytes())
+    return digest.hexdigest()
+
+
+def _load_classifier(seed: int, arm: str, status: dict):
     info = status["checkpoints"].get(arm)
     if not info:
         raise RuntimeError(f"Missing {arm} checkpoint metadata for seed {seed}")
@@ -213,17 +223,23 @@ def _load_classifier(context, seed: int, arm: str, status: dict):
     if (payload.get("seed") != seed or payload.get("arm") != arm
             or payload.get("epoch") != 30 or payload.get("official_TEST_used") is not False):
         raise RuntimeError(f"Checkpoint provenance mismatch: seed={seed}, arm={arm}")
-    backbone, head, _ = make_models(context, seed, torch.device("cpu"))
-    del backbone
-    head.load_state_dict(payload["state_dict_classifier"], strict=True)
-    actual_hash = state_hash(head)
+    state = payload.get("state_dict_classifier")
+    if not isinstance(state, dict):
+        raise RuntimeError("Checkpoint lacks a classifier state dictionary")
+    actual_hash = _classifier_state_hash(state)
     if actual_hash != info["classifier_state_sha256"] or actual_hash != payload.get("final_classifier_sha256"):
         raise RuntimeError(f"Classifier tensor hash mismatch: seed={seed}, arm={arm}")
-    weight = head.module.fc.weight.detach().cpu().numpy().astype(np.float64, copy=True)
-    bias = head.module.fc.bias.detach().cpu().numpy().astype(np.float64, copy=True)
-    if weight.shape != (100, 64) or bias.shape != (100,):
-        raise RuntimeError("Expected a 100 x 64 linear classifier and 100-D bias")
-    del head, payload
+    weight_keys = [name for name, value in state.items()
+                   if name.endswith("weight") and tuple(value.shape) == (100, 64)]
+    bias_keys = [name for name, value in state.items()
+                 if name.endswith("bias") and tuple(value.shape) == (100,)]
+    if len(weight_keys) != 1 or len(bias_keys) != 1:
+        raise RuntimeError(f"Could not uniquely identify 100x64 classifier tensors: {weight_keys}, {bias_keys}")
+    weight = state[weight_keys[0]].detach().cpu().numpy().astype(np.float64, copy=True)
+    bias = state[bias_keys[0]].detach().cpu().numpy().astype(np.float64, copy=True)
+    if not np.isfinite(weight).all() or not np.isfinite(bias).all():
+        raise RuntimeError("Nonfinite classifier parameters")
+    del payload, state
     return weight, bias
 
 
@@ -311,7 +327,7 @@ def _load_seed_models_and_logits(context, seed, eval_y, cal_x, cal_y, eval_x):
     models, logits = {}, {}
     max_parity_abs = 0.0
     for arm in ARMS:
-        weight, bias = _load_classifier(context, seed, arm, status)
+        weight, bias = _load_classifier(seed, arm, status)
         cal_logits = _linear_logits(cal_x, weight, bias)
         eval_logits = _linear_logits(eval_x, weight, bias)
         if eval_logits.shape != saved[arm].shape or not np.allclose(
