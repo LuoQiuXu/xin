@@ -1,0 +1,66 @@
+TASK: Implement and execute the finite offline Logit-Adjustment + Classifier-Geometry diagnostic.
+
+Repository: LuoQiuXu/xin
+Branch: experiment/ccmia-logit-geometry-diagnostics-20261120
+Parent branch: experiment/ccmia-causal-oracle-20261119
+Working directory: D:\xiangmuxunlian\xin
+Conda interpreter: D:\app\minicondaaa\envs\xiaoju\python.exe
+
+Read first:
+- H2T_repro_audit/ccsam_causal_oracle_20261119/README.md
+- H2T_repro_audit/ccsam_causal_oracle_20261119/SCIENTIFIC_REVIEW_ZH.md
+- H2T_repro_audit/ccsam_causal_oracle_20261119/CAUSAL_ORACLE_REPORT.md
+- H2T_repro_audit/ccsam_causal_oracle_20261119/CAUSAL_ORACLE_PROTOCOL.md
+- H2T_repro_audit/ccsam_causal_oracle_20261119/oracle_runtime.py
+- H2T_repro_audit/ccsam_causal_oracle_20261119/isolated_data.py
+- H2T_repro_audit/ccsam_causal_oracle_20261119/run_causal_oracle.py
+- H2T_repro_audit/ccsam_causal_oracle_20261119/causal_core.py
+- H2T_repro_audit/ccsam_stage2_controlled_cifar100_20261106/ccmia/ccmia_core.py, especially SGDInfluenceTracker and project_source_parameter_delta_to_fixed_margin
+- This folder's LOGIT_GEOMETRY_PROTOCOL.md and run_logit_geometry_diagnostics.py.
+
+SCIENTIFIC SCOPE — DO NOT EXPAND
+This is an offline analysis of already completed Stage-II linear classifiers. It is NOT a training experiment.
+Do not train, fine-tune, replay optimizer updates, alter checkpoints, run a new Stage-I/II, or design/train a Gate.
+Do not modify any file in the parent experiment or any historical branch.
+All code and outputs remain under H2T_repro_audit/ccsam_logit_geometry_diagnostics_20261120/.
+
+A. Provenance and data isolation
+1. Inspect actual schemas before coding. Use the completed parent branch's status.json, formal_completed.json, checkpoint SHA values, final_logits.npz, mask_seal.json, split_manifest.json and HoldoutVault implementation.
+2. Verify all three seeds (123,124,125), all six actual arms' completion metadata, 5,100 updates per arm/seed, 91,800 total optimizer updates, official_TEST_used=False, no blocked test access, every checkpoint SHA, every final_logits SHA, and the all-seed mask seal/dependencies.
+3. Use the existing sealed 990 Calibration / 990 Evaluation split. Reuse the parent's HoldoutVault / post-seal verification. Never load the full 1,980-row array as one unrestricted array; never read Evaluation before verifying the mask seal. The data are TRAIN-derived development data, not an independent test set.
+4. Recompute logits from final checkpoints and cached GAP features and verify they match the parent's saved Evaluation logits for C2, BASE_C3, TARGETED and ORACLE_SELECTION within a strict documented tolerance. Validate saved labels match the sealed Evaluation labels.
+5. Keep official CIFAR-100 TEST access at zero. Do not use torchvision CIFAR100(train=False), test pickle, test images, or test labels.
+
+B. Logit Adjustment
+1. Use original TRAIN priors pi_c=n_c/sum(n). Do not estimate priors from Calibration or Evaluation.
+2. For each seed, process C2, BASE_C3, TARGETED and ORACLE_SELECTION. ORACLE_SUPPRESSION is only an alias of TARGETED and must not be duplicated.
+3. Sweep exactly 61 values tau=-1.50..1.50 at step 0.05. Apply z'=z-tau*log(pi). No model updates.
+4. On both Calibration and Evaluation, compute Overall, Macro, Many (n>100), Medium (20<=n<=100), Few (n<20) and group sample counts. Validate each represented class has exactly 10 examples; expected group counts are Many=340, Medium=450, Few=200, total=990. Overall and Macro should agree because the split is class-balanced.
+5. Select tau_star only on Calibration by maximum Overall; deterministic tie-break: minimum abs(tau), then lower tau. Report Evaluation at the locked tau. Full Evaluation curve and its Evaluation-only peak are descriptive only; do not select from Evaluation.
+6. Plot Many vs Few curves and Overall vs tau for both partitions. Plot all four arms, mark tau=0, and mark Calibration-selected tau on both partitions.
+7. Compute Pareto frontiers and dominance fractions. Specifically compare C2 vs BASE_C3 curves and test whether the unadjusted tau=0 TARGETED / ORACLE_SELECTION points are dominated by any BASE_C3 tau point. Also report best BASE_C3 Few among points with Many>=the intervention point's Many. Explain that this is a one-dimensional prior-bias diagnostic, not proof that every model difference is a bias-only effect.
+
+C. Radial / tangential / bias decomposition
+1. The parent source_components_epoch30.npz contains momentum-propagated, trajectory-integrated source-conditioned PARAMETER DISPLACEMENTS, not per-step raw gradients. Preserve this terminology in code, tables, plots and report.
+2. For each seed load source_components_epoch30.npz arrays weight [100,100,64] and bias [100,100], plus the final C2 and BASE_C3 classifiers. Read actual arrays and validate shapes/dtypes/finiteness.
+3. Eligible pairs are the 65 non-Many source labels (TRAIN count<=100) x the 34 Many target classes represented in Calibration/Evaluation (TRAIN count>100): exactly 2,210 pairs. Assert all direct source components for Many input labels are exactly zero.
+4. Primary fixed reference is the C2 final classifier row w_ref[y]. For every eligible (source s,target row y), compute exact orthogonal decomposition of the stored cumulative direct parameter displacement:
+   radial = dot(delta_w,w_ref)/dot(w_ref,w_ref)*w_ref
+   tangential = delta_w-radial.
+   Report signed first-order radial norm change, tangential norm, total norm, exact norm change, angle change, and separate bias displacement. Assert radial+tangential reconstructs delta_w and dot(radial,tangential) is numerically zero.
+5. For each target row, sum source direct contributions and compare with observed BASE_C3-C2 final row delta. Report the non-direct remainder = observed-summed-direct. Decompose direct, observed and remainder relative to C2 final row direction. Keep bias separate. Do not call remainder pure state-feedback.
+6. For each pair, project radial, tangential and bias target-row displacement onto target-class Calibration and Evaluation feature means. Also calculate source-specific competitor-row displacement using the frozen Calibration competitor map, and report full fixed-margin displacement (target row minus competitor row). Never reselect competitors on Evaluation.
+7. Note reference-direction dependence. Optional sensitivity analysis with BASE_C3 final direction is allowed only if it does not obscure the primary C2 reference and is reported separately.
+
+D. Code quality and output
+1. Use exclusive output creation; no overwrites, resume or silent fallbacks. On failure, preserve a diagnostic_failure.json and full traceback.
+2. All outputs must remain under the new folder. Never write to parent paths.
+3. Add CPU tests for tau=0 identity, prior correction sign, all group metrics including Medium, deterministic tau tie-break, Pareto dominance, orthogonal decomposition/reconstruction, zero reference rejection, source/target axis orientation, and nonfinite rejection.
+4. Run:
+   & 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -u -m pytest 'H2T_repro_audit\ccsam_logit_geometry_diagnostics_20261120\test_logit_geometry_diagnostics.py' -q
+   & 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -u -m py_compile 'H2T_repro_audit\ccsam_logit_geometry_diagnostics_20261120\run_logit_geometry_diagnostics.py'
+   & 'D:\app\minicondaaa\envs\xiaoju\python.exe' -B -u 'H2T_repro_audit\ccsam_logit_geometry_diagnostics_20261120\run_logit_geometry_diagnostics.py' --phase analyze
+5. Do not claim execution success until commands actually exit 0 and diagnostics_completed.json exists. Do not launch any training.
+6. Commit only scripts, tests, protocol, task and small text/CSV/JSON/PNG analysis outputs if appropriate. Never commit model checkpoints, feature caches or NPZ files. Do not merge.
+
+Return implementation commit SHA and changed files; exact tests and commands actually run with exit codes; output paths and key findings including C2 vs BASE_C3 Pareto comparison, TARGETED/ORACLE_SELECTION dominance, selected tau and held-out Evaluation metrics, radial/tangential/bias attribution; all caveats and failed gates.
