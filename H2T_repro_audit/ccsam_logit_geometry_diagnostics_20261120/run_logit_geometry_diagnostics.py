@@ -263,6 +263,9 @@ def _verify_parent_and_load_data():
         raise RuntimeError(f"Wrong Git branch for diagnostics: {branch}")
     if (completion.get("state") != "completed" or completion.get("seeds") != list(SEEDS)
             or completion.get("epochs") != 30 or completion.get("actual_optimizer_steps") != 91800
+            or completion.get("paired_batches") != 15300
+            or completion.get("actual_arms") != list(PARENT_ARMS)
+            or any(item.get("state") != "completed" for item in completion.get("seed_status", []))
             or completion.get("official_TEST_used") is not False):
         raise RuntimeError("Parent formal completion ledger is incomplete or invalid")
     calibration_done = read_json(PARENT_ROOT / "calibration_completed.json")
