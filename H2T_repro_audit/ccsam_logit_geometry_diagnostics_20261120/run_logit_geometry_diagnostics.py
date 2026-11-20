@@ -29,6 +29,7 @@ from ccsam_common import guard_pass, state_hash
 
 SEEDS = (123, 124, 125)
 ARMS = ("C2", "BASE_C3", "TARGETED", "ORACLE_SELECTION")
+PARENT_ARMS = ("C2", "BASE_C3", "TARGETED", "RANDOM_MATCHED", "FREQUENCY_MATCHED", "ORACLE_SELECTION")
 TAUS = np.round(np.linspace(-1.5, 1.5, 61), 10)
 EXPECTED_GROUP_COUNTS = {"Many": 340, "Medium": 450, "Few": 200}
 LOGIT_ATOL, LOGIT_RTOL = 1e-5, 1e-5
@@ -250,7 +251,8 @@ def _verify_parent_and_load_data():
         raise RuntimeError("Parent formal completion ledger is incomplete or invalid")
     calibration_done = read_json(PARENT_ROOT / "calibration_completed.json")
     smoke_done = read_json(PARENT_ROOT / "smoke_report.json")
-    if calibration_done.get("passed") is not True or smoke_done.get("passed") is not True:
+    if (calibration_done.get("passed") is not True or smoke_done.get("passed") is not True
+            or [int(x["seed"]) for x in calibration_done.get("seeds", [])] != list(SEEDS)):
         raise RuntimeError("Parent Calibration/production Smoke completion receipts are invalid")
     context = load_context(read_json(PARENT_ROOT / "split_manifest.json"))
     context["vault"].verify_seal()
@@ -285,6 +287,7 @@ def _load_seed_models_and_logits(context, seed, eval_y, cal_x, cal_y, eval_x):
                       ("C2", "BASE_C3", "TARGETED", "RANDOM_MATCHED", "FREQUENCY_MATCHED", "ORACLE_SELECTION")}
     if (status.get("state") != "completed" or status.get("epochs_completed") != 30
             or status.get("actual_optimizer_steps") != expected_steps
+            or set(status.get("checkpoints", {})) != set(PARENT_ARMS)
             or status.get("official_TEST_used") is not False):
         raise RuntimeError(f"Invalid parent status for seed {seed}")
     guard = status.get("test_guard", {})
@@ -306,16 +309,19 @@ def _load_seed_models_and_logits(context, seed, eval_y, cal_x, cal_y, eval_x):
     if not np.array_equal(saved["evaluation_labels"], eval_y):
         raise RuntimeError("Saved logits labels differ from sealed Evaluation labels")
     models, logits = {}, {}
+    max_parity_abs = 0.0
     for arm in ARMS:
         weight, bias = _load_classifier(context, seed, arm, status)
         cal_logits = _linear_logits(cal_x, weight, bias)
         eval_logits = _linear_logits(eval_x, weight, bias)
-        if not np.allclose(eval_logits, saved[arm], atol=LOGIT_ATOL, rtol=LOGIT_RTOL):
+        if eval_logits.shape != saved[arm].shape or not np.allclose(
+                eval_logits, saved[arm], atol=LOGIT_ATOL, rtol=LOGIT_RTOL):
             raise RuntimeError(f"Checkpoint-to-saved-logit parity failed: seed={seed}, arm={arm}")
+        max_parity_abs = max(max_parity_abs, float(np.max(np.abs(eval_logits - saved[arm]))))
         models[arm] = {"weight": weight, "bias": bias}
         logits[arm] = {"calibration": cal_logits, "evaluation": eval_logits}
     saved.close()
-    return status, models, logits
+    return status, models, logits, max_parity_abs
 
 
 def _sweep_seed(seed, logits, cal_y, eval_y, counts):
@@ -652,7 +658,8 @@ def run_analysis():
     curve_rows, selected_rows, pareto_rows = [], [], []
     geometry_pairs, geometry_targets, seed_status = [], [], []
     for seed in SEEDS:
-        status, models, logits = _load_seed_models_and_logits(context, seed, eval_y, cal_x, cal_y, eval_x)
+        status, models, logits, max_parity_abs = _load_seed_models_and_logits(
+            context, seed, eval_y, cal_x, cal_y, eval_x)
         curves, selected = _sweep_seed(seed, logits, cal_y, eval_y, counts)
         curve_rows.extend(curves)
         selected_rows.extend(selected)
@@ -661,8 +668,9 @@ def run_analysis():
         geometry_pairs.extend(pairs)
         geometry_targets.extend(targets)
         seed_status.append({"seed": seed, "state": status["state"],
-                            "checkpoint_arms_verified": list(ARMS),
+                            "checkpoint_arms_verified": list(PARENT_ARMS),
                             "evaluation_logits_recomputed_and_verified": True,
+                            "max_evaluation_logit_parity_abs_error": max_parity_abs,
                             "geometry_pairs": len(pairs), "geometry_target_rows": len(targets)})
     output = ROOT / "analysis"
     output.mkdir(exist_ok=False)
