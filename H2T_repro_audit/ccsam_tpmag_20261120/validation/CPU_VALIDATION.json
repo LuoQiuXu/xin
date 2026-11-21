@@ -1,0 +1,19 @@
+{
+  "completed_at": "2026-11-21T15:14:52+08:00",
+  "python": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "python_version": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+  "test_returncode": 0,
+  "test_stdout": "",
+  "test_stderr": "test_all_one_gate_reconstructs_original_direct_gradient (test_gate_core.TailPreservingMarginGateTests.test_all_one_gate_reconstructs_original_direct_gradient) ... ok\ntest_exactly_zero_eligible_pair_is_identity (test_gate_core.TailPreservingMarginGateTests.test_exactly_zero_eligible_pair_is_identity) ... ok\ntest_gate_and_gradient_shapes_and_finiteness (test_gate_core.TailPreservingMarginGateTests.test_gate_and_gradient_shapes_and_finiteness) ... ok\ntest_gate_uses_head_benefit_and_tail_risk_ratio (test_gate_core.TailPreservingMarginGateTests.test_gate_uses_head_benefit_and_tail_risk_ratio) ... ok\ntest_ineligible_components_are_exact_identity (test_gate_core.TailPreservingMarginGateTests.test_ineligible_components_are_exact_identity) ... ok\ntest_nonbeneficial_head_pair_is_closed (test_gate_core.TailPreservingMarginGateTests.test_nonbeneficial_head_pair_is_closed) ... ok\ntest_reference_has_expected_pair_family_and_competitors (test_gate_core.TailPreservingMarginGateTests.test_reference_has_expected_pair_family_and_competitors) ... ok\ntest_rejects_nonfinite_source_gradient (test_gate_core.TailPreservingMarginGateTests.test_rejects_nonfinite_source_gradient) ... ok\ntest_tail_safe_beneficial_pair_is_fully_retained (test_gate_core.TailPreservingMarginGateTests.test_tail_safe_beneficial_pair_is_fully_retained) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.063s\n\nOK\n",
+  "compile_errors": [],
+  "code_sha256": {
+    "gate_core.py": "e396d8f268ce94d4f5ad4c9bf585683c7afb16556c09d9dd980af5297fd5c255",
+    "test_gate_core.py": "37886bf0d293044efd56591eaee67740490d2f9303fa162ac8ada6145d17b569",
+    "train_tpmag.py": "816eeabcbba8e86bddaa4af8dcc0b74917f24a672a73fe0592304ec7dde1c81a",
+    "validate_cpu.py": "03e9ca7cc6dbed58818136f67849c042e16063a1d27345e0114235478ebc8aa0",
+    "README.md": "d6cfea48289f63127b9f9a074a41f37fe1a3ee923f8659eb8356fa61ff65bdb1",
+    "TPMAG_PROTOCOL.md": "f27d794148cca590a6b25366d18138023876d4aeb0852e92d1222b29214adbf5",
+    "CODEX_TPMAG_EXECUTE_20261120.txt": "eecef98fdc5cba204b4a7eaf2340c322180a54096cfe2e71cc0aa0211ef37a70"
+  },
+  "passed": true
+}

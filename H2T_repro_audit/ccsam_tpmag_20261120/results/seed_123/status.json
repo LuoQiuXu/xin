@@ -1,0 +1,42 @@
+{
+  "state": "completed",
+  "seed": 123,
+  "started_at": "2026-11-21T15:29:24+08:00",
+  "epochs_completed": 30,
+  "optimizer_steps": 5100,
+  "initial_classifier_sha256": "69c0bb9e681774576b8b69843ab571ca020a31907225a572dd7dd9bc71910cc2",
+  "official_TEST_used": false,
+  "last_epoch": {
+    "seed": 123,
+    "epoch": 30,
+    "optimizer_steps": 5100,
+    "train_loss": 0.8946602085092337,
+    "train_accuracy": 93.7402046648843,
+    "mean_gate": 0.16268661493170233,
+    "median_gate": 0.0,
+    "zero_gate_fraction": 0.8294236962500563,
+    "one_gate_fraction": 9.619109965130726e-06,
+    "mean_head_benefit": 4.487998256583478e-05,
+    "mean_tail_margin_shift": 0.00023562720006963732,
+    "mean_tail_risk": 7.058117045579648e-06,
+    "retained_direct_gradient_norm_ratio": 0.03083828706543219,
+    "active_pair_count": 1314.4,
+    "max_gradient_decomposition_error": 1.955777406692505e-08,
+    "official_TEST_used": false
+  },
+  "completed_at": "2026-11-21T15:37:47+08:00",
+  "final_classifier_sha256": "90c03be62f0bb8a68f60fd31173149eb6a9aa05bd87d86c82d76e7994e6e702c",
+  "checkpoint": "final_classifier_TPMAG.pth",
+  "checkpoint_sha256": "c6c92700b0cdeb51915435c22707e13b05caf344e0907adf86081d8283b1b22a",
+  "gate_trace_sha256": "467b3e80ad7877d09f0114bf61407ef48a93c032946cbdc45b4806cf2e00aa80",
+  "epoch_metrics_sha256": "a3783ca115dc21ab2b33e14e1fd7fc211e8c724828da355e7f20d43d260c54f7",
+  "backbone_bn_bitwise_unchanged": true,
+  "optimizer": {
+    "type": "SGD",
+    "lr": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0002,
+    "nesterov": false,
+    "AMP": false
+  }
+}

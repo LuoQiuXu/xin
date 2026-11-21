@@ -1,0 +1,86 @@
+{
+  "decision": "NO_GO",
+  "head_efficacy_requirement": {
+    "mean_many_gain_pp_vs_BASE_C3": {
+      "mean": 2.8431372549019636,
+      "sample_sd": 0.16980890270283255,
+      "per_seed": [
+        2.647058823529413,
+        2.941176470588239,
+        2.941176470588239
+      ]
+    },
+    "mean_fixed_many_margin_gain_vs_BASE_C3": {
+      "mean": 0.7566470758587706,
+      "sample_sd": 0.0057480336945690755,
+      "per_seed": [
+        0.7525014428531422,
+        0.7542309964404383,
+        0.7632087882827312
+      ]
+    },
+    "positive_both_in_at_least_two_seeds": 3,
+    "required_many_gain_pp": 2.0,
+    "required_fixed_margin_gain": 0.1,
+    "passed": true
+  },
+  "overall_context": {
+    "mean_overall_accuracy_delta_pp_vs_BASE_C3": {
+      "mean": -0.10101010101010388,
+      "sample_sd": 0.3641970985317146,
+      "per_seed": [
+        -0.20202020202020066,
+        0.30303030303029743,
+        -0.4040404040404084
+      ]
+    },
+    "mean_overall_accuracy_delta_pp_vs_TARGETED": {
+      "mean": -2.3684757858670005e-15,
+      "sample_sd": 0.36419709853171656,
+      "per_seed": [
+        0.10101010101010388,
+        0.30303030303029743,
+        -0.4040404040404084
+      ]
+    }
+  },
+  "tail_floor_requirement": {
+    "mean_few_change_pp_vs_BASE_C3": {
+      "mean": -2.0,
+      "sample_sd": 0.8819171036881964,
+      "per_seed": [
+        -1.3333333333333357,
+        -1.6666666666666643,
+        -3.0
+      ]
+    },
+    "required_floor_pp": -2.0,
+    "passed": true
+  },
+  "hard_suppression_tradeoff_requirement": {
+    "mean_many_delta_vs_TARGETED_pp": {
+      "mean": 1.1764705882352924,
+      "sample_sd": 0.2941176470588225,
+      "per_seed": [
+        0.882352941176471,
+        1.470588235294116,
+        1.17647058823529
+      ]
+    },
+    "mean_few_delta_vs_TARGETED_pp": {
+      "mean": -0.5555555555555559,
+      "sample_sd": 0.6938886664887124,
+      "per_seed": [
+        0.0,
+        -0.33333333333333215,
+        -1.3333333333333357
+      ]
+    },
+    "required_weak_pareto_dominance": true,
+    "passed": false
+  },
+  "go": false,
+  "stop_rule": "NO-GO: stop this Gate line. No epsilon, threshold, coefficient, loss or reference tuning is permitted.",
+  "official_TEST_used": false,
+  "evaluation_scope": "TRAIN-derived development partition; not an independent test set"
+}

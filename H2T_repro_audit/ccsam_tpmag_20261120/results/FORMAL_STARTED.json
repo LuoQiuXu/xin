@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-11-21T15:29:23+08:00",
+  "code_sha256": {
+    "gate_core.py": "e396d8f268ce94d4f5ad4c9bf585683c7afb16556c09d9dd980af5297fd5c255",
+    "test_gate_core.py": "37886bf0d293044efd56591eaee67740490d2f9303fa162ac8ada6145d17b569",
+    "train_tpmag.py": "816eeabcbba8e86bddaa4af8dcc0b74917f24a672a73fe0592304ec7dde1c81a",
+    "validate_cpu.py": "03e9ca7cc6dbed58818136f67849c042e16063a1d27345e0114235478ebc8aa0",
+    "README.md": "d6cfea48289f63127b9f9a074a41f37fe1a3ee923f8659eb8356fa61ff65bdb1",
+    "TPMAG_PROTOCOL.md": "f27d794148cca590a6b25366d18138023876d4aeb0852e92d1222b29214adbf5",
+    "CODEX_TPMAG_EXECUTE_20261120.txt": "eecef98fdc5cba204b4a7eaf2340c322180a54096cfe2e71cc0aa0211ef37a70"
+  },
+  "preflight_sha256": "39d4e49f2fedb156a134357830cc7957545a148d99192cfb7a1e451ecd8110e1",
+  "smoke_sha256": "90d22ce5b0c35c3ff0bd79bcd03521d1b357b78d6713a5405241a469177c35f9",
+  "seeds": [
+    123,
+    124,
+    125
+  ],
+  "arm": "TPMAG",
+  "epochs": 30,
+  "optimizer_steps_per_seed": 5100,
+  "official_TEST_used": false
+}
