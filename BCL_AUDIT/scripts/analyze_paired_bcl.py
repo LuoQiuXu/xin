@@ -849,6 +849,12 @@ def main():
         raise RuntimeError("Offline gradients/margins require a TRAIN-only probe cache")
     if "training split" not in str(probe_metadata.get("source_split", "")):
         raise RuntimeError("Probe cache does not certify the original TRAIN split")
+    expected_probe_order = "per-class fixed-count selection followed by seeded global shuffle"
+    if probe_metadata.get("probe_order") != expected_probe_order:
+        raise RuntimeError(
+            "Probe cache is stale or class-major; use a fresh Phase-2 output root "
+            "to regenerate the globally shuffled LT TRAIN-only probe."
+        )
     class_counts = cifar100lt_class_counts()
     criterion_lc = LogitCompensatedCE(class_counts).to(device)
     criterion_bcl = BalancedContrastiveLoss(class_counts, temperature=0.1).to(device)
