@@ -1,0 +1,9 @@
+outputs/
+*.pth
+*.pth.tar
+*.npz
+*.npy
+*.log
+runs/
+__pycache__/
+.pytest_cache/
