@@ -85,6 +85,7 @@ until the mechanism evidence is coherent and repeatable across paired seeds.
 - `outputs/data_audit/superclass_counts.csv`
 - `outputs/data_audit/head_tail_pair_topology.csv`
 - `outputs/data_audit/DINO_CLASS_SIMILARITY.npy` (after DINO pass)
+- `outputs/environment.json`
 - `outputs/LC_only_seed42/` and `outputs/BCL_seed42/`
 - `outputs/*_seed42/batchnorm_audit.jsonl`
 - `outputs/offline_probe_margin_metrics.csv`
