@@ -41,13 +41,13 @@ def test_reuse_static_audit_loads_without_rewriting(tmp_path):
     counts = cifar100lt_class_counts()
     selected_indices = np.arange(int(counts.sum()), dtype=np.int64)
     np.save(tmp_path / "cifar100lt_if100_train_indices_seed0.npy", selected_indices)
-    (tmp_path / "class_counts.csv").write_text("placeholder\\n", encoding="utf-8")
-    (tmp_path / "superclass_counts.csv").write_text("placeholder\\n", encoding="utf-8")
+    (tmp_path / "class_counts.csv").write_text("placeholder\n", encoding="utf-8")
+    (tmp_path / "superclass_counts.csv").write_text("placeholder\n", encoding="utf-8")
     pair_path = tmp_path / "head_tail_pair_topology.csv"
     pair_path.write_text(
         "head_fine_id,tail_fine_id,head_coarse_id,tail_coarse_id,"
-        "same_superclass,dino_cosine_similarity,dino_topk_union\\n"
-        "0,99,0,19,False,,\\n",
+        "same_superclass,dino_cosine_similarity,dino_topk_union\n"
+        "0,99,0,19,False,,\n",
         encoding="utf-8",
     )
     summary = {
