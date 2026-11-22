@@ -118,6 +118,7 @@ The tests must cover:
 - exact IF=100 count vector and selected-index length;
 - ResNet-32 / classifier / embedding / prototype shapes;
 - BCL scalar loss, finite gradients, and participation of all 100 prototypes;
+- numerical parity with the released official BalSCL reference formula;
 - declared LC/BCL gradient routes;
 - identical three-view dataset contract for LC-only and BCL;
 - three-view BatchNorm audit hooks;
