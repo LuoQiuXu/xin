@@ -67,6 +67,7 @@ Record complete output, exit code, elapsed time and warnings. Tests must cover:
 - LC-only v1-only supervision and exact lambda=2.0 / mu=0.6 objective;
 - strict missing-index failure;
 - paired epoch-seed / sample-order audit;
+- saved init_seed42.pth reload and SHA-256 verification for both groups;
 - identical three-view dataset contract and BatchNorm hooks;
 - BCL loss formula and gradient routes;
 - DINO sidecar immutability and synthetic graph degree/superclass-overlap
@@ -100,7 +101,8 @@ GPU / training:
 - RTX 5070 Laptop GPU, FP32 only;
 - AMP disabled, TF32 disabled, no gradient accumulation;
 - exact ResNet-32 and original BCL graph;
-- same real batch and exact same initial model state for both groups;
+- load init_seed42.pth independently for each group via load_initial_model_state()
+  and verify the same saved state-dict SHA-256;
 - LC-only: concatenate three views through backbone, take only v1 logits,
   objective exactly 2.0*LC;
 - BCL: same backbone batch, v1 LC plus v2/v3 BCL, objective exactly

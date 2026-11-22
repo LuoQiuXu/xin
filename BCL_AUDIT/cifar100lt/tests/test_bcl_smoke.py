@@ -18,7 +18,9 @@ from BCL_AUDIT.cifar100lt.train import (
     classification_logits_v1,
     compose_group_loss,
     epoch_seed_for,
+    load_initial_model_state,
     make_train_loader,
+    state_dict_sha256,
     verify_paired_data_streams,
 )
 from BCL_AUDIT.scripts.analyze_paired_bcl import summarize_did
@@ -415,3 +417,34 @@ def test_epoch_seed_and_paired_data_stream_audit(tmp_path):
     assert report["epochs_compared"] == 200
     assert report["mismatch_count"] == 0
     assert (tmp_path / "paired_data_stream_audit.json").is_file()
+
+
+def test_both_groups_can_verify_the_saved_initial_checkpoint(tmp_path):
+    model = BCLCIFARModel()
+    state = {name: value.detach().clone() for name, value in model.state_dict().items()}
+    expected_hash = state_dict_sha256(state)
+    checkpoint_path = tmp_path / "init_seed42.pth"
+    torch.save(
+        {
+            "model_state": state,
+            "seed": 42,
+            "model_state_sha256": expected_hash,
+        },
+        checkpoint_path,
+    )
+
+    loaded = load_initial_model_state(
+        checkpoint_path,
+        expected_seed=42,
+        expected_sha256=expected_hash,
+    )
+    assert state_dict_sha256(loaded) == expected_hash
+    for name in state:
+        assert torch.equal(state[name], loaded[name])
+
+    with pytest.raises(RuntimeError, match="SHA-256 verification failed"):
+        load_initial_model_state(
+            checkpoint_path,
+            expected_seed=42,
+            expected_sha256="0" * 64,
+        )

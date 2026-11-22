@@ -355,7 +355,7 @@ def train_group(
     data_root: Path,
     output_root: Path,
     indices_file: Path,
-    initial_state: dict,
+    initial_state_path: Path,
     initial_state_sha256: str,
     num_workers: int,
     device: torch.device,
@@ -374,6 +374,12 @@ def train_group(
     )
     class_counts = cifar100lt_class_counts()
 
+    # Each group independently reloads the exact saved init_seed42.pth file.
+    initial_state = load_initial_model_state(
+        initial_state_path,
+        expected_seed=TRAIN_SEED,
+        expected_sha256=initial_state_sha256,
+    )
     model = BCLCIFARModel()
     model.load_state_dict(initial_state, strict=True)
     if state_dict_sha256(model.state_dict()) != initial_state_sha256:
@@ -583,6 +589,26 @@ def _safe_torch_load(path: Path, device: torch.device):
         return torch.load(path, map_location=device)
 
 
+def load_initial_model_state(
+    path: Path,
+    expected_seed: int,
+    expected_sha256: str,
+) -> dict[str, torch.Tensor]:
+    if not path.is_file():
+        raise FileNotFoundError(f"Missing paired initial checkpoint: {path}")
+    checkpoint = _safe_torch_load(path, torch.device("cpu"))
+    if int(checkpoint.get("seed", -1)) != int(expected_seed):
+        raise RuntimeError("init_seed42.pth seed does not match the paired experiment seed")
+    state = checkpoint.get("model_state")
+    if not isinstance(state, dict):
+        raise RuntimeError("init_seed42.pth does not contain a model_state dictionary")
+    actual_sha256 = state_dict_sha256(state)
+    recorded_sha256 = checkpoint.get("model_state_sha256")
+    if recorded_sha256 != actual_sha256 or actual_sha256 != expected_sha256:
+        raise RuntimeError("init_seed42.pth model-state SHA-256 verification failed")
+    return state
+
+
 @torch.inference_mode()
 def evaluate_final_checkpoint(
     group: str,
@@ -785,7 +811,7 @@ def main():
         data_root=data_root,
         output_root=output_root,
         indices_file=indices_file,
-        initial_state=initial_state,
+        initial_state_path=initial_state_path,
         initial_state_sha256=initial_state_sha256,
         num_workers=args.num_workers,
         device=device,
@@ -795,7 +821,7 @@ def main():
         data_root=data_root,
         output_root=output_root,
         indices_file=indices_file,
-        initial_state=initial_state,
+        initial_state_path=initial_state_path,
         initial_state_sha256=initial_state_sha256,
         num_workers=args.num_workers,
         device=device,
