@@ -91,6 +91,7 @@ def test_gradient_routes_match_the_declared_computation_graph():
     # BCL path: Backbone and W receive gradients through samples / prototypes;
     # both MLPs are BCL-only modules.
     all_views = torch.cat([images, images + 0.05, images - 0.05], dim=0)
+    all_views = all_views.detach().requires_grad_(True)
     _, all_logits, all_embeddings, prototypes = model(
         all_views,
         compute_contrastive=True,
@@ -105,6 +106,7 @@ def test_gradient_routes_match_the_declared_computation_graph():
     bcl_grads = torch.autograd.grad(
         bcl,
         [
+            all_views,
             model.backbone.conv1.weight,
             model.classifier.weight,
             model.sample_mlp.net[0].weight,
@@ -116,3 +118,7 @@ def test_gradient_routes_match_the_declared_computation_graph():
         assert gradient is not None
         assert torch.isfinite(gradient).all()
         assert gradient.abs().sum() > 0
+
+    # Train-mode BatchNorm2d / BatchNorm1d couple all three views. Although
+    # BCL directly uses z2/z3, its gradient can reach the v1 input rows.
+    assert bcl_grads[0][:batch_size].abs().sum() > 0
