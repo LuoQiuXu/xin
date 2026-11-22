@@ -53,3 +53,19 @@ GPU 预检进程退出码 0。两组均未发生 OOM，异常记录为空。
 未启动 200 Epoch 正式训练，未保存 checkpoint，未运行 DINOv2 或 TEST 评估。审计后本地 TRAIN 与 meta 的 SHA256 仍匹配。Git 对已跟踪文件及暂存区的差异为空，本轮产物保存在本地忽略的 `BCL_AUDIT/outputs/`。 [GPU 原始回执](preflight_20261122_01/gpu_preflight.json) · [临时预检脚本](preflight_20261122_01/bcl_preflight_once.py)
 
 数据验证回执 SHA256 `f8f0f95c94342975d9e37b57a889d2d7913578033d0fb71703e4c4cf046c27e2`。GPU 回执 SHA256 `5447471faa4b7b134832fa2a27b5926f73242688d880c384a41fae54fe8acca3`。
+
+
+## Post-preflight source revalidation note
+
+This report records the GPU-capacity probe performed against source commit
+`6cf5f8ac06a701fb5daa6af8c745495f1bae47d9`. Subsequent review found that the
+committed training/topology/probe paths still used stock
+`torchvision.datasets.CIFAR100(train=True)`, whose torchvision 0.29.1
+integrity check also inspects `test_list`. The current branch has since been
+hardened with a permanent TRAIN-only loader and a regression test.
+
+Therefore this report remains valid as historical evidence that the 3-view
+FP32 batch fits the RTX 5070 Laptop 8 GB GPU, but its READY status does not
+authorize the full pilot against the updated source until
+`CODEX_PREFLIGHT_ONLY.txt` is rerun and a fresh report is generated against
+the current executable source.
