@@ -38,7 +38,7 @@ Then compute the DINOv2 class topology using the original balanced CIFAR-100
 python BCL_AUDIT/scripts/audit_cifar100lt_topology.py `
   --data-root "D:\datasets\cifar100" `
   --output-dir "BCL_AUDIT\outputs\data_audit" `
-  --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
+  --compute-dino --reuse-static-audit --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 ```
 
 The topology script reads and checksum-validates only the original TRAIN and
