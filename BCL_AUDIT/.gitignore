@@ -7,3 +7,19 @@ outputs/
 runs/
 __pycache__/
 .pytest_cache/
+
+# Compact Stage -1 preflight evidence
+!/outputs/
+/outputs/*
+!/outputs/preflight_report.md
+!/outputs/preflight_recheck_20261122_01/
+/outputs/preflight_recheck_20261122_01/*
+!/outputs/preflight_recheck_20261122_01/gpu_preflight.json
+!/outputs/preflight_recheck_20261122_01/data_validation.json
+!/outputs/data_audit_recheck_20261122_01/
+/outputs/data_audit_recheck_20261122_01/*
+!/outputs/data_audit_recheck_20261122_01/data_audit_summary.json
+!/outputs/data_audit_recheck_20261122_01/data_validation.json
+!/outputs/data_audit_recheck_20261122_01/class_counts.csv
+!/outputs/data_audit_recheck_20261122_01/superclass_counts.csv
+!/outputs/data_audit_recheck_20261122_01/head_tail_pair_topology.csv

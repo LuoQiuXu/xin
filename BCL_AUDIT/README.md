@@ -58,11 +58,12 @@ training-split-only data audit, and one exact-protocol FP32 step at batch size
 256 with three concatenated views (effective backbone batch 768) on the RTX
 5070 Laptop 8 GB GPU.
 
-Do not launch the training command below unless
-`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**
-and its tested source commit matches the current executable source. The
-currently committed report is historical evidence for the earlier code; after
-the TRAIN-only loader hardening, rerun `CODEX_PREFLIGHT_ONLY.txt` first.
+The committed [preflight report](outputs/preflight_report.md) at
+`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**.
+It tested executable source `dc150d1023510c1ec40841fdc133fb8ba106774c`
+and was published in commit `2da996aee10b9e0c2f36f01a4b54eb213bbe4349`.
+Authorize Stage -1 only after comparing the current executable Python files
+with that tested source. Reuse the verified GPU preflight after documentation-only changes.
 If the exact configuration OOMs, do not reduce batch size, enable AMP, or add
 gradient accumulation; stop and review the capacity report first.
 

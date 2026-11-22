@@ -80,8 +80,9 @@ upload checkpoints, arrays, or raw predictions unless asked.
 
 ## Preflight status after TRAIN-only loader hardening
 
-The previous READY report establishes that the fixed 3-view FP32 batch fits
-the RTX 5070 Laptop 8 GB GPU, but it was generated against an earlier source
-commit. After the permanent TRAIN-only loader change, rerun
-`BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt` and obtain a fresh READY report before
-starting either 200-epoch run.
+The committed [preflight report](../outputs/preflight_report.md) at
+`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**.
+It tested executable source `dc150d1023510c1ec40841fdc133fb8ba106774c`
+and was published in commit `2da996aee10b9e0c2f36f01a4b54eb213bbe4349`.
+Authorize Stage -1 only after comparing the current executable Python files
+with that tested source. Reuse the verified GPU preflight after documentation-only changes.

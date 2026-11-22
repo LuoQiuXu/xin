@@ -1,0 +1,174 @@
+{
+  "groups": {
+    "LC-only": {
+      "status": "passed",
+      "optimizer_steps": 1,
+      "last_stage": "completed",
+      "before": {
+        "driver_free_bytes": 7338983424,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 0,
+        "reserved_bytes": 0,
+        "peak_allocated_bytes": 0,
+        "peak_reserved_bytes": 0
+      },
+      "backbone_input_shape": [
+        768,
+        3,
+        32,
+        32
+      ],
+      "backbone_input_dtype": "torch.float32",
+      "step_seconds": 0.5301315000106115,
+      "after": {
+        "driver_free_bytes": 4772069376,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 93057024,
+        "reserved_bytes": 2403336192,
+        "peak_allocated_bytes": 2021376000,
+        "peak_reserved_bytes": 2403336192
+      },
+      "losses": {
+        "LC": 7.321621894836426,
+        "BCL": 0.0,
+        "total": 14.643243789672852
+      },
+      "optimizer_lr": 0.03,
+      "parameters_with_gradient": {
+        "backbone": 93,
+        "classifier": 2
+      },
+      "parameter_tensors_changed": {
+        "backbone": 93,
+        "classifier": 2
+      }
+    },
+    "BCL": {
+      "status": "passed",
+      "optimizer_steps": 1,
+      "last_stage": "completed",
+      "before": {
+        "driver_free_bytes": 7083130880,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 67108864,
+        "reserved_bytes": 92274688,
+        "peak_allocated_bytes": 67108864,
+        "peak_reserved_bytes": 92274688
+      },
+      "backbone_input_shape": [
+        768,
+        3,
+        32,
+        32
+      ],
+      "backbone_input_dtype": "torch.float32",
+      "sample_embedding_shape": [
+        768,
+        128
+      ],
+      "prototype_shape": [
+        100,
+        128
+      ],
+      "step_seconds": 0.40421409998089075,
+      "after": {
+        "driver_free_bytes": 4744806400,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 95363072,
+        "reserved_bytes": 2430599168,
+        "peak_allocated_bytes": 2022882304,
+        "peak_reserved_bytes": 2430599168
+      },
+      "losses": {
+        "LC": 7.321621894836426,
+        "BCL": 5.790878772735596,
+        "total": 18.11777114868164
+      },
+      "optimizer_lr": 0.03,
+      "parameters_with_gradient": {
+        "backbone": 93,
+        "classifier": 2,
+        "sample_mlp": 6,
+        "prototype_mlp": 6
+      },
+      "parameter_tensors_changed": {
+        "backbone": 93,
+        "classifier": 2,
+        "sample_mlp": 6,
+        "prototype_mlp": 6
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "cuda_runtime": "13.2",
+    "cuda_visible_devices": null,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "device": "cuda:0",
+    "cudnn": 92400,
+    "memory_start": {
+      "driver_free_bytes": 7338983424,
+      "driver_total_bytes": 8546484224,
+      "allocated_bytes": 0,
+      "reserved_bytes": 0,
+      "peak_allocated_bytes": 0,
+      "peak_reserved_bytes": 0
+    },
+    "amp": false,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false
+  },
+  "batch_size": 256,
+  "num_workers": 0,
+  "grad_accumulation": false,
+  "dino_invoked": false,
+  "formal_training_started": false,
+  "test_evaluation_started": false,
+  "source_commit": "dc150d1023510c1ec40841fdc133fb8ba106774c",
+  "data_audit_output_dir": "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01",
+  "indices_file": "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01\\cifar100lt_if100_train_indices_seed0.npy",
+  "indices_sha256": "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7",
+  "shared_initial_state_sha256": "cae88d1a2b9238b30d6512da052032f07739bb45c21800b4ee01a3f6228e88ca",
+  "real_cifar_open_events": {
+    "train": 2,
+    "meta": 2,
+    "test": 0
+  },
+  "loader": {
+    "type": "BCL_AUDIT.cifar100lt.data.CIFAR100TrainOnly",
+    "train": true,
+    "substituted": false
+  },
+  "real_batch": {
+    "sha256": "ff2ad26e03868a454c14ff3b6b160e0a0eeb9f8b74615b4df89c9dac9dac99c2",
+    "label_classes": 68,
+    "shapes": [
+      [
+        256,
+        3,
+        32,
+        32
+      ],
+      [
+        256,
+        3,
+        32,
+        32
+      ],
+      [
+        256,
+        3,
+        32,
+        32
+      ]
+    ],
+    "dtype": "torch.float32",
+    "loader_seconds": 0.41249190000235103
+  },
+  "conclusion": "READY FOR FULL PILOT"
+}
