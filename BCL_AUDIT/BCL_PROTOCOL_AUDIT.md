@@ -66,9 +66,26 @@ In the released BCL training loop, the three views are concatenated along the ba
 
 `inputs = cat([v1, v2, v3], dim=0)`
 
-The shared backbone (and any BatchNorm layers it contains) therefore computes batch statistics over the concatenated (v_1,v_2,v_3) distributions. The classification logits are taken from the first (B) outputs; the contrastive embeddings are taken from the (v_2,v_3) chunks.
+The shared backbone therefore computes its BatchNorm2d statistics over the concatenated
+(v_1,v_2,v_3) distributions. The classification logits are taken from the first
+B outputs; the contrastive embeddings are taken from the (v_2,v_3) chunks.
 
-The first LC-only pilot intentionally uses only (v_1), as agreed. This means the two groups have different BatchNorm input distributions. **Record this as a known comparison caveat; do not silently “correct” it or add another group in Stage -1.** A future BN-matched control may be considered only after the first paired pilot is complete.
+There is a second, easy-to-miss coupling point: the released sample projection head
+is also applied to the full 3B feature tensor before the code selects the
+(v_2,v_3) projected outputs. That head contains BatchNorm1d. Its batch statistics
+therefore also mix v_1,v_2,v_3.
+
+Consequently, although the BCL objective directly consumes only the (v_2,v_3)
+projection outputs, in train mode its gradients can flow indirectly to v_1
+backbone features through cross-view BatchNorm statistics (in both the backbone
+and sample projection head). This is a view-level gradient coupling, not a third
+shared trainable-parameter conflict site.
+
+The first LC-only pilot intentionally uses only v_1, as agreed. This means
+the two groups have different BatchNorm input distributions and different
+train-mode cross-view coupling. **Record this as a known comparison caveat; do not
+silently “correct” it or add another group in Stage -1.** A future BN-matched
+control may be considered only after the first paired pilot is complete.
 
 ### 3.3 Shared-gradient targets and branch-specific modules
 
@@ -83,14 +100,25 @@ The parameters shared by both losses are:
 1. **Backbone parameters** (\theta)
 2. **Classifier weights** (W), because BCL reaches (W) through the prototype MLP
 
-The sample projection MLP and prototype MLP receive BCL gradients only. The prototype MLP is a gradient-transformation path from BCL through its Jacobian to (W), not a third cross-branch conflict site.
+The sample projection MLP and prototype MLP receive BCL gradients only. The
+prototype MLP is a gradient-transformation path from BCL through its Jacobian to
+(W), not a third cross-branch conflict site. The sample MLP's BatchNorm1d does,
+however, couple the three views in train mode; BCL gradients can reach the
+v_1 feature rows through those batch statistics even though only v_2,v_3
+projected outputs enter the BCL loss.
 
 When the offline gradient probe is implemented later, observe only:
 
 - parameter-level: (\nabla_{W_y}\mathcal L_{LC}) versus (\nabla_{W_y}\mathcal L_{BCL})
 - representation-level: (\nabla_{f(x)}\mathcal L_{LC}) versus (\nabla_{f(x)}\mathcal L_{BCL})
 
-For the representation-level comparison, feed the **same fixed probe image/view** through both loss paths. Do not compare gradients at different augmented views and call that a same-point gradient conflict. Do not run these probes in Stage -1.
+For the representation-level comparison, feed the **same fixed probe image/view**
+through both loss paths. Also state explicitly whether the probe runs in eval mode
+(frozen BN running statistics, no cross-example BN gradient coupling) or train mode
+(full 3-view batch context, including the indirect BCL-to-v1 gradient described
+above). These answer different questions and must not be mixed. Do not compare
+gradients at different augmented views and call that a same-point gradient conflict.
+Do not run these probes in Stage -1.
 
 ### 3.4 Classifier-head qualification: do not copy the ImageNet scale into CIFAR
 
