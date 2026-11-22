@@ -14,6 +14,14 @@ Required packages:
 
 The first pilot is intentionally FP32. Do not enable AMP or gradient accumulation.
 
+## Strict TRAIN-only data access
+
+The training and offline-probe paths use `CIFAR100TrainOnly`. Do not replace
+it with stock `torchvision.datasets.CIFAR100(train=True)`: torchvision 0.29.1
+checks both train and test file integrity even for `train=True`. The static
+topology/DINO audit reads only the original TRAIN and meta pickle files.
+The balanced test dataset is instantiated only after both training runs.
+
 ## Run the one-seed paired pilot
 
 First run the static data audit so the exact IF=100 indices are written:
