@@ -3,9 +3,12 @@ import torch
 import torch.nn.functional as F
 
 from BCL_AUDIT.cifar100lt.data import (
+    CIFAR100LT,
     cifar100lt_class_counts,
     make_cifar100lt_indices,
 )
+from BCL_AUDIT.cifar100lt.train import BatchNormAudit
+from BCL_AUDIT.scripts.analyze_paired_bcl import summarize_did
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
 
@@ -122,3 +125,95 @@ def test_gradient_routes_match_the_declared_computation_graph():
     # Train-mode BatchNorm2d / BatchNorm1d couple all three views. Although
     # BCL directly uses z2/z3, its gradient can reach the v1 input rows.
     assert bcl_grads[0][:batch_size].abs().sum() > 0
+
+
+
+def test_lc_only_and_bcl_share_three_view_dataset_contract():
+    for mode in ("lc", "bcl"):
+        dataset = CIFAR100LT.__new__(CIFAR100LT)
+        dataset.mode = mode
+        dataset.indices = np.asarray([0], dtype=np.int64)
+        dataset.data = np.zeros((1, 32, 32, 3), dtype=np.uint8)
+        dataset.targets = np.asarray([7], dtype=np.int64)
+        dataset.transform_v1 = lambda image: torch.zeros(3, 32, 32)
+        dataset.transform_sim = lambda image: torch.ones(3, 32, 32)
+
+        views, label = dataset[0]
+        assert len(views) == 3
+        assert views[0].shape == (3, 32, 32)
+        assert views[1].shape == (3, 32, 32)
+        assert views[2].shape == (3, 32, 32)
+        assert label == 7
+
+
+def test_batchnorm_audit_captures_backbone_and_bcl_sample_projection_views():
+    model = BCLCIFARModel()
+    audit = BatchNormAudit(model)
+    audit.arm()
+    images = torch.randn(6, 3, 32, 32)  # three views, two examples per view
+    with torch.no_grad():
+        model(images, compute_contrastive=True)
+    audit.finish_batch()
+    record = audit.snapshot("BCL", 40)
+    audit.close()
+
+    first_batch = record["first_minibatch_per_view_input_stats"]
+    assert "backbone.bn1" in first_batch
+    assert "sample_mlp.net.1" in first_batch
+    assert set(first_batch["backbone.bn1"]["views"]) == {"v1", "v2", "v3"}
+    assert set(first_batch["sample_mlp.net.1"]["views"]) == {"v1", "v2", "v3"}
+
+
+def test_head_tail_did_is_paired_and_direction_specific():
+    effects = [
+        {
+            "direction": "Head_to_Tail",
+            "same_superclass": True,
+            "dino_topk_union": True,
+            "delta_confusion_BCL_minus_LC": 0.20,
+            "delta_raw_margin_BCL_minus_LC": -0.10,
+            "delta_adjusted_margin_BCL_minus_LC": -0.08,
+        },
+        {
+            "direction": "Head_to_Tail",
+            "same_superclass": False,
+            "dino_topk_union": False,
+            "delta_confusion_BCL_minus_LC": 0.05,
+            "delta_raw_margin_BCL_minus_LC": -0.02,
+            "delta_adjusted_margin_BCL_minus_LC": -0.01,
+        },
+        {
+            "direction": "Tail_to_Head",
+            "same_superclass": True,
+            "dino_topk_union": False,
+            "delta_confusion_BCL_minus_LC": 0.12,
+            "delta_raw_margin_BCL_minus_LC": -0.04,
+            "delta_adjusted_margin_BCL_minus_LC": -0.03,
+        },
+        {
+            "direction": "Tail_to_Head",
+            "same_superclass": False,
+            "dino_topk_union": True,
+            "delta_confusion_BCL_minus_LC": 0.02,
+            "delta_raw_margin_BCL_minus_LC": 0.01,
+            "delta_adjusted_margin_BCL_minus_LC": 0.02,
+        },
+    ]
+    rows = summarize_did(effects)
+    head_row = next(
+        row for row in rows
+        if row["relation"] == "same_superclass"
+        and row["direction"] == "Head_to_Tail"
+        and row["metric"] == "delta_confusion_BCL_minus_LC"
+        and row["slice"] == "SameSuperclass"
+    )
+    assert abs(head_row["DID_positive_minus_negative"] - 0.15) < 1e-12
+
+    tail_row = next(
+        row for row in rows
+        if row["relation"] == "same_superclass"
+        and row["direction"] == "Tail_to_Head"
+        and row["metric"] == "delta_confusion_BCL_minus_LC"
+        and row["slice"] == "SameSuperclass"
+    )
+    assert abs(tail_row["DID_positive_minus_negative"] - 0.10) < 1e-12
