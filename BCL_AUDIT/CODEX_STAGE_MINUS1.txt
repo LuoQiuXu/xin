@@ -274,9 +274,13 @@ Before the two 200-epoch runs, run small non-training tests:
 7. A single optimizer step works in FP32.
 8. Checkpoint save/reload round trip works.
 9. A single training batch fits GPU memory at batch size 256.
+10. In train mode, verify that BCL can send gradients to the v1 input rows through
+    the backbone / sample-head BatchNorm coupling, even though the BCL objective
+    directly consumes only z2 and z3.
 
-These are implementation tests, not the scientific gradient-conflict probe. Do not
-aggregate them into a claim that a gradient conflict exists.
+These are implementation / computation-graph tests, not the scientific
+gradient-conflict probe. Do not aggregate them into a claim that a gradient
+conflict exists.
 
 G. FINAL TEST EVALUATION
 ------------------------
