@@ -34,17 +34,18 @@ A. REPOSITORY / BRANCH SAFETY
 
 B. IMPLEMENT THE CIFAR-100 BCL PORT
 -----------------------------------
-Create a small, standalone package under BCL_AUDIT/cifar100lt/ with at least:
+A first standalone package has already been committed under BCL_AUDIT/cifar100lt/.
+Review these files before editing:
   - data.py
   - models.py
   - losses.py
   - train.py
-  - evaluate.py (or a clearly separated final-evaluation function)
   - tests/test_bcl_smoke.py
-  - a concise README with exact run commands
+  - README.md
 
-Do not pull in the old H2T code or make the BCL experiment depend on unrelated
-project modules.
+Validate and complete this implementation; do not overwrite it blindly. Add or
+repair files only where needed. Do not pull in the old H2T code or make the BCL
+experiment depend on unrelated project modules.
 
 B1. CIFAR-100-LT split
 - Load the original CIFAR-100 training split only for constructing the LT train set.
@@ -224,16 +225,11 @@ E. DATA TOPOLOGY AUDIT
 Run the committed script:
   BCL_AUDIT/scripts/audit_cifar100lt_topology.py
 
-First static pass:
-  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py
-    --data-root "<actual CIFAR data root>"
-    --output-dir "BCL_AUDIT/outputs/data_audit"
+First static pass (one command):
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR data root>" --output-dir "BCL_AUDIT/outputs/data_audit"
 
-Then DINOv2 pass:
-  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py
-    --data-root "<actual CIFAR data root>"
-    --output-dir "BCL_AUDIT/outputs/data_audit"
-    --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
+Then DINOv2 pass (one command):
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR data root>" --output-dir "BCL_AUDIT/outputs/data_audit" --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 
 The script must load only the original balanced CIFAR-100 training split. It must
 not instantiate/read CIFAR100(train=False). DINO input is Bicubic 224x224 with
