@@ -1,9 +1,13 @@
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn.functional as F
 
+from BCL_AUDIT.cifar100lt import data as data_module
 from BCL_AUDIT.cifar100lt.data import (
     CIFAR100LT,
+    CIFAR100TrainOnly,
     cifar100lt_class_counts,
     make_cifar100lt_indices,
 )
@@ -11,6 +15,24 @@ from BCL_AUDIT.cifar100lt.train import BatchNormAudit
 from BCL_AUDIT.scripts.analyze_paired_bcl import summarize_did
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
+
+
+def test_cifar100_train_only_integrity_never_checks_test_files(monkeypatch, tmp_path):
+    loader = CIFAR100TrainOnly.__new__(CIFAR100TrainOnly)
+    loader.root = str(tmp_path)
+    loader.base_folder = "cifar-100-python"
+    loader.train_list = [("train", "train-md5")]
+    loader.test_list = [("test", "test-md5")]
+
+    checked_files = []
+
+    def fake_check_integrity(path, md5):
+        checked_files.append(Path(path).name)
+        return True
+
+    monkeypatch.setattr(data_module, "check_integrity", fake_check_integrity)
+    assert loader._check_integrity() is True
+    assert checked_files == ["train"]
 
 
 def test_if100_count_vector_and_indices():
