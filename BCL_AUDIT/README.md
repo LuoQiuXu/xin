@@ -41,7 +41,11 @@ python BCL_AUDIT/scripts/audit_cifar100lt_topology.py `
   --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 ```
 
-The script loads only `CIFAR100(train=True)`; it does not instantiate the test
+The topology script reads and checksum-validates only the original TRAIN and
+meta pickle files. Do not use stock `CIFAR100(train=True)` for this audit:
+torchvision 0.29.1 checks both train and test file integrity even when
+`train=True`. The DINO path receives only the TRAIN images. The test split is
+not instantiated or read during topology construction.
 dataset. DINOv2 uses Bicubic resize to 224x224 and ImageNet normalization. The
 default model is ViT-S/14 to keep extraction practical on an 8 GB GPU.
 
