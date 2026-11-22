@@ -66,9 +66,9 @@ If outputs already exist, do not overwrite them; choose a fresh output directory
 The report must record the exact data_audit_output_dir and the exact saved
 indices_file path so the later Stage -1 task can reuse them without guessing.
 
-Do not run DINOv2 during this preflight unless the data audit succeeds and
-there is enough disk space and network/cache availability. DINO is not needed
-to establish whether the training batch fits.
+Do NOT run DINOv2 during this preflight. DINO extraction belongs to the
+subsequent Stage -1 task, after this updated preflight has passed. DINO is not
+needed to establish whether the training batch fits.
 
 4. EXACT-PROTOCOL GPU MEMORY PREFLIGHT
 --------------------------------------
