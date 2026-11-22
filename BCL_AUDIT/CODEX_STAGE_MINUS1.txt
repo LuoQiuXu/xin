@@ -54,8 +54,10 @@ not invalidate the capacity probe.
 
 When preflight is READY:
 - Reuse its validated data_audit outputs and exact saved IF=100 index file.
+- Use the exact indices_file path recorded by the fresh preflight report; do not assume it is outputs/data_audit if a fresh directory was needed.
 - Do not rerun or overwrite the static audit outputs.
 - Run the DINOv2 topology extraction only if it has not already completed.
+- The DINO invocation must use --reuse-static-audit with the exact data_audit_output_dir recorded by the fresh preflight report; it must not rewrite static audit files.
 - Use a fresh training output root if any paired-run artifacts already exist.
 
 A. BRANCH / REPOSITORY SAFETY
@@ -227,7 +229,7 @@ Run static taxonomy and split audit:
 
 Then run frozen DINOv2:
 
-  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR root>" --output-dir "BCL_AUDIT/outputs/data_audit" --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR root>" --output-dir "<preflight data_audit_output_dir>" --compute-dino --reuse-static-audit --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 
 Rules:
 - The DINO script may load only the original balanced CIFAR-100 TRAIN pickle
@@ -268,7 +270,7 @@ G. ONE MERGED OFFLINE DIAGNOSTIC PASS
 -------------------------------------
 After both final evaluations are saved, run:
 
-  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "BCL_AUDIT/outputs/data_audit/cifar100lt_if100_train_indices_seed0.npy" --output-root "BCL_AUDIT/outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
+  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "<exact indices_file path recorded by fresh preflight report>" --output-root "BCL_AUDIT/outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
 
 This is the merged offline pass; do not create a separate training stage.
 
