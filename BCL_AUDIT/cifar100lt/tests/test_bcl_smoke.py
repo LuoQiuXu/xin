@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import numpy as np
@@ -13,6 +14,7 @@ from BCL_AUDIT.cifar100lt.data import (
 )
 from BCL_AUDIT.cifar100lt.train import BatchNormAudit
 from BCL_AUDIT.scripts.analyze_paired_bcl import summarize_did
+from BCL_AUDIT.scripts.audit_cifar100lt_topology import _load_existing_static_audit
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
 
@@ -33,6 +35,49 @@ def test_cifar100_train_only_integrity_never_checks_test_files(monkeypatch, tmp_
     monkeypatch.setattr(data_module, "check_integrity", fake_check_integrity)
     assert loader._check_integrity() is True
     assert checked_files == ["train"]
+
+
+def test_reuse_static_audit_loads_without_rewriting(tmp_path):
+    counts = cifar100lt_class_counts()
+    selected_indices = np.arange(int(counts.sum()), dtype=np.int64)
+    np.save(tmp_path / "cifar100lt_if100_train_indices_seed0.npy", selected_indices)
+    (tmp_path / "class_counts.csv").write_text("placeholder\\n", encoding="utf-8")
+    (tmp_path / "superclass_counts.csv").write_text("placeholder\\n", encoding="utf-8")
+    pair_path = tmp_path / "head_tail_pair_topology.csv"
+    pair_path.write_text(
+        "head_fine_id,tail_fine_id,head_coarse_id,tail_coarse_id,"
+        "same_superclass,dino_cosine_similarity,dino_topk_union\\n"
+        "0,99,0,19,False,,\\n",
+        encoding="utf-8",
+    )
+    summary = {
+        "source_split": "original balanced CIFAR-100 training split only",
+        "test_split_loaded": False,
+        "split_seed": 0,
+        "imbalance_factor": 0.01,
+        "class_counts": counts.tolist(),
+        "long_tail_train_size": int(counts.sum()),
+        "total_many_few_pairs": 1,
+        "dino_similarity_computed": False,
+    }
+    summary_path = tmp_path / "data_audit_summary.json"
+    summary_path.write_text(json.dumps(summary), encoding="utf-8")
+
+    before = {
+        path.name: path.read_bytes()
+        for path in tmp_path.iterdir()
+    }
+    loaded_summary, pair_rows = _load_existing_static_audit(
+        tmp_path, counts, selected_indices, split_seed=0, imb_factor=0.01
+    )
+    after = {
+        path.name: path.read_bytes()
+        for path in tmp_path.iterdir()
+    }
+
+    assert loaded_summary == summary
+    assert pair_rows[0]["same_superclass"] is False
+    assert before == after
 
 
 def test_if100_count_vector_and_indices():
