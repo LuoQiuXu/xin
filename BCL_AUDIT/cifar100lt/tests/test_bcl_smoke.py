@@ -217,3 +217,77 @@ def test_head_tail_did_is_paired_and_direction_specific():
         and row["slice"] == "SameSuperclass"
     )
     assert abs(tail_row["DID_positive_minus_negative"] - 0.10) < 1e-12
+
+def _official_balscl_reference(
+    class_prototypes: torch.Tensor,
+    two_view_features: torch.Tensor,
+    targets: torch.Tensor,
+    temperature: float = 0.1,
+) -> torch.Tensor:
+    """Numerical reference matching the released BCL BalSCL source formula."""
+    batch_size = int(two_view_features.shape[0])
+    num_classes = int(class_prototypes.shape[0])
+    device = two_view_features.device
+
+    sample_targets = targets.to(device=device, dtype=torch.long).reshape(-1, 1)
+    prototype_targets = torch.arange(num_classes, device=device).reshape(-1, 1)
+    all_targets = torch.cat(
+        [sample_targets.repeat(2, 1), prototype_targets], dim=0
+    ).reshape(-1)
+
+    class_counts_in_batch = torch.zeros(
+        num_classes, device=device, dtype=torch.float32
+    )
+    class_counts_in_batch.scatter_add_(
+        0, all_targets, torch.ones_like(all_targets, dtype=torch.float32)
+    )
+
+    positive_mask = (
+        all_targets[: 2 * batch_size, None] == all_targets[None, :]
+    ).to(dtype=two_view_features.dtype)
+    logits_mask = torch.ones_like(positive_mask)
+    logits_mask.scatter_(
+        1,
+        torch.arange(2 * batch_size, device=device).reshape(-1, 1),
+        0,
+    )
+    positive_mask = positive_mask * logits_mask
+
+    sample_features = torch.cat(
+        [two_view_features[:, 0], two_view_features[:, 1]], dim=0
+    )
+    all_features = torch.cat(
+        [sample_features, class_prototypes.to(device=device, dtype=two_view_features.dtype)],
+        dim=0,
+    )
+    logits = all_features[: 2 * batch_size] @ all_features.T
+    logits = logits / temperature
+    logits = logits - logits.max(dim=1, keepdim=True).values.detach()
+
+    exp_logits = torch.exp(logits) * logits_mask
+    per_entry_weight = class_counts_in_batch[all_targets].to(
+        dtype=two_view_features.dtype
+    ).reshape(1, -1).expand_as(exp_logits) - positive_mask
+    denominator = (exp_logits / per_entry_weight).sum(dim=1, keepdim=True)
+    log_prob = logits - torch.log(denominator)
+    mean_log_prob_positive = (
+        positive_mask * log_prob
+    ).sum(dim=1) / positive_mask.sum(dim=1)
+    return -mean_log_prob_positive.reshape(2, batch_size).mean()
+
+
+def test_bcl_loss_matches_released_official_balscl_formula():
+    torch.manual_seed(20261122)
+    counts = cifar100lt_class_counts()
+    criterion = BalancedContrastiveLoss(counts, temperature=0.1)
+
+    features = F.normalize(torch.randn(9, 2, 128), dim=-1)
+    prototypes = F.normalize(torch.randn(100, 128), dim=-1)
+    targets = torch.tensor([0, 0, 1, 2, 2, 4, 7, 9, 9], dtype=torch.long)
+
+    actual = criterion(prototypes, features, targets)
+    reference = _official_balscl_reference(
+        prototypes, features, targets, temperature=0.1
+    )
+    assert torch.allclose(actual, reference, atol=1e-6, rtol=1e-6)
+
