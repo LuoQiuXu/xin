@@ -48,5 +48,5 @@ Do not commit dataset files, checkpoints, logs, or generated arrays to GitHub. K
 - The first training comparison is only LC-only versus BCL, one seed, 200 epochs.
 - Do not start the 400-epoch run or multi-seed experiments yet.
 - Do not add a new method or gradient-conflict probe in Stage -1.
-- Keep the 3-view BatchNorm caveat explicit: BCL concatenates all three views before the shared backbone forward; LC-only uses one view in this first pilot.
+- Keep the 3-view BatchNorm caveat explicit: BCL concatenates all three views before the shared backbone and sample-projection MLP; both BatchNorm2d and BatchNorm1d mix views. LC-only uses one view in this first pilot.
 - Use the same fixed IF=100 training subset and pilot seed for both groups.
