@@ -184,7 +184,9 @@ The audited port therefore uses these strict paths:
   separate metadata validation still checks the CIFAR-100 meta file.
 - Static taxonomy / DINO audit: directly reads and checksum-validates only the
   original `train` and `meta` pickle files; it does not instantiate a
-  torchvision CIFAR dataset.
+  torchvision CIFAR dataset. When adding DINO after the static audit, use
+  `--reuse-static-audit`; the script validates and reuses the saved index and
+  pair table rather than rewriting the static audit outputs.
 - Final benchmark: `CIFAR100(train=False)` is permitted only after both
   200-epoch training runs have completed.
 
