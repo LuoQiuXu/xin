@@ -56,6 +56,53 @@ def parse_bool(value: Any) -> bool:
     return str(value).strip().lower() in {"true", "1", "yes", "y"}
 
 
+def _pair_assignments(
+    rows: list[dict[str, str]], path: Path
+) -> dict[tuple[int, int], tuple[int, int, bool]]:
+    assignments = {}
+    for row_number, row in enumerate(rows, start=2):
+        try:
+            identity = (int(row["head_fine_id"]), int(row["tail_fine_id"]))
+            relation = str(row["same_superclass"]).strip().lower()
+            if relation not in {"true", "false", "1", "0", "yes", "no", "y", "n"}:
+                raise ValueError("Missing or invalid same_superclass flag")
+            assignment = (
+                int(row["head_coarse_id"]),
+                int(row["tail_coarse_id"]),
+                parse_bool(relation),
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise RuntimeError(
+                f"Invalid pair identity or superclass assignment in {path.name}, row {row_number}"
+            ) from exc
+        if identity in assignments:
+            raise RuntimeError(f"Duplicate pair identity {identity} in {path.name}")
+        assignments[identity] = assignment
+    return assignments
+
+
+def load_pair_topology(data_audit_dir: Path) -> list[dict[str, str]]:
+    static_path = data_audit_dir / "head_tail_pair_topology.csv"
+    static_rows = read_csv(static_path)
+    if not static_rows:
+        raise RuntimeError("head_tail_pair_topology.csv is empty; run the static topology audit first")
+
+    dino_path = data_audit_dir / "head_tail_pair_topology_dino.csv"
+    if not (dino_path.exists() or dino_path.is_symlink()):
+        return static_rows
+
+    dino_rows = read_csv(dino_path)
+    if len(dino_rows) != len(static_rows):
+        raise RuntimeError("DINO sidecar row count differs from the static pair table")
+    static = _pair_assignments(static_rows, static_path)
+    dino = _pair_assignments(dino_rows, dino_path)
+    if dino.keys() != static.keys():
+        raise RuntimeError("DINO sidecar pair identities differ from the static pair table")
+    if dino != static:
+        raise RuntimeError("DINO sidecar superclass assignments differ from the static pair table")
+    return dino_rows
+
+
 def load_or_create_probe_cache(
     data_root: Path,
     indices_file: Path,
@@ -318,8 +365,10 @@ def compute_pair_effects(
         head_id = int(pair["head_fine_id"])
         tail_id = int(pair["tail_fine_id"])
         same_superclass = parse_bool(pair["same_superclass"])
-        dino_value = pair.get("dino_topk_union", "")
-        dino_near = parse_bool(dino_value) if str(dino_value).strip() else None
+        dino_value = pair.get("dino_topk_union")
+        dino_near = None
+        if dino_value is not None and str(dino_value).strip():
+            dino_near = parse_bool(dino_value)
 
         for direction, source_id, target_id in (
             ("Head_to_Tail", head_id, tail_id),
@@ -379,12 +428,13 @@ def summarize_did(effects: list[dict[str, Any]]):
         "delta_adjusted_margin_BCL_minus_LC",
     ]
     for relation_key, positive_label, negative_label in relation_specs:
-        if relation_key == "dino_topk_union" and not any(
-            row[relation_key] != "" for row in effects
-        ):
-            continue
+        relation_rows = effects
+        if relation_key == "dino_topk_union":
+            relation_rows = [row for row in effects if row[relation_key] != ""]
+            if not relation_rows:
+                continue
         for direction in ("Head_to_Tail", "Tail_to_Head"):
-            directional = [row for row in effects if row["direction"] == direction]
+            directional = [row for row in relation_rows if row["direction"] == direction]
             positive = [
                 row for row in directional if parse_bool(row[relation_key])
             ]
@@ -468,9 +518,7 @@ def main():
     if set(class_meta) != set(range(100)):
         raise RuntimeError("class_counts.csv must contain all official fine IDs 0..99")
 
-    pair_rows = read_csv(data_audit_dir / "head_tail_pair_topology.csv")
-    if not pair_rows:
-        raise RuntimeError("head_tail_pair_topology.csv is empty; run the static topology audit first")
+    pair_rows = load_pair_topology(data_audit_dir)
 
     probe_cache_path = output_root / "offline_probe" / (
         f"balanced_lt_probe_{args.probe_per_class}perclass_seed{args.probe_seed}.pt"

@@ -31,6 +31,15 @@ import numpy as np
 from PIL import Image
 
 
+_DINO_OUTPUTS = (
+    "DINO_CLASS_MEAN_FEATURES.npy",
+    "DINO_CLASS_SIMILARITY.npy",
+    "dino_metadata.json",
+    "head_tail_pair_topology_dino.csv",
+    "data_audit_dino_summary.json",
+)
+
+
 def _pickle_value(obj: dict, key: str):
     if key in obj:
         return obj[key]
@@ -158,7 +167,7 @@ def _shot_group(n: int) -> str:
 
 def _write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]):
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8-sig") as f:
+    with path.open("x", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
@@ -270,7 +279,8 @@ def _write_static_audit(
         ],
     )
 
-    np.save(out_dir / f"cifar100lt_if100_train_indices_seed{split_seed}.npy", selected_indices)
+    with (out_dir / f"cifar100lt_if100_train_indices_seed{split_seed}.npy").open("xb") as f:
+        np.save(f, selected_indices)
     summary = {
         "dataset": "CIFAR-100",
         "source_split": "original balanced CIFAR-100 training split only",
@@ -296,7 +306,7 @@ def _write_static_audit(
         "total_many_few_pairs": same_coarse_count + cross_coarse_count,
         "dino_similarity_computed": False,
     }
-    with (out_dir / "data_audit_summary.json").open("w", encoding="utf-8") as f:
+    with (out_dir / "data_audit_summary.json").open("x", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
     return summary, pair_rows
 
@@ -394,7 +404,6 @@ class _DinoCIFARTrainDataset:
 def _compute_dino_similarity(
     images: np.ndarray,
     labels: np.ndarray,
-    out_dir: Path,
     model_name: str,
     batch_size: int,
     num_workers: int,
@@ -467,8 +476,6 @@ def _compute_dino_similarity(
 
     class_means_np = class_means.detach().cpu().numpy()
     similarity_np = similarity.detach().cpu().numpy()
-    np.save(out_dir / "DINO_CLASS_MEAN_FEATURES.npy", class_means_np)
-    np.save(out_dir / "DINO_CLASS_SIMILARITY.npy", similarity_np)
 
     # Symmetric-union Top-K: pair (i,j) is near if j is in i's Top-K OR i is in j's Top-K.
     near_pairs = set()
@@ -519,17 +526,21 @@ def _compute_dino_similarity(
         "elapsed_seconds": dino_seconds,
         "peak_cuda_memory_bytes": peak_memory,
     }
-    with (out_dir / "dino_metadata.json").open("w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2, ensure_ascii=False)
-    return similarity_np, near_pairs, metadata
+    return class_means_np, similarity_np, near_pairs, metadata
 
 
-def _update_pair_csv_with_dino(
+def _write_dino_outputs(
     out_dir: Path,
+    summary: dict[str, Any],
     pair_rows: list[dict[str, Any]],
+    class_means: np.ndarray,
     similarity: np.ndarray,
     near_pairs: set[tuple[int, int]],
+    metadata: dict[str, Any],
 ):
+    if not pair_rows:
+        raise RuntimeError("Cannot enrich an empty static Many–Few pair table")
+
     updated = []
     for row in pair_rows:
         head_id = int(row["head_fine_id"])
@@ -539,46 +550,43 @@ def _update_pair_csv_with_dino(
         new_row["dino_cosine_similarity"] = f"{float(similarity[head_id, tail_id]):.8f}"
         new_row["dino_topk_union"] = key in near_pairs
         updated.append(new_row)
-    _write_csv(
-        out_dir / "head_tail_pair_topology.csv",
-        updated,
-        [
-            "head_fine_id",
-            "head_fine_name",
-            "tail_fine_id",
-            "tail_fine_name",
-            "head_coarse_id",
-            "tail_coarse_id",
-            "same_superclass",
-            "dino_cosine_similarity",
-            "dino_topk_union",
-        ],
+    near = sum(row["dino_topk_union"] for row in updated)
+    near_within = sum(
+        row["dino_topk_union"] for row in updated if row["same_superclass"]
     )
+    dino_summary = {
+        **summary,
+        "dino_enrichment_completed": True,
+        "dino_topk_union_many_few_pairs": near,
+        "dino_topk_union_within_superclass_many_few_pairs": near_within,
+        "dino_topk_union_cross_superclass_many_few_pairs": near - near_within,
+    }
 
-    summary_path = out_dir / "data_audit_summary.json"
-    with summary_path.open("r", encoding="utf-8") as f:
-        summary = json.load(f)
-    summary["dino_similarity_computed"] = True
-    summary["dino_topk_union_many_few_pairs"] = int(
-        sum(tuple(sorted((int(r["head_fine_id"]), int(r["tail_fine_id"])))) in near_pairs
-            for r in updated)
+    with (out_dir / "DINO_CLASS_MEAN_FEATURES.npy").open("xb") as f:
+        np.save(f, class_means)
+    with (out_dir / "DINO_CLASS_SIMILARITY.npy").open("xb") as f:
+        np.save(f, similarity)
+    with (out_dir / "dino_metadata.json").open("x", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+    _write_csv(out_dir / "head_tail_pair_topology_dino.csv", updated, list(updated[0]))
+    # Write the completion summary after the other DINO outputs.
+    with (out_dir / "data_audit_dino_summary.json").open("x", encoding="utf-8") as f:
+        json.dump(dino_summary, f, indent=2, ensure_ascii=False)
+
+
+def _dino_outputs_complete(out_dir: Path) -> bool:
+    paths = [out_dir / name for name in _DINO_OUTPUTS]
+    if not any(path.exists() or path.is_symlink() for path in paths):
+        return False
+    if all(path.is_file() and path.stat().st_size > 0 for path in paths):
+        with (out_dir / "data_audit_dino_summary.json").open(encoding="utf-8") as f:
+            summary = json.load(f)
+        if isinstance(summary, dict) and summary.get("dino_enrichment_completed") is True:
+            return True
+    raise FileExistsError(
+        "DINOv2 outputs are partial or inconsistent. Refusing to overwrite existing files in "
+        f"{out_dir}"
     )
-    summary["dino_topk_union_within_superclass_many_few_pairs"] = int(
-        sum(
-            tuple(sorted((int(r["head_fine_id"]), int(r["tail_fine_id"])))) in near_pairs
-            for r in updated
-            if bool(r["same_superclass"])
-        )
-    )
-    summary["dino_topk_union_cross_superclass_many_few_pairs"] = int(
-        sum(
-            tuple(sorted((int(r["head_fine_id"]), int(r["tail_fine_id"])))) in near_pairs
-            for r in updated
-            if not bool(r["same_superclass"])
-        )
-    )
-    with summary_path.open("w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2, ensure_ascii=False)
 
 
 def main():
@@ -599,9 +607,12 @@ def main():
         parser.error("This Stage -1 audit is fixed to CIFAR-100-LT IF=100 (--imb-factor 0.01)")
     if not (1 <= args.topk < 100):
         parser.error("--topk must be in [1, 99]")
+    if args.reuse_static_audit and not args.compute_dino:
+        parser.error("--reuse-static-audit requires --compute-dino")
 
     out_dir = args.output_dir.expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    dino_complete = args.compute_dino and _dino_outputs_complete(out_dir)
     data_root = args.data_root.expanduser().resolve()
 
     images, fine, coarse, fine_names, coarse_names, fine_to_coarse = _load_original_train(
@@ -610,9 +621,6 @@ def main():
     counts, selected_indices = _make_long_tail_indices(
         fine, args.imb_factor, args.split_seed
     )
-
-    if args.reuse_static_audit and not args.compute_dino:
-        parser.error("--reuse-static-audit requires --compute-dino")
 
     if args.reuse_static_audit:
         summary, pair_rows = _load_existing_static_audit(
@@ -668,30 +676,22 @@ def main():
     print(f"  outputs: {out_dir}")
 
     if args.compute_dino:
-        dino_paths = [
-            out_dir / "DINO_CLASS_MEAN_FEATURES.npy",
-            out_dir / "DINO_CLASS_SIMILARITY.npy",
-            out_dir / "dino_metadata.json",
-        ]
-        existing_dino = [path.exists() for path in dino_paths]
-        if all(existing_dino) and bool(summary.get("dino_similarity_computed")):
+        if dino_complete:
             print("DINOv2 outputs already complete; skipping without overwriting")
-        elif any(existing_dino) or bool(summary.get("dino_similarity_computed")):
-            raise FileExistsError(
-                "DINOv2 outputs are partial or inconsistent. Refusing to overwrite; "
-                "inspect the existing output directory or choose a fresh one."
-            )
         else:
-            similarity, near_pairs, metadata = _compute_dino_similarity(
+            if summary.get("dino_similarity_computed") is True:
+                raise FileExistsError("The static audit already reports DINO results. Inspect its outputs.")
+            class_means, similarity, near_pairs, metadata = _compute_dino_similarity(
                 images=images,
                 labels=fine,
-                out_dir=out_dir,
                 model_name=args.dino_model,
                 batch_size=args.dino_batch_size,
                 num_workers=args.num_workers,
                 topk=args.topk,
             )
-            _update_pair_csv_with_dino(out_dir, pair_rows, similarity, near_pairs)
+            _write_dino_outputs(
+                out_dir, summary, pair_rows, class_means, similarity, near_pairs, metadata
+            )
             print(
                 f"DINOv2 completed: {metadata['model']}, "
                 f"elapsed={metadata['elapsed_seconds']:.1f}s, "

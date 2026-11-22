@@ -30,6 +30,17 @@ First run the static data audit so the exact IF=100 indices are written:
 python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "D:\datasets\cifar100" --output-dir "BCL_AUDIT\outputs\data_audit"
 \`\`\`
 
+The DINO pass uses `--compute-dino --reuse-static-audit` with the exact audit
+directory from preflight. It keeps `class_counts.csv`, `superclass_counts.csv`,
+`head_tail_pair_topology.csv`, `data_audit_summary.json`, and
+`cifar100lt_if100_train_indices_seed0.npy` byte-identical. It saves
+`head_tail_pair_topology_dino.csv`, `data_audit_dino_summary.json`,
+`DINO_CLASS_MEAN_FEATURES.npy`, `DINO_CLASS_SIMILARITY.npy`, and
+`dino_metadata.json` separately. A partial set of DINO outputs stops the run.
+Offline analysis prefers the DINO pair sidecar after checking it against the
+original pair table and falls back to the original table when the sidecar is
+absent. The DINO analysis requires recorded DINO relations.
+
 Then run the two training groups sequentially. The test split is instantiated only
 after both 200-epoch training runs have completed:
 

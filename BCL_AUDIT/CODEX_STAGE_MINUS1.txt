@@ -57,7 +57,9 @@ When preflight is READY:
 - Use the exact indices_file path recorded by the fresh preflight report; do not assume it is outputs/data_audit if a fresh directory was needed.
 - Do not rerun or overwrite the static audit outputs.
 - Run the DINOv2 topology extraction only if it has not already completed.
-- The DINO invocation must use --reuse-static-audit with the exact data_audit_output_dir recorded by the fresh preflight report; it must not rewrite static audit files.
+- Use --reuse-static-audit with the exact data_audit_output_dir recorded by
+  preflight. The static audit files remain byte-identical and the DINO pass
+  writes separate derived files.
 - Use a fresh training output root if any paired-run artifacts already exist.
 
 A. BRANCH / REPOSITORY SAFETY
@@ -239,6 +241,13 @@ Rules:
 - DINO: Bicubic resize 224x224, ImageNet normalization, normalized CLS features,
   class mean then L2 normalization, cosine similarity.
 - Save model/checkpoint provenance and SHA-256 where available.
+- Keep class_counts.csv, superclass_counts.csv, head_tail_pair_topology.csv,
+  data_audit_summary.json, and cifar100lt_if100_train_indices_seed0.npy immutable.
+- Write DINO outputs to head_tail_pair_topology_dino.csv,
+  data_audit_dino_summary.json, DINO_CLASS_MEAN_FEATURES.npy,
+  DINO_CLASS_SIMILARITY.npy, and dino_metadata.json. The summary sidecar copies
+  the static fields and adds DINO counts and dino_enrichment_completed.
+  Skip a complete set of DINO outputs. Stop if any are present but incomplete.
 - Report all Many/Medium/Few class counts, superclass distribution, full
   Head-Few pair list, within-superclass and cross-superclass pair counts.
 - DINO Top-K uses the symmetric-union rule and is a separate exogenous relation.
@@ -270,7 +279,7 @@ G. ONE MERGED OFFLINE DIAGNOSTIC PASS
 -------------------------------------
 After both final evaluations are saved, run:
 
-  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "<exact indices_file path recorded by fresh preflight report>" --output-root "BCL_AUDIT/outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
+  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "<exact indices_file path recorded by fresh preflight report>" --data-audit-dir "<preflight data_audit_output_dir>" --output-root "BCL_AUDIT/outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
 
 This is the merged offline pass; do not create a separate training stage.
 
@@ -310,7 +319,10 @@ G4. Head-Tail directional confusion / paired DID
     DID = E[Delta C | SameSuperclass]
           - E[Delta C | DifferentSuperclass]
 - Also report pairwise raw-logit and adjusted-logit margins.
-- If DINO Top-K union is present, report it as a separate relation slice.
+- Prefer head_tail_pair_topology_dino.csv when present. Require identical row
+  counts, pair identities, and superclass assignments in the original table.
+  Fall back to head_tail_pair_topology.csv when the sidecar is absent.
+- Report DINO Top-K union as a separate relation slice when it is recorded.
 - Report pair counts. One-seed DID is descriptive, not seed-level significance.
 
 H. ORACLE GATE — DO NOT RUN NOW

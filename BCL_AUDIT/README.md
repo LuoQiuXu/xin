@@ -50,6 +50,11 @@ resize to 224x224 and ImageNet normalization. If preflight used a fresh output
 directory, replace the example path with its recorded data_audit_output_dir.
 The default model is ViT-S/14 to keep extraction practical on an 8 GB GPU.
 
+`--reuse-static-audit` validates the five original static artifacts listed below
+and leaves them byte-identical. The DINO pass writes its pair table, summary,
+arrays, and metadata separately. It skips a complete set of DINO outputs and
+stops if it finds a partial set.
+
 ## Mandatory GPU capacity preflight — run this first
 
 Before any 200-epoch training, give Codex the instructions in
@@ -87,15 +92,18 @@ Checkpoints include model/optimizer/RNG state at epochs 40, 100, 160-pre-decay,
 After both training runs and their final epoch-200 test evaluation complete:
 
 ```powershell
-python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\datasets\cifar100" --indices-file "BCL_AUDIT\outputs\data_audit\cifar100lt_if100_train_indices_seed0.npy" --output-root "BCL_AUDIT\outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
+python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\datasets\cifar100" --indices-file "BCL_AUDIT\outputs\data_audit\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "BCL_AUDIT\outputs\data_audit" --output-root "BCL_AUDIT\outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
 ```
 
 This creates one fixed five-per-class probe set from the selected LT training
 subset. It reports margins at all five checkpoints; gradients at classifier
 rows W_y and the same probe feature f(x) on BCL checkpoints; and paired
 Head->Tail / Tail->Head confusion and DID from the saved final benchmark
-predictions. The DINO relation is reported separately from the exogenous
-CIFAR-100 coarse-superclass relation.
+predictions. Point `--data-audit-dir` to the directory recorded by preflight.
+Analysis prefers `head_tail_pair_topology_dino.csv` after checking its row
+count, pair identities, and superclass assignments against the original
+table. With only the original table, the analyzer uses its available
+relations. The DINO relation is reported separately when DINO values exist.
 
 The first run is one-seed reconnaissance only. The script writes
 `stage_gate.json` and does not run any Oracle. Do not proceed to an Oracle
@@ -106,7 +114,13 @@ until the mechanism evidence is coherent and repeatable across paired seeds.
 - `outputs/data_audit/class_counts.csv`
 - `outputs/data_audit/superclass_counts.csv`
 - `outputs/data_audit/head_tail_pair_topology.csv`
-- `outputs/data_audit/DINO_CLASS_SIMILARITY.npy` (after DINO pass)
+- `outputs/data_audit/data_audit_summary.json`
+- `outputs/data_audit/cifar100lt_if100_train_indices_seed0.npy`
+- `outputs/data_audit/head_tail_pair_topology_dino.csv`
+- `outputs/data_audit/data_audit_dino_summary.json`
+- `outputs/data_audit/DINO_CLASS_MEAN_FEATURES.npy`
+- `outputs/data_audit/DINO_CLASS_SIMILARITY.npy`
+- `outputs/data_audit/dino_metadata.json`
 - `outputs/environment.json`
 - `outputs/LC_only_seed42/` and `outputs/BCL_seed42/`
 - `outputs/*_seed42/batchnorm_audit.jsonl`
