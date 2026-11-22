@@ -202,6 +202,12 @@ def _save_checkpoint(
             "seed": seed,
             "model_state": model.state_dict(),
             "optimizer_state": optimizer.state_dict(),
+            "rng_state": {
+                "python": random.getstate(),
+                "numpy": np.random.get_state(),
+                "torch": torch.get_rng_state(),
+                "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+            },
             "class_counts": class_counts.tolist(),
             "last_lr": last_lr,
             "protocol": {
