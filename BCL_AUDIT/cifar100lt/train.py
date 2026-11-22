@@ -251,10 +251,6 @@ def train_group(
             "peak_cuda_memory_bytes": peak_memory_bytes,
             "num_train_samples": seen,
         }
-        epoch_summaries.append(summary)
-        with history_path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(summary, ensure_ascii=False) + "\n")
-
         human_epoch = epoch_index + 1
         if human_epoch in CHECKPOINT_EPOCHS:
             if human_epoch == 160:
@@ -275,6 +271,10 @@ def train_group(
                 last_lr=lr,
             )
             summary["checkpoint"] = str(checkpoint_path)
+
+        epoch_summaries.append(summary)
+        with history_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(summary, ensure_ascii=False) + "\n")
 
         print(
             f"[{group}] epoch {human_epoch:03d}/{EPOCHS} "
@@ -299,6 +299,9 @@ def train_group(
         ),
         "final_epoch": epoch_summaries[-1],
         "checkpoint_dir": str(checkpoint_dir),
+        "checkpoint_paths": [
+            item["checkpoint"] for item in epoch_summaries if "checkpoint" in item
+        ],
     }
     with (run_dir / "training_summary.json").open("w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, ensure_ascii=False)
