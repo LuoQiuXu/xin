@@ -63,6 +63,8 @@ Verify in the report:
 - split seed 0 and saved source indices;
 - Many/Medium/Few class counts and complete directed-relevant Many-Few pair table.
 If outputs already exist, do not overwrite them; choose a fresh output directory.
+The report must record the exact data_audit_output_dir and the exact saved
+indices_file path so the later Stage -1 task can reuse them without guessing.
 
 Do not run DINOv2 during this preflight unless the data audit succeeds and
 there is enough disk space and network/cache availability. DINO is not needed
@@ -107,6 +109,7 @@ Write a compact local report:
 
 Include:
 - exact branch, current commit SHA, and source commit actually tested;
+- exact data_audit_output_dir and exact indices_file path;
 - test results;
 - data audit checks and sample count;
 - environment and GPU memory;
