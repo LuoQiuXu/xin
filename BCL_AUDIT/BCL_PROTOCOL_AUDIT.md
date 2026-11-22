@@ -119,18 +119,21 @@ however, couple the three views in train mode; BCL gradients can reach the
 v_1 feature rows through those batch statistics even though only v_2,v_3
 projected outputs enter the BCL loss.
 
-When the offline gradient probe is implemented later, observe only:
+The merged offline diagnostic observes only:
 
 - parameter-level: (\nabla_{W_y}\mathcal L_{LC}) versus (\nabla_{W_y}\mathcal L_{BCL})
 - representation-level: (\nabla_{f(x)}\mathcal L_{LC}) versus (\nabla_{f(x)}\mathcal L_{BCL})
 
-For the representation-level comparison, feed the **same fixed probe image/view**
-through both loss paths. Also state explicitly whether the probe runs in eval mode
-(frozen BN running statistics, no cross-example BN gradient coupling) or train mode
-(full 3-view batch context, including the indirect BCL-to-v1 gradient described
-above). These answer different questions and must not be mixed. Do not compare
-gradients at different augmented views and call that a same-point gradient conflict.
-Do not run these probes in Stage -1.
+For the representation-level comparison, the script uses the same fixed v_2
+probe feature tensor f(x) for both losses: LC is computed by applying W to that
+same f(x), while BCL uses that same f(x) through the sample MLP, paired with v_3.
+The prototype path uses the same classifier W through the prototype MLP.
+
+The offline gradient probe runs in eval mode (frozen BN running statistics,
+without cross-example BN gradient coupling) to isolate local loss-gradient
+interaction. Train-mode cross-view BN effects are measured separately by the
+training-time BatchNorm audit. Do not compare gradients at different augmented
+views and call that a same-point gradient conflict.
 
 ### 3.4 Classifier-head qualification: do not copy the ImageNet scale into CIFAR
 
