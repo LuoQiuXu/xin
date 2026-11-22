@@ -301,6 +301,69 @@ def _write_static_audit(
     return summary, pair_rows
 
 
+def _load_existing_static_audit(
+    out_dir: Path,
+    counts: np.ndarray,
+    selected_indices: np.ndarray,
+    split_seed: int,
+    imb_factor: float,
+):
+    """Validate and load existing static outputs without rewriting them."""
+    indices_path = out_dir / f"cifar100lt_if100_train_indices_seed{split_seed}.npy"
+    summary_path = out_dir / "data_audit_summary.json"
+    pair_path = out_dir / "head_tail_pair_topology.csv"
+    required = [
+        out_dir / "class_counts.csv",
+        out_dir / "superclass_counts.csv",
+        pair_path,
+        indices_path,
+        summary_path,
+    ]
+    missing = [str(path) for path in required if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "Cannot reuse an incomplete static audit. Missing: " + ", ".join(missing)
+        )
+
+    with summary_path.open("r", encoding="utf-8") as stream:
+        summary = json.load(stream)
+    if summary.get("source_split") != "original balanced CIFAR-100 training split only":
+        raise RuntimeError("Existing audit does not identify the original TRAIN split")
+    if summary.get("test_split_loaded") is not False:
+        raise RuntimeError("Existing audit does not certify test_split_loaded=false")
+    if int(summary.get("split_seed", -1)) != int(split_seed):
+        raise RuntimeError("Existing static audit split_seed does not match this run")
+    if abs(float(summary.get("imbalance_factor", -1.0)) - float(imb_factor)) > 1e-12:
+        raise RuntimeError("Existing static audit imbalance factor does not match")
+    if summary.get("class_counts") != counts.tolist():
+        raise RuntimeError("Existing static audit class-count vector does not match")
+    if int(summary.get("long_tail_train_size", -1)) != int(selected_indices.size):
+        raise RuntimeError("Existing static audit train size does not match")
+
+    saved_indices = np.load(indices_path).astype(np.int64)
+    if saved_indices.ndim != 1 or not np.array_equal(saved_indices, selected_indices):
+        raise RuntimeError("Existing saved IF=100 indices differ from the current TRAIN split")
+    if np.unique(saved_indices).size != saved_indices.size:
+        raise RuntimeError("Existing saved IF=100 indices contain duplicates")
+
+    with pair_path.open("r", newline="", encoding="utf-8-sig") as stream:
+        pair_rows = list(csv.DictReader(stream))
+    expected_pairs = int(summary["total_many_few_pairs"])
+    if len(pair_rows) != expected_pairs:
+        raise RuntimeError(
+            f"Existing Head-Few pair table has {len(pair_rows)} rows; expected {expected_pairs}"
+        )
+    for row in pair_rows:
+        row["head_fine_id"] = int(row["head_fine_id"])
+        row["tail_fine_id"] = int(row["tail_fine_id"])
+        row["head_coarse_id"] = int(row["head_coarse_id"])
+        row["tail_coarse_id"] = int(row["tail_coarse_id"])
+        row["same_superclass"] = str(row["same_superclass"]).strip().lower() == "true"
+        row["dino_cosine_similarity"] = row.get("dino_cosine_similarity") or ""
+        row["dino_topk_union"] = row.get("dino_topk_union") or ""
+    return summary, pair_rows
+
+
 class _DinoCIFARTrainDataset:
     def __init__(self, images: np.ndarray, labels: np.ndarray):
         from torch.utils.data import Dataset
@@ -525,6 +588,7 @@ def main():
     parser.add_argument("--imb-factor", type=float, default=0.01)
     parser.add_argument("--split-seed", type=int, default=0)
     parser.add_argument("--compute-dino", action="store_true")
+    parser.add_argument("--reuse-static-audit", action="store_true")
     parser.add_argument("--dino-model", type=str, default="dinov2_vits14")
     parser.add_argument("--dino-batch-size", type=int, default=16)
     parser.add_argument("--num-workers", type=int, default=0)
@@ -546,16 +610,44 @@ def main():
     counts, selected_indices = _make_long_tail_indices(
         fine, args.imb_factor, args.split_seed
     )
-    summary, pair_rows = _write_static_audit(
-        out_dir,
-        counts,
-        selected_indices,
-        fine_names,
-        coarse_names,
-        fine_to_coarse,
-        args.split_seed,
-        args.imb_factor,
-    )
+
+    if args.reuse_static_audit and not args.compute_dino:
+        parser.error("--reuse-static-audit requires --compute-dino")
+
+    if args.reuse_static_audit:
+        summary, pair_rows = _load_existing_static_audit(
+            out_dir,
+            counts,
+            selected_indices,
+            args.split_seed,
+            args.imb_factor,
+        )
+        print("Reusing validated static audit outputs without rewriting them")
+    else:
+        static_paths = [
+            out_dir / "class_counts.csv",
+            out_dir / "superclass_counts.csv",
+            out_dir / "head_tail_pair_topology.csv",
+            out_dir / f"cifar100lt_if100_train_indices_seed{args.split_seed}.npy",
+            out_dir / "data_audit_summary.json",
+        ]
+        existing_static = [str(path) for path in static_paths if path.exists()]
+        if existing_static:
+            raise FileExistsError(
+                "Refusing to overwrite existing static audit outputs. Choose a "
+                "fresh --output-dir, or use --compute-dino --reuse-static-audit. "
+                "Existing: " + ", ".join(existing_static)
+            )
+        summary, pair_rows = _write_static_audit(
+            out_dir,
+            counts,
+            selected_indices,
+            fine_names,
+            coarse_names,
+            fine_to_coarse,
+            args.split_seed,
+            args.imb_factor,
+        )
 
     print("CIFAR-100-LT static audit completed")
     print(f"  source split: original balanced training split only")
@@ -576,22 +668,36 @@ def main():
     print(f"  outputs: {out_dir}")
 
     if args.compute_dino:
-        similarity, near_pairs, metadata = _compute_dino_similarity(
-            images=images,
-            labels=fine,
-            out_dir=out_dir,
-            model_name=args.dino_model,
-            batch_size=args.dino_batch_size,
-            num_workers=args.num_workers,
-            topk=args.topk,
-        )
-        _update_pair_csv_with_dino(out_dir, pair_rows, similarity, near_pairs)
-        print(
-            f"DINOv2 completed: {metadata['model']}, "
-            f"elapsed={metadata['elapsed_seconds']:.1f}s, "
-            f"peak_cuda={metadata['peak_cuda_memory_bytes']} bytes"
-        )
-        print(f"  similarity matrix: {out_dir / 'DINO_CLASS_SIMILARITY.npy'}")
+        dino_paths = [
+            out_dir / "DINO_CLASS_MEAN_FEATURES.npy",
+            out_dir / "DINO_CLASS_SIMILARITY.npy",
+            out_dir / "dino_metadata.json",
+        ]
+        existing_dino = [path.exists() for path in dino_paths]
+        if all(existing_dino) and bool(summary.get("dino_similarity_computed")):
+            print("DINOv2 outputs already complete; skipping without overwriting")
+        elif any(existing_dino) or bool(summary.get("dino_similarity_computed")):
+            raise FileExistsError(
+                "DINOv2 outputs are partial or inconsistent. Refusing to overwrite; "
+                "inspect the existing output directory or choose a fresh one."
+            )
+        else:
+            similarity, near_pairs, metadata = _compute_dino_similarity(
+                images=images,
+                labels=fine,
+                out_dir=out_dir,
+                model_name=args.dino_model,
+                batch_size=args.dino_batch_size,
+                num_workers=args.num_workers,
+                topk=args.topk,
+            )
+            _update_pair_csv_with_dino(out_dir, pair_rows, similarity, near_pairs)
+            print(
+                f"DINOv2 completed: {metadata['model']}, "
+                f"elapsed={metadata['elapsed_seconds']:.1f}s, "
+                f"peak_cuda={metadata['peak_cuda_memory_bytes']} bytes"
+            )
+            print(f"  similarity matrix: {out_dir / 'DINO_CLASS_SIMILARITY.npy'}")
 
 
 if __name__ == "__main__":
