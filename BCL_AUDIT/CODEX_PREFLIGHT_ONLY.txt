@@ -25,6 +25,19 @@ evaluation, no new method, no hyperparameter changes.
 - Do not commit datasets, model weights, caches, logs or generated arrays.
 - Use the actual local CIFAR root; do not guess it.
 
+TRAIN-only loader / test-file integrity guard
+---------------------------------------------
+In torchvision 0.29.1, stock CIFAR100(train=True) still checks both
+train_list and test_list in _check_integrity(). Do not use that constructor
+before final benchmark evaluation.
+
+Use the permanent CIFAR100TrainOnly loader from
+BCL_AUDIT/cifar100lt/data.py for the training DataLoader and use the static
+audit's raw TRAIN/meta pickle loader for taxonomy/DINO. The preflight must
+exercise this committed loader, not a temporary monkeypatch or wrapper.
+The test suite must include a test proving _check_integrity() touches only
+train_list and never test_list.
+
 2. SOFTWARE TESTS
 -----------------
 Run:
@@ -93,7 +106,7 @@ Write a compact local report:
   BCL_AUDIT/outputs/preflight_report.md
 
 Include:
-- exact branch and current commit SHA;
+- exact branch, current commit SHA, and source commit actually tested;
 - test results;
 - data audit checks and sample count;
 - environment and GPU memory;
