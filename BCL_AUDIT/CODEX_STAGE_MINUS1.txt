@@ -1,336 +1,311 @@
-BCL CIFAR-100-LT — CODEX STAGE -1 TASK
+BCL CIFAR-100-LT — CODEX TASK
+PAIRED PILOT + MERGED OFFLINE DIAGNOSTICS
 =========================================
 
 Repository: LuoQiuXu/xin
-Branch: research/bcl-cifar100lt-audit-20261122
-Read first:
+Required branch: research/bcl-cifar100lt-audit-20261122
+
+Read before doing anything:
   - BCL_AUDIT/README.md
   - BCL_AUDIT/BCL_PROTOCOL_AUDIT.md
+  - BCL_AUDIT/cifar100lt/README.md
+  - BCL_AUDIT/cifar100lt/data.py
+  - BCL_AUDIT/cifar100lt/models.py
+  - BCL_AUDIT/cifar100lt/losses.py
+  - BCL_AUDIT/cifar100lt/train.py
   - BCL_AUDIT/scripts/audit_cifar100lt_topology.py
+  - BCL_AUDIT/scripts/analyze_paired_bcl.py
 
 MISSION
 -------
-Implement and execute only the first closed-loop BCL audit on CIFAR-100-LT IF=100:
-(1) finish protocol/code verification and a standalone CIFAR training port;
-(2) run one paired seed of LC-only and BCL for 200 epochs in FP32;
-(3) produce superclass statistics and a DINOv2 similarity matrix from the original
-    balanced CIFAR-100 TRAIN split only.
+Complete one closed-loop, one-seed BCL audit on CIFAR-100-LT IF=100:
 
-We are researching whether BCL has a structural weakness. We have NOT established
-that BCL is defective and must not design a new method in this task.
+1. Verify the existing standalone CIFAR BCL port; repair only real defects.
+2. Run the fixed data/taxonomy audit and DINOv2 topology extraction.
+3. Run one paired seed (seed 42) of LC-only and original BCL, each 200 epochs,
+   FP32, batch size 256.
+4. Save complete checkpoints at epochs 40, 100, 160-pre-decay, 180-pre-decay,
+   and 200.
+5. Run one merged offline diagnostic pass: checkpoint margins, dual-layer
+   gradients, Head->Tail / Tail->Head confusion, and paired DID.
 
-A. REPOSITORY / BRANCH SAFETY
+We are investigating whether BCL has a structural weakness. We have NOT
+established that BCL is defective. Do not design or implement a replacement
+method or run an Oracle in this task.
+
+A. BRANCH / REPOSITORY SAFETY
 -----------------------------
-1. Confirm the current branch is exactly:
+1. Confirm repository is LuoQiuXu/xin.
+2. Confirm current branch is exactly:
    research/bcl-cifar100lt-audit-20261122
-2. Do not work on main and do not modify H2T, PI-H2T, CC-SAM, CC-MIA, or TP-MAG code.
-3. Keep all new source files under BCL_AUDIT/cifar100lt/ or BCL_AUDIT/scripts/.
-4. Do not commit CIFAR data, DINO weights, checkpoints, TensorBoard event files,
-   training logs, or large generated arrays.
-5. Before writing code, inspect the actual files listed above and the local Python /
-   PyTorch / torchvision / CUDA versions. Do not assume the user's data path.
-6. If the local checkout is not on the requested branch, stop and report it; do not
-   silently create or switch to another branch.
+3. If the checkout is on another branch, STOP and report it. Do not silently
+   switch branches or create another branch.
+4. Do not work on main.
+5. Do not modify H2T, PI-H2T, CC-SAM, CC-MIA, or TP-MAG code.
+6. Keep new source changes inside BCL_AUDIT/.
+7. Do not commit CIFAR data, DINO weights, checkpoints, logs, event files,
+   prediction archives, or generated arrays.
+8. Before training, record Python, PyTorch, torchvision, CUDA, GPU name, and
+   available GPU memory. Do not assume a data path.
 
-B. IMPLEMENT THE CIFAR-100 BCL PORT
------------------------------------
-A first standalone package has already been committed under BCL_AUDIT/cifar100lt/.
-Review these files before editing:
-  - data.py
-  - models.py
-  - losses.py
-  - train.py
-  - tests/test_bcl_smoke.py
-  - README.md
-
-Validate and complete this implementation; do not overwrite it blindly. Add or
-repair files only where needed. Do not pull in the old H2T code or make the BCL
-experiment depend on unrelated project modules.
+B. REVIEW AND TEST THE EXISTING CIFAR PORT
+------------------------------------------
+The package already exists. Do not overwrite it blindly.
 
 B1. CIFAR-100-LT split
-- Load the original CIFAR-100 training split only for constructing the LT train set.
-- Fine class IDs must remain official IDs 0..99. Do not shuffle class order.
-- IF=100 counts must be:
+- Original CIFAR-100 train split only.
+- Official fine-label order 0..99; do not shuffle class order.
+- Exact count rule:
     n_i = int(500 * 0.01 ** (i / 99.0)), i=0,...,99
-- Use int() truncation, not round().
-- Use split_seed=0 for selecting images within each class.
-- Validate the count vector exactly, including first=500, last=5, total=10847.
-- Use the same selected original train indices in both groups.
-- Read and validate fine/coarse taxonomy from the original CIFAR-100 train metadata:
-  100 fine classes, 20 coarse superclasses, exactly 5 fine classes per superclass.
-- Keep split_seed=0 separate from training seed=42.
+- Use int() truncation, never round().
+- IF=100 expected endpoints: 500 and 5.
+- Expected total: 10,847 images.
+- split_seed=0 selects original training indices within each class.
+- training seed=42 is separate from split_seed=0.
+- Use the exact same saved indices in LC-only and BCL.
+- Validate no duplicate/out-of-range indices and exact class-count vector.
+- Validate 100 fine classes, 20 CIFAR-100 coarse superclasses, exactly five
+  fine classes per coarse superclass.
 
-B2. CIFAR ResNet-32
-- Implement the standard CIFAR ResNet-32, not an ImageNet ResNet-32:
-  3x3 stem, 16 channels, three residual stages with [5,5,5] BasicBlocks,
-  stage widths 16/32/64, downsampling at stages 2 and 3, global average pooling,
-  64-dimensional final feature.
-- Verify depth and output shapes with a unit test.
-- Use the CIFAR shortcut convention from the referenced PaCo CIFAR ResNet-32
-  implementation (Option A) unless an exact equivalent implementation already
-  exists in this new package.
-- Classifier for this CIFAR port: standard nn.Linear(64,100), not the BCL
-  ImageNet NormedLinear(s=30). The inspected BCL paper/code does not establish
-  that s=30 is used for CIFAR. Record this implementation choice in the report.
-- Do not add an extra classifier scale or temperature.
+B2. CIFAR ResNet-32 / classifier
+- CIFAR ResNet-32: 3x3 stem, [5,5,5] BasicBlocks, widths 16/32/64,
+  Option-A shortcut, final feature dimension 64.
+- Standard nn.Linear(64,100) classifier.
+- Do NOT import the ImageNet BCL NormedLinear scale s=30 into CIFAR.
+- The inspected official BCL public entry point is for ImageNet/iNaturalist;
+  it does not provide a wired CIFAR-100 training route.
+- Record that this is a standalone paper-faithful CIFAR port, not an
+  unmodified official CIFAR entry point.
 
-B3. BCL architecture
-Implement the shared-backbone, two-branch graph:
-  v1 -> shared ResNet32 -> classifier W -> LC
-  v2,v3 -> shared ResNet32 -> sample projection MLP -> normalized z2,z3 -> BCL
-  W -> separate prototype MLP -> normalized class prototypes -> BCL
+B3. BCL graph and loss
+- Shared ResNet-32 backbone.
+- v1 -> backbone -> W -> logit-compensated CE.
+- v2/v3 -> backbone -> sample MLP -> normalized embeddings -> BCL.
+- W -> separate prototype MLP -> normalized class prototypes -> BCL.
+- Sample and prototype MLPs are separate 64->512->128 MLPs.
+- The prototype MLP is a differentiable mapping from W to class prototypes;
+  it is not an independent cross-branch conflict site.
+- Shared parameters receiving LC and BCL gradients: backbone and W.
+- Use the device-safe BalSCL/BCL formula with class-complement prototypes and
+  class-averaging. Temperature=0.1.
+- Logit compensation: logits + log(class_prior).
+- LC-only objective: 2.0 * LC.
+- BCL objective: 2.0 * LC + 0.6 * BCL.
 
-For ResNet-32 feature dimension 64:
-  sample MLP: Linear(64,512) -> BatchNorm1d(512) -> ReLU -> Linear(512,128)
-  prototype MLP: a SEPARATE MLP with the same dimensions
-  L2-normalize sample embeddings and prototype embeddings before BCL.
+B4. Tests
+Run before any full training:
+  python -m pytest BCL_AUDIT/cifar100lt/tests -q
 
-The classifier weight matrix for nn.Linear has shape [100,64]. Feed its 100
-class rows through the prototype MLP to obtain [100,128] prototypes.
+The tests must cover:
+- exact IF=100 count vector and selected-index length;
+- ResNet-32 / classifier / embedding / prototype shapes;
+- BCL scalar loss, finite gradients, and participation of all 100 prototypes;
+- declared LC/BCL gradient routes;
+- identical three-view dataset contract for LC-only and BCL;
+- three-view BatchNorm audit hooks;
+- directional Head-Tail DID formula.
 
-Important gradient-graph rule:
-- shared parameters that receive both LC and BCL gradients: Backbone and W.
-- sample projection MLP: BCL gradient only.
-- prototype MLP: BCL gradient only; it maps BCL gradients back to W.
-Do NOT treat the prototype MLP as a third cross-branch gradient-conflict site.
+If tests fail, diagnose and repair the smallest relevant issue. Do not launch
+training with failing tests.
 
-For paired initialization, instantiate the same full model/module order for both
-groups, save one initial state, and reload that same initial state before each run.
-This guarantees identical initial backbone/classifier weights and a consistent
-initialization protocol. The LC-only run simply does not execute the contrastive
-path/loss. Do not create different backbone/classifier initializations by accident.
+C. MATCHED THREE-VIEW PAIRED CONTROL — CRITICAL
+------------------------------------------------
+Both groups MUST use the same three-view data protocol:
 
-B4. BCL loss
-- Implement the official released BalSCL / BCL formula faithfully:
-  class-complement prototypes are appended to the two contrastive-view embeddings;
-  positives include same-class view embeddings and the class prototype;
-  denominator contributions are averaged by class (class-averaging).
-- Temperature tau=0.1.
-- Use the released official BCL loss implementation as the semantic reference:
-  https://github.com/FlamieZhu/Balanced-Contrastive-Learning/blob/main/loss/contrastive.py
-- You may reimplement the operations with device-safe, readable PyTorch code.
-  If you copy any source code, preserve its attribution/license.
-- Add tests for output scalar, finite loss, finite gradients, correct positive masks,
-  and all 100 prototypes being included in every BCL denominator.
-- Avoid accidental CPU tensors in the loss (e.g. torch.eye created on CPU then
-  indexed on CUDA). Every mask/count tensor must be created on the active device.
+- v1: RandomCrop(32,padding=4), RandomHorizontalFlip, CIFAR AutoAugment,
+  ToTensor, Cutout(length=16), CIFAR-100 normalization.
+- v2 and v3: independently sampled SimAugment views:
+  RandomResizedCrop(32,scale=(0.2,1.0)), HorizontalFlip, ColorJitter,
+  Grayscale, GaussianBlur, ToTensor, CIFAR-100 normalization.
 
-B5. Logit compensation and total objective
-For class counts n_y:
-  prior_y = n_y / sum(n)
-  adjusted_logits = logits_v1 + log(prior_y)
-  LC = cross_entropy(adjusted_logits, labels)
+For BOTH LC-only and BCL:
+1. Concatenate [v1,v2,v3] into one 3B tensor.
+2. Pass the 3B tensor through the shared backbone in one forward call.
+3. Use only the first B v1 logits for the LC objective.
 
-Use:
-  Group A (LC-only): total_loss = 2.0 * LC
-  Group B (BCL):     total_loss = 2.0 * LC + 0.6 * BCL
+Additional BCL operations:
+- Apply the sample MLP to all 3B backbone features.
+- Use only v2/v3 embeddings in the BCL sample term.
+- Derive all class prototypes from classifier rows W through the separate
+  prototype MLP.
 
-Only v1 logits contribute to LC. BCL uses only v2 and v3 sample embeddings plus
-the classifier-derived prototypes.
+LC-only must NOT revert to a one-view backbone forward. This matched protocol
+is required so backbone BatchNorm2d sees the same three-view input mixture in
+both groups.
 
-C. VIEW AUGMENTATIONS AND BN SEMANTICS
---------------------------------------
-Use the CIFAR-specific transformations in the protocol audit:
+Record the remaining branch-specific BN distinction:
+- BCL's sample projection MLP has BatchNorm1d and is applied to all 3B
+  features; LC-only does not execute this projection MLP.
+- Do not mislabel this BN/view coupling as a third shared parameter-conflict
+  site.
+- batchnorm_audit.jsonl must record first-minibatch per-view input moments
+  and BN running-stat summaries at epochs 40/100/160/180/200.
 
-v1 classification view:
-  RandomCrop(32, padding=4)
-  RandomHorizontalFlip
-  CIFAR AutoAugment policy
-  ToTensor
-  Cutout(length=16)
-  Normalize(mean=(0.4914,0.4822,0.4465), std=(0.2023,0.1994,0.2010))
+D. FIXED TRAINING PROTOCOL — ONE SEED ONLY
+------------------------------------------
+Run groups sequentially, not concurrently:
 
-v2 and v3 contrastive views, independently sampled:
-  RandomResizedCrop(32, scale=(0.2,1.0))
-  RandomHorizontalFlip
-  ColorJitter(0.4,0.4,0.4,0.1), p=0.8
-  RandomGrayscale(p=0.2)
-  GaussianBlur with sigma range [0.1,2.0], p=0.5
-  ToTensor
-  same CIFAR normalization
-
-Use the CIFAR AutoAugment / Cutout and SimAugment semantics from the referenced
-PaCo CIFAR implementation where needed:
-  https://github.com/JIA-Lab-research/Parametric-Contrastive-Learning
-  PaCo/LT/paco_cifar.py
-If copying a helper, preserve its license/attribution. Do not replace CIFAR AutoAugment
-with RandAugment. Do not invent a different SimAugment pipeline without documenting it.
-
-BCL forward:
-- For each batch, concatenate [v1, v2, v3] along batch dimension and pass the
-  concatenated tensor through the shared ResNet-32 in one forward call.
-- Split outputs back into three B-sized chunks.
-- Use v1 logits for LC and v2/v3 embeddings for BCL.
-- This intentionally reproduces the three-view BatchNorm semantics of the BCL
-  implementation: backbone BatchNorm2d statistics mix v1 AutoAugment and v2/v3
-  SimAugment distributions.
-- The sample projection MLP is also applied to all 3B features before z2/z3 are
-  selected; its BatchNorm1d therefore mixes all three views as well.
-- Although BCL loss directly consumes only z2/z3, train-mode BatchNorm coupling
-  can send BCL gradients indirectly to v1 backbone feature rows. This is a
-  view-level coupling, not a third shared trainable-parameter conflict site.
-- LC-only Group A must use only v1 in the first pilot.
-- Record both BN differences between A and B. Do not add a BN-matched control or
-  another experiment group in this task.
-
-D. TRAINING PROTOCOL — ONLY ONE SEED, 200 EPOCHS
------------------------------------------------
-Run the two groups sequentially, not concurrently:
-
-  Group A: LC-only, one view, seed=42, 200 epochs
-  Group B: BCL, three views, seed=42, 200 epochs
+  Group A: LC-only, three-view concatenated backbone, LC on v1 only.
+  Group B: original BCL, same three-view backbone, LC on v1 plus BCL on v2/v3.
 
 Shared settings:
-- batch size 256
-- FP32 only; no autocast / AMP
+- seed=42 for both groups
+- same saved initial full model state for both groups
+- same exact IF=100 sample indices
+- batch size=256
+- FP32 only; no AMP/autocast
 - no gradient accumulation
 - SGD, momentum=0.9
 - base LR=0.15
 - weight decay=5e-4
 - 5-epoch linear warmup from 0 to 0.15
-- multiply LR by 0.1 after 160 completed epochs and after 180 completed epochs
-- total 200 epochs
-- DataLoader shuffle generator and worker seeds must be explicitly set
+- LR drops by 0.1 at the start of epoch index 160 and epoch index 180
+  (after 160 and 180 completed epochs)
+- 200 epochs total
+- DataLoader shuffle generator and worker seeds explicitly set
 - reset Python / NumPy / torch / CUDA RNGs before each group
-- use the same saved initial backbone/classifier weights for both groups
-- use the exact same saved IF=100 sample indices
-
-Use 0-based epoch indices internally. Warmup covers epoch indices 0..4. Apply the
-first LR drop at the start of epoch index 160 (after 160 epochs are complete), and
-the second at the start of epoch index 180.
 
 Checkpoint milestones (human-numbered completed epochs):
-  epoch_040
-  epoch_100
-  epoch_160_pre_decay
-  epoch_180_pre_decay
-  epoch_200
+  epoch_040.pth
+  epoch_100.pth
+  epoch_160_pre_decay.pth
+  epoch_180_pre_decay.pth
+  epoch_200.pth
 
-The epoch_160_pre_decay checkpoint is saved immediately after completing the
-160th epoch and before the LR drop used for epoch 161. The epoch_180_pre_decay
-checkpoint is saved immediately after completing the 180th epoch and before the
-LR drop used for epoch 181.
+Each checkpoint must include model state (including BN running buffers),
+optimizer state, RNG states, epoch, group, seed, class counts, and protocol.
+Epoch 160 and 180 checkpoints must be saved after those epochs complete and
+before the next epoch's LR decay.
 
 Record per epoch:
-- epoch and current learning rate
-- LC and BCL losses separately (BCL loss is absent/zero for Group A)
-- training accuracy
+- LR, LC loss, BCL loss (zero/absent for LC-only), total loss
+- raw-logit training accuracy
 - epoch wall-clock seconds
-- CUDA peak allocated memory (reset / record clearly)
-- checkpoint path and best/final status
+- peak allocated CUDA memory
+- checkpoint path at milestone epochs
 
-Do not choose checkpoints by test accuracy. Use the final epoch-200 checkpoint
-for the first pilot's headline evaluation.
+If batch 256 FP32 OOMs, STOP and report the exact trace and memory usage.
+Do not silently reduce batch size, enable AMP, or add gradient accumulation.
 
-If batch 256 OOMs, stop and report the exact failure and memory trace. Do not
-silently reduce batch size, switch to AMP, or add gradient accumulation.
+E. DATA / EXOGENOUS TOPOLOGY AUDIT
+----------------------------------
+Run static taxonomy and split audit:
 
-Run implementation tests first:
-  python -m pytest BCL_AUDIT/cifar100lt/tests -q
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR root>" --output-dir "BCL_AUDIT/outputs/data_audit"
 
-After the static data audit has written the fixed split indices, run the paired pilot:
-  python -m BCL_AUDIT.cifar100lt.train --data-root "<actual CIFAR data root>" --output-root "BCL_AUDIT/outputs" --indices-file "BCL_AUDIT/outputs/data_audit/cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
+Then run frozen DINOv2:
 
-The training command itself runs LC-only and BCL sequentially, then performs final
-test evaluation only after both training runs complete.
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR root>" --output-dir "BCL_AUDIT/outputs/data_audit" --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 
-E. DATA TOPOLOGY AUDIT
-----------------------
-Run the committed script:
-  BCL_AUDIT/scripts/audit_cifar100lt_topology.py
+Rules:
+- The DINO script may load only the original balanced CIFAR-100 training split
+  (CIFAR100(train=True), 500 images per fine class).
+- Never instantiate/read CIFAR100(train=False) for DINO/topology.
+- DINO: Bicubic resize 224x224, ImageNet normalization, normalized CLS features,
+  class mean then L2 normalization, cosine similarity.
+- Save model/checkpoint provenance and SHA-256 where available.
+- Report all Many/Medium/Few class counts, superclass distribution, full
+  Head-Few pair list, within-superclass and cross-superclass pair counts.
+- DINO Top-K uses the symmetric-union rule and is a separate exogenous relation.
+- Do not infer a stable effect from a small or concentrated pair set.
+- Do not define semantic overlap using model confusion or BCL outcomes.
 
-First static pass (one command):
-  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR data root>" --output-dir "BCL_AUDIT/outputs/data_audit"
+F. FINAL BENCHMARK EVALUATION
+-----------------------------
+The training script must finish BOTH 200-epoch training runs before it
+instantiates CIFAR100(train=False).
 
-Then DINOv2 pass (one command):
-  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR data root>" --output-dir "BCL_AUDIT/outputs/data_audit" --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
+Then evaluate only the final epoch-200 checkpoints for the first benchmark
+comparison. Save:
+- labels and predictions
+- raw logits and logit-adjusted logits
+- class accuracy and confusion matrix
+- Overall / Many / Medium / Few metrics
 
-The script must load only the original balanced CIFAR-100 training split. It must
-not instantiate/read CIFAR100(train=False). DINO input is Bicubic 224x224 with
-ImageNet normalization. The DINO class means use all 500 original training images
-per fine class. If DINO model weights are unavailable, report the error; do not
-substitute a model or use test images.
+Do not evaluate/select checkpoints by test accuracy. Do not use test images or
+labels for DINO, topology construction, probe generation, or hyperparameter
+selection.
 
-Verify:
-- all 20 CIFAR-100 superclasses contain exactly five fine classes
-- the exact Many/Medium/Few class counts and per-superclass distribution
-- the exact number of within-superclass Many-Few pairs and cross-superclass
-  Many-Few pairs
-- DINO Top-K pair counts under the symmetric-union rule
-- whether any group is too small / concentrated to support later inference
+G. ONE MERGED OFFLINE DIAGNOSTIC PASS
+-------------------------------------
+After both final evaluations are saved, run:
 
-Do not start gradient probes yet. Do not claim that a small number of pairs can
-support a significance test.
+  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "BCL_AUDIT/outputs/data_audit/cifar100lt_if100_train_indices_seed0.npy" --output-root "BCL_AUDIT/outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
 
-F. UNIT TESTS / SMOKE CHECKS BEFORE FULL TRAINING
--------------------------------------------------
-Before the two 200-epoch runs, run small non-training tests:
-1. CIFAR split count vector and total length are exact.
-2. ResNet32 output feature dimension is 64 and classifier logits are [B,100].
-3. BCL 3-view forward returns the expected [3B,...] / [B,...] shapes.
-4. BCL loss is finite and differentiable; all prototypes participate.
-5. Separate LC backward and BCL backward both reach Backbone and W.
-6. Prototype MLP and sample MLP receive BCL gradients only.
-7. A single optimizer step works in FP32.
-8. Checkpoint save/reload round trip works.
-9. A single training batch fits GPU memory at batch size 256.
-10. In train mode, verify that BCL can send gradients to the v1 input rows through
-    the backbone / sample-head BatchNorm coupling, even though the BCL objective
-    directly consumes only z2 and z3.
+This is the merged offline pass; do not create a separate training stage.
 
-These are implementation / computation-graph tests, not the scientific
-gradient-conflict probe. Do not aggregate them into a claim that a gradient
-conflict exists.
+G1. Fixed probe
+- Select five examples per fine class from the saved LT training indices.
+- Cache v1/v2/v3 and deterministic evaluation views once.
+- Reuse exactly the same 500 probe images/views for every checkpoint.
+- This probe is sourced only from the LT training subset; no test data.
 
-G. FINAL TEST EVALUATION
-------------------------
-Only after both training runs are complete, evaluate the balanced CIFAR-100 test
-split for final reporting. Do not use test data for:
-- DINOv2 similarity or superclass topology
-- checkpoint selection
-- LR schedule or hyperparameter selection
-- any training-time decisions
+G2. Checkpoint margins
+- For LC-only and BCL checkpoints 40/100/160/180/200:
+  report per-class probe accuracy, raw true-class margin, and
+  logit-adjusted true-class margin.
 
-Report Overall, Many, Medium, Few, plus confusion matrices / raw prediction arrays
-for later offline paired analysis. Many/Medium/Few thresholds must be exactly those
-declared in BCL_PROTOCOL_AUDIT.md: Many >100, Medium 20..100 inclusive, Few <20.
+G3. Dual-layer gradient diagnostics
+- Run on BCL checkpoints only; LC-only projection heads are untrained.
+- Put the model in eval mode to freeze BN running statistics.
+- Use the same v2 feature tensor f(x) for both LC and BCL gradient calculations.
+- LC: classifier W and logit-compensated CE.
+- BCL: same f(x) through sample MLP, paired with v3, plus classifier W through
+  prototype MLP.
+- At classifier row W_y report cosine(grad_W_y LC, grad_W_y BCL), both norms,
+  and norm ratio.
+- At the same probe feature f(x), report cosine(grad_f LC, grad_f BCL), both
+  norms, and negative-cosine fraction.
+- Do not count prototype MLP as a separate conflict site.
+- State clearly that eval-mode probes isolate local loss gradients; train-mode
+  BN coupling is measured separately by batchnorm_audit.jsonl.
 
-H. REQUIRED DELIVERABLES
-------------------------
-Create BCL_AUDIT/STAGE_MINUS1_REPORT.md with:
-1. environment / GPU / CUDA / PyTorch / torchvision versions
-2. paper-versus-public-code audit and all unresolved assumptions
-3. exact CIFAR-100-LT class-count vector and selected split seed
-4. superclass distribution and within/cross Many-Few pair counts
-5. DINOv2 model, transforms, metadata, similarity matrix dimensions, Top-K counts
-6. LC-only and BCL final Top-1 / Many / Medium / Few
-7. per-epoch time, total training time, peak CUDA memory
-8. confirmation of FP32, batch size 256, 200 epochs
-9. all checkpoint milestone paths
-10. BN three-view caveat
-11. any deviation, error, or unresolved protocol item
+G4. Head-Tail directional confusion / paired DID
+- Use only saved final epoch-200 benchmark predictions/logits.
+- For each directed pair:
+    C[a->b]^M = P(prediction=b | true=a, model=M)
+    Delta C[a->b] = C[a->b]^BCL - C[a->b]^LC-only
+- Report Head->Tail and Tail->Head separately.
+- Group pairs by the exogenous CIFAR-100 coarse-superclass label and compute:
+    DID = E[Delta C | SameSuperclass]
+          - E[Delta C | DifferentSuperclass]
+- Also report pairwise raw-logit and adjusted-logit margins.
+- If DINO Top-K union is present, report it as a separate relation slice.
+- Report pair counts. One-seed DID is descriptive, not seed-level significance.
 
-Expected local output structure (do not commit large artifacts):
-  BCL_AUDIT/outputs/data_audit/
-  BCL_AUDIT/outputs/LC_only_seed42/
-  BCL_AUDIT/outputs/BCL_seed42/
-  BCL_AUDIT/STAGE_MINUS1_REPORT.md
+H. ORACLE GATE — DO NOT RUN NOW
+--------------------------------
+No Oracle in this task. The first paired seed is reconnaissance only.
 
-Commit source code, tests, compact CSV/JSON summaries if appropriate, and the
-Markdown report only. Keep checkpoints, raw predictions, logs, event files, and
-.npy arrays local unless the user explicitly asks to upload them.
+Only after additional paired seeds show repeatable and coherent evidence across
+gradient direction/norm, margins, directional confusion, and Overall/Many/
+Medium/Few performance may one mechanism-aligned Oracle be selected:
 
-I. STOP CONDITIONS
-------------------
-Stop after this one-seed, 200-epoch paired pilot and static topology audit.
-Do NOT:
-- run 400 epochs
-- launch seeds 43/44
-- implement any proposed BCL improvement
-- implement the offline W / f(x) gradient probe
-- add extra controls or hyperparameter sweeps
-- use the test set to build DINO topology
-- silently alter batch size, precision, augmentation, or classifier head
+1. Prototype Oracle: replace W-derived prototypes with balanced reference
+   feature prototypes.
+2. Relation Oracle: suppress/down-weight same-superclass negative prototypes
+   in the contrastive denominator.
+3. Gradient Oracle: remove only the BCL gradient component conflicting with LC:
+   g_BCL* = g_BCL - min(0, g_LC^T g_BCL) /
+            (||g_LC||^2 + eps) * g_LC.
+   Test classifier-W and backbone scopes separately if justified.
 
-Return the exact commands, logs, report path, checkpoint paths, and git commit SHA.
-Then wait for scientific review before any next experiment.
+Do not run all three as a fishing expedition. Stop if the selected Oracle has
+no stable benefit or improves one class group only by sacrificing another.
+No numeric go/no-go threshold was pre-registered; do not invent one after
+seeing the results.
+
+I. REQUIRED RETURN PACKAGE
+--------------------------
+After completion, report:
+1. Exact branch and commit SHA.
+2. Environment / GPU / peak memory.
+3. Test results.
+4. Data count vector summary and superclass pair counts.
+5. DINO provenance and whether train-only extraction completed.
+6. LC-only and BCL epoch-200 metrics, plus full training time.
+7. Checkpoint paths and BatchNorm audit summary.
+8. Offline margin / W_y gradient / same-f gradient summaries.
+9. Head->Tail and Tail->Head confusion deltas and DID, with pair counts.
+10. Stage-gate conclusion: HOLD / replicate / stop, with evidence.
+11. Explicit confirmation that no Oracle or new method was run.
