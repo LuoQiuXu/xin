@@ -12,9 +12,9 @@
 
 ## CIFAR-100-LT IF=100 数据和拓扑
 
-本地数据根目录 `D:\xiangmuxunlian\xin\H2T\data\cifar100`。从原始均衡 TRAIN 的 50,000 张图生成 IF=100 指数不平衡划分，使用 seed 0 和 `int(500 * 0.01 ** (class_id / 99.0))`，完整类别计数和索引逐元素复核通过。首尾类别为 500／5 张，共 10,847 张，源索引全部唯一。 [数据审计](data_audit/data_audit_summary.json) · [索引](data_audit/cifar100lt_if100_train_indices_seed0.npy)
+本地数据根目录 `D:\xiangmuxunlian\xin\H2T\data\cifar100`。从原始均衡 TRAIN 的 50,000 张图生成 IF=100 指数不平衡划分，使用 seed 0 和 `int(500 * 0.01 ** (class_id / 99.0))`，完整类别计数和索引逐元素复核通过。首尾类别为 500／5 张，共 10,847 张，源索引全部唯一。 本地数据审计文件（未提交）：`data_audit/data_audit_summary.json`；固定索引：`data_audit/cifar100lt_if100_train_indices_seed0.npy`
 
-100 个 fine class 每类只对应一个 coarse superclass。20 个 superclass 各有 5 个 fine class。按 >100／20–100／<20 分组，Many／Medium／Few 各为 35／35／30 类。1,050 个 Many–Few 对逐项核对通过，其中同 superclass 35 对、跨 superclass 1015 对。同 superclass 对分布在 13/20 个 superclass，覆盖 21/30 个 Few 类。 [逐类计数](data_audit/class_counts.csv) · [Superclass 拓扑](data_audit/superclass_counts.csv) · [完整类别对表](data_audit/head_tail_pair_topology.csv)
+100 个 fine class 每类只对应一个 coarse superclass。20 个 superclass 各有 5 个 fine class。按 >100／20–100／<20 分组，Many／Medium／Few 各为 35／35／30 类。1,050 个 Many–Few 对逐项核对通过，其中同 superclass 35 对、跨 superclass 1015 对。同 superclass 对分布在 13/20 个 superclass，覆盖 21/30 个 Few 类。 本地审计 CSV（未提交）：`data_audit/class_counts.csv`、`data_audit/superclass_counts.csv`、`data_audit/head_tail_pair_topology.csv`
 
 | 数据文件 | SHA256 |
 | --- | --- |
@@ -22,7 +22,7 @@
 | CIFAR-100 meta | `a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9` |
 | IF=100 seed 0 源索引 | `be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7` |
 
-当前 torchvision 默认会对 TRAIN 和 TEST 都进行归档完整性检查。本轮使用临时 TRAIN-only 包装，保留 torchvision 的 TRAIN／meta 校验和训练样本加载，禁用下载、TEST 构造和 TEST 文件打开。静态审计和 GPU 探针各加载一次 TRAIN，两处 TEST 构造与文件读取尝试均为 0。静态审计出现一条文档字符串 Windows 路径转义的 `SyntaxWarning`，进程退出码为 0。 [数据门禁回执](preflight_20261122_01/data_validation.json)
+当前 torchvision 默认会对 TRAIN 和 TEST 都进行归档完整性检查。本轮使用临时 TRAIN-only 包装，保留 torchvision 的 TRAIN／meta 校验和训练样本加载，禁用下载、TEST 构造和 TEST 文件打开。静态审计和 GPU 探针各加载一次 TRAIN，两处 TEST 构造与文件读取尝试均为 0。静态审计出现一条文档字符串 Windows 路径转义的 `SyntaxWarning`，进程退出码为 0。 本地数据门禁回执（未提交）：`preflight_20261122_01/data_validation.json`
 
 ## CUDA 环境与固定设置
 
@@ -50,7 +50,7 @@ LC-only 用 v1 logits 的 LC 损失。BCL 对 768 个 backbone 特征执行样�
 
 GPU 预检进程退出码 0。两组均未发生 OOM，异常记录为空。
 
-未启动 200 Epoch 正式训练，未保存 checkpoint，未运行 DINOv2 或 TEST 评估。审计后本地 TRAIN 与 meta 的 SHA256 仍匹配。Git 对已跟踪文件及暂存区的差异为空，本轮产物保存在本地忽略的 `BCL_AUDIT/outputs/`。 [GPU 原始回执](preflight_20261122_01/gpu_preflight.json) · [临时预检脚本](preflight_20261122_01/bcl_preflight_once.py)
+未启动 200 Epoch 正式训练，未保存 checkpoint，未运行 DINOv2 或 TEST 评估。审计后本地 TRAIN 与 meta 的 SHA256 仍匹配。Git 对已跟踪文件及暂存区的差异为空，本轮产物保存在本地忽略的 `BCL_AUDIT/outputs/`。 本地 GPU 原始回执（未提交）：`preflight_20261122_01/gpu_preflight.json`；临时预检脚本：`preflight_20261122_01/bcl_preflight_once.py`
 
 数据验证回执 SHA256 `f8f0f95c94342975d9e37b57a889d2d7913578033d0fb71703e4c4cf046c27e2`。GPU 回执 SHA256 `5447471faa4b7b134832fa2a27b5926f73242688d880c384a41fae54fe8acca3`。
 
