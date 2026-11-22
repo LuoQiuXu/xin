@@ -45,8 +45,8 @@ The topology script reads and checksum-validates only the original TRAIN and
 meta pickle files. Do not use stock `CIFAR100(train=True)` for this audit:
 torchvision 0.29.1 checks both train and test file integrity even when
 `train=True`. The DINO path receives only the TRAIN images. The test split is
-not instantiated or read during topology construction.
-dataset. DINOv2 uses Bicubic resize to 224x224 and ImageNet normalization. The
+not instantiated or read during topology construction. DINOv2 uses Bicubic
+resize to 224x224 and ImageNet normalization. The
 default model is ViT-S/14 to keep extraction practical on an 8 GB GPU.
 
 ## Mandatory GPU capacity preflight — run this first
@@ -58,7 +58,10 @@ training-split-only data audit, and one exact-protocol FP32 step at batch size
 5070 Laptop 8 GB GPU.
 
 Do not launch the training command below unless
-`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**.
+`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**
+and its tested source commit matches the current executable source. The
+currently committed report is historical evidence for the earlier code; after
+the TRAIN-only loader hardening, rerun `CODEX_PREFLIGHT_ONLY.txt` first.
 If the exact configuration OOMs, do not reduce batch size, enable AMP, or add
 gradient accumulation; stop and review the capacity report first.
 
