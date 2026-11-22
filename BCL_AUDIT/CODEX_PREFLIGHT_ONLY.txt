@@ -1,0 +1,107 @@
+BCL CIFAR-100-LT — CODEX PREFLIGHT ONLY
+========================================
+
+Repository: LuoQiuXu/xin
+Required branch: research/bcl-cifar100lt-audit-20261122
+
+PURPOSE
+-------
+Do NOT launch the 200-epoch experiment yet. The user's GPU is an RTX 5070
+Laptop with 8 GB VRAM. The fixed research protocol is batch_size=256, FP32,
+three concatenated views (effective backbone batch 768), without AMP or
+gradient accumulation. This may exceed available VRAM. We must establish
+whether the exact protocol is executable before committing to long training.
+
+This task ends with a diagnostic report. No full training, no test-set
+evaluation, no new method, no hyperparameter changes.
+
+1. SAFETY
+---------
+- Confirm repository LuoQiuXu/xin and exact branch above. Stop on mismatch.
+- Read BCL_AUDIT/README.md, BCL_AUDIT/BCL_PROTOCOL_AUDIT.md and all source
+  files under BCL_AUDIT/cifar100lt/ and BCL_AUDIT/scripts/.
+- Do not modify main or any H2T / PI-H2T / CC-SAM / CC-MIA / TP-MAG files.
+- Do not overwrite, delete, or clean existing outputs.
+- Do not commit datasets, model weights, caches, logs or generated arrays.
+- Use the actual local CIFAR root; do not guess it.
+
+2. SOFTWARE TESTS
+-----------------
+Run:
+  python -m pytest BCL_AUDIT/cifar100lt/tests -q
+
+If tests fail:
+- diagnose the first real failure;
+- repair only the smallest relevant defect inside BCL_AUDIT/;
+- add/update a focused test;
+- rerun the full test suite.
+Do not proceed if any test remains failing.
+
+3. DATA / TAXONOMY AUDIT
+------------------------
+Run the static training-split-only audit:
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR root>" --output-dir "BCL_AUDIT/outputs/data_audit"
+
+Verify in the report:
+- CIFAR-100 original training split only; test_split_loaded=false;
+- IF=100, exact count formula int(500 * 0.01 ** (class_id / 99.0));
+- first/last counts 500 and 5; total long-tail samples 10,847;
+- 100 fine classes, 20 coarse superclasses, five fine classes per superclass;
+- split seed 0 and saved source indices;
+- Many/Medium/Few class counts and complete directed-relevant Many-Few pair table.
+If outputs already exist, do not overwrite them; choose a fresh output directory.
+
+Do not run DINOv2 during this preflight unless the data audit succeeds and
+there is enough disk space and network/cache availability. DINO is not needed
+to establish whether the training batch fits.
+
+4. EXACT-PROTOCOL GPU MEMORY PREFLIGHT
+--------------------------------------
+Do not change BATCH_SIZE=256, precision=FP32, three-view concatenation,
+architecture, or loss to make this test pass.
+
+Create a temporary local-only preflight script (do not commit it unless a
+real reusable code defect is found) that:
+- imports BCLCIFARModel, LogitCompensatedCE and BalancedContrastiveLoss;
+- records Python / PyTorch / torchvision / CUDA / GPU / free and total VRAM;
+- creates a real DataLoader batch using the fixed IF=100 indices and
+  CIFAR100LT transform pipeline, batch_size=256, num_workers=0;
+- forms all_views = cat([v1,v2,v3], dim=0), so the backbone sees 768 images;
+- runs one full FP32 training step for LC-only: backbone forward, v1 LC loss,
+  backward, optimizer step;
+- clears gradients and CUDA cache, resets peak memory stats;
+- runs one full FP32 training step for BCL: same 768-image backbone forward,
+  sample MLP, classifier-derived prototypes, BCL loss, backward, optimizer step;
+- records peak allocated and reserved VRAM and wall time for each group;
+- catches CUDA OOM, records the complete exception and memory stats, then
+  exits cleanly without trying smaller batch sizes or AMP.
+
+Use the actual class-count vector from the audit. Ensure the smoke test uses
+the same three independent transforms and loss graph as the real trainer.
+This is a single-step capacity probe only; it is not a training run and must
+not save checkpoints.
+
+If batch 256 FP32 OOMs, STOP. Do not reduce batch size, enable AMP, use
+gradient accumulation, or claim the fixed protocol is reproduced. Report
+that the original protocol is not feasible on this device as configured.
+We will decide separately whether to use a smaller-device pilot as an
+engineering diagnostic or move the formal run to a larger GPU.
+
+5. DELIVERABLE
+--------------
+Write a compact local report:
+  BCL_AUDIT/outputs/preflight_report.md
+
+Include:
+- exact branch and current commit SHA;
+- test results;
+- data audit checks and sample count;
+- environment and GPU memory;
+- LC-only and BCL one-step success/failure;
+- peak allocated/reserved VRAM and timings;
+- any traceback in full;
+- explicit conclusion: READY FOR FULL PILOT / GPU CAPACITY BLOCKED /
+  CODE OR DATA BLOCKED.
+
+Do not start the 200-epoch runs in this task. Return the report and wait for
+the user's review before launching the formal paired pilot.
