@@ -23,3 +23,8 @@ __pycache__/
 !/outputs/data_audit_recheck_20261122_01/class_counts.csv
 !/outputs/data_audit_recheck_20261122_01/superclass_counts.csv
 !/outputs/data_audit_recheck_20261122_01/head_tail_pair_topology.csv
+
+!/outputs/preflight_recheck_20261122_03/
+/outputs/preflight_recheck_20261122_03/*
+!/outputs/preflight_recheck_20261122_03/data_validation.json
+!/outputs/preflight_recheck_20261122_03/gpu_preflight.json

@@ -36,6 +36,7 @@ _DINO_OUTPUTS = (
     "DINO_CLASS_SIMILARITY.npy",
     "dino_metadata.json",
     "head_tail_pair_topology_dino.csv",
+    "DINO_CLASS_TOPOLOGY.csv",
     "data_audit_dino_summary.json",
 )
 
@@ -537,6 +538,9 @@ def _write_dino_outputs(
     similarity: np.ndarray,
     near_pairs: set[tuple[int, int]],
     metadata: dict[str, Any],
+    fine_names: list[str],
+    coarse_names: list[str],
+    fine_to_coarse: np.ndarray,
 ):
     if not pair_rows:
         raise RuntimeError("Cannot enrich an empty static Many–Few pair table")
@@ -554,12 +558,107 @@ def _write_dino_outputs(
     near_within = sum(
         row["dino_topk_union"] for row in updated if row["same_superclass"]
     )
+
+    # Audit the complete 100-node graph, not only the Many-Few slice.
+    num_classes = int(similarity.shape[0])
+    topk = int(metadata["topk"])
+    if similarity.shape != (num_classes, num_classes):
+        raise RuntimeError(f"Expected a square DINO similarity matrix, got {similarity.shape}")
+    if len(fine_names) != num_classes or len(fine_to_coarse) != num_classes:
+        raise RuntimeError("DINO class names / superclass mapping do not cover every fine class")
+    if len(coarse_names) == 0:
+        raise RuntimeError("DINO superclass names are missing")
+
+    directed_neighbors: dict[int, list[int]] = {}
+    directed_same_edges = 0
+    union_degrees = np.zeros(num_classes, dtype=np.int64)
+    union_same_degrees = np.zeros(num_classes, dtype=np.int64)
+    union_cross_degrees = np.zeros(num_classes, dtype=np.int64)
+    for class_id in range(num_classes):
+        row = similarity[class_id].astype(np.float64, copy=True)
+        row[class_id] = -np.inf
+        neighbors = np.argsort(-row)[:topk].astype(np.int64).tolist()
+        directed_neighbors[class_id] = neighbors
+        directed_same_edges += sum(
+            int(fine_to_coarse[class_id]) == int(fine_to_coarse[neighbor])
+            for neighbor in neighbors
+        )
+
+    for left, right in near_pairs:
+        left, right = int(left), int(right)
+        if left == right or not (0 <= left < num_classes and 0 <= right < num_classes):
+            raise RuntimeError(f"Invalid symmetric-union DINO edge: {(left, right)}")
+        union_degrees[left] += 1
+        union_degrees[right] += 1
+        if int(fine_to_coarse[left]) == int(fine_to_coarse[right]):
+            union_same_degrees[left] += 1
+            union_same_degrees[right] += 1
+        else:
+            union_cross_degrees[left] += 1
+            union_cross_degrees[right] += 1
+
+    directed_edge_count = num_classes * topk
+    directed_same_fraction = (
+        float(directed_same_edges / directed_edge_count) if directed_edge_count else float("nan")
+    )
+    coarse_sizes = np.bincount(np.asarray(fine_to_coarse, dtype=np.int64))
+    random_same_expectation = float(
+        np.mean([(int(coarse_sizes[int(c)]) - 1) / max(num_classes - 1, 1) for c in fine_to_coarse])
+    )
+    union_edge_count = int(len(near_pairs))
+    union_same_edge_count = int(sum(
+        int(fine_to_coarse[left]) == int(fine_to_coarse[right])
+        for left, right in near_pairs
+    ))
+    union_cross_edge_count = union_edge_count - union_same_edge_count
+    union_same_fraction = (
+        float(union_same_edge_count / union_edge_count) if union_edge_count else float("nan")
+    )
+
+    class_topology_rows = []
+    for class_id in range(num_classes):
+        neighbors = directed_neighbors[class_id]
+        same_directed = sum(
+            int(fine_to_coarse[class_id]) == int(fine_to_coarse[neighbor])
+            for neighbor in neighbors
+        )
+        class_topology_rows.append({
+            "fine_id": class_id,
+            "fine_name": fine_names[class_id],
+            "coarse_id": int(fine_to_coarse[class_id]),
+            "coarse_name": coarse_names[int(fine_to_coarse[class_id])],
+            "directed_topk_neighbor_ids": ";".join(map(str, neighbors)),
+            "directed_topk_same_superclass_count": int(same_directed),
+            "directed_topk_same_superclass_fraction": (
+                float(same_directed / max(len(neighbors), 1))
+            ),
+            "symmetric_union_degree": int(union_degrees[class_id]),
+            "symmetric_union_same_superclass_degree": int(union_same_degrees[class_id]),
+            "symmetric_union_cross_superclass_degree": int(union_cross_degrees[class_id]),
+        })
+
     dino_summary = {
         **summary,
         "dino_enrichment_completed": True,
         "dino_topk_union_many_few_pairs": near,
         "dino_topk_union_within_superclass_many_few_pairs": near_within,
         "dino_topk_union_cross_superclass_many_few_pairs": near - near_within,
+        "dino_topk_union_edge_count_all_classes": union_edge_count,
+        "dino_topk_union_same_superclass_edge_count_all_classes": union_same_edge_count,
+        "dino_topk_union_cross_superclass_edge_count_all_classes": union_cross_edge_count,
+        "dino_topk_union_same_superclass_edge_fraction_all_classes": union_same_fraction,
+        "dino_topk_union_degree_min": int(union_degrees.min()),
+        "dino_topk_union_degree_median": float(np.median(union_degrees)),
+        "dino_topk_union_degree_max": int(union_degrees.max()),
+        "dino_topk_union_degree_mean": float(union_degrees.mean()),
+        "dino_topk_directed_edge_count": int(directed_edge_count),
+        "dino_topk_directed_same_superclass_edge_count": int(directed_same_edges),
+        "dino_topk_directed_same_superclass_fraction": directed_same_fraction,
+        "dino_topk_directed_same_superclass_random_expectation": random_same_expectation,
+        "dino_topk_directed_same_superclass_enrichment_ratio": (
+            directed_same_fraction / random_same_expectation
+            if random_same_expectation > 0 else float("nan")
+        ),
     }
 
     with (out_dir / "DINO_CLASS_MEAN_FEATURES.npy").open("xb") as f:
@@ -569,6 +668,19 @@ def _write_dino_outputs(
     with (out_dir / "dino_metadata.json").open("x", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2, ensure_ascii=False)
     _write_csv(out_dir / "head_tail_pair_topology_dino.csv", updated, list(updated[0]))
+    _write_csv(
+        out_dir / "DINO_CLASS_TOPOLOGY.csv",
+        class_topology_rows,
+        [
+            "fine_id", "fine_name", "coarse_id", "coarse_name",
+            "directed_topk_neighbor_ids",
+            "directed_topk_same_superclass_count",
+            "directed_topk_same_superclass_fraction",
+            "symmetric_union_degree",
+            "symmetric_union_same_superclass_degree",
+            "symmetric_union_cross_superclass_degree",
+        ],
+    )
     # Write the completion summary after the other DINO outputs.
     with (out_dir / "data_audit_dino_summary.json").open("x", encoding="utf-8") as f:
         json.dump(dino_summary, f, indent=2, ensure_ascii=False)
@@ -690,7 +802,16 @@ def main():
                 topk=args.topk,
             )
             _write_dino_outputs(
-                out_dir, summary, pair_rows, class_means, similarity, near_pairs, metadata
+                out_dir,
+                summary,
+                pair_rows,
+                class_means,
+                similarity,
+                near_pairs,
+                metadata,
+                fine_names,
+                coarse_names,
+                fine_to_coarse,
             )
             print(
                 f"DINOv2 completed: {metadata['model']}, "

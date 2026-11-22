@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 import torch.nn.functional as F
 
@@ -12,7 +13,14 @@ from BCL_AUDIT.cifar100lt.data import (
     cifar100lt_class_counts,
     make_cifar100lt_indices,
 )
-from BCL_AUDIT.cifar100lt.train import BatchNormAudit
+from BCL_AUDIT.cifar100lt.train import (
+    BatchNormAudit,
+    classification_logits_v1,
+    compose_group_loss,
+    epoch_seed_for,
+    make_train_loader,
+    verify_paired_data_streams,
+)
 from BCL_AUDIT.scripts.analyze_paired_bcl import summarize_did
 from BCL_AUDIT.scripts.audit_cifar100lt_topology import _load_existing_static_audit
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
@@ -358,3 +366,52 @@ def test_bcl_loss_matches_released_official_balscl_formula():
     )
     assert torch.allclose(actual, reference, atol=1e-6, rtol=1e-6)
 
+
+
+def test_lc_only_uses_v1_logits_and_exact_loss_coefficients():
+    batch_size = 3
+    all_logits = torch.arange(9 * 100, dtype=torch.float32).reshape(9, 100)
+    logits_v1 = classification_logits_v1(all_logits, batch_size)
+    assert torch.equal(logits_v1, all_logits[:batch_size])
+
+    loss_lc = torch.tensor(2.5)
+    loss_bcl = torch.tensor(4.0)
+    assert torch.allclose(compose_group_loss("LC_only", loss_lc, loss_bcl), torch.tensor(5.0))
+    assert torch.allclose(compose_group_loss("BCL", loss_lc, loss_bcl), torch.tensor(7.4))
+    with pytest.raises(ValueError, match="Unknown training group"):
+        compose_group_loss("unknown", loss_lc, loss_bcl)
+
+
+def test_training_refuses_to_regenerate_missing_preflight_indices(tmp_path):
+    with pytest.raises(FileNotFoundError, match="must not silently regenerate"):
+        make_train_loader(
+            data_root=tmp_path,
+            mode="lc",
+            indices_file=tmp_path / "missing_indices.npy",
+            num_workers=0,
+            seed=42,
+        )
+
+
+def test_epoch_seed_and_paired_data_stream_audit(tmp_path):
+    assert epoch_seed_for(42, 0) == 4_200_000
+    assert epoch_seed_for(42, 199) == 4_200_199
+
+    for group in ("LC_only", "BCL"):
+        run_dir = tmp_path / f"{group}_seed42"
+        run_dir.mkdir(parents=True)
+        with (run_dir / "history.jsonl").open("w", encoding="utf-8") as stream:
+            for epoch_index in range(200):
+                row = {
+                    "epoch": epoch_index + 1,
+                    "epoch_seed": epoch_seed_for(42, epoch_index),
+                    "sample_order_sha256": f"order-{epoch_index}",
+                    "first_batch_views_sha256": f"views-{epoch_index}",
+                }
+                stream.write(json.dumps(row) + "\n")
+
+    report = verify_paired_data_streams(tmp_path)
+    assert report["paired_data_streams_identical"] is True
+    assert report["epochs_compared"] == 200
+    assert report["mismatch_count"] == 0
+    assert (tmp_path / "paired_data_stream_audit.json").is_file()

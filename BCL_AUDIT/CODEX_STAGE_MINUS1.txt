@@ -1,5 +1,5 @@
 BCL CIFAR-100-LT — CODEX TASK
-PAIRED PILOT + MERGED OFFLINE DIAGNOSTICS
+PAIRED PILOT + HUMAN-GATED OFFLINE DIAGNOSTICS
 =========================================
 
 Repository: LuoQiuXu/xin
@@ -7,7 +7,8 @@ Required branch: research/bcl-cifar100lt-audit-20261122
 
 Read before doing anything:
   - BCL_AUDIT/README.md
-  - BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt
+  - BCL_AUDIT/CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt
+  - BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt
   - BCL_AUDIT/BCL_PROTOCOL_AUDIT.md
   - BCL_AUDIT/cifar100lt/README.md
   - BCL_AUDIT/cifar100lt/data.py
@@ -19,16 +20,23 @@ Read before doing anything:
 
 MISSION
 -------
-Complete one closed-loop, one-seed BCL audit on CIFAR-100-LT IF=100:
+Complete a one-seed BCL audit on CIFAR-100-LT IF=100 in TWO PHASES, separated
+by an explicit human acceptance gate:
 
+PHASE 1:
 1. Verify the existing standalone CIFAR BCL port; repair only real defects.
-2. Run the fixed data/taxonomy audit and DINOv2 topology extraction.
+2. Reuse the fixed data/taxonomy audit and run DINOv2 topology extraction.
 3. Run one paired seed (seed 42) of LC-only and original BCL, each 200 epochs,
    FP32, batch size 256.
 4. Save complete checkpoints at epochs 40, 100, 160-pre-decay, 180-pre-decay,
    and 200.
-5. Run one merged offline diagnostic pass: checkpoint margins, dual-layer
-   gradients, Head->Tail / Tail->Head confusion, and paired DID.
+5. Evaluate the two final checkpoints once on TEST and report Overall/Many/
+   Medium/Few. STOP for human acceptance. Do not run offline diagnostics yet.
+
+PHASE 2:
+6. Only after the user explicitly approves Phase 1, run the single merged
+   offline diagnostic pass: LT-train margins, TEST read-only margins,
+   common-input and native three-view gradients, directional confusion, and DID.
 
 We are investigating whether BCL has a structural weakness. We have NOT
 established that BCL is defective. Do not design or implement a replacement
@@ -36,10 +44,16 @@ method or run an Oracle in this task.
 
 HARD PRECONDITION — GPU PREFLIGHT MUST PASS
 -------------------------------------------
-This full Stage -1 task is blocked until the separate task in
-BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt has been completed and the local report
-BCL_AUDIT/outputs/preflight_report.md concludes exactly:
-  READY FOR FULL PILOT
+This Stage -1 task is blocked until the current-source task
+BCL_AUDIT/CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt has been completed and the
+local report BCL_AUDIT/outputs/preflight_report.md contains a fresh
+READY FOR FULL PILOT result whose tested_source_commit matches the current
+executable Python files under BCL_AUDIT/.
+
+The older READY result for dc150d1 / 0617c2 is historical capacity evidence
+only. It does NOT authorize the newly hardened training, topology and
+diagnostic source. Do not use CODEX_PREFLIGHT_REVALIDATE_0617C.txt for the
+current source version.
 
 If that report is missing, incomplete, or concludes GPU CAPACITY BLOCKED /
 CODE OR DATA BLOCKED, STOP. Do not start DINOv2, either 200-epoch run, or
@@ -48,9 +62,9 @@ final test evaluation. Return the preflight findings and wait for the user.
 The report must identify the exact source-code commit tested. If executable
 source files have changed after that tested commit, the old READY result is
 only historical capacity evidence and does NOT authorize this Stage -1 run.
-Rerun CODEX_PREFLIGHT_ONLY.txt against the current source and require a fresh
-READY FOR FULL PILOT report before proceeding. Documentation-only commits do
-not invalidate the capacity probe.
+Rerun CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt against the current source and
+require a fresh READY FOR FULL PILOT report before proceeding.
+Documentation-only commits do not invalidate the capacity probe.
 
 When preflight is READY:
 - Reuse its validated data_audit outputs and exact saved IF=100 index file.
@@ -186,7 +200,8 @@ Run groups sequentially, not concurrently:
 
 Shared settings:
 - seed=42 for both groups
-- same saved initial full model state for both groups
+- save one complete init_seed42.pth and load the exact same state in both groups
+- record a deterministic state-dict SHA-256 and verify the loaded hash in each group
 - same exact IF=100 sample indices
 - batch size=256
 - FP32 only; no AMP/autocast
@@ -198,8 +213,12 @@ Shared settings:
 - LR drops by 0.1 at the start of epoch index 160 and epoch index 180
   (after 160 and 180 completed epochs)
 - 200 epochs total
-- DataLoader shuffle generator and worker seeds explicitly set
-- reset Python / NumPy / torch / CUDA RNGs before each group
+- for every zero-based epoch e, use paired epoch seed 42*100000+e
+- reset Python / NumPy / torch / CUDA RNGs and the DataLoader generator before
+  creating that epoch's iterator in BOTH groups
+- hash the full epoch source-index order and byte-hash the first augmented
+  three-view minibatch in each epoch; require exact equality for all 200
+  epochs before opening TEST
 
 Checkpoint milestones (human-numbered completed epochs):
   epoch_040.pth
@@ -244,9 +263,15 @@ Rules:
 - Keep class_counts.csv, superclass_counts.csv, head_tail_pair_topology.csv,
   data_audit_summary.json, and cifar100lt_if100_train_indices_seed0.npy immutable.
 - Write DINO outputs to head_tail_pair_topology_dino.csv,
-  data_audit_dino_summary.json, DINO_CLASS_MEAN_FEATURES.npy,
-  DINO_CLASS_SIMILARITY.npy, and dino_metadata.json. The summary sidecar copies
-  the static fields and adds DINO counts and dino_enrichment_completed.
+  DINO_CLASS_TOPOLOGY.csv, data_audit_dino_summary.json,
+  DINO_CLASS_MEAN_FEATURES.npy, DINO_CLASS_SIMILARITY.npy, and
+  dino_metadata.json. The summary sidecar copies the static fields and adds
+  DINO counts and dino_enrichment_completed.
+- DINO_CLASS_TOPOLOGY.csv must contain one row for each of the 100 fine classes:
+  directed Top-5 neighbor IDs, same-superclass Top-5 count/fraction,
+  symmetric-union degree, and same-/cross-superclass union degrees.
+- The DINO summary must report symmetric-union degree min/median/max and
+  directed Top-5 same-superclass overlap, its random expectation and enrichment.
   Skip a complete set of DINO outputs. Stop if any are present but incomplete.
 - Report all Many/Medium/Few class counts, superclass distribution, full
   Head-Few pair list, within-superclass and cross-superclass pair counts.
@@ -273,15 +298,45 @@ comparison. Save:
 
 Do not evaluate/select checkpoints by test accuracy. Do not use test images or
 labels for DINO, topology construction, probe generation, or hyperparameter
-selection.
+selection. TEST is used only once for the final epoch-200 benchmark and later
+read-only margin/confusion calculations; it is never used for gradient probes.
 
-G. ONE MERGED OFFLINE DIAGNOSTIC PASS
--------------------------------------
-After both final evaluations are saved, run:
+PHASE 1 HUMAN ACCEPTANCE GATE — HARD STOP
+------------------------------------------
+After DINOv2, both 200-epoch runs, paired data-stream verification and the two
+final TEST evaluations are complete, STOP. Do NOT run Section G in the same
+Codex task. Return the Phase 1 evidence and wait for the user's explicit
+approval before Phase 2.
 
-  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "<exact indices_file path recorded by fresh preflight report>" --data-audit-dir "<preflight data_audit_output_dir>" --output-root "BCL_AUDIT/outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
+Human acceptance checklist:
+- [ ] Both groups completed exactly 200 epochs and saved all five checkpoints.
+- [ ] paired_data_stream_audit.json reports 200/200 identical epoch seeds,
+      sample-order hashes and first-minibatch three-view hashes.
+- [ ] init_seed42.pth SHA-256 is recorded and both groups loaded that exact state.
+- [ ] Standard CIFAR ResNet-32 and nn.Linear(64,100) are present; no ImageNet
+      NormedLinear or s=30 scale was introduced.
+- [ ] v1 AutoAugment+Cutout and independent v2/v3 SimAugment are intact.
+- [ ] Five-epoch warmup and LR drops after 160/180 completed epochs are intact.
+- [ ] LC-only uses exactly 2.0*LC on v1 logits only; BCL uses exactly
+      2.0*LC + 0.6*BCL.
+- [ ] FP32, batch 256, no AMP, no TF32 and no gradient accumulation.
+- [ ] Final Overall/Many/Medium/Few metrics and training logs are complete.
+- [ ] BCL's approximately 51%-52% CIFAR reference is treated as a sanity
+      reference, not a hard pass/fail threshold. A large deviation or no
+      LC-only advantage triggers protocol review, not post-hoc tuning.
+- [ ] TEST was not accessed before both training runs completed.
 
-This is the merged offline pass; do not create a separate training stage.
+Only after the user approves Phase 1, execute the following Phase 2 diagnostics.
+
+G. PHASE 2 — ONE MERGED OFFLINE DIAGNOSTIC PASS
+------------------------------------------------
+Use the SAME dedicated training output root used in Phase 1, so the analyzer
+finds LC_only_seed42 and BCL_seed42 directly beneath it. Do not point to the
+generic BCL_AUDIT/outputs parent directory.
+
+  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "<actual CIFAR root>" --indices-file "<exact indices_file path recorded by fresh preflight report>" --data-audit-dir "<preflight data_audit_output_dir>" --output-root "<same dedicated Stage-1 training output root>" --probe-per-class 5 --probe-seed 777 --batch-size 128
+
+This is one offline analysis pass; do not train again or create another group.
 
 G1. Fixed probe
 - Select five examples per fine class from the saved LT training indices.
@@ -289,25 +344,39 @@ G1. Fixed probe
 - Reuse exactly the same 500 probe images/views for every checkpoint.
 - This probe is sourced only from the LT training subset; no test data.
 
-G2. Checkpoint margins
-- For LC-only and BCL checkpoints 40/100/160/180/200:
-  report per-class probe accuracy, raw true-class margin, and
-  logit-adjusted true-class margin.
+G2. Margins and data-source separation
+- For LC-only and BCL checkpoints 40/100/160/180/200, report per-class
+  accuracy, raw true-class margin and logit-adjusted true-class margin on the
+  fixed five-per-class LT TRAIN probe (deterministic eval view).
+- Compute full balanced TEST per-class raw/adjusted margins from saved
+  final_test_predictions.npz only. No TEST forward pass or autograd is allowed
+  in the analyzer. Keep TEST margins in a separate output file.
 
-G3. Dual-layer gradient diagnostics
+G3. Dual-mode gradient diagnostics — LT TRAIN only
 - Run on BCL checkpoints only; LC-only projection heads are untrained.
-- Put the model in eval mode to freeze BN running statistics.
-- Use the same v2 feature tensor f(x) for both LC and BCL gradient calculations.
+- Both probes must use only the fixed five-per-class LT TRAIN probe cache,
+  globally shuffled with the fixed probe seed before batching. Never use TEST
+  for gradients, even if TEST logits are already available.
+- Probe A, common_input_eval: model.eval(), freeze BN running statistics, and
+  use the same v2 feature tensor f(x) for both LC and BCL gradient calculations.
+- Probe B, native_three_view_train: concatenate the cached native v1/v2/v3
+  augmentations into one 3B forward with model.train(), preserving train-mode
+  BN coupling. LC uses v1 logits only; BCL uses v2/v3 embeddings and prototypes.
 - LC: classifier W and logit-compensated CE.
 - BCL: same f(x) through sample MLP, paired with v3, plus classifier W through
   prototype MLP.
 - At classifier row W_y report cosine(grad_W_y LC, grad_W_y BCL), both norms,
   and norm ratio.
-- At the same probe feature f(x), report cosine(grad_f LC, grad_f BCL), both
-  norms, and negative-cosine fraction.
+- For Probe A, at the same f(x), report cosine(grad_f LC, grad_f BCL), both
+  norms and negative-cosine fraction.
+- For Probe B, report per-class W_y gradient cosine/norms; per-view feature
+  gradient cosine/conflict fractions; global backbone-parameter gradient
+  cosine/norms; and per-view input-gradient norms/cosines.
+- Restore all BN running_mean/running_var/num_batches_tracked buffers after
+  every train-mode diagnostic batch; do not mutate checkpoint state.
 - Do not count prototype MLP as a separate conflict site.
-- State clearly that eval-mode probes isolate local loss gradients; train-mode
-  BN coupling is measured separately by batchnorm_audit.jsonl.
+- Label eval-mode common-input and train-mode native-three-view results as
+  different estimands, not interchangeable measurements.
 
 G4. Head-Tail directional confusion / paired DID
 - Use only saved final epoch-200 benchmark predictions/logits.
@@ -324,6 +393,8 @@ G4. Head-Tail directional confusion / paired DID
   Fall back to head_tail_pair_topology.csv when the sidecar is absent.
 - Report DINO Top-K union as a separate relation slice when it is recorded.
 - Report pair counts. One-seed DID is descriptive, not seed-level significance.
+- TEST-derived quantities are limited to final benchmark accuracy, read-only
+  margins and directional confusion/DID from saved logits/predictions.
 
 H. ORACLE GATE — DO NOT RUN NOW
 --------------------------------
@@ -349,15 +420,20 @@ seeing the results.
 
 I. REQUIRED RETURN PACKAGE
 --------------------------
-After completion, report:
-1. Exact branch and commit SHA.
-2. Environment / GPU / peak memory.
-3. Test results.
-4. Data count vector summary and superclass pair counts.
-5. DINO provenance and whether train-only extraction completed.
-6. LC-only and BCL epoch-200 metrics, plus full training time.
-7. Checkpoint paths and BatchNorm audit summary.
-8. Offline margin / W_y gradient / same-f gradient summaries.
+Phase 1 return:
+1. Exact branch and commit SHA; current-source preflight tested commit.
+2. Environment / GPU / peak memory and full test results.
+3. Data count vector, superclass pair counts, DINO provenance, all-class
+   degree min/median/max and Top-5 superclass overlap.
+4. Initial-state hash and 200-epoch paired data-stream audit.
+5. LC-only and BCL epoch-200 Overall/Many/Medium/Few metrics and full time.
+6. Checkpoint paths, BatchNorm audit and protocol checklist.
+7. Explicit confirmation that Phase 2 diagnostics, Oracle and new method
+   were NOT run.
+
+Phase 2 return (only after explicit user approval):
+8. LT-train and TEST margin summaries; common-input and native-three-view
+   W_y / feature / backbone / input gradient summaries.
 9. Head->Tail and Tail->Head confusion deltas and DID, with pair counts.
 10. Stage-gate conclusion: HOLD / replicate / stop, with evidence.
 11. Explicit confirmation that no Oracle or new method was run.

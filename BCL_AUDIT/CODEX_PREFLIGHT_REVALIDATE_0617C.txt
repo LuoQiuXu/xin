@@ -1,3 +1,8 @@
+HISTORICAL ONLY — SUPERSEDED BY CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt
+
+This file is pinned to the earlier 0617c2 source and must NOT be used to
+authorize the current paired-data-stream / native-gradient source.
+
 BCL CIFAR-100-LT — CODEX PREFLIGHT REVALIDATION
 SOURCE UPDATE: NON-DESTRUCTIVE DINO SIDECARS
 ================================================

@@ -1,0 +1,162 @@
+BCL CIFAR-100-LT — CURRENT-SOURCE PREFLIGHT REVALIDATION
+==========================================================
+
+Repository: LuoQiuXu/xin
+Required branch: research/bcl-cifar100lt-audit-20261122
+
+PURPOSE
+-------
+Revalidate the exact committed Python source after the paired-data-stream,
+native-gradient and DINO topology-audit hardening. This task performs tests and
+one exact-protocol GPU capacity probe only. It must NOT run DINOv2, any training
+epoch, checkpoint evaluation or TEST evaluation.
+
+At task start, record the exact branch HEAD SHA. That SHA is the tested source
+commit. Do not edit executable Python files during this task. If a code defect
+is found and fixed, commit the code change first and restart this preflight
+against the new HEAD.
+
+A. SAFETY / SOURCE IDENTITY
+---------------------------
+1. Confirm repository and branch exactly as above. Do not switch branches,
+   create another branch, work on main, amend or force-push.
+2. Record current HEAD, branch, git status and latest commit.
+3. Preserve all local modifications and untracked historical directories.
+   Never reset, clean, stash, delete or overwrite user artifacts.
+4. Compare the tracked executable Python files under BCL_AUDIT/ with the
+   current HEAD. The tested_source_commit in the new report must be this exact
+   HEAD SHA.
+5. Read CODEX_STAGE_MINUS1.txt and current train.py / data.py / models.py /
+   losses.py / analyzer / topology source.
+6. No H2T, PI-H2T, CC-SAM, CC-MIA or TP-MAG modifications.
+
+B. PRESERVE THE EXISTING STATIC DATA AUDIT
+------------------------------------------
+Reuse the exact paths from the existing committed preflight report:
+
+CIFAR root:
+  D:\xiangmuxunlian\xin\H2T\data\cifar100
+
+data_audit_output_dir:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01
+
+indices_file:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
+
+Expected index SHA-256:
+  be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
+
+Before any tests, verify the five static artifacts exist and compute SHA-256:
+- class_counts.csv
+- superclass_counts.csv
+- head_tail_pair_topology.csv
+- data_audit_summary.json
+- cifar100lt_if100_train_indices_seed0.npy
+
+After tests and GPU probe, recompute and require identical hashes. Do not run
+the topology script, regenerate indices, download data, or touch TEST files.
+The exact source indices path must exist; do not substitute a new split.
+
+C. FULL TEST SUITE
+------------------
+Run exactly:
+  python -B -m pytest BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
+
+Record complete output, exit code, elapsed time and warnings. Tests must cover:
+- exact IF=100 split and train-only file boundary;
+- LC-only v1-only supervision and exact lambda=2.0 / mu=0.6 objective;
+- strict missing-index failure;
+- paired epoch-seed / sample-order audit;
+- identical three-view dataset contract and BatchNorm hooks;
+- BCL loss formula and gradient routes;
+- DINO sidecar immutability and synthetic graph degree/superclass-overlap
+  schema (the production run must emit 100 class rows);
+- read-only TEST margins;
+- common-input and native train-mode gradient probes;
+- restoration of BatchNorm running buffers.
+
+If any test fails, stop. Repair only a real defect, commit it, then restart this
+current-source preflight from the beginning.
+
+D. EXACT-PROTOCOL GPU ONE-STEP PREFLIGHT
+----------------------------------------
+Use the actual committed train.py, data.py, model and loss implementations.
+Use a temporary local-only helper under:
+  BCL_AUDIT/outputs/preflight_recheck_20261122_03/gpu_preflight_recheck.py
+
+The helper and all generated binaries remain ignored/untracked.
+
+Data:
+- use the actual make_train_loader() entry point in train.py, backed by the
+  CIFAR100LT / original TRAIN-only data path and the exact saved IF=100 indices;
+- train=True, download=False, num_workers=0;
+- batch_size=256; independent v1/v2/v3 transforms;
+- the current indexed loader yields (views, labels, original_source_indices);
+  unpack all three fields and hash the source indices;
+- concatenate [v1,v2,v3] into [768,3,32,32];
+- TEST file-open count must remain zero.
+
+GPU / training:
+- RTX 5070 Laptop GPU, FP32 only;
+- AMP disabled, TF32 disabled, no gradient accumulation;
+- exact ResNet-32 and original BCL graph;
+- same real batch and exact same initial model state for both groups;
+- LC-only: concatenate three views through backbone, take only v1 logits,
+  objective exactly 2.0*LC;
+- BCL: same backbone batch, v1 LC plus v2/v3 BCL, objective exactly
+  2.0*LC + 0.6*BCL;
+- SGD, momentum 0.9, weight decay 5e-4, LR 0.15;
+- one full forward/backward/optimizer update per group;
+- record initial-state hash, batch/view hash, finite losses/gradients,
+  successful parameter update, environment and allocated/reserved VRAM.
+
+Do not lower batch size or alter precision if OOM. Record the complete error
+and stop.
+
+E. WRITE NEW EVIDENCE
+---------------------
+Use a new directory:
+  BCL_AUDIT/outputs/preflight_recheck_20261122_03/
+
+Create only these compact evidence files for tracking:
+- data_validation.json
+- gpu_preflight.json
+
+Keep gpu_preflight_recheck.py, logs, arrays, indices, checkpoints and all other
+outputs ignored.
+
+Append a dated section to BCL_AUDIT/outputs/preflight_report.md preserving the
+historical text. State:
+- exact tested_source_commit (current HEAD recorded at task start);
+- current branch and report commit separately;
+- static artifact/index SHA-256 before and after;
+- test summary;
+- TEST file-open count (must be zero);
+- one-step LC-only and BCL status, loss, update, timings and VRAM;
+- no DINOv2, no training epochs and no TEST evaluation.
+
+Mark READY FOR FULL PILOT only if all tests, static hashes and both GPU steps
+pass without any protocol change. Otherwise state CODE OR DATA BLOCKED or
+GPU CAPACITY BLOCKED.
+
+F. GIT / COMMIT SAFETY
+----------------------
+Add narrow .gitignore allow-list rules only for:
+- outputs/preflight_recheck_20261122_03/data_validation.json
+- outputs/preflight_recheck_20261122_03/gpu_preflight.json
+
+Verify the helper script and representative .npy/.pth/.npz/.log files remain
+ignored. Stage only .gitignore, preflight_report.md and the two JSON files.
+Do not stage static arrays, training artifacts, logs or historical untracked
+directories. Commit and push normally to the SAME branch; no amend/force-push.
+
+G. HARD STOP
+------------
+Do not:
+- initialize/download/run DINOv2;
+- run LC-only or BCL training epochs;
+- instantiate/read CIFAR100(train=False);
+- evaluate TEST;
+- run the analyzer, Oracle or a new method.
+
+Wait for the user's review of the new READY report before Stage -1 Phase 1.

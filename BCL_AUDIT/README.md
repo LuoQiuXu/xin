@@ -8,8 +8,8 @@ This is an independent research line for auditing **Balanced Contrastive Learnin
 2. Leakage-safe CIFAR-100-LT superclass and DINOv2 topology statistics:
    `scripts/audit_cifar100lt_topology.py`
 3. Paired one-seed, 200-epoch FP32 pilot: LC-only versus original BCL.
-4. One merged offline diagnostic pass: checkpoint margins, dual-layer gradients,
-   Head-to-Tail / Tail-to-Head confusion, and superclass/DINO paired DID.
+4. Human-gated two-phase diagnostics: first final TEST benchmark; only after
+   approval, LT-train gradients/margins plus read-only TEST margins and DID.
 
 ## Critical paired-control definition
 
@@ -55,59 +55,58 @@ and leaves them byte-identical. The DINO pass writes its pair table, summary,
 arrays, and metadata separately. It skips a complete set of DINO outputs and
 stops if it finds a partial set.
 
-## Mandatory GPU capacity preflight — run this first
+## Mandatory current-source GPU preflight — run this first
 
-Before any 200-epoch training, give Codex the instructions in
-[`CODEX_PREFLIGHT_ONLY.txt`](CODEX_PREFLIGHT_ONLY.txt). This checks the tests,
-training-split-only data audit, and one exact-protocol FP32 step at batch size
-256 with three concatenated views (effective backbone batch 768) on the RTX
-5070 Laptop 8 GB GPU.
-
-The committed [preflight report](outputs/preflight_report.md) at
-`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**.
-It tested executable source `dc150d1023510c1ec40841fdc133fb8ba106774c`
-and was published in commit `2da996aee10b9e0c2f36f01a4b54eb213bbe4349`.
-Authorize Stage -1 only after comparing the current executable Python files
-with that tested source. Reuse the verified GPU preflight after documentation-only changes.
-If the exact configuration OOMs, do not reduce batch size, enable AMP, or add
-gradient accumulation; stop and review the capacity report first.
+Before any 200-epoch training, run
+`CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt` and require a fresh
+`READY FOR FULL PILOT` result for the exact current Python source. The older
+dc150d1 / 0617c2 READY entries are historical and do not authorize the newly
+hardened code. If batch 256 FP32 OOMs, do not reduce batch size, enable AMP or
+add gradient accumulation; stop and review the capacity report first.
 
 ## Training command
 
-After the static audit writes the fixed IF=100 indices, run the paired groups
-sequentially:
+After the exact saved IF=100 indices from the newest preflight report are
+available, run the paired groups sequentially with a dedicated output root:
 
 ```powershell
-python -m BCL_AUDIT.cifar100lt.train --data-root "D:\datasets\cifar100" --output-root "BCL_AUDIT\outputs" --indices-file "BCL_AUDIT\outputs\data_audit\cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
+python -m BCL_AUDIT.cifar100lt.train --data-root "D:\\datasets\\cifar100" --output-root "BCL_AUDIT\\outputs\\stage_minus1_seed42_20261122_01" --indices-file "BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01\\cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
 ```
 
 Fixed protocol: seed 42, 200 epochs, batch 256, FP32, SGD, base LR 0.15,
 5-epoch warmup, LR drops after 160 and 180 completed epochs, weight decay
 5e-4, LC coefficient 2.0, BCL coefficient 0.6, temperature 0.1.
-Checkpoints include model/optimizer/RNG state at epochs 40, 100, 160-pre-decay,
-180-pre-decay, and 200.
+Both groups use the same saved initial state; each epoch has the same
+group-independent epoch seed, full sample-order hash and first-minibatch
+three-view fingerprint. The trainer refuses to regenerate missing indices and
+does not open TEST until both histories pass the paired data-stream audit.
 
-## Merged offline diagnostics
+## Two-phase Stage -1 execution
 
-After both training runs and their final epoch-200 test evaluation complete:
+Phase 1 is DINOv2 train-only topology + the paired 200-epoch runs + final
+epoch-200 TEST metrics. It must stop for manual acceptance. Do not run the
+offline analyzer in the same task.
+
+The DINO pass additionally writes `DINO_CLASS_TOPOLOGY.csv`, containing all
+100 classes' symmetric-union degrees and directed Top-5 superclass overlap.
+The summary reports degree min/median/max and same-superclass enrichment
+against the random-neighbor expectation.
+
+## Phase 2 offline diagnostics — after explicit approval only
+
+After reviewing and approving Phase 1, run
+`CODEX_STAGE_MINUS1_PHASE2.txt`. It uses the SAME dedicated training output
+root, not the generic outputs parent:
 
 ```powershell
-python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\datasets\cifar100" --indices-file "BCL_AUDIT\outputs\data_audit\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "BCL_AUDIT\outputs\data_audit" --output-root "BCL_AUDIT\outputs" --probe-per-class 5 --probe-seed 777 --batch-size 128
+python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\\datasets\\cifar100" --indices-file "BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01\\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01" --output-root "BCL_AUDIT\\outputs\\stage_minus1_seed42_20261122_01" --probe-per-class 5 --probe-seed 777 --batch-size 128
 ```
 
-This creates one fixed five-per-class probe set from the selected LT training
-subset. It reports margins at all five checkpoints; gradients at classifier
-rows W_y and the same probe feature f(x) on BCL checkpoints; and paired
-Head->Tail / Tail->Head confusion and DID from the saved final benchmark
-predictions. Point `--data-audit-dir` to the directory recorded by preflight.
-Analysis prefers `head_tail_pair_topology_dino.csv` after checking its row
-count, pair identities, and superclass assignments against the original
-table. With only the original table, the analyzer uses its available
-relations. The DINO relation is reported separately when DINO values exist.
-
-The first run is one-seed reconnaissance only. The script writes
-`stage_gate.json` and does not run any Oracle. Do not proceed to an Oracle
-until the mechanism evidence is coherent and repeatable across paired seeds.
+Training margins and both gradient probes use only the fixed LT TRAIN probe.
+The common-input probe runs in eval mode; the native three-view probe runs
+with train-mode BN and restores all BN running buffers. TEST margins and
+Head/Tail confusion/DID are read-only calculations from saved final logits
+and predictions. No TEST gradient is computed.
 
 ## Expected outputs
 
@@ -117,18 +116,24 @@ until the mechanism evidence is coherent and repeatable across paired seeds.
 - `outputs/data_audit/data_audit_summary.json`
 - `outputs/data_audit/cifar100lt_if100_train_indices_seed0.npy`
 - `outputs/data_audit/head_tail_pair_topology_dino.csv`
+- `outputs/data_audit/DINO_CLASS_TOPOLOGY.csv`
 - `outputs/data_audit/data_audit_dino_summary.json`
 - `outputs/data_audit/DINO_CLASS_MEAN_FEATURES.npy`
 - `outputs/data_audit/DINO_CLASS_SIMILARITY.npy`
 - `outputs/data_audit/dino_metadata.json`
-- `outputs/environment.json`
-- `outputs/LC_only_seed42/` and `outputs/BCL_seed42/`
-- `outputs/*_seed42/batchnorm_audit.jsonl`
-- `outputs/offline_probe_margin_metrics.csv`
-- `outputs/offline_dual_gradient_metrics.csv`
-- `outputs/head_tail_pair_effects.csv`
-- `outputs/head_tail_did_summary.csv`
-- `outputs/stage_gate.json`
+- `<stage_output_root>/environment.json`
+- `<stage_output_root>/LC_only_seed42/` and `<stage_output_root>/BCL_seed42/`
+- `<stage_output_root>/*_seed42/batchnorm_audit.jsonl`
+- `<stage_output_root>/paired_data_stream_audit.json`
+- `<stage_output_root>/offline_probe_margin_metrics.csv`
+- `<stage_output_root>/offline_dual_gradient_metrics.csv`
+- `<stage_output_root>/offline_native_three_view_gradient_class_metrics.csv`
+- `<stage_output_root>/offline_native_three_view_gradient_global_metrics.csv`
+- `<stage_output_root>/offline_test_margin_metrics.csv`
+- `<stage_output_root>/offline_test_margin_summary.json`
+- `<stage_output_root>/head_tail_pair_effects.csv`
+- `<stage_output_root>/head_tail_did_summary.csv`
+- `<stage_output_root>/stage_gate.json`
 
 Do not commit datasets, DINO weights, checkpoints, logs, or generated arrays.
 Keep run outputs local and upload only compact reports / CSV summaries when

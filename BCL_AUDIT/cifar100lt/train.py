@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import platform
 import random
@@ -12,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 from .data import CIFAR100BalancedTest, CIFAR100LT, cifar100lt_class_counts
 from .losses import BalancedContrastiveLoss, LogitCompensatedCE
@@ -53,6 +54,117 @@ def seed_worker(worker_id: int):
     np.random.seed(worker_seed)
     random.seed(worker_seed)
 
+
+def epoch_seed_for(seed: int, epoch_index: int) -> int:
+    """Stable, group-independent seed for each zero-based training epoch."""
+    return int(seed) * 100_000 + int(epoch_index)
+
+
+def state_dict_sha256(state_dict: dict[str, torch.Tensor]) -> str:
+    """Hash tensor names, dtypes, shapes and bytes in a deterministic order."""
+    digest = hashlib.sha256()
+    for name in sorted(state_dict):
+        tensor = state_dict[name].detach().cpu().contiguous()
+        digest.update(name.encode("utf-8"))
+        digest.update(str(tensor.dtype).encode("ascii"))
+        digest.update(np.asarray(tensor.shape, dtype=np.int64).tobytes())
+        digest.update(tensor.numpy().tobytes(order="C"))
+    return digest.hexdigest()
+
+
+def classification_logits_v1(all_logits: torch.Tensor, batch_size: int) -> torch.Tensor:
+    """Return only v1 logits from a concatenated [v1,v2,v3] forward."""
+    if all_logits.ndim != 2 or all_logits.shape[0] != 3 * int(batch_size):
+        raise ValueError(
+            "Expected exactly 3B logits from the matched three-view backbone, "
+            f"got {tuple(all_logits.shape)} for B={batch_size}"
+        )
+    return all_logits[:batch_size]
+
+
+def compose_group_loss(
+    group: str,
+    loss_lc: torch.Tensor,
+    loss_bcl: torch.Tensor,
+) -> torch.Tensor:
+    """Keep the paired objective weights exact: LC-only=2.0*LC; BCL=2.0*LC+0.6*BCL."""
+    if group == "LC_only":
+        return LAMBDA_LC * loss_lc
+    if group == "BCL":
+        return LAMBDA_LC * loss_lc + MU_BCL * loss_bcl
+    raise ValueError(f"Unknown training group: {group}")
+
+
+def first_batch_views_sha256(views) -> str:
+    digest = hashlib.sha256()
+    for view in views:
+        array = view.detach().cpu().contiguous().numpy()
+        digest.update(array.tobytes(order="C"))
+    return digest.hexdigest()
+
+
+class IndexedCIFAR100LTDataset(Dataset):
+    """Expose original TRAIN indices for a paired per-epoch sample-order audit."""
+
+    def __init__(self, dataset: CIFAR100LT):
+        self.dataset = dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, index: int):
+        views, label = self.dataset[index]
+        return views, label, int(self.dataset.indices[index])
+
+
+def verify_paired_data_streams(output_root: Path) -> dict:
+    """Require exact epoch seeds, sample orders and first-batch view fingerprints."""
+    histories = {}
+    for group in ("LC_only", "BCL"):
+        path = output_root / f"{group}_seed{TRAIN_SEED}" / "history.jsonl"
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing training history for paired audit: {path}")
+        with path.open("r", encoding="utf-8") as stream:
+            histories[group] = [json.loads(line) for line in stream if line.strip()]
+
+    if len(histories["LC_only"]) != EPOCHS or len(histories["BCL"]) != EPOCHS:
+        raise RuntimeError(
+            "Paired data-stream audit requires complete histories for both 200-epoch runs"
+        )
+
+    mismatches = []
+    fields = ("epoch", "epoch_seed", "sample_order_sha256", "first_batch_views_sha256")
+    for left, right in zip(histories["LC_only"], histories["BCL"]):
+        for field in fields:
+            if left.get(field) != right.get(field):
+                mismatches.append({
+                    "epoch": left.get("epoch"),
+                    "field": field,
+                    "LC_only": left.get(field),
+                    "BCL": right.get(field),
+                })
+    report = {
+        "seed": TRAIN_SEED,
+        "epochs_compared": min(len(histories["LC_only"]), len(histories["BCL"])),
+        "comparison_fields": list(fields),
+        "paired_data_streams_identical": not mismatches,
+        "mismatch_count": len(mismatches),
+        "mismatches": mismatches,
+        "note": (
+            "The full epoch sample order is hashed. The first augmented minibatch "
+            "per epoch is byte-hashed as an augmentation sentinel; both groups use "
+            "the same epoch seed, worker seeding and transform pipeline."
+        ),
+    }
+    report_path = output_root / "paired_data_stream_audit.json"
+    with report_path.open("w", encoding="utf-8") as stream:
+        json.dump(report, stream, indent=2, ensure_ascii=False)
+    if mismatches:
+        raise RuntimeError(
+            f"LC-only/BCL data streams diverged; see {report_path}. "
+            "Stop before TEST evaluation."
+        )
+    return report
 
 
 class BatchNormAudit:
@@ -164,6 +276,11 @@ def make_train_loader(
     num_workers: int,
     seed: int,
 ):
+    if not indices_file.is_file():
+        raise FileNotFoundError(
+            f"Required preflight-generated IF=100 indices are missing: {indices_file}. "
+            "Training must not silently regenerate a different split."
+        )
     dataset = CIFAR100LT(
         root=data_root,
         mode=mode,
@@ -171,10 +288,11 @@ def make_train_loader(
         split_seed=0,
         download=False,
     )
+    indexed_dataset = IndexedCIFAR100LTDataset(dataset)
     generator = torch.Generator()
     generator.manual_seed(seed)
     loader = DataLoader(
-        dataset,
+        indexed_dataset,
         batch_size=BATCH_SIZE,
         shuffle=True,
         num_workers=num_workers,
@@ -196,6 +314,7 @@ def _save_checkpoint(
     class_counts: np.ndarray,
     last_lr: float,
     data_loader_generator: torch.Generator,
+    initial_model_state_sha256: str,
 ):
     path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
@@ -213,6 +332,7 @@ def _save_checkpoint(
                 "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
             },
             "class_counts": class_counts.tolist(),
+            "initial_model_state_sha256": initial_model_state_sha256,
             "last_lr": last_lr,
             "protocol": {
                 "epochs": EPOCHS,
@@ -236,6 +356,7 @@ def train_group(
     output_root: Path,
     indices_file: Path,
     initial_state: dict,
+    initial_state_sha256: str,
     num_workers: int,
     device: torch.device,
 ):
@@ -255,6 +376,8 @@ def train_group(
 
     model = BCLCIFARModel()
     model.load_state_dict(initial_state, strict=True)
+    if state_dict_sha256(model.state_dict()) != initial_state_sha256:
+        raise RuntimeError("Loaded initial model state does not match init_seed42.pth hash")
     model = model.to(device)
 
     criterion_lc = LogitCompensatedCE(class_counts).to(device)
@@ -275,17 +398,21 @@ def train_group(
     run_dir.mkdir(parents=True, exist_ok=True)
     history_path = run_dir / "history.jsonl"
     if history_path.exists():
-        history_path.unlink()
+        raise FileExistsError(f"Refusing to overwrite existing history: {history_path}")
 
     epoch_summaries = []
     bn_audit = BatchNormAudit(model)
     bn_audit_path = run_dir / "batchnorm_audit.jsonl"
     if bn_audit_path.exists():
-        bn_audit_path.unlink()
+        raise FileExistsError(f"Refusing to overwrite existing BatchNorm audit: {bn_audit_path}")
     total_start = time.perf_counter()
 
     for epoch_index in range(EPOCHS):
         human_epoch = epoch_index + 1
+        epoch_seed = epoch_seed_for(TRAIN_SEED, epoch_index)
+        # Reset augmentation / sampler RNGs identically for this epoch in both groups.
+        set_seed(epoch_seed)
+        loader_generator.manual_seed(epoch_seed)
         if human_epoch in CHECKPOINT_EPOCHS:
             bn_audit.arm()
         lr = learning_rate_for_epoch(epoch_index)
@@ -298,13 +425,20 @@ def train_group(
         loss_total_sum = 0.0
         correct = 0
         seen = 0
+        sample_order_digest = hashlib.sha256()
+        first_views_digest = None
 
         if device.type == "cuda":
             torch.cuda.reset_peak_memory_stats(device)
             torch.cuda.synchronize(device)
         epoch_start = time.perf_counter()
 
-        for images, labels in loader:
+        for batch_index, (images, labels, source_indices) in enumerate(loader):
+            sample_order_digest.update(
+                source_indices.detach().cpu().numpy().astype(np.int64, copy=False).tobytes()
+            )
+            if batch_index == 0:
+                first_views_digest = first_batch_views_sha256(images)
             labels = labels.to(device, non_blocking=True)
             batch_size = int(labels.shape[0])
 
@@ -321,16 +455,16 @@ def train_group(
                     all_views,
                     compute_contrastive=False,
                 )
-                logits = all_logits[:batch_size]
+                logits = classification_logits_v1(all_logits, batch_size)
                 loss_lc = criterion_lc(logits, labels)
                 loss_bcl = logits.new_zeros(())
-                loss = LAMBDA_LC * loss_lc
+                loss = compose_group_loss(group, loss_lc, loss_bcl)
             else:
                 _, all_logits, all_embeddings, class_prototypes = model(
                     all_views,
                     compute_contrastive=True,
                 )
-                logits = all_logits[:batch_size]
+                logits = classification_logits_v1(all_logits, batch_size)
                 z2 = all_embeddings[batch_size : 2 * batch_size]
                 z3 = all_embeddings[2 * batch_size : 3 * batch_size]
                 two_view_features = torch.stack([z2, z3], dim=1)
@@ -341,7 +475,7 @@ def train_group(
                     two_view_features,
                     labels,
                 )
-                loss = LAMBDA_LC * loss_lc + MU_BCL * loss_bcl
+                loss = compose_group_loss(group, loss_lc, loss_bcl)
 
             bn_audit.finish_batch()
             optimizer.zero_grad(set_to_none=True)
@@ -361,8 +495,13 @@ def train_group(
             peak_memory_bytes = 0
         epoch_seconds = time.perf_counter() - epoch_start
 
+        if first_views_digest is None:
+            raise RuntimeError("DataLoader produced no batches in this epoch")
         summary = {
             "epoch": epoch_index + 1,
+            "epoch_seed": epoch_seed,
+            "sample_order_sha256": sample_order_digest.hexdigest(),
+            "first_batch_views_sha256": first_views_digest,
             "lr": lr,
             "loss_lc": loss_lc_sum / max(seen, 1),
             "loss_bcl": loss_bcl_sum / max(seen, 1),
@@ -390,6 +529,7 @@ def train_group(
                 class_counts=class_counts,
                 last_lr=lr,
                 data_loader_generator=loader_generator,
+                initial_model_state_sha256=initial_state_sha256,
             )
             summary["checkpoint"] = str(checkpoint_path)
             bn_record = bn_audit.snapshot(group, human_epoch)
@@ -418,6 +558,7 @@ def train_group(
         "epochs": EPOCHS,
         "batch_size": BATCH_SIZE,
         "precision": "fp32",
+        "initial_model_state_sha256": initial_state_sha256,
         "total_training_seconds": total_seconds,
         "mean_epoch_seconds": float(np.mean([x["epoch_seconds"] for x in epoch_summaries])),
         "max_epoch_peak_cuda_memory_bytes": max(
@@ -558,8 +699,12 @@ def main():
     data_root = args.data_root.expanduser().resolve()
     output_root = args.output_root.expanduser().resolve()
     indices_file = args.indices_file.expanduser().resolve()
+    if not indices_file.is_file():
+        raise FileNotFoundError(
+            f"Required preflight-generated IF=100 indices are missing: {indices_file}. "
+            "Do not regenerate or download the split in the training entry point."
+        )
     output_root.mkdir(parents=True, exist_ok=True)
-    indices_file.parent.mkdir(parents=True, exist_ok=True)
 
     existing_run_artifacts = [
         output_root / "environment.json",
@@ -624,7 +769,15 @@ def main():
     }
     del template_model
     initial_state_path = output_root / f"initial_model_seed{TRAIN_SEED}.pth"
-    torch.save({"model_state": initial_state, "seed": TRAIN_SEED}, initial_state_path)
+    initial_state_sha256 = state_dict_sha256(initial_state)
+    torch.save(
+        {
+            "model_state": initial_state,
+            "seed": TRAIN_SEED,
+            "model_state_sha256": initial_state_sha256,
+        },
+        initial_state_path,
+    )
 
     # Run the two groups sequentially. No test dataset is instantiated here.
     lc_checkpoint, lc_summary = train_group(
@@ -633,6 +786,7 @@ def main():
         output_root=output_root,
         indices_file=indices_file,
         initial_state=initial_state,
+        initial_state_sha256=initial_state_sha256,
         num_workers=args.num_workers,
         device=device,
     )
@@ -642,9 +796,14 @@ def main():
         output_root=output_root,
         indices_file=indices_file,
         initial_state=initial_state,
+        initial_state_sha256=initial_state_sha256,
         num_workers=args.num_workers,
         device=device,
     )
+
+    # Hard stop before TEST: paired sampler order and augmented-view sentinels
+    # must match exactly for all 200 epochs.
+    paired_data_stream_audit = verify_paired_data_streams(output_root)
 
     # Only now instantiate the balanced test dataset for final reporting.
     lc_metrics = evaluate_final_checkpoint(
@@ -660,7 +819,9 @@ def main():
         "batch_size": BATCH_SIZE,
         "precision": "fp32",
         "initial_model_checkpoint": str(initial_state_path),
+        "initial_model_state_sha256": initial_state_sha256,
         "indices_file": str(indices_file),
+        "paired_data_stream_audit": paired_data_stream_audit,
         "LC_only_training": lc_summary,
         "BCL_training": bcl_summary,
         "LC_only_final_test": lc_metrics,

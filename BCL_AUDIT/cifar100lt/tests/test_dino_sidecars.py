@@ -19,6 +19,7 @@ DINO_FILES = (
     "DINO_CLASS_MEAN_FEATURES.npy",
     "DINO_CLASS_SIMILARITY.npy",
     "dino_metadata.json",
+    "DINO_CLASS_TOPOLOGY.csv",
 )
 
 
@@ -83,8 +84,13 @@ def static_audit(tmp_path, monkeypatch, pairs):
 
     images = np.zeros((7, 2, 2, 3), dtype=np.uint8)
     labels = np.arange(7)
+    fine_names = [f"fine-{index}" for index in range(7)]
+    coarse_names = ["coarse-0", "coarse-1"]
+    fine_to_coarse = np.asarray([0, 0, 1, 1, 0, 1, 0], dtype=np.int64)
     monkeypatch.setattr(
-        topology, "_load_original_train", lambda _: (images, labels, None, None, None, None)
+        topology,
+        "_load_original_train",
+        lambda _: (images, labels, np.zeros(7, dtype=np.int64), fine_names, coarse_names, fine_to_coarse),
     )
     monkeypatch.setattr(topology, "_make_long_tail_indices", lambda *_: (counts, indices))
     monkeypatch.setattr(
@@ -137,13 +143,24 @@ def test_dino_sidecars_preserve_static_audit(static_audit, monkeypatch, pairs, e
         )
     ]
     summary = json.loads((out_dir / DINO_SUMMARY).read_text(encoding="utf-8"))
-    assert summary == {
-        **static_summary,
-        "dino_enrichment_completed": True,
-        "dino_topk_union_many_few_pairs": 2,
-        "dino_topk_union_within_superclass_many_few_pairs": 1,
-        "dino_topk_union_cross_superclass_many_few_pairs": 1,
-    }
+    assert summary["dino_enrichment_completed"] is True
+    assert summary["dino_topk_union_many_few_pairs"] == 2
+    assert summary["dino_topk_union_within_superclass_many_few_pairs"] == 1
+    assert summary["dino_topk_union_cross_superclass_many_few_pairs"] == 1
+    # Full 100-class graph statistics are also emitted; this synthetic fixture
+    # has seven nodes and two cross-superclass union edges.
+    assert summary["dino_topk_union_degree_min"] == 0
+    assert summary["dino_topk_union_degree_median"] == 0.0
+    assert summary["dino_topk_union_degree_max"] == 2
+    assert summary["dino_topk_union_edge_count_all_classes"] == 2
+    assert summary["dino_topk_union_same_superclass_edge_count_all_classes"] == 1
+    assert summary["dino_topk_union_cross_superclass_edge_count_all_classes"] == 1
+    assert summary["dino_topk_directed_edge_count"] == 35
+    assert summary["dino_topk_directed_same_superclass_random_expectation"] > 0
+    class_topology = analysis.read_csv(out_dir / "DINO_CLASS_TOPOLOGY.csv")
+    assert len(class_topology) == 7
+    assert {row["fine_id"] for row in class_topology} == {str(i) for i in range(7)}
+    assert all("symmetric_union_degree" in row for row in class_topology)
     np.testing.assert_array_equal(np.load(out_dir / "DINO_CLASS_MEAN_FEATURES.npy"), class_means)
     np.testing.assert_array_equal(np.load(out_dir / "DINO_CLASS_SIMILARITY.npy"), similarity)
     assert json.loads((out_dir / "dino_metadata.json").read_text(encoding="utf-8")) == metadata

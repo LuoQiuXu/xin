@@ -1,265 +1,139 @@
-BCL CIFAR-100-LT — CODEX EXECUTION WRAPPER
-PRE-FLIGHT EVIDENCE CLEANUP + STAGE -1 PAIRED PILOT
-===================================================
+BCL CIFAR-100-LT — STAGE -1 PHASE 1 EXECUTION
+=================================================
 
 Repository: LuoQiuXu/xin
 Required branch: research/bcl-cifar100lt-audit-20261122
 
-READ THESE FILES FIRST
-----------------------
-1. BCL_AUDIT/CODEX_STAGE_MINUS1_EXECUTE.txt  (this file)
-2. BCL_AUDIT/CODEX_STAGE_MINUS1.txt         (authoritative experiment protocol)
-3. BCL_AUDIT/outputs/preflight_report.md
-4. BCL_AUDIT/README.md
-5. BCL_AUDIT/cifar100lt/README.md
-6. BCL_AUDIT/.gitignore
+READ FIRST
+----------
+1. BCL_AUDIT/CODEX_STAGE_MINUS1_EXECUTE.txt
+2. BCL_AUDIT/CODEX_STAGE_MINUS1.txt
+3. BCL_AUDIT/CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt
+4. BCL_AUDIT/outputs/preflight_report.md
+5. BCL_AUDIT/README.md
+6. BCL_AUDIT/cifar100lt/README.md
 
 MISSION
 -------
-Do exactly two things:
+Execute PHASE 1 only:
+- reuse validated static IF=100 audit outputs;
+- compute DINOv2 topology and 100-class graph statistics;
+- run the paired LC-only/BCL 200-epoch seed-42 FP32 experiment;
+- verify exact paired data streams;
+- run final TEST evaluation after BOTH training runs;
+- STOP for manual acceptance.
 
-A. Reconcile the newly completed GPU preflight evidence with the repository
-   documentation and Git ignore rules. Preserve only compact reproducibility
-   evidence in Git; do not upload data, checkpoints, embeddings, arrays, or logs.
+Do not run Phase 2 diagnostics in this task.
 
-B. Execute the existing one-seed Stage -1 experiment exactly as specified in
-   BCL_AUDIT/CODEX_STAGE_MINUS1.txt.
-
-This is a controlled reconnaissance experiment, not a method-development task.
-Do not add mechanisms, ablations, seeds, Oracle experiments, or hyperparameter
-search. Do not modify H2T, PI-H2T, CC-SAM, CC-MIA, or TP-MAG.
-
-A. BRANCH AND WORKTREE SAFETY
------------------------------
-1. Confirm repository is LuoQiuXu/xin.
-2. Confirm the checked-out branch is exactly:
+A. BRANCH / SOURCE / WORKTREE SAFETY
+------------------------------------
+1. Confirm repository LuoQiuXu/xin and branch exactly:
    research/bcl-cifar100lt-audit-20261122
-3. Do not switch branches, create a branch, or work on main.
-4. Confirm the local branch is at commit
-   2da996aee10b9e0c2f36f01a4b54eb213bbe4349
-   or a descendant of it.
-   - If the local branch is behind and the worktree is clean, fast-forward only.
-   - If there are local modifications, do not discard or overwrite them; stop
-     and report the status.
-   - If the branch name or repository is wrong, stop.
-5. Record branch, HEAD SHA, git status, and the latest commit before editing.
+2. Do not switch branches, create a branch, amend, force-push or work on main.
+3. Record local HEAD, branch and git status. Preserve all local modifications.
+4. Confirm the current preflight report contains a fresh READY FOR FULL PILOT
+   entry from CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt.
+5. Compare every executable Python file under BCL_AUDIT/ against the exact
+   tested_source_commit recorded by that new report. If any Python source
+   differs, STOP and rerun the current-source preflight task.
+6. Older READY evidence for dc150d1 / 0617c2 is historical only.
+7. Do not modify H2T, PI-H2T, CC-SAM, CC-MIA or TP-MAG.
+8. Never commit datasets, DINO weights, checkpoints, logs, event files,
+   predictions, generated arrays or local helper scripts.
 
-B. VALIDATE THE NEW PREFLIGHT — DO NOT RERUN IT UNNECESSARILY
-------------------------------------------------------------
-The committed report is:
-  BCL_AUDIT/outputs/preflight_report.md
+B. PRESERVE EXACT STATIC AUDIT AND DATA PATHS
+---------------------------------------------
+Use the paths recorded in the newest preflight report; do not infer or replace:
 
-It concludes:
-  READY FOR FULL PILOT
+CIFAR root:
+  D:\xiangmuxunlian\xin\H2T\data\cifar100
 
-The exact executable source commit tested by that report is:
-  dc150d1023510c1ec40841fdc133fb8ba106774c
+data_audit_output_dir:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01
 
-The report was committed/updated at:
-  2da996aee10b9e0c2f36f01a4b54eb213bbe4349
+indices_file:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
 
-The report records:
-- pytest: 10 passed, 1 warning;
-- actual TRAIN file events: 2;
-- actual metadata file events: 2;
-- TEST file events during preflight: 0;
-- CIFAR-100-LT IF=100: 10,847 samples, 100 fine classes;
-- RTX 5070 Laptop GPU, FP32, batch size 256, concatenated backbone batch 768;
-- one real SGD update passed for LC-only and original BCL, with no OOM.
+Verify all paths exist. Verify the index SHA-256 equals the newest preflight
+report. Preserve the five static audit artifacts byte-for-byte. Do not rerun
+the static audit or regenerate indices.
 
-Before proceeding, verify that all executable Python source files under
-BCL_AUDIT (including tests, training code, data code, topology code, and
-diagnostic code) are unchanged between the tested source commit above and the
-current HEAD. Use git diff / git status; do not rely only on commit messages.
+C. TESTS BEFORE DINO / TRAINING
+-------------------------------
+Run:
+  python -B -m pytest BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
 
-Decision:
-- If no executable .py files changed after the tested source commit, the
-  READY report remains valid. Do NOT rerun CODEX_PREFLIGHT_ONLY.txt.
-- If any executable .py file changed, or the report is missing/incomplete,
-  stop the Stage -1 launch. Run BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt against the
-  current source and require a new READY FOR FULL PILOT report.
-- Documentation-only changes and the report-only commit do not invalidate
-  the GPU capacity measurement.
+If any test fails, STOP and repair the smallest source defect. Since executable
+source would then change, rerun CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt and
+require a new READY result before resuming.
 
-Do not claim the current branch HEAD itself was the tested source commit:
-the tested executable source commit is dc150d1...; the later report commit is
-2da996a.... State both accurately.
+D. DINOv2 TRAIN-ONLY TOPOLOGY
+-----------------------------
+If all DINO outputs already exist and are complete, validate and reuse them.
+If absent, run:
+  python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --output-dir "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01" --compute-dino --reuse-static-audit --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 
-C. RECONCILE DOCUMENTATION
---------------------------
-The two README files contain obsolete text saying the committed READY report
-is historical and that the TRAIN-only loader hardening still requires a new
-preflight. That statement is now stale.
+DINO may read only the original balanced TRAIN pickle and metadata. TEST file
+existence, checksum, contents, labels and paths must not be accessed.
 
-Update only the preflight-status paragraphs in:
-- BCL_AUDIT/README.md
-- BCL_AUDIT/cifar100lt/README.md
+Require:
+- DINO_CLASS_MEAN_FEATURES.npy and DINO_CLASS_SIMILARITY.npy;
+- head_tail_pair_topology_dino.csv;
+- DINO_CLASS_TOPOLOGY.csv (100 class rows);
+- data_audit_dino_summary.json and dino_metadata.json;
+- symmetric-union degree min/median/max;
+- directed Top-5 same-superclass overlap, random expectation and enrichment;
+- Many/Medium/Few class counts and 1,050 Many-Few pairs.
 
-Replace them with a concise, accurate status that says:
-- the current committed report concludes READY FOR FULL PILOT;
-- the report tested executable source commit
-  dc150d1023510c1ec40841fdc133fb8ba106774c;
-- the report is available at BCL_AUDIT/outputs/preflight_report.md;
-- the current branch report update is commit
-  2da996aee10b9e0c2f36f01a4b54eb213bbe4349;
-- Stage -1 is authorized only if the executable-source comparison in section B
-  confirms no .py changes after the tested source commit;
-- no need to rerun the GPU preflight for documentation-only changes.
-
-Do not rewrite the scientific protocol or alter the numerical settings in the
-READMEs or CODEX_STAGE_MINUS1.txt.
-
-D. MAKE ONLY COMPACT PREFLIGHT EVIDENCE TRACKABLE
-------------------------------------------------
-Current BCL_AUDIT/.gitignore ignores the entire outputs/ directory. Keep all
-large/generated outputs ignored, but add narrow negation rules at the END of
-BCL_AUDIT/.gitignore so that only the following compact evidence files can be
-tracked when they exist:
-
-1. BCL_AUDIT/outputs/preflight_report.md
-
-2. BCL_AUDIT/outputs/preflight_recheck_20261122_01/gpu_preflight.json
-3. BCL_AUDIT/outputs/preflight_recheck_20261122_01/data_validation.json
-
-4. BCL_AUDIT/outputs/data_audit_recheck_20261122_01/data_audit_summary.json
-5. BCL_AUDIT/outputs/data_audit_recheck_20261122_01/data_validation.json
-6. BCL_AUDIT/outputs/data_audit_recheck_20261122_01/class_counts.csv
-7. BCL_AUDIT/outputs/data_audit_recheck_20261122_01/superclass_counts.csv
-8. BCL_AUDIT/outputs/data_audit_recheck_20261122_01/head_tail_pair_topology.csv
-
-Important:
-- First check whether each file actually exists in the local worktree.
-- Never fabricate a missing artifact or replace it with an empty placeholder.
-- If an expected artifact is absent, report it as absent and leave it absent.
-- Inspect candidate JSON/CSV files for secrets or irrelevant machine-specific
-  information before staging. Do not alter measured values or provenance.
-- Keep every other file under outputs/ ignored by default.
-- Keep *.pth, *.pth.tar, *.npz, *.npy, *.log, runs/, __pycache__, and
-  .pytest_cache ignored.
-- In particular, do not unignore CIFAR indices .npy, DINO similarity/features,
-  DINO model weights, checkpoints, predictions, event files, or training logs.
-- Add parent-directory negations as required by Git's ignore semantics, then
-  add exact file-level allow-list rules. Do not unignore outputs recursively.
-
-Verify with git check-ignore -v and git status --short that the eight named
-paths are trackable only when present and that representative .npy/.pth/.log
-files remain ignored.
-
-E. COMMIT THE DOCUMENTATION / PREFLIGHT-EVIDENCE CLEANUP
---------------------------------------------------------
-Commit only:
-- BCL_AUDIT/README.md
-- BCL_AUDIT/cifar100lt/README.md
-- BCL_AUDIT/.gitignore
-- the compact evidence files from section D that actually exist and pass review
-
-Do not commit or stage any training output, dataset, model weight, checkpoint,
-DINO array, index array, prediction archive, event file, or log.
-
-Use a clear commit message such as:
-  docs(bcl): reconcile ready preflight evidence
-
-After committing, record the new HEAD SHA. Do not amend or force-push.
-
-F. EXECUTE THE EXISTING STAGE -1 TASK
--------------------------------------
-Now follow BCL_AUDIT/CODEX_STAGE_MINUS1.txt line by line. That file is the
-authoritative scientific and engineering protocol. Do not reinterpret it or
-silently relax any condition.
-
-The preflight report provides these exact local paths:
-  data_audit_output_dir:
-    D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01
-
-  indices_file:
-    D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
-
-  CIFAR data root:
-    D:\xiangmuxunlian\xin\H2T\data\cifar100
-
-Verify that these paths exist before running. Do not guess an alternative path.
-If the CIFAR data root or saved index file is missing, stop and ask the user;
-do not regenerate or download the dataset without permission.
-
-The preflight report says static audit is already complete and DINO similarity
-has NOT yet been computed. Therefore:
-- reuse the exact saved static audit and exact saved IF=100 indices;
-- do not rerun or overwrite the static audit;
-- run DINOv2 topology extraction only, with --reuse-static-audit, into the
-  exact data_audit_output_dir above;
-- use dinov2_vits14, DINO batch size 16, top-k 5;
-- use only the original balanced CIFAR-100 TRAIN split and metadata;
-- never instantiate or read TEST during DINO/topology extraction.
-
-Run the mandatory tests specified in CODEX_STAGE_MINUS1.txt before training.
-The preflight's 10/10 test pass is evidence, but the Stage -1 task still
-requires a fresh local test invocation before launching the long runs.
-
-Use a fresh, dedicated training output root:
+E. PAIRED 200-EPOCH TRAINING AND FINAL TEST
+-------------------------------------------
+Use a fresh dedicated output root:
   BCL_AUDIT/outputs/stage_minus1_seed42_20261122_01
 
-If that directory already contains any Stage -1 artifacts, choose a new
-incremented suffix; never overwrite or delete an earlier run.
+If any Stage-1 artifacts already exist there, use the next unused suffix.
+Never delete or overwrite previous results.
 
-Run the two groups sequentially:
-- Group A: LC-only, 200 epochs.
-- Group B: original BCL, 200 epochs.
-- Seed 42 for both.
-- Same initial model state and exact same saved IF=100 training indices.
-- Batch size 256, FP32, no AMP, no TF32, no gradient accumulation.
-- Three views concatenated through the shared ResNet-32 in BOTH groups.
-- Only v1 logits enter the LC objective.
-- BCL additionally uses v2/v3 sample embeddings and classifier-derived
-  prototypes.
-- Keep the exact optimizer, LR schedule, loss weights, augmentations,
-  checkpoint milestones, and audit logging specified in CODEX_STAGE_MINUS1.txt.
+Run:
+  python -m BCL_AUDIT.cifar100lt.train --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --output-root "BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
 
-Do not reduce batch size, enable AMP, add gradient accumulation, or change
-the protocol if OOM occurs. Stop and return the exact trace and GPU memory
-measurements.
+Protocol is locked:
+- seed 42; LC-only then BCL sequentially; 200 epochs each;
+- batch 256, FP32, no AMP, no TF32, no gradient accumulation;
+- SGD, momentum 0.9, LR 0.15, weight decay 5e-4;
+- 5-epoch warmup; drops after 160 and 180 completed epochs;
+- LC-only = 2.0 * LC, only v1 logits supervised;
+- BCL = 2.0 * LC + 0.6 * BCL;
+- same initial state and same saved indices;
+- v1 AutoAugment+Cutout; independent v2/v3 SimAugment;
+- all three views concatenated through the shared backbone for BOTH groups;
+- standard nn.Linear(64,100), no NormedLinear or s=30 scale.
 
-The training script must complete BOTH 200-epoch runs before it instantiates
-or reads CIFAR100(train=False) for final benchmark evaluation.
+The trainer must verify paired epoch seeds, full sample-order hashes and
+first-minibatch three-view hashes for all 200 epochs. If any mismatch occurs,
+stop before TEST evaluation.
 
-After both runs and final evaluation, execute the single merged offline
-diagnostic pass from CODEX_STAGE_MINUS1.txt. IMPORTANT: pass the SAME dedicated
-training output root to the analyzer (the --output-root argument), not the
-generic BCL_AUDIT/outputs parent directory. The analyzer must find the
-LC_only_seed42 and BCL_seed42 folders under that dedicated root.
+If batch 256 FP32 OOMs, STOP. Do not reduce batch size, enable AMP or add
+gradient accumulation.
 
-G. SCIENTIFIC STOP CONDITIONS
------------------------------
-- Exactly one paired seed: 42.
-- No seeds 43/44.
-- No 400-epoch run.
-- No Oracle of any kind.
-- No new loss, gate, prototype correction, gradient surgery, or semantic
-  reweighting.
-- No extra mechanism fishing or additional training groups.
-- Do not use test data for DINO, topology, probes, checkpoint selection, or
-  hyperparameter selection.
-- Do not claim statistical significance from one seed.
-- If any critical protocol mismatch occurs, stop and report it rather than
-  silently repairing the experiment design.
+The trainer may instantiate TEST only after both 200-epoch runs and paired
+data-stream verification have completed. Evaluate only final epoch-200
+checkpoints; do not select checkpoints or tune hyperparameters using TEST.
 
-H. REQUIRED RETURN PACKAGE
---------------------------
-After completion, return a concise but complete report containing:
+F. HARD STOP — HUMAN ACCEPTANCE
+-------------------------------
+After DINO, tests, paired training, data-stream verification and final TEST
+metrics are complete, STOP. Do not invoke analyze_paired_bcl.py.
 
-1. Repository, exact branch, final HEAD SHA, and worktree status.
-2. Whether executable source files changed after the tested preflight commit.
-3. Updated preflight status and the compact evidence files committed.
-4. Exact CIFAR root, saved indices path, and DINO provenance.
-5. Test command and full test summary.
-6. LC-only and BCL training completion status, total wall-clock time,
-   peak allocated/reserved GPU memory, and any interruption.
-7. Final Overall / Many / Medium / Few test accuracy for both groups.
-8. Checkpoint paths and BatchNorm audit summary.
-9. Offline margin, classifier-row W_y gradient, same-feature gradient,
-   Head->Tail / Tail->Head confusion, DID, and pair counts.
-10. Stage gate: HOLD / replicate / stop, supported by the actual evidence.
-11. Explicit confirmation that no extra seed, Oracle, or new method ran.
+Return:
+1. repository, branch, pre-task HEAD, final HEAD, worktree status;
+2. exact tested Python source commit from preflight and source-diff result;
+3. test output and warnings;
+4. DINO provenance, degree min/median/max, superclass overlap and pair counts;
+5. initial-state SHA-256 and paired_data_stream_audit.json;
+6. LC-only/BCL training completion, time, peak memory and all checkpoint paths;
+7. final TEST Overall/Many/Medium/Few metrics for both groups;
+8. BatchNorm audit summary and protocol verification;
+9. confirmation: Phase 2 diagnostics NOT run, no Oracle, no new method.
 
-Keep large experiment artifacts local and ignored by Git. Do not push binary
-training outputs. If a run fails or is interrupted, preserve its artifacts and
-report exact paths; never delete them to make a rerun look clean.
+Wait for the user's explicit review/approval before running:
+  BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt

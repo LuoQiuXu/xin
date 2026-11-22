@@ -83,17 +83,22 @@ concatenated through the shared backbone in both groups; LC-only applies its
 classification loss to v1 logits only, while BCL additionally uses v2/v3
 projections and classifier-derived prototypes. The training script records
 per-view BatchNorm input moments and running statistics at checkpoint epochs.
+Only v1 logits contribute to LC in both groups; the exact objective weights
+remain 2.0 for LC and 0.6 for BCL.
 
 The training script saves complete epoch 40, 100, 160-pre-decay, 180-pre-decay,
-and 200 checkpoints, including model, optimizer, protocol, and RNG states. Do not
-upload checkpoints, arrays, or raw predictions unless asked.
+and 200 checkpoints, including model, optimizer, protocol, initial-state hash
+and RNG states. Each epoch has a deterministic paired seed; the full sample
+order and first augmented three-view minibatch are hashed and compared across
+LC-only/BCL before TEST is opened. Missing preflight indices are a hard error:
+the training entry point never silently regenerates a split. Do not upload
+checkpoints, arrays, or raw predictions unless asked.
 
 
 ## Preflight status after TRAIN-only loader hardening
 
-The committed [preflight report](../outputs/preflight_report.md) at
-`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**.
-It tested executable source `dc150d1023510c1ec40841fdc133fb8ba106774c`
-and was published in commit `2da996aee10b9e0c2f36f01a4b54eb213bbe4349`.
-Authorize Stage -1 only after comparing the current executable Python files
-with that tested source. Reuse the verified GPU preflight after documentation-only changes.
+The report at `BCL_AUDIT/outputs/preflight_report.md` contains historical
+READY evidence for earlier Python source. The current paired-data-stream and
+offline-diagnostic hardening changes executable Python; therefore run
+`BCL_AUDIT/CODEX_PREFLIGHT_REVALIDATE_CURRENT.txt` and require a fresh
+READY result for the exact current source before any DINO or 200-epoch run.

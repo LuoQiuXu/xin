@@ -1,0 +1,120 @@
+BCL CIFAR-100-LT — STAGE -1 PHASE 2 OFFLINE DIAGNOSTICS
+==========================================================
+
+Repository: LuoQiuXu/xin
+Required branch: research/bcl-cifar100lt-audit-20261122
+
+PRECONDITION
+------------
+Run this task only after the user explicitly accepts the Phase 1 report.
+Do not repeat DINO, training, checkpoint creation or TEST evaluation.
+
+Read:
+- BCL_AUDIT/CODEX_STAGE_MINUS1.txt
+- BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt
+- Phase 1 paired_pilot_summary.json
+- Phase 1 paired_data_stream_audit.json
+- both groups' final_test_predictions.npz and final_test_metrics.json
+- all five checkpoints per group
+- the exact data_audit_output_dir and indices_file recorded by preflight
+
+A. BRANCH / OUTPUT SAFETY
+-------------------------
+Confirm repository and branch exactly:
+  LuoQiuXu/xin
+  research/bcl-cifar100lt-audit-20261122
+
+Use the SAME dedicated Stage-1 output root that contains:
+  LC_only_seed42/
+  BCL_seed42/
+
+Do not pass the generic BCL_AUDIT/outputs parent directory. Do not overwrite
+existing analyzer outputs; if any Phase-2 output already exists, use a fresh
+analysis subdirectory or stop and report.
+
+B. SOURCE / TEST SPLIT SEPARATION
+---------------------------------
+All gradient diagnostics and training margins must use only the fixed
+five-per-class probe selected from the saved IF=100 LT TRAIN indices. The
+selected samples are globally shuffled with the fixed probe seed before they
+are batched, avoiding class-major diagnostic minibatches while retaining five
+samples per class.
+The probe cache must explicitly record test_split_loaded=false.
+
+TEST is allowed only for:
+- read-only margins from the saved final logits;
+- Head->Tail / Tail->Head confusion;
+- paired DID from saved final predictions/logits.
+
+Never run autograd, gradient calculation, backward, optimizer updates or a
+new model forward on TEST. Do not instantiate CIFAR100(train=False) again.
+
+C. RUN ONE MERGED OFFLINE ANALYSIS
+----------------------------------
+Run:
+  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01" --output-root "BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01" --probe-per-class 5 --probe-seed 777 --batch-size 128
+
+The command must reuse the exact Phase 1 output root. If the actual fresh paths
+differ, use only the exact paths recorded in the newest preflight report.
+
+D. REQUIRED DIAGNOSTICS
+-----------------------
+1. Training margins:
+   - fixed 5-per-class LT TRAIN probe;
+   - deterministic eval view;
+   - LC-only and BCL checkpoints 40/100/160/180/200;
+   - raw and logit-adjusted true-class margins.
+
+2. TEST margins:
+   - read saved final_test_predictions.npz only;
+   - compute raw and adjusted true-class margins by class;
+   - report Many/Medium/Few summaries;
+   - no TEST forward or autograd.
+
+3. Common-input eval gradient probe (BCL checkpoints only):
+   - model.eval(), BN running stats frozen;
+   - use exactly the same v2 feature tensor f(x) for LC and BCL;
+   - report per-class W_y cosine/norm/ratio;
+   - report same-feature gradient cosine, norms and negative-cosine fraction.
+
+4. Native three-view train-mode gradient probe (BCL checkpoints only):
+   - fixed LT TRAIN probe v1/v2/v3;
+   - concatenate [v1,v2,v3] and use one model.train() forward;
+   - LC uses v1 logits only; BCL uses v2/v3 embeddings and classifier-derived
+     prototypes;
+   - report per-class W_y gradients, per-view feature gradients, full
+     backbone-parameter gradient cosine/norms, and per-view input gradients;
+   - restore running_mean, running_var and num_batches_tracked after each
+     diagnostic batch. Checkpoint buffers must remain unchanged.
+   - label this result separately from common-input eval; they are different
+     gradient estimands.
+
+5. Directional confusion and DID:
+   - use only saved final epoch-200 TEST predictions/logits;
+   - C[a->b] = P(prediction=b | true=a);
+   - report Head->Tail and Tail->Head separately;
+   - DID = E[Delta C | SameSuperclass] - E[Delta C | DifferentSuperclass];
+   - DINO Top-5 symmetric-union relation remains a separate exogenous slice;
+   - report pair counts and margins. One seed is descriptive only.
+
+E. STOP CONDITIONS
+------------------
+- Do not train or evaluate checkpoints again.
+- Do not add seeds or groups.
+- Do not run any Oracle or introduce a method.
+- If TEST is found in a gradient path, stop and report the code location.
+- If BN buffers change after the native train-mode probe, stop and report.
+- No post-hoc numeric threshold or significance claim from one seed.
+
+F. RETURN PACKAGE
+-----------------
+Return:
+- exact branch, commit and output root;
+- training-probe provenance and proof test_split_loaded=false;
+- training and TEST margin tables;
+- common-input gradient summary;
+- native three-view W_y/feature/backbone/input gradient summary;
+- proof BN buffers restored;
+- Head->Tail/Tail->Head confusion deltas, DID and pair counts;
+- stage gate HOLD / replicate / stop with evidence;
+- explicit confirmation: no training, no Oracle, no new method.

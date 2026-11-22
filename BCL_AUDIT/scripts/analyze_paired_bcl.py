@@ -151,6 +151,9 @@ def load_or_create_probe_cache(
             rng.choice(pool, size=per_class, replace=False).astype(np.int64).tolist()
         )
     probe_indices = np.asarray(probe_indices, dtype=np.int64)
+    # Keep five samples per class but mix class identities across diagnostic
+    # minibatches so train-mode BN is not exposed to class-major batches.
+    probe_indices = probe_indices[rng.permutation(probe_indices.size)]
 
     transform_v1, transform_sim, transform_eval = build_cifar_transforms()
     set_probe_seed(seed)
@@ -175,6 +178,7 @@ def load_or_create_probe_cache(
             "test_split_loaded": False,
             "per_class": per_class,
             "probe_seed": seed,
+            "probe_order": "per-class fixed-count selection followed by seeded global shuffle",
             "class_order": "official fine-label IDs 0..99",
         },
     }
@@ -243,6 +247,8 @@ def compute_probe_margin_rows(
         rows.append(
             {
                 "group": group,
+                "source_split": "LT_train_probe",
+                "view_type": "deterministic_eval_view",
                 "epoch": epoch,
                 "class_id": class_id,
                 "coarse_id": meta["coarse_id"],
@@ -250,7 +256,9 @@ def compute_probe_margin_rows(
                 "probe_count": int(mask.sum().item()),
                 "raw_top1": 100.0 * float((predictions[mask] == labels[mask]).float().mean().cpu()),
                 "raw_margin_mean": float(raw_margin[mask].mean().cpu()),
+                "raw_margin_median": float(raw_margin[mask].median().cpu()),
                 "adjusted_margin_mean": float(adjusted_margin[mask].mean().cpu()),
+                "adjusted_margin_median": float(adjusted_margin[mask].median().cpu()),
             }
         )
     return rows
@@ -329,6 +337,9 @@ def compute_bcl_gradient_rows(
         meta = class_meta[class_id]
         rows.append(
             {
+                "probe_mode": "common_input_eval",
+                "source_split": "LT_train_probe",
+                "bn_mode": "eval",
                 "epoch": epoch,
                 "class_id": class_id,
                 "coarse_id": meta["coarse_id"],
@@ -347,6 +358,307 @@ def compute_bcl_gradient_rows(
                 "same_f_BCL_gradient_norm_mean": float(np.mean(f_bcl_norm[class_mask])),
             }
         )
+    return rows
+
+
+
+
+def _snapshot_bn_running_buffers(model: BCLCIFARModel) -> dict[str, torch.Tensor]:
+    suffixes = ("running_mean", "running_var", "num_batches_tracked")
+    return {
+        name: buffer.detach().clone()
+        for name, buffer in model.named_buffers()
+        if name.endswith(suffixes)
+    }
+
+
+def _restore_bn_running_buffers(model: BCLCIFARModel, snapshot: dict[str, torch.Tensor]):
+    with torch.no_grad():
+        for name, buffer in model.named_buffers():
+            if name in snapshot:
+                buffer.copy_(snapshot[name])
+
+
+def _flatten_gradient_tensors(gradients) -> torch.Tensor:
+    pieces = [
+        gradient.detach().reshape(-1).to(device="cpu", dtype=torch.float64)
+        for gradient in gradients
+        if gradient is not None
+    ]
+    if not pieces:
+        return torch.zeros(0, dtype=torch.float64)
+    return torch.cat(pieces)
+
+
+def _scalar_cosine(a: torch.Tensor, b: torch.Tensor) -> float:
+    denominator = float(a.norm().item() * b.norm().item())
+    if denominator <= 1e-30:
+        return float("nan")
+    return float(torch.dot(a.reshape(-1), b.reshape(-1)).item() / denominator)
+
+
+def compute_native_three_view_gradient_diagnostics(
+    model: BCLCIFARModel,
+    epoch: int,
+    probe: dict,
+    class_meta: dict[int, dict[str, str]],
+    criterion_lc: LogitCompensatedCE,
+    criterion_bcl: BalancedContrastiveLoss,
+    device: torch.device,
+    batch_size: int,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Measure the native three-view train-mode graph using LT TRAIN probes only.
+
+    Unlike the common-input eval probe, this uses one concatenated [v1,v2,v3]
+    forward with train-mode BatchNorm. It compares gradients at classifier W,
+    backbone parameters, the three-view feature tensor, and the image inputs.
+    BN running buffers are restored after every diagnostic batch, so analysis
+    cannot mutate the checkpoint being measured.
+    """
+    labels_all = probe["labels"].detach().cpu().long()
+    count_all = int(labels_all.numel())
+    if count_all == 0:
+        raise RuntimeError("Native three-view gradient probe is empty")
+    if probe.get("metadata", {}).get("test_split_loaded") is not False:
+        raise RuntimeError("Gradient probes must be sourced only from LT TRAIN data")
+
+    was_training = model.training
+    bn_snapshot = _snapshot_bn_running_buffers(model)
+    model.train()
+
+    weight_lc_sum = torch.zeros_like(
+        model.classifier.weight.detach(), device="cpu", dtype=torch.float64
+    )
+    weight_bcl_sum = torch.zeros_like(weight_lc_sum)
+    backbone_lc_sum = None
+    backbone_bcl_sum = None
+    class_feature_records: dict[int, dict[int, dict[str, list[float]]]] = {}
+    input_records = {
+        view: {"cosine": [], "lc_norm": [], "bcl_norm": [], "conflict": []}
+        for view in (1, 2, 3)
+    }
+
+    backbone_parameters = list(model.backbone.parameters())
+    for start in range(0, count_all, batch_size):
+        end = min(start + batch_size, count_all)
+        labels = labels_all[start:end].to(device)
+        current_batch = int(labels.shape[0])
+        views = [
+            probe[f"view{view}"][start:end].to(device, non_blocking=True)
+            for view in (1, 2, 3)
+        ]
+        all_views = torch.cat(views, dim=0).detach().requires_grad_(True)
+
+        try:
+            features, all_logits, all_embeddings, prototypes = model(
+                all_views, compute_contrastive=True
+            )
+            logits_v1 = all_logits[:current_batch]
+            z2 = all_embeddings[current_batch : 2 * current_batch]
+            z3 = all_embeddings[2 * current_batch : 3 * current_batch]
+            two_view_embeddings = torch.stack([z2, z3], dim=1)
+            loss_lc = criterion_lc(logits_v1, labels)
+            loss_bcl = criterion_bcl(prototypes, two_view_embeddings, labels)
+
+            gradient_targets = [
+                model.classifier.weight,
+                features,
+                *backbone_parameters,
+                all_views,
+            ]
+            gradients_lc = torch.autograd.grad(
+                loss_lc,
+                gradient_targets,
+                retain_graph=True,
+                allow_unused=True,
+            )
+            gradients_bcl = torch.autograd.grad(
+                loss_bcl,
+                gradient_targets,
+                allow_unused=True,
+            )
+
+            weight_lc_sum += (
+                gradients_lc[0].detach().cpu().double() * current_batch
+            )
+            weight_bcl_sum += (
+                gradients_bcl[0].detach().cpu().double() * current_batch
+            )
+
+            backbone_lc = _flatten_gradient_tensors(
+                gradients_lc[2 : 2 + len(backbone_parameters)]
+            )
+            backbone_bcl = _flatten_gradient_tensors(
+                gradients_bcl[2 : 2 + len(backbone_parameters)]
+            )
+            if backbone_lc_sum is None:
+                backbone_lc_sum = torch.zeros_like(backbone_lc)
+                backbone_bcl_sum = torch.zeros_like(backbone_bcl)
+            backbone_lc_sum += backbone_lc * current_batch
+            backbone_bcl_sum += backbone_bcl * current_batch
+
+            feature_lc = gradients_lc[1].detach()
+            feature_bcl = gradients_bcl[1].detach()
+            input_lc = gradients_lc[-1].detach()
+            input_bcl = gradients_bcl[-1].detach()
+            labels_np = labels.detach().cpu().numpy()
+
+            for view_index in (1, 2, 3):
+                view_slice = slice(
+                    (view_index - 1) * current_batch,
+                    view_index * current_batch,
+                )
+                f_lc = feature_lc[view_slice]
+                f_bcl = feature_bcl[view_slice]
+                feature_cos = safe_rowwise_cosine(f_lc, f_bcl).cpu().numpy()
+                feature_lc_norm = f_lc.norm(dim=1).cpu().numpy()
+                feature_bcl_norm = f_bcl.norm(dim=1).cpu().numpy()
+
+                x_lc = input_lc[view_slice].flatten(1)
+                x_bcl = input_bcl[view_slice].flatten(1)
+                input_cos = safe_rowwise_cosine(x_lc, x_bcl).cpu().numpy()
+                input_lc_norm = x_lc.norm(dim=1).cpu().numpy()
+                input_bcl_norm = x_bcl.norm(dim=1).cpu().numpy()
+                input_records[view_index]["cosine"].extend(input_cos.tolist())
+                input_records[view_index]["lc_norm"].extend(input_lc_norm.tolist())
+                input_records[view_index]["bcl_norm"].extend(input_bcl_norm.tolist())
+                input_records[view_index]["conflict"].extend((input_cos < 0).tolist())
+
+                for sample_index, class_id in enumerate(labels_np.tolist()):
+                    record = class_feature_records.setdefault(
+                        int(class_id),
+                        {
+                            view: {
+                                "cosine": [],
+                                "lc_norm": [],
+                                "bcl_norm": [],
+                                "conflict": [],
+                            }
+                            for view in (1, 2, 3)
+                        },
+                    )[view_index]
+                    record["cosine"].append(float(feature_cos[sample_index]))
+                    record["lc_norm"].append(float(feature_lc_norm[sample_index]))
+                    record["bcl_norm"].append(float(feature_bcl_norm[sample_index]))
+                    record["conflict"].append(bool(feature_cos[sample_index] < 0))
+        finally:
+            # Train-mode BN uses current-batch statistics in the forward pass;
+            # restore running buffers so the checkpoint remains byte-identical.
+            _restore_bn_running_buffers(model, bn_snapshot)
+
+    model.train(was_training)
+
+    if backbone_lc_sum is None or backbone_bcl_sum is None:
+        raise RuntimeError("Native three-view gradient probe produced no backbone gradients")
+
+    weight_cos = safe_rowwise_cosine(weight_lc_sum, weight_bcl_sum).numpy()
+    weight_lc_norm = weight_lc_sum.norm(dim=1).numpy()
+    weight_bcl_norm = weight_bcl_sum.norm(dim=1).numpy()
+
+    class_rows = []
+    for class_id in sorted(class_feature_records):
+        meta = class_meta[class_id]
+        row = {
+            "probe_mode": "native_three_view_train",
+            "source_split": "LT_train_probe",
+            "bn_mode": "train",
+            "epoch": epoch,
+            "class_id": class_id,
+            "coarse_id": meta["coarse_id"],
+            "shot_group": meta["shot_group"],
+            "W_y_gradient_cosine": float(weight_cos[class_id]),
+            "W_y_conflict_negative_cosine": bool(weight_cos[class_id] < 0),
+            "W_y_LC_gradient_norm": float(weight_lc_norm[class_id]),
+            "W_y_BCL_gradient_norm": float(weight_bcl_norm[class_id]),
+            "W_y_BCL_to_LC_norm_ratio": float(
+                weight_bcl_norm[class_id] / max(weight_lc_norm[class_id], 1e-12)
+            ),
+        }
+        for view_index in (1, 2, 3):
+            values = class_feature_records[class_id][view_index]
+            suffix = f"v{view_index}"
+            row[f"feature_gradient_cosine_{suffix}_mean"] = float(np.mean(values["cosine"]))
+            row[f"feature_gradient_conflict_{suffix}_fraction"] = float(
+                np.mean(values["conflict"])
+            )
+            row[f"feature_gradient_LC_{suffix}_norm_mean"] = float(np.mean(values["lc_norm"]))
+            row[f"feature_gradient_BCL_{suffix}_norm_mean"] = float(np.mean(values["bcl_norm"]))
+        class_rows.append(row)
+
+    global_row = {
+        "probe_mode": "native_three_view_train",
+        "source_split": "LT_train_probe",
+        "bn_mode": "train",
+        "epoch": epoch,
+        "backbone_gradient_cosine": _scalar_cosine(
+            backbone_lc_sum, backbone_bcl_sum
+        ),
+        "backbone_LC_gradient_norm": float(backbone_lc_sum.norm().item()),
+        "backbone_BCL_gradient_norm": float(backbone_bcl_sum.norm().item()),
+        "backbone_BCL_to_LC_norm_ratio": float(
+            backbone_bcl_sum.norm().item() / max(backbone_lc_sum.norm().item(), 1e-12)
+        ),
+        "bn_running_buffers_restored": True,
+        "gradient_source_split": "LT_train_probe_only",
+    }
+    for view_index in (1, 2, 3):
+        values = input_records[view_index]
+        suffix = f"v{view_index}"
+        global_row[f"input_gradient_cosine_{suffix}_mean"] = float(np.mean(values["cosine"]))
+        global_row[f"input_gradient_conflict_{suffix}_fraction"] = float(
+            np.mean(values["conflict"])
+        )
+        global_row[f"input_gradient_LC_{suffix}_norm_mean"] = float(np.mean(values["lc_norm"]))
+        global_row[f"input_gradient_BCL_{suffix}_norm_mean"] = float(np.mean(values["bcl_norm"]))
+    return class_rows, global_row
+
+
+def compute_test_margin_rows(
+    group: str,
+    labels: np.ndarray,
+    logits: np.ndarray,
+    adjusted_logits: np.ndarray,
+    class_meta: dict[int, dict[str, str]],
+) -> list[dict[str, Any]]:
+    """Read-only TEST margin calculation; intentionally contains no autograd."""
+    labels = np.asarray(labels, dtype=np.int64)
+    logits = np.asarray(logits, dtype=np.float64)
+    adjusted_logits = np.asarray(adjusted_logits, dtype=np.float64)
+    if logits.shape != (labels.size, 100) or adjusted_logits.shape != logits.shape:
+        raise RuntimeError("TEST logits must have shape [num_test, 100]")
+    if labels.size == 0 or np.any((labels < 0) | (labels >= 100)):
+        raise RuntimeError("Invalid TEST labels for margin calculation")
+
+    row_index = np.arange(labels.size)
+    raw_true = logits[row_index, labels]
+    adjusted_true = adjusted_logits[row_index, labels]
+    raw_competitor = logits.copy()
+    adjusted_competitor = adjusted_logits.copy()
+    raw_competitor[row_index, labels] = -np.inf
+    adjusted_competitor[row_index, labels] = -np.inf
+    raw_margin = raw_true - raw_competitor.max(axis=1)
+    adjusted_margin = adjusted_true - adjusted_competitor.max(axis=1)
+    predictions = logits.argmax(axis=1)
+
+    rows = []
+    for class_id in range(100):
+        mask = labels == class_id
+        if not np.any(mask):
+            raise RuntimeError(f"TEST split contains no examples for class {class_id}")
+        meta = class_meta[class_id]
+        rows.append({
+            "group": group,
+            "source_split": "balanced_TEST_read_only",
+            "class_id": class_id,
+            "coarse_id": meta["coarse_id"],
+            "shot_group": meta["shot_group"],
+            "test_count": int(mask.sum()),
+            "raw_top1": 100.0 * float(np.mean(predictions[mask] == labels[mask])),
+            "raw_margin_mean": float(np.mean(raw_margin[mask])),
+            "raw_margin_median": float(np.median(raw_margin[mask])),
+            "adjusted_margin_mean": float(np.mean(adjusted_margin[mask])),
+            "adjusted_margin_median": float(np.median(adjusted_margin[mask])),
+        })
     return rows
 
 
@@ -394,6 +706,7 @@ def compute_pair_effects(
             effects.append(
                 {
                     "direction": direction,
+                    "source_split": "balanced_TEST_read_only",
                     "head_class": head_id,
                     "tail_class": tail_id,
                     "source_class": source_id,
@@ -531,12 +844,19 @@ def main():
         seed=args.probe_seed,
     )
     probe["labels"] = probe["labels"].long()
+    probe_metadata = probe.get("metadata", {})
+    if probe_metadata.get("test_split_loaded") is not False:
+        raise RuntimeError("Offline gradients/margins require a TRAIN-only probe cache")
+    if "training split" not in str(probe_metadata.get("source_split", "")):
+        raise RuntimeError("Probe cache does not certify the original TRAIN split")
     class_counts = cifar100lt_class_counts()
     criterion_lc = LogitCompensatedCE(class_counts).to(device)
     criterion_bcl = BalancedContrastiveLoss(class_counts, temperature=0.1).to(device)
 
     all_margin_rows = []
     all_gradient_rows = []
+    all_native_gradient_class_rows = []
+    all_native_gradient_global_rows = []
     for group in ("LC_only", "BCL"):
         run_dir = output_root / f"{group}_seed42" / "checkpoints"
         for epoch, filename in CHECKPOINTS:
@@ -566,6 +886,18 @@ def main():
                         batch_size=args.batch_size,
                     )
                 )
+                native_class_rows, native_global_row = compute_native_three_view_gradient_diagnostics(
+                    model=model,
+                    epoch=epoch,
+                    probe=probe,
+                    class_meta=class_meta,
+                    criterion_lc=criterion_lc,
+                    criterion_bcl=criterion_bcl,
+                    device=device,
+                    batch_size=args.batch_size,
+                )
+                all_native_gradient_class_rows.extend(native_class_rows)
+                all_native_gradient_global_rows.append(native_global_row)
             del model
             if device.type == "cuda":
                 torch.cuda.empty_cache()
@@ -574,15 +906,16 @@ def main():
         output_root / "offline_probe_margin_metrics.csv",
         all_margin_rows,
         [
-            "group", "epoch", "class_id", "coarse_id", "shot_group",
-            "probe_count", "raw_top1", "raw_margin_mean", "adjusted_margin_mean",
+            "group", "source_split", "view_type", "epoch", "class_id", "coarse_id", "shot_group",
+            "probe_count", "raw_top1", "raw_margin_mean", "raw_margin_median",
+            "adjusted_margin_mean", "adjusted_margin_median",
         ],
     )
     write_csv(
         output_root / "offline_dual_gradient_metrics.csv",
         all_gradient_rows,
         [
-            "epoch", "class_id", "coarse_id", "shot_group",
+            "probe_mode", "source_split", "bn_mode", "epoch", "class_id", "coarse_id", "shot_group",
             "W_y_gradient_cosine", "W_y_conflict_negative_cosine",
             "W_y_LC_gradient_norm", "W_y_BCL_gradient_norm",
             "W_y_BCL_to_LC_norm_ratio",
@@ -591,6 +924,40 @@ def main():
             "same_f_feature_conflict_fraction",
             "same_f_LC_gradient_norm_mean",
             "same_f_BCL_gradient_norm_mean",
+        ],
+    )
+
+    write_csv(
+        output_root / "offline_native_three_view_gradient_class_metrics.csv",
+        all_native_gradient_class_rows,
+        [
+            "probe_mode", "source_split", "bn_mode", "epoch", "class_id",
+            "coarse_id", "shot_group",
+            "W_y_gradient_cosine", "W_y_conflict_negative_cosine",
+            "W_y_LC_gradient_norm", "W_y_BCL_gradient_norm",
+            "W_y_BCL_to_LC_norm_ratio",
+            "feature_gradient_cosine_v1_mean", "feature_gradient_conflict_v1_fraction",
+            "feature_gradient_LC_v1_norm_mean", "feature_gradient_BCL_v1_norm_mean",
+            "feature_gradient_cosine_v2_mean", "feature_gradient_conflict_v2_fraction",
+            "feature_gradient_LC_v2_norm_mean", "feature_gradient_BCL_v2_norm_mean",
+            "feature_gradient_cosine_v3_mean", "feature_gradient_conflict_v3_fraction",
+            "feature_gradient_LC_v3_norm_mean", "feature_gradient_BCL_v3_norm_mean",
+        ],
+    )
+    write_csv(
+        output_root / "offline_native_three_view_gradient_global_metrics.csv",
+        all_native_gradient_global_rows,
+        [
+            "probe_mode", "source_split", "bn_mode", "epoch",
+            "backbone_gradient_cosine", "backbone_LC_gradient_norm",
+            "backbone_BCL_gradient_norm", "backbone_BCL_to_LC_norm_ratio",
+            "bn_running_buffers_restored", "gradient_source_split",
+            "input_gradient_cosine_v1_mean", "input_gradient_conflict_v1_fraction",
+            "input_gradient_LC_v1_norm_mean", "input_gradient_BCL_v1_norm_mean",
+            "input_gradient_cosine_v2_mean", "input_gradient_conflict_v2_fraction",
+            "input_gradient_LC_v2_norm_mean", "input_gradient_BCL_v2_norm_mean",
+            "input_gradient_cosine_v3_mean", "input_gradient_conflict_v3_fraction",
+            "input_gradient_LC_v3_norm_mean", "input_gradient_BCL_v3_norm_mean",
         ],
     )
 
@@ -615,6 +982,46 @@ def main():
     labels_bcl = loaded["BCL"]["labels"].astype(np.int64)
     if not np.array_equal(labels_lc, labels_bcl):
         raise RuntimeError("LC-only and BCL final evaluation labels are not paired")
+    expected_test_counts = np.full(100, 100, dtype=np.int64)
+    if not np.array_equal(np.bincount(labels_lc, minlength=100), expected_test_counts):
+        raise RuntimeError("Expected the balanced CIFAR-100 TEST split: 100 examples per class")
+
+    test_margin_rows = []
+    for group in ("LC_only", "BCL"):
+        test_margin_rows.extend(
+            compute_test_margin_rows(
+                group=group,
+                labels=loaded[group]["labels"],
+                logits=loaded[group]["logits"],
+                adjusted_logits=loaded[group]["adjusted_logits"],
+                class_meta=class_meta,
+            )
+        )
+    write_csv(
+        output_root / "offline_test_margin_metrics.csv",
+        test_margin_rows,
+        [
+            "group", "source_split", "class_id", "coarse_id", "shot_group",
+            "test_count", "raw_top1", "raw_margin_mean", "raw_margin_median",
+            "adjusted_margin_mean", "adjusted_margin_median",
+        ],
+    )
+    test_margin_summary = {}
+    for group in ("LC_only", "BCL"):
+        group_rows = [row for row in test_margin_rows if row["group"] == group]
+        test_margin_summary[group] = {}
+        for shot_group in ("many", "medium", "few"):
+            subset = [row for row in group_rows if row["shot_group"] == shot_group]
+            test_margin_summary[group][shot_group] = {
+                "num_classes": len(subset),
+                "raw_margin_mean": float(np.mean([row["raw_margin_mean"] for row in subset])),
+                "adjusted_margin_mean": float(
+                    np.mean([row["adjusted_margin_mean"] for row in subset])
+                ),
+                "raw_top1_macro_class": float(np.mean([row["raw_top1"] for row in subset])),
+            }
+    with (output_root / "offline_test_margin_summary.json").open("w", encoding="utf-8") as stream:
+        json.dump(test_margin_summary, stream, indent=2, ensure_ascii=False)
 
     effects = compute_pair_effects(
         labels=labels_lc,
@@ -631,7 +1038,7 @@ def main():
         output_root / "head_tail_pair_effects.csv",
         effects,
         [
-            "direction", "head_class", "tail_class", "source_class", "target_class",
+            "direction", "source_split", "head_class", "tail_class", "source_class", "target_class",
             "same_superclass", "dino_topk_union",
             "LC_confusion_rate", "BCL_confusion_rate",
             "delta_confusion_BCL_minus_LC",
@@ -676,9 +1083,16 @@ def main():
         ),
         "paired_performance_delta_BCL_minus_LC_only": performance_delta,
         "gradient_diagnostics": (
-            "BCL checkpoint only; compare LC and BCL gradients at classifier rows W_y "
-            "and the same v2 feature tensor f(x). Offline model.eval() freezes BN "
-            "running statistics; train-mode cross-view BN coupling is reported separately."
+            "All gradient probes use the fixed LT TRAIN-only probe cache. The common-input "
+            "probe uses model.eval() and the same v2 feature tensor for LC/BCL gradients. "
+            "The native_three_view_train probe concatenates v1/v2/v3 in one train-mode "
+            "forward and reports W_y, feature, backbone-parameter and input gradients; "
+            "BatchNorm running buffers are restored after each diagnostic batch."
+        ),
+        "margin_data_sources": (
+            "Training margins use the fixed five-per-class LT TRAIN probe. TEST margins "
+            "are computed read-only from saved final logits; no TEST autograd or "
+            "gradient calculation is performed."
         ),
         "head_tail_diagnostics": (
             "C[a->b] = P(prediction=b | true=a); Head-to-Tail and Tail-to-Head are "
@@ -709,7 +1123,9 @@ def main():
     print(f"Offline diagnostics completed on {device}.")
     print(f"Probe cache: {probe_cache_path}")
     print(f"Margin rows: {output_root / 'offline_probe_margin_metrics.csv'}")
-    print(f"Gradient rows: {output_root / 'offline_dual_gradient_metrics.csv'}")
+    print(f"Common-input gradient rows: {output_root / 'offline_dual_gradient_metrics.csv'}")
+    print(f"Native train-mode gradient rows: {output_root / 'offline_native_three_view_gradient_class_metrics.csv'}")
+    print(f"TEST margin rows: {output_root / 'offline_test_margin_metrics.csv'}")
     print(f"Pair effects: {output_root / 'head_tail_pair_effects.csv'}")
     print(f"DID summary: {output_root / 'head_tail_did_summary.csv'}")
     print(f"Stage gate: {output_root / 'stage_gate.json'}")
