@@ -1,0 +1,192 @@
+# BCL CIFAR-100-LT Protocol Audit
+
+**Status:** protocol audit / Stage -1  
+**Scope:** CIFAR-100-LT, IF=100, ResNet-32, one-seed 200-epoch pilot  
+**Research status:** BCL is a candidate research base. No BCL defect or improvement method is assumed.
+
+## 1. Research objective
+
+The immediate objective is not to design a new loss or gate. It is to establish a defensible CIFAR-100-LT BCL implementation and then determine whether BCL exhibits a reproducible, topology-localized weakness.
+
+The first controlled comparison is:
+
+- **Group A — LC-only:** one classification view (v_1), logit-compensated cross-entropy only.
+- **Group B — BCL:** classification view (v_1), contrastive views (v_2,v_3), shared ResNet-32, classifier-derived prototypes, and the BCL objective.
+
+Do not add gradient surgery, prototype refinement, semantic gates, or other proposed improvements in Stage -1.
+
+## 2. Paper-grounded CIFAR protocol
+
+Primary source: Zhu et al., *Balanced Contrastive Learning for Long-Tailed Visual Recognition*, CVPR 2022, Sections 3–4 and Tables 3–4.
+
+For CIFAR-100-LT, IF=100:
+
+| Item | 200-epoch pilot setting |
+|---|---:|
+| Dataset | CIFAR-100-LT |
+| Imbalance factor | 100 |
+| Backbone | CIFAR ResNet-32 |
+| Batch size | 256 |
+| Base learning rate | 0.15 |
+| Warmup | 5 epochs, linearly warm to 0.15 |
+| LR drops | after 160 and 180 completed epochs, multiply LR by 0.1 |
+| Weight decay | 5e-4 |
+| BCL temperature | 0.1 |
+| Logit-compensation coefficient λ | 2.0 |
+| BCL coefficient μ | 0.6 |
+| Sample/prototype MLP hidden dimension | 512 |
+| Sample/prototype MLP output dimension | 128 |
+| Precision | FP32 for the first pilot |
+| Optimizer | SGD, momentum 0.9 (see qualification below) |
+| Training length | 200 epochs |
+
+The paper reports **51.93%** Top-1 for BCL on CIFAR-100-LT IF=100 at 200 epochs (Table 3 / Table 4). It reports **53.9%** at 400 epochs. Table 2's **50.8% LC-only versus 53.9% BCL** is a 400-epoch ablation. Do not compare the 200-epoch BCL result directly against the 400-epoch LC-only number.
+
+The accessible CIFAR implementation paragraph does not explicitly spell out the CIFAR optimizer and momentum. SGD with momentum 0.9 is selected as the pilot implementation convention, consistent with the released BCL large-scale training code and the referenced CIFAR long-tail recipe. Record this as an implementation choice, not as a separately verified CIFAR-specific paper statement.
+
+## 3. Source-code audit: what is and is not provided
+
+### 3.1 Official BCL repository
+
+Repository: https://github.com/FlamieZhu/Balanced-Contrastive-Learning
+
+Verified from the public default branch:
+
+- `main.py` exposes `--dataset` choices `inat` and `imagenet`; it does not expose a CIFAR-100 training route.
+- `main.py` builds ResNet-50 / ResNeXt-50 models, not CIFAR ResNet-32.
+- `dataset/cifar.py` contains an imbalanced CIFAR dataset utility, but this is not wired into the public `main.py` training entry point.
+- `loss/contrastive.py` contains the released `BalSCL` implementation.
+- `models/resnext.py` contains the large-scale BCL model and `NormedLinear`.
+
+Therefore this project must implement a **standalone, paper-faithful CIFAR port**. Do not describe it as an unmodified run of the official CIFAR code; that CIFAR entry point is not present in the inspected public repository.
+
+### 3.2 Three-view forward and BatchNorm
+
+In the released BCL training loop, the three views are concatenated along the batch dimension before the shared model forward:
+
+`inputs = cat([v1, v2, v3], dim=0)`
+
+The shared backbone (and any BatchNorm layers it contains) therefore computes batch statistics over the concatenated (v_1,v_2,v_3) distributions. The classification logits are taken from the first (B) outputs; the contrastive embeddings are taken from the (v_2,v_3) chunks.
+
+The first LC-only pilot intentionally uses only (v_1), as agreed. This means the two groups have different BatchNorm input distributions. **Record this as a known comparison caveat; do not silently “correct” it or add another group in Stage -1.** A future BN-matched control may be considered only after the first paired pilot is complete.
+
+### 3.3 Shared-gradient targets and branch-specific modules
+
+The relevant computation graph is:
+
+- Classification: (v_1 \rightarrow f_\theta \rightarrow W \rightarrow \mathcal L_{LC})
+- Contrastive samples: (v_2,v_3 \rightarrow f_\theta \rightarrow h_{sample} \rightarrow z_2,z_3 \rightarrow \mathcal L_{BCL})
+- Contrastive prototypes: (W \rightarrow h_{proto} \rightarrow c_1,\ldots,c_K \rightarrow \mathcal L_{BCL})
+
+The parameters shared by both losses are:
+
+1. **Backbone parameters** (\theta)
+2. **Classifier weights** (W), because BCL reaches (W) through the prototype MLP
+
+The sample projection MLP and prototype MLP receive BCL gradients only. The prototype MLP is a gradient-transformation path from BCL through its Jacobian to (W), not a third cross-branch conflict site.
+
+When the offline gradient probe is implemented later, observe only:
+
+- parameter-level: (\nabla_{W_y}\mathcal L_{LC}) versus (\nabla_{W_y}\mathcal L_{BCL})
+- representation-level: (\nabla_{f(x)}\mathcal L_{LC}) versus (\nabla_{f(x)}\mathcal L_{BCL})
+
+For the representation-level comparison, feed the **same fixed probe image/view** through both loss paths. Do not compare gradients at different augmented views and call that a same-point gradient conflict. Do not run these probes in Stage -1.
+
+### 3.4 Classifier-head qualification: do not copy the ImageNet scale into CIFAR
+
+The official BCL large-scale `NormedLinear` normalizes features and weights and multiplies the cosine output by `s=30`. This is verified in `models/resnext.py`, but that model is used by the released ImageNet/iNaturalist training path.
+
+The BCL paper's CIFAR implementation paragraph does not explicitly state that CIFAR-100 uses this scaled cosine classifier. The referenced PaCo CIFAR implementation provides a CIFAR ResNet-32 with a standard linear classifier by default (`use_norm=False`); its optional `NormedLinear` has no `s=30` multiplier.
+
+**Pilot decision:** use a standard `nn.Linear(64, 100)` classifier for the CIFAR ResNet-32 port. Keep the choice explicit in the audit report. Do not import the BCL ImageNet `s=30` setting into CIFAR. If a direct CIFAR-specific BCL source is found later, compare it before changing this choice.
+
+Useful reference implementation for CIFAR architecture and augmentation semantics:
+https://github.com/JIA-Lab-research/Parametric-Contrastive-Learning
+- `PaCo/LT/models/resnet_cifar.py`
+- `PaCo/LT/paco_cifar.py`
+- `PaCo/LT/dataset/imbalance_cifar.py`
+
+## 4. CIFAR-100-LT data protocol
+
+Use the original balanced CIFAR-100 **training** split only to construct the long-tailed training subset and the DINOv2 class topology.
+
+For fine-class index (i=0,\ldots,99), use the standard exponential rule:
+
+[
+n_i = \operatorname{int}\left(500\times 0.01^{i/99}\right)
+]
+
+Requirements:
+
+- Preserve official fine-label IDs (0\ldots99); do not shuffle class order before assigning counts.
+- Use `int()` truncation, not rounding.
+- Fix the long-tail sample-selection seed to 0 for the paired runs.
+- Keep the training RNG seed separate (pilot seed 42).
+- Save the selected original training indices and the exact 100-class count vector.
+- Validate that the first class has 500 samples and the last has 5.
+- Read CIFAR-100 fine/coarse labels from the original training metadata; verify every fine class maps to exactly one coarse class and each of the 20 superclasses contains five fine classes.
+
+Shot groups for this audit are fixed as: Many (>100), Medium (20\text{--}100), Few (<20). Keep the thresholds in the output metadata.
+
+### 4.1 Superclass pair-count audit
+
+Before interpreting any within-superclass Head–Tail result, report:
+
+- number of Many, Medium, and Few fine classes in each superclass
+- number of unordered within-superclass Many–Few pairs
+- number of unordered cross-superclass Many–Few pairs
+- the complete pair list, not just the aggregate count
+
+If the within-superclass Many–Few pair count is small or concentrated in a few superclasses, flag the limitation. Do not infer a stable topology effect from a handful of pairs.
+
+### 4.2 DINOv2 similarity matrix — training data only
+
+Generate the (100\times100) visual class-similarity matrix from the original **balanced CIFAR-100 training split (500 images per class)**. The script must never instantiate or read the CIFAR-100 test split for this computation.
+
+Pilot defaults:
+
+- frozen `dinov2_vits14` (record exact model identifier and checkpoint/cache provenance)
+- resize (32\times32\rightarrow224\times224) using Bicubic interpolation
+- ImageNet normalization: mean ((0.485,0.456,0.406)), std ((0.229,0.224,0.225))
+- extract normalized CLS features, average within each fine class, L2-normalize class means, then compute cosine similarity
+- save `DINO_CLASS_SIMILARITY.npy`, class mean features, and a JSON metadata file
+- report DINO Top-K neighbors using a documented symmetric-union rule; default (K=5)
+
+Do not use test images, test-derived statistics, or test labels for this topology prior. Test data may be used only for the final benchmark evaluation after training, never for topology construction, checkpoint selection, or hyperparameter selection.
+
+## 5. Augmentation semantics for the CIFAR port
+
+The BCL paper specifies AutoAugment + Cutout for (v_1), and SimAugment for (v_2,v_3). The referenced PaCo CIFAR code provides a concrete CIFAR implementation:
+
+- (v_1): RandomCrop(32, padding=4), RandomHorizontalFlip, CIFAR AutoAugment policy, ToTensor, Cutout(length=16), CIFAR-100 normalization.
+- (v_2,v_3): RandomResizedCrop(32, scale=(0.2,1.0)), RandomHorizontalFlip, ColorJitter(0.4,0.4,0.4,0.1) with (p=0.8), RandomGrayscale((p=0.2)), GaussianBlur(([0.1,2.0])) with (p=0.5), ToTensor, CIFAR-100 normalization.
+- CIFAR-100 normalization: mean ((0.4914,0.4822,0.4465)), std ((0.2023,0.1994,0.2010)).
+
+Record the exact torchvision / augmentation implementation version. Do not substitute RandAugment for AutoAugment in the CIFAR classification view.
+
+## 6. Stage -1 pilot and deliverables
+
+Run only one paired seed at first:
+
+- seed 42 for both groups
+- Group A: LC-only, one (v_1), 200 epochs
+- Group B: BCL, (v_1,v_2,v_3), 200 epochs
+- FP32, batch size 256, no AMP, no gradient accumulation
+- same long-tail sample indices, same seed, same ResNet-32 backbone/classifier initialization protocol
+- save checkpoints after human-numbered epochs 40, 100, 160, 180, and 200. The epoch-160 checkpoint must be saved after completing 160 epochs and **before** the LR drop applied at the start of epoch 161; similarly save epoch 180 before the next drop.
+- record per-epoch time, total time, peak CUDA memory, train losses, LR, and final Top-1 / Many / Medium / Few accuracy
+- evaluate the balanced CIFAR-100 test split only after training, for final reporting; never use it for model selection
+
+The 200-epoch BCL paper result of 51.93% is a sanity reference, not a hard pass/fail threshold. If the result is materially outside the expected neighborhood, first audit the data split, transforms, BCL loss, classifier, LR schedule, and checkpoint/evaluation protocol. Do not “tune until it matches.”
+
+## 7. What Stage -1 must not do
+
+- no 400-epoch run
+- no extra seeds 43/44
+- no gradient-conflict probes yet
+- no new method, gate, prototype correction, gradient projection, or semantic reweighting
+- no test-set DINO features
+- no automatic checkpoint selection using the test set
+- no uploading datasets, checkpoints, or large binary outputs to GitHub
+
+The next decision is made only after the protocol audit, the data/topology counts, and the two 200-epoch pilot runs are available.
