@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import platform
 import random
+import sys
 import time
 from pathlib import Path
 
@@ -566,16 +568,38 @@ def main():
     if device.type == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA device requested but CUDA is unavailable")
 
+    import torchvision
+
+    environment = {
+        "python_version": sys.version,
+        "platform": platform.platform(),
+        "torch_version": torch.__version__,
+        "torchvision_version": torchvision.__version__,
+        "cuda_available": bool(torch.cuda.is_available()),
+        "cuda_runtime": torch.version.cuda,
+        "cudnn_version": torch.backends.cudnn.version(),
+        "device": str(device),
+        "num_workers": args.num_workers,
+        "seed": TRAIN_SEED,
+        "precision": "fp32",
+    }
+    if device.type == "cuda":
+        free_memory, total_memory = torch.cuda.mem_get_info(device)
+        environment.update({
+            "gpu_name": torch.cuda.get_device_name(device),
+            "gpu_total_memory_bytes": int(total_memory),
+            "gpu_free_memory_before_training_bytes": int(free_memory),
+        })
+    with (output_root / "environment.json").open("w", encoding="utf-8") as f:
+        json.dump(environment, f, indent=2, ensure_ascii=False)
+
     print(f"Device: {device}")
     print(f"PyTorch: {torch.__version__}")
-    try:
-        import torchvision
-        print(f"torchvision: {torchvision.__version__}")
-    except Exception:
-        pass
+    print(f"torchvision: {torchvision.__version__}")
     if device.type == "cuda":
         print(f"GPU: {torch.cuda.get_device_name(device)}")
         print(f"CUDA runtime: {torch.version.cuda}")
+        print(f"GPU free/total: {free_memory}/{total_memory} bytes")
 
     # Create a single initial state, then reload it for both independent runs.
     set_seed(TRAIN_SEED)
