@@ -94,6 +94,11 @@ Data:
 - batch_size=256; independent v1/v2/v3 transforms;
 - the current indexed loader yields (views, labels, original_source_indices);
   unpack all three fields and hash the source indices;
+- instantiate mode="lc" and mode="bcl" loaders with the same fixed seed;
+  reset global RNG and each loader generator to epoch_seed_for(42,0) before
+  creating each iterator; require identical source-index order and byte-
+  identical first-batch three-view fingerprints;
+- use the same verified real batch for both one-step objective checks;
 - concatenate [v1,v2,v3] into [768,3,32,32];
 - TEST file-open count must remain zero.
 

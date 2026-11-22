@@ -734,7 +734,7 @@ def main():
 
     existing_run_artifacts = [
         output_root / "environment.json",
-        output_root / f"initial_model_seed{TRAIN_SEED}.pth",
+        output_root / "init_seed42.pth",
         output_root / f"LC_only_seed{TRAIN_SEED}",
         output_root / f"BCL_seed{TRAIN_SEED}",
     ]
@@ -794,7 +794,7 @@ def main():
         for key, value in template_model.state_dict().items()
     }
     del template_model
-    initial_state_path = output_root / f"initial_model_seed{TRAIN_SEED}.pth"
+    initial_state_path = output_root / "init_seed42.pth"
     initial_state_sha256 = state_dict_sha256(initial_state)
     torch.save(
         {
