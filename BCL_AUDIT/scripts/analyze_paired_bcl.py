@@ -137,7 +137,7 @@ def load_or_create_probe_cache(
     return cache
 
 
-@torch.inference_mode()
+@torch.no_grad()
 def extract_backbone_features(
     model: BCLCIFARModel,
     images: torch.Tensor,
