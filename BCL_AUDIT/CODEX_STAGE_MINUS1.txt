@@ -212,6 +212,11 @@ Rules:
 
 F. FINAL BENCHMARK EVALUATION
 -----------------------------
+Before starting training, check whether environment.json,
+initial_model_seed42.pth, LC_only_seed42/, or BCL_seed42/ already exists under
+the selected output root. The script refuses to overwrite an earlier run.
+If previous artifacts exist, choose a fresh --output-root; do not delete them.
+
 The training script must finish BOTH 200-epoch training runs before it
 instantiates CIFAR100(train=False).
 
