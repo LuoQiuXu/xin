@@ -59,5 +59,12 @@ All generated outputs are local and ignored by Git:
 - BCL_AUDIT/outputs/BCL_seed42/
 - BCL_AUDIT/outputs/paired_pilot_summary.json
 
-The training script saves epoch 40, 100, 160-pre-decay, 180-pre-decay, and 200
-checkpoints. Do not upload checkpoints, arrays, or raw predictions unless asked.
+Both LC-only and BCL use the same three-view dataset output. All three views are
+concatenated through the shared backbone in both groups; LC-only applies its
+classification loss to v1 logits only, while BCL additionally uses v2/v3
+projections and classifier-derived prototypes. The training script records
+per-view BatchNorm input moments and running statistics at checkpoint epochs.
+
+The training script saves complete epoch 40, 100, 160-pre-decay, 180-pre-decay,
+and 200 checkpoints, including model, optimizer, protocol, and RNG states. Do not
+upload checkpoints, arrays, or raw predictions unless asked.
