@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from .data import CIFAR100BalancedTest, CIFAR100LT, cifar100lt_class_counts
@@ -49,6 +50,98 @@ def seed_worker(worker_id: int):
     worker_seed = torch.initial_seed() % (2**32)
     np.random.seed(worker_seed)
     random.seed(worker_seed)
+
+
+
+class BatchNormAudit:
+    """Capture first-minibatch per-view inputs and checkpoint running stats.
+
+    Backbone BatchNorm2d sees concatenated [v1,v2,v3] in both paired groups.
+    The BCL sample-projection BatchNorm1d is recorded separately because that
+    projection head is only executed by the BCL objective.
+    """
+
+    def __init__(self, model: nn.Module):
+        self.modules = {}
+        self.handles = []
+        self.active = False
+        self.first_batch_inputs = {}
+        for name, module in model.named_modules():
+            is_backbone_bn = name.startswith("backbone.") and isinstance(module, nn.BatchNorm2d)
+            is_sample_bn = name == "sample_mlp.net.1" and isinstance(module, nn.BatchNorm1d)
+            if is_backbone_bn or is_sample_bn:
+                self.modules[name] = module
+                self.handles.append(module.register_forward_pre_hook(self._make_hook(name)))
+
+    def _make_hook(self, name: str):
+        def hook(module, inputs):
+            if not self.active or name in self.first_batch_inputs:
+                return
+            x = inputs[0].detach().float()
+            if x.ndim not in (2, 4) or x.shape[0] % 3 != 0:
+                self.first_batch_inputs[name] = {"view_split_available": False}
+                return
+            batch_size = x.shape[0] // 3
+            dims = (0,) if x.ndim == 2 else (0, 2, 3)
+            mixed_mean = x.mean(dim=dims)
+            mixed_var = x.var(dim=dims, unbiased=False)
+            view_stats = {}
+            for view_index, chunk in enumerate(x.split(batch_size, dim=0), start=1):
+                view_mean = chunk.mean(dim=dims)
+                view_var = chunk.var(dim=dims, unbiased=False)
+                view_stats[f"v{view_index}"] = {
+                    "input_mean_channel_average": float(view_mean.mean().cpu()),
+                    "input_var_channel_average": float(view_var.mean().cpu()),
+                    "mean_abs_channel_difference_from_concat": float(
+                        (view_mean - mixed_mean).abs().mean().cpu()
+                    ),
+                    "var_abs_channel_difference_from_concat": float(
+                        (view_var - mixed_var).abs().mean().cpu()
+                    ),
+                }
+            self.first_batch_inputs[name] = {
+                "view_split_available": True,
+                "batch_size_per_view": int(batch_size),
+                "concat_input_mean_channel_average": float(mixed_mean.mean().cpu()),
+                "concat_input_var_channel_average": float(mixed_var.mean().cpu()),
+                "views": view_stats,
+            }
+        return hook
+
+    def arm(self):
+        self.first_batch_inputs = {}
+        self.active = True
+
+    def finish_batch(self):
+        self.active = False
+
+    def snapshot(self, group: str, epoch: int):
+        running_stats = {}
+        for name, module in self.modules.items():
+            mean = module.running_mean.detach().float().cpu()
+            var = module.running_var.detach().float().cpu()
+            running_stats[name] = {
+                "num_batches_tracked": int(module.num_batches_tracked.detach().cpu().item()),
+                "running_mean_abs_average": float(mean.abs().mean()),
+                "running_mean_channel_std": float(mean.std(unbiased=False)),
+                "running_var_average": float(var.mean()),
+                "running_var_channel_std": float(var.std(unbiased=False)),
+            }
+        return {
+            "group": group,
+            "epoch_completed": int(epoch),
+            "view_order": ["v1_classification", "v2_contrastive", "v3_contrastive"],
+            "backbone_bn_input": "concatenated 3B batch; train-mode BatchNorm2d",
+            "sample_mlp_bn1d": "BCL-only; applied to all 3B backbone features",
+            "first_minibatch_per_view_input_stats": self.first_batch_inputs,
+            "running_stats_after_epoch": running_stats,
+        }
+
+    def close(self):
+        self.active = False
+        for handle in self.handles:
+            handle.remove()
+        self.handles = []
 
 
 def learning_rate_for_epoch(epoch_index: int) -> float:
@@ -175,9 +268,16 @@ def train_group(
         history_path.unlink()
 
     epoch_summaries = []
+    bn_audit = BatchNormAudit(model)
+    bn_audit_path = run_dir / "batchnorm_audit.jsonl"
+    if bn_audit_path.exists():
+        bn_audit_path.unlink()
     total_start = time.perf_counter()
 
     for epoch_index in range(EPOCHS):
+        human_epoch = epoch_index + 1
+        if human_epoch in CHECKPOINT_EPOCHS:
+            bn_audit.arm()
         lr = learning_rate_for_epoch(epoch_index)
         for parameter_group in optimizer.param_groups:
             parameter_group["lr"] = lr
@@ -198,18 +298,24 @@ def train_group(
             labels = labels.to(device, non_blocking=True)
             batch_size = int(labels.shape[0])
 
+            view1, view2, view3 = [
+                view.to(device, non_blocking=True) for view in images
+            ]
+            # Both groups concatenate the same three views through the shared
+            # backbone. LC-only uses only v1 logits; BCL additionally consumes
+            # v2/v3 projections and classifier-derived prototypes.
+            all_views = torch.cat([view1, view2, view3], dim=0)
+
             if group == "LC_only":
-                images = images.to(device, non_blocking=True)
-                _, logits, _, _ = model(images, compute_contrastive=False)
+                _, all_logits, _, _ = model(
+                    all_views,
+                    compute_contrastive=False,
+                )
+                logits = all_logits[:batch_size]
                 loss_lc = criterion_lc(logits, labels)
                 loss_bcl = logits.new_zeros(())
                 loss = LAMBDA_LC * loss_lc
             else:
-                view1, view2, view3 = [
-                    view.to(device, non_blocking=True) for view in images
-                ]
-                # Preserve BCL's one-forward three-view BatchNorm semantics.
-                all_views = torch.cat([view1, view2, view3], dim=0)
                 _, all_logits, all_embeddings, class_prototypes = model(
                     all_views,
                     compute_contrastive=True,
@@ -227,6 +333,7 @@ def train_group(
                 )
                 loss = LAMBDA_LC * loss_lc + MU_BCL * loss_bcl
 
+            bn_audit.finish_batch()
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
@@ -255,7 +362,6 @@ def train_group(
             "peak_cuda_memory_bytes": peak_memory_bytes,
             "num_train_samples": seen,
         }
-        human_epoch = epoch_index + 1
         if human_epoch in CHECKPOINT_EPOCHS:
             if human_epoch == 160:
                 milestone = "epoch_160_pre_decay"
@@ -275,6 +381,10 @@ def train_group(
                 last_lr=lr,
             )
             summary["checkpoint"] = str(checkpoint_path)
+            bn_record = bn_audit.snapshot(group, human_epoch)
+            with bn_audit_path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(bn_record, ensure_ascii=False) + "\n")
+            summary["batchnorm_audit_epoch"] = human_epoch
 
         epoch_summaries.append(summary)
         with history_path.open("a", encoding="utf-8") as f:
@@ -289,6 +399,7 @@ def train_group(
             f"peak_cuda={peak_memory_bytes / (1024**3):.2f}GiB"
         )
 
+    bn_audit.close()
     total_seconds = time.perf_counter() - total_start
     result = {
         "group": group,
@@ -303,6 +414,7 @@ def train_group(
         ),
         "final_epoch": epoch_summaries[-1],
         "checkpoint_dir": str(checkpoint_dir),
+        "batchnorm_audit_file": str(bn_audit_path),
         "checkpoint_paths": [
             item["checkpoint"] for item in epoch_summaries if "checkpoint" in item
         ],
@@ -346,16 +458,21 @@ def evaluate_final_checkpoint(
 
     all_labels = []
     all_predictions = []
+    all_logits = []
     for images, labels in loader:
         images = images.to(device, non_blocking=True)
         _, logits, _, _ = model(images, compute_contrastive=False)
         predictions = logits.argmax(dim=1)
         all_labels.append(labels.cpu().numpy())
         all_predictions.append(predictions.cpu().numpy())
+        all_logits.append(logits.detach().cpu().numpy())
 
     labels_np = np.concatenate(all_labels).astype(np.int64)
     predictions_np = np.concatenate(all_predictions).astype(np.int64)
+    logits_np = np.concatenate(all_logits).astype(np.float32)
     class_counts = cifar100lt_class_counts()
+    log_prior_np = np.log(class_counts.astype(np.float32) / float(class_counts.sum()))
+    adjusted_logits_np = logits_np + log_prior_np[None, :]
 
     class_accuracy = np.zeros(100, dtype=np.float64)
     for class_id in range(100):
@@ -393,6 +510,8 @@ def evaluate_final_checkpoint(
         eval_dir / "final_test_predictions.npz",
         labels=labels_np,
         predictions=predictions_np,
+        logits=logits_np,
+        adjusted_logits=adjusted_logits_np,
         class_accuracy=class_accuracy,
     )
     np.save(eval_dir / "final_test_confusion_matrix.npy", confusion)
@@ -499,11 +618,17 @@ def main():
         "BCL_training": bcl_summary,
         "LC_only_final_test": lc_metrics,
         "BCL_final_test": bcl_metrics,
-        "known_caveat": (
-            "BCL applies the backbone and sample projection MLP to concatenated "
-            "v1+v2+v3 features; BatchNorm2d and BatchNorm1d mix views. In train mode, "
-            "BCL gradients can indirectly reach v1 feature rows through BN coupling. "
-            "LC-only uses only v1 in this first pilot."
+        "matched_view_protocol": (
+            "Both LC-only and BCL concatenate v1+v2+v3 through the shared backbone; "
+            "both therefore expose backbone BatchNorm2d to the same three-view input "
+            "distribution. LC-only applies LC to v1 logits only. BCL additionally runs "
+            "the sample projection MLP on all 3B features and applies BCL to v2/v3."
+        ),
+        "known_bn_caveat": (
+            "BCL sample-projection BatchNorm1d also mixes all three views; this MLP "
+            "is BCL-only. Train-mode BatchNorm can couple gradients across view rows. "
+            "The training-time BatchNorm audit records per-view inputs and running "
+            "statistics at epochs 40/100/160/180/200."
         ),
     }
     with (output_root / "paired_pilot_summary.json").open("w", encoding="utf-8") as f:
