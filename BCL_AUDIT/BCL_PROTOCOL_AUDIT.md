@@ -171,6 +171,27 @@ Requirements:
 
 Shot groups for this audit are fixed as: Many (>100), Medium (20\text{--}100), Few (<20). Keep the thresholds in the output metadata.
 
+### 4.0 Strict TRAIN-only file-access boundary
+
+Do not assume that `torchvision.datasets.CIFAR100(train=True)` is file-level
+TRAIN-only. In torchvision 0.29.1, its inherited `_check_integrity()` iterates
+over both `train_list` and `test_list`, so a nominal TRAIN constructor can
+still hash/read the TEST pickle before returning the TRAIN data.
+
+The audited port therefore uses these strict paths:
+- Training DataLoader and offline probes: `CIFAR100TrainOnly` in
+  `cifar100lt/data.py`, which checks only `train_list`; torchvision's
+  separate metadata validation still checks the CIFAR-100 meta file.
+- Static taxonomy / DINO audit: directly reads and checksum-validates only the
+  original `train` and `meta` pickle files; it does not instantiate a
+  torchvision CIFAR dataset.
+- Final benchmark: `CIFAR100(train=False)` is permitted only after both
+  200-epoch training runs have completed.
+
+Do not instantiate the stock `CIFAR100(train=True)` before final benchmark
+evaluation. A test must guard that the train-only loader never checks
+`test_list`.
+
 ### 4.1 Superclass pair-count audit
 
 Before interpreting any within-superclass Head–Tail result, report:
