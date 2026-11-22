@@ -9,11 +9,29 @@ import torch
 from PIL import Image, ImageFilter
 from torch.utils.data import Dataset
 from torchvision import datasets, transforms
+from torchvision.datasets.utils import check_integrity
 from torchvision.transforms import AutoAugmentPolicy
 
 
 CIFAR100_MEAN = (0.4914, 0.4822, 0.4465)
 CIFAR100_STD = (0.2023, 0.1994, 0.2010)
+
+class CIFAR100TrainOnly(datasets.CIFAR100):
+    """CIFAR-100 loader that validates and reads only the training split.
+
+    torchvision's stock CIFAR100(train=True) integrity check iterates over
+    both train_list and test_list. This subclass intentionally checks only
+    train_list; the superclass then loads the TRAIN pickle and validates the
+    metadata file. It never opens or hashes the TEST pickle.
+    """
+
+    def _check_integrity(self) -> bool:
+        for filename, md5 in self.train_list:
+            file_path = Path(self.root) / self.base_folder / filename
+            if not check_integrity(str(file_path), md5):
+                return False
+        return True
+
 
 
 def cifar100lt_class_counts(imb_factor: float = 0.01) -> np.ndarray:
@@ -135,15 +153,21 @@ class CIFAR100LT(Dataset):
         mode: str,
         indices_file: Optional[str | Path] = None,
         split_seed: int = 0,
-        download: bool = True,
+        download: bool = False,
     ):
         if mode not in {"lc", "bcl"}:
             raise ValueError("mode must be 'lc' or 'bcl'")
         self.mode = mode
-        self.base = datasets.CIFAR100(
+        if download:
+            raise ValueError(
+                "CIFAR100LT uses a strict TRAIN-only loader and will not download "
+                "the combined CIFAR archive (which also contains the TEST split). "
+                "Place the extracted CIFAR-100 TRAIN and meta files locally first."
+            )
+        self.base = CIFAR100TrainOnly(
             root=str(root),
             train=True,
-            download=download,
+            download=False,
             transform=None,
         )
         self.data = self.base.data
