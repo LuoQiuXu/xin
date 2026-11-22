@@ -169,7 +169,7 @@ def make_train_loader(
         mode=mode,
         indices_file=indices_file,
         split_seed=0,
-        download=True,
+        download=False,
     )
     generator = torch.Generator()
     generator.manual_seed(seed)
