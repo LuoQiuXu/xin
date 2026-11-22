@@ -76,3 +76,12 @@ per-view BatchNorm input moments and running statistics at checkpoint epochs.
 The training script saves complete epoch 40, 100, 160-pre-decay, 180-pre-decay,
 and 200 checkpoints, including model, optimizer, protocol, and RNG states. Do not
 upload checkpoints, arrays, or raw predictions unless asked.
+
+
+## Preflight status after TRAIN-only loader hardening
+
+The previous READY report establishes that the fixed 3-view FP32 batch fits
+the RTX 5070 Laptop 8 GB GPU, but it was generated against an earlier source
+commit. After the permanent TRAIN-only loader change, rerun
+`BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt` and obtain a fresh READY report before
+starting either 200-epoch run.
