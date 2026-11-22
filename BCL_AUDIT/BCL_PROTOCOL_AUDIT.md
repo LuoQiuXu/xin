@@ -10,8 +10,8 @@ The immediate objective is not to design a new loss or gate. It is to establish 
 
 The first controlled comparison is:
 
-- **Group A — LC-only:** one classification view (v_1), logit-compensated cross-entropy only.
-- **Group B — BCL:** classification view (v_1), contrastive views (v_2,v_3), shared ResNet-32, classifier-derived prototypes, and the BCL objective.
+- **Group A — LC-only:** receives the same three independently sampled views (v_1,v_2,v_3); all three are concatenated through the shared ResNet-32, but only v_1 logits enter logit-compensated cross-entropy.
+- **Group B — BCL:** receives the same three-view protocol and concatenated shared-backbone forward; v_1 logits enter LC, while v_2/v_3 sample embeddings and classifier-derived prototypes enter the BCL objective.
 
 Do not add gradient surgery, prototype refinement, semantic gates, or other proposed improvements in Stage -1.
 
@@ -81,11 +81,23 @@ backbone features through cross-view BatchNorm statistics (in both the backbone
 and sample projection head). This is a view-level gradient coupling, not a third
 shared trainable-parameter conflict site.
 
-The first LC-only pilot intentionally uses only v_1, as agreed. This means
-the two groups have different BatchNorm input distributions and different
-train-mode cross-view coupling. **Record this as a known comparison caveat; do not
-silently “correct” it or add another group in Stage -1.** A future BN-matched
-control may be considered only after the first paired pilot is complete.
+**Paired-control correction:** LC-only and BCL now both concatenate (v_1,v_2,v_3)
+through the shared backbone. LC-only uses only the v_1 logits in its objective;
+BCL uses v_1 for LC and v_2/v_3 for the contrastive objective. Thus backbone
+BatchNorm2d sees a matched three-view input distribution in both groups.
+
+The BCL sample projection MLP is applied to all 3B features, so its BatchNorm1d
+also mixes v_1,v_2,v_3. This projection MLP is not executed in LC-only because it
+does not contribute to the LC objective. Keep this remaining branch-specific
+BatchNorm1d difference explicit. The training script records first-minibatch
+per-view pre-BN activation moments and running statistics at epochs 40/100/160/
+180/200 in `batchnorm_audit.jsonl`.
+
+In train mode, the shared backbone BatchNorm2d couples view rows in both groups.
+The BCL sample-projection BatchNorm1d introduces an additional BCL-specific
+view-coupling path. This is a view-level coupling effect, not a third shared
+trainable-parameter conflict site. Do not add another training group in this
+first paired pilot.
 
 ### 3.3 Shared-gradient targets and branch-specific modules
 
@@ -197,8 +209,8 @@ Record the exact torchvision / augmentation implementation version. Do not subst
 Run only one paired seed at first:
 
 - seed 42 for both groups
-- Group A: LC-only, one (v_1), 200 epochs
-- Group B: BCL, (v_1,v_2,v_3), 200 epochs
+- Group A: LC-only, three views concatenated through the backbone; LC uses only v_1 logits; 200 epochs
+- Group B: BCL, the same three-view concatenated backbone forward; LC uses v_1 logits and BCL uses v_2/v_3 plus prototypes; 200 epochs
 - FP32, batch size 256, no AMP, no gradient accumulation
 - same long-tail sample indices, same seed, same ResNet-32 backbone/classifier initialization protocol
 - save checkpoints after human-numbered epochs 40, 100, 160, 180, and 200. The epoch-160 checkpoint must be saved after completing 160 epochs and **before** the LR drop applied at the start of epoch 161; similarly save epoch 180 before the next drop.
@@ -211,10 +223,101 @@ The 200-epoch BCL paper result of 51.93% is a sanity reference, not a hard pass/
 
 - no 400-epoch run
 - no extra seeds 43/44
-- no gradient-conflict probes yet
+- no gradient probes during the training loop; after both runs finish, use the single offline diagnostic script described below
 - no new method, gate, prototype correction, gradient projection, or semantic reweighting
 - no test-set DINO features
 - no automatic checkpoint selection using the test set
 - no uploading datasets, checkpoints, or large binary outputs to GitHub
 
 The next decision is made only after the protocol audit, the data/topology counts, and the two 200-epoch pilot runs are available.
+
+
+## 8. Merged offline diagnostics and stage gate
+
+After the paired 200-epoch runs and the final epoch-200 benchmark evaluation,
+run one offline script. This combines the previously separated representation
+and classifier diagnostics; do not create another training stage for these
+measurements.
+
+### 8.1 Fixed training probe set
+
+- Select five fixed images per fine class from the saved IF=100 training indices
+  (500 probes total), using probe seed 777.
+- Cache v_1, v_2, v_3, and deterministic evaluation views once; reuse exactly
+  the same tensors for every checkpoint.
+- The probe source is the selected long-tailed CIFAR-100 training subset only.
+  The offline probe must not load the CIFAR-100 test split.
+- For LC-only and BCL checkpoints at epochs 40/100/160/180/200, report per-class
+  probe accuracy and raw / logit-adjusted true-class margins.
+
+### 8.2 Dual-layer gradient comparison
+
+Run this only on BCL checkpoints. The LC-only projection heads are not trained,
+so their BCL gradients are not a meaningful comparator.
+
+At each BCL checkpoint, set the model to eval mode and freeze BN running
+statistics. Use the same v_2 feature tensor f(x) for both losses:
+
+- LC gradient: v_2 feature f(x) -> classifier W -> logit-compensated CE.
+- BCL gradient: the same f(x) -> sample projection MLP -> BCL, with v_3 as its
+  paired contrastive view and classifier W -> prototype MLP -> class prototypes.
+
+Report:
+- classifier row W_y: cosine(grad_W_y LC, grad_W_y BCL), both gradient norms,
+  and BCL/LC norm ratio for each class y;
+- same probe feature f(x): cosine(grad_f(x) LC, grad_f(x) BCL), both norms,
+  and the fraction of negative-cosine probes per class.
+
+The prototype MLP is only the differentiable transformation path from W to
+class prototypes. Do not describe it as an independent cross-branch conflict
+site. Eval-mode gradient diagnostics intentionally isolate the local loss
+interaction; the train-mode BatchNorm view coupling is reported separately by
+the training-time BN audit.
+
+### 8.3 Head–Tail confusion and paired DID
+
+Use the saved epoch-200 final-test predictions/logits only for the final
+benchmark confusion analysis. Do not use test results to select checkpoints,
+tune hyperparameters, construct DINO similarity, or define semantic overlap.
+
+For model M and directed class pair a -> b:
+
+`C_{a->b}^M = P(\hat y=b | y=a, M)`
+
+`Delta C_{a->b} = C_{a->b}^{BCL} - C_{a->b}^{LC-only}`
+
+Report Head->Tail and Tail->Head separately. For each direction, group the
+predefined pairs by CIFAR-100 coarse-superclass membership and compute:
+
+`DID = E[Delta C | SameSuperclass] - E[Delta C | DifferentSuperclass]`
+
+Also report pairwise raw-logit and logit-adjusted margins for the same pairs.
+If DINO Top-K union is available, report it as a separate exogenous relation
+slice; do not merge DINO and coarse-superclass labels into one outcome-derived
+overlap score. Report pair counts alongside every DID. A one-seed DID is
+descriptive only; do not claim seed-level statistical significance.
+
+### 8.4 Mechanism-aligned Oracle gate
+
+Do not execute an Oracle in this first one-seed reconnaissance.
+
+Only after additional paired seeds show repeatable, mechanism-consistent evidence
+across gradient direction/norm, margins, directional confusion, and
+Overall/Many/Medium/Few performance may one Oracle be selected to test the
+specific mechanism supported by the evidence:
+
+1. **Prototype Oracle:** replace W-derived prototypes with balanced reference
+   feature prototypes. This isolates prototype reliability.
+2. **Relation Oracle:** suppress or down-weight same-superclass negative
+   prototypes in the contrastive denominator. This isolates semantic relation
+   mismatch.
+3. **Gradient Oracle:** remove only the BCL component conflicting with LC:
+   `g_BCL* = g_BCL - min(0, g_LC^T g_BCL) / (||g_LC||^2 + eps) * g_LC`.
+   Test the classifier-W and backbone scopes separately if this Oracle is
+   justified by the observed gradient evidence.
+
+These are mechanism-aligned diagnostic Oracles, not an unconstrained
+performance upper bound. Do not run all three as a fishing expedition. Stop if
+the selected Oracle has no stable benefit or improves one class group only by
+sacrificing another. No numeric go/no-go threshold was pre-registered; do not
+invent a threshold after seeing the results.
