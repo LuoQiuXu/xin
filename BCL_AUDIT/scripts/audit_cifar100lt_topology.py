@@ -40,42 +40,61 @@ def _pickle_value(obj: dict, key: str):
     raise KeyError(f"Missing key {key!r} in CIFAR-100 pickle")
 
 
-def _load_original_train(data_root: Path):
-    """Download/load only torchvision CIFAR100(train=True), then read coarse labels."""
-    try:
-        import torchvision.datasets as tv_datasets
-    except Exception as exc:
-        raise RuntimeError("torchvision is required for the CIFAR-100 training split") from exc
+def _md5_file(path: Path) -> str:
+    digest = hashlib.md5()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
-    train_set = tv_datasets.CIFAR100(
-        root=str(data_root),
-        train=True,
-        download=True,
-        transform=None,
-    )
+
+def _load_original_train(data_root: Path):
+    """Read and validate only the original CIFAR-100 TRAIN and metadata pickles."""
     raw_train_path = data_root / "cifar-100-python" / "train"
     raw_meta_path = data_root / "cifar-100-python" / "meta"
     if not raw_train_path.is_file() or not raw_meta_path.is_file():
         raise FileNotFoundError(
-            f"Expected extracted CIFAR-100 training files under {data_root / 'cifar-100-python'}"
+            "Expected locally extracted CIFAR-100 TRAIN and meta files under "
+            f"{data_root / 'cifar-100-python'}. This strict audit does not "
+            "download the combined archive because it also contains TEST data."
         )
 
-    with raw_train_path.open("rb") as f:
-        raw_train = pickle.load(f, encoding="bytes")
-    with raw_meta_path.open("rb") as f:
-        raw_meta = pickle.load(f, encoding="bytes")
+    # Official CIFAR-100 checksums for TRAIN and metadata only. Deliberately
+    # do not inspect the test file's existence, checksum, or contents.
+    expected_train_md5 = "16019d7e3df5f24257cddd939b257f8d"
+    expected_meta_md5 = "7973b15100ade9c7d40fb424638fde48"
+    observed_train_md5 = _md5_file(raw_train_path)
+    observed_meta_md5 = _md5_file(raw_meta_path)
+    if observed_train_md5 != expected_train_md5:
+        raise RuntimeError(
+            f"CIFAR-100 TRAIN checksum mismatch: {observed_train_md5}"
+        )
+    if observed_meta_md5 != expected_meta_md5:
+        raise RuntimeError(
+            f"CIFAR-100 meta checksum mismatch: {observed_meta_md5}"
+        )
+
+    with raw_train_path.open("rb") as stream:
+        raw_train = pickle.load(stream, encoding="bytes")
+    with raw_meta_path.open("rb") as stream:
+        raw_meta = pickle.load(stream, encoding="bytes")
 
     fine = np.asarray(_pickle_value(raw_train, "fine_labels"), dtype=np.int64)
     coarse = np.asarray(_pickle_value(raw_train, "coarse_labels"), dtype=np.int64)
-    images = np.asarray(train_set.data)
+    flat_images = np.asarray(_pickle_value(raw_train, "data"), dtype=np.uint8)
+    if flat_images.shape != (50_000, 3 * 32 * 32):
+        raise RuntimeError(f"Unexpected CIFAR-100 TRAIN image array: {flat_images.shape}")
+    images = flat_images.reshape(50_000, 3, 32, 32).transpose(0, 2, 3, 1).copy()
 
-    if images.shape[0] != 50_000 or fine.shape[0] != 50_000 or coarse.shape[0] != 50_000:
+    if images.shape != (50_000, 32, 32, 3) or fine.shape != (50_000,) or coarse.shape != (50_000,):
         raise RuntimeError(
-            f"Unexpected CIFAR-100 train sizes: images={images.shape}, "
+            f"Unexpected CIFAR-100 TRAIN sizes: images={images.shape}, "
             f"fine={fine.shape}, coarse={coarse.shape}"
         )
-    if not np.array_equal(fine, np.asarray(train_set.targets, dtype=np.int64)):
-        raise RuntimeError("Fine labels in torchvision and raw training pickle do not match")
+    if not np.array_equal(np.bincount(fine, minlength=100), np.full(100, 500)):
+        raise RuntimeError("CIFAR-100 TRAIN must contain exactly 500 images per fine class")
+    if np.any((coarse < 0) | (coarse >= 20)):
+        raise RuntimeError("CIFAR-100 coarse labels are outside [0, 19]")
 
     fine_names = list(_pickle_value(raw_meta, "fine_label_names"))
     coarse_names = list(_pickle_value(raw_meta, "coarse_label_names"))
