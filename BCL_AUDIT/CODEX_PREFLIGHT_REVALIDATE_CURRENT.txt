@@ -106,8 +106,11 @@ GPU / training:
 - RTX 5070 Laptop GPU, FP32 only;
 - AMP disabled, TF32 disabled, no gradient accumulation;
 - exact ResNet-32 and original BCL graph;
-- load init_seed42.pth independently for each group via load_initial_model_state()
-  and verify the same saved state-dict SHA-256;
+- with set_seed(42), instantiate one BCLCIFARModel, save its complete
+  state_dict to the ignored preflight directory as init_seed42.pth, and store
+  seed=42 plus state_dict_sha256 in the checkpoint payload;
+- load that file independently for LC-only and BCL via
+  load_initial_model_state() and verify the same saved state-dict SHA-256;
 - LC-only: concatenate three views through backbone, take only v1 logits,
   objective exactly 2.0*LC;
 - BCL: same backbone batch, v1 LC plus v2/v3 BCL, objective exactly
