@@ -48,8 +48,7 @@ torchvision 0.29.1 checks both train and test file integrity even when
 not instantiated or read during topology construction. DINOv2 uses Bicubic
 resize to 224x224 and ImageNet normalization. If preflight used a fresh output
 directory, replace the example path with its recorded data_audit_output_dir.
-The
-default model is ViT-S/14 to keep extraction practical on an 8 GB GPU.
+The default model is ViT-S/14 to keep extraction practical on an 8 GB GPU.
 
 ## Mandatory GPU capacity preflight — run this first
 
