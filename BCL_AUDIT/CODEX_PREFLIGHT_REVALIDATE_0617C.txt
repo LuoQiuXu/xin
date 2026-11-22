@@ -1,0 +1,285 @@
+BCL CIFAR-100-LT — CODEX PREFLIGHT REVALIDATION
+SOURCE UPDATE: NON-DESTRUCTIVE DINO SIDECARS
+================================================
+
+Repository: LuoQiuXu/xin
+Required branch: research/bcl-cifar100lt-audit-20261122
+
+Expected Python source commit under revalidation:
+0617c2170fc8a79766ccabeba6ded6d786835ab5
+
+This task is ONLY a source-version revalidation of the already-approved
+fixed-protocol GPU preflight. Do not start DINOv2 or either 200-epoch run.
+
+READ FIRST
+----------
+1. BCL_AUDIT/CODEX_PREFLIGHT_REVALIDATE_0617C.txt (this file)
+2. BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt
+3. BCL_AUDIT/outputs/preflight_report.md
+4. BCL_AUDIT/CODEX_STAGE_MINUS1.txt
+5. BCL_AUDIT/cifar100lt/train.py
+6. BCL_AUDIT/cifar100lt/data.py
+7. BCL_AUDIT/scripts/audit_cifar100lt_topology.py
+8. BCL_AUDIT/scripts/analyze_paired_bcl.py
+9. BCL_AUDIT/cifar100lt/tests/test_dino_sidecars.py
+10. BCL_AUDIT/.gitignore
+
+A. BRANCH / WORKTREE SAFETY
+---------------------------
+1. Confirm repository LuoQiuXu/xin and branch exactly:
+   research/bcl-cifar100lt-audit-20261122
+2. Do not switch branches, create a new branch, amend, force-push, or work on
+   main.
+3. Expected tested Python source commit:
+   0617c2170fc8a79766ccabeba6ded6d786835ab5
+   The current HEAD may be a later documentation/task-file commit. That is OK
+   only if all executable Python files match this source commit.
+4. Preserve all local modifications and both historical untracked directories.
+   Do not clean, reset, stash, delete, or overwrite them.
+5. If repository, branch, or local worktree state is unexpected, stop and
+   report exact git status before doing anything destructive.
+6. Record current HEAD, branch, git status, and the latest commit.
+
+B. SOURCE-DIFF GATE
+-------------------
+Compare all tracked Python files under BCL_AUDIT between:
+  dc150d1023510c1ec40841fdc133fb8ba106774c
+and
+  0617c2170fc8a79766ccabeba6ded6d786835ab5
+
+The expected Python changes are ONLY:
+- modified BCL_AUDIT/scripts/audit_cifar100lt_topology.py
+- modified BCL_AUDIT/scripts/analyze_paired_bcl.py
+- added BCL_AUDIT/cifar100lt/tests/test_dino_sidecars.py
+
+Confirm that training-critical files remain unchanged, especially:
+- BCL_AUDIT/cifar100lt/train.py
+- BCL_AUDIT/cifar100lt/data.py
+- model / loss / optimizer / sampler / augmentation implementation files
+
+If any other executable Python file changed, stop and explain why. Do not
+silently expand the revalidation scope.
+
+The reason a new preflight is required is that the topology and analysis Python
+files changed after the earlier tested source commit. The new DINO sidecar
+unit tests do not replace the GPU capacity revalidation.
+
+C. PRESERVE THE EXISTING STATIC AUDIT — DO NOT REGENERATE IT
+------------------------------------------------------------
+Reuse these exact existing local paths from the committed preflight report:
+
+CIFAR root:
+  D:\xiangmuxunlian\xin\H2T\data\cifar100
+
+data_audit_output_dir:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01
+
+indices_file:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
+
+Expected index SHA-256:
+  be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
+
+Before testing, verify that all five local static artifacts exist:
+- class_counts.csv
+- superclass_counts.csv
+- head_tail_pair_topology.csv
+- data_audit_summary.json
+- cifar100lt_if100_train_indices_seed0.npy
+
+Compute and record their SHA-256 values BEFORE the test and GPU probe.
+After all operations, recompute them and require byte-identical SHA-256 values.
+The index SHA must equal the expected value above.
+
+The four tracked static CSV/JSON artifacts must also retain the same Git blob
+IDs as commit:
+083d515911191f1f05b270f9ebf0f4d2d160c9ff
+
+Do NOT:
+- rerun the static audit;
+- call audit_cifar100lt_topology.py;
+- use --reuse-static-audit (the current CLI requires --compute-dino with it);
+- generate a new index;
+- rewrite, copy over, rename, or touch any static audit artifact;
+- download or re-extract CIFAR-100.
+
+The DINO sidecar change is being tested by synthetic unit tests. DINOv2 itself
+must remain completely uninitialized in this task.
+
+D. RUN THE COMPLETE UPDATED TEST SUITE
+--------------------------------------
+Run exactly:
+
+  python -B -m pytest BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
+
+Expected result from the current source:
+  23 passed
+
+Record the full pytest output, exit code, elapsed time, and any warnings.
+One existing Windows path escape SyntaxWarning may be reported from the
+topology script's path example. Do not edit source merely to silence this
+warning. If any test fails, stop; diagnose the first failure and do not launch
+the GPU probe until the suite passes.
+
+E. REPEAT THE EXACT FIXED-PROTOCOL GPU ONE-STEP PREFLIGHT
+---------------------------------------------------------
+This section is mandatory even though the earlier source passed GPU preflight.
+Use the existing local preflight script as a reference if present, but create
+a NEW output directory and NEW script/results. Never overwrite the old run.
+
+New local-only run directory:
+  BCL_AUDIT/outputs/preflight_recheck_20261122_02/
+
+New compact evidence files:
+  BCL_AUDIT/outputs/preflight_recheck_20261122_02/data_validation.json
+  BCL_AUDIT/outputs/preflight_recheck_20261122_02/gpu_preflight.json
+
+Local-only helper script:
+  BCL_AUDIT/outputs/preflight_recheck_20261122_02/gpu_preflight_recheck.py
+
+The helper script must remain untracked/ignored. Only the two JSON evidence
+files and the Markdown report may be committed.
+
+Use the actual committed training/data/model/loss implementation. Do not
+modify training source code to make the probe pass.
+
+Data:
+- CIFAR-100 original TRAIN split only.
+- Reuse the exact existing IF=100 indices file specified in section C.
+- Use CIFAR100TrainOnly from BCL_AUDIT/cifar100lt/data.py.
+- train=True, download=False, num_workers=0.
+- Batch size 256.
+- Three independent views v1/v2/v3.
+- Concatenate along batch dimension: [768, 3, 32, 32].
+- Do not instantiate torchvision CIFAR100(train=True), because its stock
+  integrity check may inspect TEST files.
+- Do not instantiate or read CIFAR100(train=False).
+- Do not load any TEST image, label, metadata, or file list.
+- Record actual TRAIN/meta/TEST file-open events if the existing audit
+  instrumentation supports it. TEST file-open count must be zero.
+
+GPU:
+- RTX 5070 Laptop GPU, same actual CUDA device.
+- FP32 only.
+- AMP disabled.
+- TF32 disabled.
+- No gradient accumulation.
+- No reduced batch size.
+- Same ResNet-32, optimizer, losses, and model graph as the actual trainer.
+- Run exactly one complete forward/backward/optimizer step for LC-only.
+- Clear gradients and releasable cache, reset peak memory statistics.
+- Run exactly one complete forward/backward/optimizer step for original BCL.
+- Both groups must use the same real batch/views and identical initial model
+  state. Record batch and initial-state hashes if available.
+- LC-only must use v1 logits for LC.
+- BCL must use the actual v2/v3 sample embeddings and classifier-derived
+  prototypes as in train.py.
+- Record environment versions, device name, total/free VRAM, peak allocated
+  and reserved memory, wall time, finite losses/gradients, and successful
+  parameter update for each group.
+- Catch and fully record CUDA OOM. Do not retry with smaller settings.
+
+If the existing preflight helper is unavailable, reconstruct a local-only
+helper from the procedure in CODEX_PREFLIGHT_ONLY.txt and the prior
+preflight_recheck_20261122_01/gpu_preflight_recheck.py if it exists. Do not
+add it to tracked source.
+
+If any path is missing, test fails, TEST is touched, or GPU OOM occurs, stop
+and report. Do not change the protocol.
+
+F. WRITE THE NEW REVALIDATION EVIDENCE
+--------------------------------------
+1. Create data_validation.json with:
+   - tested source commit;
+   - current branch and HEAD;
+   - exact CIFAR root, audit directory, and indices path;
+   - index SHA-256 and all five before/after static artifact SHA-256 values;
+   - 10,847 long-tail samples, IF=100, 100 fine classes;
+   - 35/35/30 Many/Medium/Few class counts;
+   - 35 within-superclass and 1,015 cross-superclass Many-Few pairs;
+   - explicit test_split_loaded=false and TEST file-open count 0.
+2. Create gpu_preflight.json with the complete environment, one-step results,
+   hashes, timings, memory measurements, and exceptions if any.
+3. Update BCL_AUDIT/outputs/preflight_report.md by APPENDING a dated
+   "Source revalidation — 0617c2" section. Preserve the earlier report text.
+4. The new section must explicitly state:
+   - tested Python source commit is 0617c2170fc8a79766ccabeba6ded6d786835ab5;
+   - current report/evidence commit is separate and must not be confused with
+     the tested Python source commit;
+   - pytest result;
+   - exact static data/index paths and hashes;
+   - LC-only and BCL one-step status, time and GPU memory;
+   - TEST file-open count;
+   - no DINOv2, no full training, no TEST evaluation.
+5. Mark READY FOR FULL PILOT only if all tests, integrity checks, and both GPU
+   one-step probes pass without protocol changes. Otherwise mark the precise
+   blocker (CODE OR DATA BLOCKED / GPU CAPACITY BLOCKED).
+
+G. TRACK ONLY COMPACT EVIDENCE
+------------------------------
+Append narrow allow-list rules to BCL_AUDIT/.gitignore for ONLY:
+- outputs/preflight_recheck_20261122_02/data_validation.json
+- outputs/preflight_recheck_20261122_02/gpu_preflight.json
+
+Add parent-directory negations required by Git ignore semantics. Keep all other
+files under outputs/ ignored. In particular, keep the helper .py, .npy, .npz,
+.pth, .pth.tar, .log, event files, caches, DINO features, and checkpoints
+ignored.
+
+Verify with git check-ignore -v and git status --short that exactly the two
+new JSON files are trackable and the helper script plus representative binary
+and log files remain ignored.
+
+H. COMMIT AND PUSH
+------------------
+Before committing, verify:
+- only BCL_AUDIT/.gitignore and BCL_AUDIT/outputs/preflight_report.md plus the
+  two new JSON evidence files are staged;
+- no source Python files changed;
+- no historical untracked directories are staged or deleted;
+- all five static artifact SHA-256 values are unchanged.
+
+Commit message:
+  test(bcl): revalidate fixed-protocol preflight on 0617c2
+
+Push normally to the SAME branch:
+  research/bcl-cifar100lt-audit-20261122
+
+Do not amend, force-push, or create a new branch.
+
+I. HARD STOP — NO STAGE -1 LAUNCH IN THIS TASK
+----------------------------------------------
+Do NOT:
+- initialize, download, or run DINOv2;
+- run LC-only training epochs;
+- run BCL training epochs;
+- run any checkpoint evaluation;
+- instantiate/read CIFAR100(train=False);
+- run TEST evaluation;
+- run Oracle;
+- add seeds or experimental groups;
+- change batch size, precision, architecture, optimizer, losses, augmentations,
+  or LR schedule;
+- introduce any new mechanism.
+
+This task ends immediately after the new preflight evidence is committed and
+pushed. Wait for the user to review the report before DINOv2 or Stage -1.
+
+J. REQUIRED RETURN SUMMARY
+--------------------------
+Return:
+1. Repository, branch, pre-task HEAD, final HEAD, and worktree status.
+2. Exact Python source commit tested.
+3. Python source diff check result.
+4. Full pytest summary and warning.
+5. Five static artifact SHA-256 before/after and Git blob comparison.
+6. Exact paths used and index SHA.
+7. TEST file-open count.
+8. LC-only and BCL one-step status, finite loss/update, wall time,
+   peak allocated/reserved VRAM.
+9. New report and JSON evidence paths/commit.
+10. Explicit confirmation: DINOv2 not started; 0/200 epochs for both groups;
+    TEST evaluation not run.
+11. Final gate: READY FOR FULL PILOT or exact blocker.
+
+No estimates or invented values. Report measured results only.
