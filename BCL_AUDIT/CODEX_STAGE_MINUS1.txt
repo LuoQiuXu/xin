@@ -7,6 +7,7 @@ Required branch: research/bcl-cifar100lt-audit-20261122
 
 Read before doing anything:
   - BCL_AUDIT/README.md
+  - BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt
   - BCL_AUDIT/BCL_PROTOCOL_AUDIT.md
   - BCL_AUDIT/cifar100lt/README.md
   - BCL_AUDIT/cifar100lt/data.py
@@ -32,6 +33,23 @@ Complete one closed-loop, one-seed BCL audit on CIFAR-100-LT IF=100:
 We are investigating whether BCL has a structural weakness. We have NOT
 established that BCL is defective. Do not design or implement a replacement
 method or run an Oracle in this task.
+
+HARD PRECONDITION — GPU PREFLIGHT MUST PASS
+-------------------------------------------
+This full Stage -1 task is blocked until the separate task in
+BCL_AUDIT/CODEX_PREFLIGHT_ONLY.txt has been completed and the local report
+BCL_AUDIT/outputs/preflight_report.md concludes exactly:
+  READY FOR FULL PILOT
+
+If that report is missing, incomplete, or concludes GPU CAPACITY BLOCKED /
+CODE OR DATA BLOCKED, STOP. Do not start DINOv2, either 200-epoch run, or
+final test evaluation. Return the preflight findings and wait for the user.
+
+When preflight is READY:
+- Reuse its validated data_audit outputs and exact saved IF=100 index file.
+- Do not rerun or overwrite the static audit outputs.
+- Run the DINOv2 topology extraction only if it has not already completed.
+- Use a fresh training output root if any paired-run artifacts already exist.
 
 A. BRANCH / REPOSITORY SAFETY
 -----------------------------
