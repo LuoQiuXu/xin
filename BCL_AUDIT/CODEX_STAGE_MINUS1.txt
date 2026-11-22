@@ -162,11 +162,16 @@ BCL forward:
 - Split outputs back into three B-sized chunks.
 - Use v1 logits for LC and v2/v3 embeddings for BCL.
 - This intentionally reproduces the three-view BatchNorm semantics of the BCL
-  implementation: BatchNorm statistics mix the v1 AutoAugment distribution and
-  v2/v3 SimAugment distributions.
+  implementation: backbone BatchNorm2d statistics mix v1 AutoAugment and v2/v3
+  SimAugment distributions.
+- The sample projection MLP is also applied to all 3B features before z2/z3 are
+  selected; its BatchNorm1d therefore mixes all three views as well.
+- Although BCL loss directly consumes only z2/z3, train-mode BatchNorm coupling
+  can send BCL gradients indirectly to v1 backbone feature rows. This is a
+  view-level coupling, not a third shared trainable-parameter conflict site.
 - LC-only Group A must use only v1 in the first pilot.
-- Record that this creates a BN-distribution difference between A and B. Do not
-  add a BN-matched control or another experiment group in this task.
+- Record both BN differences between A and B. Do not add a BN-matched control or
+  another experiment group in this task.
 
 D. TRAINING PROTOCOL — ONLY ONE SEED, 200 EPOCHS
 -----------------------------------------------
