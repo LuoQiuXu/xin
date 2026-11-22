@@ -561,6 +561,20 @@ def main():
     output_root.mkdir(parents=True, exist_ok=True)
     indices_file.parent.mkdir(parents=True, exist_ok=True)
 
+    existing_run_artifacts = [
+        output_root / "environment.json",
+        output_root / f"initial_model_seed{TRAIN_SEED}.pth",
+        output_root / f"LC_only_seed{TRAIN_SEED}",
+        output_root / f"BCL_seed{TRAIN_SEED}",
+    ]
+    existing_run_artifacts = [path for path in existing_run_artifacts if path.exists()]
+    if existing_run_artifacts:
+        raise RuntimeError(
+            "Refusing to overwrite an existing paired pilot. Choose a fresh "
+            "--output-root or move the previous run outputs first: "
+            + ", ".join(str(path) for path in existing_run_artifacts)
+        )
+
     if args.device:
         device = torch.device(args.device)
     else:
