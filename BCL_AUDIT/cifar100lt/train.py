@@ -496,8 +496,10 @@ def main():
         "LC_only_final_test": lc_metrics,
         "BCL_final_test": bcl_metrics,
         "known_caveat": (
-            "BCL uses one concatenated 3-view backbone forward, so BatchNorm sees "
-            "v1+v2+v3; LC-only uses only v1 in this first pilot."
+            "BCL applies the backbone and sample projection MLP to concatenated "
+            "v1+v2+v3 features; BatchNorm2d and BatchNorm1d mix views. In train mode, "
+            "BCL gradients can indirectly reach v1 feature rows through BN coupling. "
+            "LC-only uses only v1 in this first pilot."
         ),
     }
     with (output_root / "paired_pilot_summary.json").open("w", encoding="utf-8") as f:
