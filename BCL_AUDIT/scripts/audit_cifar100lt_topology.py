@@ -250,7 +250,7 @@ def _write_static_audit(
         ],
     )
 
-    np.save(out_dir / "cifar100lt_if100_train_indices_seed0.npy", selected_indices)
+    np.save(out_dir / f"cifar100lt_if100_train_indices_seed{split_seed}.npy", selected_indices)
     summary = {
         "dataset": "CIFAR-100",
         "source_split": "original balanced CIFAR-100 training split only",
@@ -497,8 +497,8 @@ def main():
     parser.add_argument("--topk", type=int, default=5)
     args = parser.parse_args()
 
-    if not (0.0 < args.imb_factor <= 1.0):
-        parser.error("--imb-factor must be in (0, 1]")
+    if abs(args.imb_factor - 0.01) > 1e-12:
+        parser.error("This Stage -1 audit is fixed to CIFAR-100-LT IF=100 (--imb-factor 0.01)")
     if not (1 <= args.topk < 100):
         parser.error("--topk must be in [1, 99]")
 
