@@ -11,9 +11,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from PIL import Image
-from torchvision import datasets
 
-from BCL_AUDIT.cifar100lt.data import build_cifar_transforms, cifar100lt_class_counts
+from BCL_AUDIT.cifar100lt.data import CIFAR100TrainOnly, build_cifar_transforms, cifar100lt_class_counts
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
 
@@ -77,7 +76,7 @@ def load_or_create_probe_cache(
     if not indices_file.is_file():
         raise FileNotFoundError(f"Missing fixed CIFAR-100-LT indices: {indices_file}")
 
-    train_set = datasets.CIFAR100(
+    train_set = CIFAR100TrainOnly(
         root=str(data_root),
         train=True,
         download=False,
