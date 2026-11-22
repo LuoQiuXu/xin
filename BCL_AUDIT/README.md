@@ -45,6 +45,19 @@ The script loads only `CIFAR100(train=True)`; it does not instantiate the test
 dataset. DINOv2 uses Bicubic resize to 224x224 and ImageNet normalization. The
 default model is ViT-S/14 to keep extraction practical on an 8 GB GPU.
 
+## Mandatory GPU capacity preflight — run this first
+
+Before any 200-epoch training, give Codex the instructions in
+[`CODEX_PREFLIGHT_ONLY.txt`](CODEX_PREFLIGHT_ONLY.txt). This checks the tests,
+training-split-only data audit, and one exact-protocol FP32 step at batch size
+256 with three concatenated views (effective backbone batch 768) on the RTX
+5070 Laptop 8 GB GPU.
+
+Do not launch the training command below unless
+`BCL_AUDIT/outputs/preflight_report.md` concludes **READY FOR FULL PILOT**.
+If the exact configuration OOMs, do not reduce batch size, enable AMP, or add
+gradient accumulation; stop and review the capacity report first.
+
 ## Training command
 
 After the static audit writes the fixed IF=100 indices, run the paired groups
