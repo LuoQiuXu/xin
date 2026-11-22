@@ -28,9 +28,10 @@ Use the SAME dedicated Stage-1 output root that contains:
   LC_only_seed42/
   BCL_seed42/
 
-Do not pass the generic BCL_AUDIT/outputs parent directory. Do not overwrite
-existing analyzer outputs; if any Phase-2 output already exists, use a fresh
-analysis subdirectory or stop and report.
+Do not pass the generic BCL_AUDIT/outputs parent directory. If any
+Phase-2 analyzer output already exists in this training root, STOP and report
+it; do not overwrite it and do not choose a new subdirectory, because the
+analyzer discovers checkpoints directly beneath this same root.
 
 B. SOURCE / TEST SPLIT SEPARATION
 ---------------------------------
