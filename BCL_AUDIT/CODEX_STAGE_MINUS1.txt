@@ -220,6 +220,15 @@ for the first pilot's headline evaluation.
 If batch 256 OOMs, stop and report the exact failure and memory trace. Do not
 silently reduce batch size, switch to AMP, or add gradient accumulation.
 
+Run implementation tests first:
+  python -m pytest BCL_AUDIT/cifar100lt/tests -q
+
+After the static data audit has written the fixed split indices, run the paired pilot:
+  python -m BCL_AUDIT.cifar100lt.train --data-root "<actual CIFAR data root>" --output-root "BCL_AUDIT/outputs" --indices-file "BCL_AUDIT/outputs/data_audit/cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
+
+The training command itself runs LC-only and BCL sequentially, then performs final
+test evaluation only after both training runs complete.
+
 E. DATA TOPOLOGY AUDIT
 ----------------------
 Run the committed script:
