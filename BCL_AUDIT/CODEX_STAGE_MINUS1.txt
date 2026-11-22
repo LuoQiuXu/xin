@@ -45,6 +45,13 @@ If that report is missing, incomplete, or concludes GPU CAPACITY BLOCKED /
 CODE OR DATA BLOCKED, STOP. Do not start DINOv2, either 200-epoch run, or
 final test evaluation. Return the preflight findings and wait for the user.
 
+The report must identify the exact source-code commit tested. If executable
+source files have changed after that tested commit, the old READY result is
+only historical capacity evidence and does NOT authorize this Stage -1 run.
+Rerun CODEX_PREFLIGHT_ONLY.txt against the current source and require a fresh
+READY FOR FULL PILOT report before proceeding. Documentation-only commits do
+not invalidate the capacity probe.
+
 When preflight is READY:
 - Reuse its validated data_audit outputs and exact saved IF=100 index file.
 - Do not rerun or overwrite the static audit outputs.
@@ -72,6 +79,11 @@ The package already exists. Do not overwrite it blindly.
 
 B1. CIFAR-100-LT split
 - Original CIFAR-100 train split only.
+- Do not instantiate stock torchvision.datasets.CIFAR100(train=True) before
+  final evaluation: torchvision 0.29.1 checks both train_list and test_list.
+- Use CIFAR100TrainOnly for training/probes and the raw TRAIN/meta pickle
+  reader for topology/DINO. Never inspect TEST file existence or checksum
+  before the final benchmark stage.
 - Official fine-label order 0..99; do not shuffle class order.
 - Exact count rule:
     n_i = int(500 * 0.01 ** (i / 99.0)), i=0,...,99
@@ -116,6 +128,7 @@ Run before any full training:
 
 The tests must cover:
 - exact IF=100 count vector and selected-index length;
+- train-only loader integrity check never touches test_list;
 - ResNet-32 / classifier / embedding / prototype shapes;
 - BCL scalar loss, finite gradients, and participation of all 100 prototypes;
 - numerical parity with the released official BalSCL reference formula;
@@ -217,8 +230,9 @@ Then run frozen DINOv2:
   python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "<actual CIFAR root>" --output-dir "BCL_AUDIT/outputs/data_audit" --compute-dino --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 
 Rules:
-- The DINO script may load only the original balanced CIFAR-100 training split
-  (CIFAR100(train=True), 500 images per fine class).
+- The DINO script may load only the original balanced CIFAR-100 TRAIN pickle
+  (50,000 images; 500 per fine class), plus the metadata pickle. It must not
+  instantiate stock CIFAR100(train=True), which checks TEST file integrity.
 - Never instantiate/read CIFAR100(train=False) for DINO/topology.
 - DINO: Bicubic resize 224x224, ImageNet normalization, normalized CLS features,
   class mean then L2 normalization, cosine similarity.
