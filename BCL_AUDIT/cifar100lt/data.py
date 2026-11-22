@@ -127,7 +127,7 @@ def build_cifar_transforms():
 
 
 class CIFAR100LT(Dataset):
-    """CIFAR-100-LT train subset with one-view or three-view output."""
+    """CIFAR-100-LT train subset with the same three-view contract for both groups."""
 
     def __init__(
         self,
@@ -152,6 +152,17 @@ class CIFAR100LT(Dataset):
 
         if indices_file is not None and Path(indices_file).is_file():
             self.indices = np.load(indices_file).astype(np.int64)
+            if self.indices.ndim != 1:
+                raise RuntimeError("Provided train indices must be a one-dimensional array")
+            if self.indices.size != int(self.cls_num_list.sum()):
+                raise RuntimeError(
+                    f"Provided train indices have {self.indices.size} rows; "
+                    f"expected {int(self.cls_num_list.sum())}"
+                )
+            if np.any(self.indices < 0) or np.any(self.indices >= len(self.targets)):
+                raise RuntimeError("Provided train indices contain out-of-range values")
+            if np.unique(self.indices).size != self.indices.size:
+                raise RuntimeError("Provided train indices contain duplicates")
             observed = np.bincount(self.targets[self.indices], minlength=100)
             if not np.array_equal(observed, self.cls_num_list):
                 raise RuntimeError("Provided train indices do not match the IF=100 class counts")
@@ -176,10 +187,11 @@ class CIFAR100LT(Dataset):
         image = Image.fromarray(self.data[original_index])
         label = int(self.targets[original_index])
 
+        # Both LC-only and BCL receive the same three independently augmented views.
+        # The LC-only objective consumes only v1 logits, but v1/v2/v3 are all
+        # concatenated through the shared backbone so BatchNorm2d sees a matched
+        # three-view input distribution in both paired groups.
         view1 = self.transform_v1(image)
-        if self.mode == "lc":
-            return view1, label
-
         view2 = self.transform_sim(image)
         view3 = self.transform_sim(image)
         return (view1, view2, view3), label
