@@ -130,6 +130,9 @@ class BCLCIFARModel(nn.Module):
         self.backbone = CIFARResNet32(num_classes=num_classes)
         # CIFAR port uses a standard linear classifier; do not import ImageNet s=30.
         self.classifier = nn.Linear(feature_dim, num_classes)
+        # Match the Kaiming-normal linear-head initialization in the referenced
+        # CIFAR ResNet-32 implementation; do not use the ImageNet cosine scale.
+        nn.init.kaiming_normal_(self.classifier.weight)
         # Separate MLPs: sample projection and classifier-weight prototype mapping.
         self.sample_mlp = ProjectionMLP(
             feature_dim, projection_hidden_dim, projection_dim
