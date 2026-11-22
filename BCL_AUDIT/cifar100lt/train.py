@@ -181,7 +181,7 @@ def make_train_loader(
         generator=generator,
         worker_init_fn=seed_worker,
     )
-    return dataset, loader
+    return dataset, loader, generator
 
 
 def _save_checkpoint(
@@ -193,6 +193,7 @@ def _save_checkpoint(
     seed: int,
     class_counts: np.ndarray,
     last_lr: float,
+    data_loader_generator: torch.Generator,
 ):
     path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
@@ -202,6 +203,7 @@ def _save_checkpoint(
             "seed": seed,
             "model_state": model.state_dict(),
             "optimizer_state": optimizer.state_dict(),
+            "data_loader_generator_state": data_loader_generator.get_state(),
             "rng_state": {
                 "python": random.getstate(),
                 "numpy": np.random.get_state(),
@@ -240,7 +242,7 @@ def train_group(
     set_seed(TRAIN_SEED)
 
     mode = "lc" if group == "LC_only" else "bcl"
-    dataset, loader = make_train_loader(
+    dataset, loader, loader_generator = make_train_loader(
         data_root=data_root,
         mode=mode,
         indices_file=indices_file,
@@ -385,6 +387,7 @@ def train_group(
                 seed=TRAIN_SEED,
                 class_counts=class_counts,
                 last_lr=lr,
+                data_loader_generator=loader_generator,
             )
             summary["checkpoint"] = str(checkpoint_path)
             bn_record = bn_audit.snapshot(group, human_epoch)
