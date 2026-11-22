@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import pickle
 import time
@@ -400,10 +401,24 @@ def _compute_dino_similarity(
     peak_memory = (
         int(torch.cuda.max_memory_allocated(device)) if device.type == "cuda" else 0
     )
+    checkpoint_candidates = sorted(
+        (Path(torch_hub_dir) / "checkpoints").glob(f"{model_name}*.pth")
+    )
+    checkpoint_file = checkpoint_candidates[0] if checkpoint_candidates else None
+    checkpoint_sha256 = None
+    if checkpoint_file is not None:
+        digest = hashlib.sha256()
+        with checkpoint_file.open("rb") as checkpoint_stream:
+            for chunk in iter(lambda: checkpoint_stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        checkpoint_sha256 = digest.hexdigest()
+
     metadata = {
         "model": model_name,
         "source": "facebookresearch/dinov2 via torch.hub",
         "torch_hub_cache": torch_hub_dir,
+        "checkpoint_file": str(checkpoint_file) if checkpoint_file else None,
+        "checkpoint_sha256": checkpoint_sha256,
         "source_split": "original balanced CIFAR-100 training split only",
         "test_split_loaded": False,
         "images_per_fine_class": 500,
