@@ -1,0 +1,179 @@
+BCL + SYMMETRIC LABEL NOISE — CODEX IMPLEMENTATION AND RUN TASK
+====================================================================
+
+Repository: LuoQiuXu/xin
+Required branch: research/bcl-symmetric-noise-baseline-20261123
+Base branch: research/bcl-cifar100lt-audit-20261122
+
+READ FIRST
+----------
+- BCL_AUDIT/README.md
+- BCL_AUDIT/BCL_PROTOCOL_AUDIT.md
+- BCL_AUDIT/cifar100lt/data.py
+- BCL_AUDIT/cifar100lt/models.py
+- BCL_AUDIT/cifar100lt/losses.py
+- BCL_AUDIT/cifar100lt/train.py
+- BCL_AUDIT/cifar100lt/noise.py
+- BCL_AUDIT/cifar100lt/tests/test_noise.py
+- BCL_AUDIT/CODEX_STAGE_MINUS1_EXECUTE.txt
+- BCL_AUDIT/outputs/preflight_report.md (if present)
+
+MISSION
+-------
+Implement and execute the FIRST CONTROLLED LABEL-NOISE BASELINE for original
+BCL on CIFAR-100-LT IF=100. The purpose is only to measure how standard BCL
+degrades under known synthetic label corruption. Do NOT implement any
+anti-noise method yet.
+
+Conditions:
+  A. Clean labels (0% noise)
+  B. Symmetric label noise (20%)
+  C. Symmetric label noise (40%)
+
+Use the existing audited BCL CIFAR port, ResNet-32, the exact fixed IF=100
+training indices, three-view pipeline, BCL objective and evaluation protocol.
+This is a new experiment branch. Do not work on main or overwrite the parent
+branch.
+
+IMPORTANT EXPERIMENT DESIGN
+---------------------------
+1. Preserve the LT subset first. Use the exact preflight-generated indices
+   file (10,847 rows, class counts 500 -> 5) unchanged for all three groups.
+2. Corrupt ONLY labels attached to those selected training examples. Do not
+   alter images, sample indices, class selection, test labels, or test images.
+3. Noise is instance-independent symmetric K-class noise:
+   - choose exactly round(rate * 10,847) selected examples without replacement;
+   - each selected label is replaced uniformly by one of the other 99 classes;
+   - never select the original class as the replacement;
+   - input/sample order is preserved.
+4. Generate each corruption once from the clean labels and fixed seed 2026.
+   Save clean labels, noisy labels, flipped mask, selected original indices,
+   requested/realized rate, transition counts, clean/noisy class counts,
+   seed, and SHA-256 checksums in a compact noise_manifest.npz/json.
+   The corruption must be deterministic and independent of training seed.
+5. The clean condition must use the original labels byte-for-byte.
+6. BCL class averaging and LC log-prior must use the OBSERVED noisy-label
+   class counts in 20%/40% groups, because these are the labels available to
+   the learner. Do not use latent clean labels for training losses, sampling,
+   class counts, early stopping, checkpoint selection, or tuning.
+7. Keep clean labels ONLY for offline corruption auditing and reporting:
+   flipped count/rate, per-source-class flips, source->observed transition
+   matrix, and verification. Never feed clean labels into model/loss code.
+8. Evaluation uses the original balanced CIFAR-100 TEST split with its clean
+   ground-truth labels. Evaluate raw logits and the same logit-compensated
+   logits convention used by the existing BCL audit; clearly label both.
+   Do not use test data for training, noise generation, checkpoint selection,
+   or hyperparameter tuning.
+
+TRAINING PROTOCOL
+-----------------
+- BCL only (no LC-only group in this first noise sensitivity screen).
+- 200 epochs, seed 42, batch 256, FP32, no AMP, no TF32, no gradient
+  accumulation, SGD momentum 0.9.
+- Base LR 0.15, weight decay 5e-4, 5-epoch warmup, drops after 160 and
+  180 completed epochs.
+- Objective: 2.0 * LC + 0.6 * BCL; temperature 0.1.
+- CIFAR ResNet-32 and standard nn.Linear(64,100), no ImageNet s=30 scale.
+- Identical model initialization across the three conditions: save one
+  initialization state and reload it for every condition.
+- Use identical epoch seeds, DataLoader generator seeds, sample order and
+  three-view augmentation RNG stream across conditions. The label corruption
+  must not consume or perturb the Python/NumPy/Torch RNG streams used for
+  model init or augmentations. Precompute labels before training.
+- Run conditions sequentially to fit the 8 GB GPU. Do not run concurrently.
+- If the existing 200-epoch clean BCL checkpoint from the approved parent
+  Stage -1 experiment is available locally AND its source/data/protocol hashes
+  match, it may be reused as the clean condition. Otherwise train clean.
+- Never silently change batch size, precision, model, augmentation, epochs,
+  or optimizer to make the run fit. If batch 256 FP32 OOMs, stop and report.
+
+IMPLEMENTATION REQUIREMENTS
+---------------------------
+A. Keep the original clean BCL code path unchanged when no noise option is
+   selected. Prefer a new module, e.g. BCL_AUDIT/cifar100lt/train_noise.py,
+   rather than rewriting the existing train.py.
+B. Add a dataset wrapper or explicit noisy-label array argument. Dataset
+   samples must return (three_views, observed_label, original_train_index).
+   The clean latent label must never be returned to the training loop.
+C. Add a deterministic noise-manifest builder using noise.py. Verify:
+   - all selected original indices are unique and exactly match saved IF=100;
+   - clean counts exactly equal IF=100 counts;
+   - exact requested flip count;
+   - every flipped target differs from source;
+   - every unflipped target equals source;
+   - all observed labels are in [0,99];
+   - observed counts sum to 10,847 and are used by both LC and BCL criteria.
+D. Reuse existing BCLCIFARModel, BalancedContrastiveLoss, LogitCompensatedCE,
+   build_cifar_transforms, learning_rate schedule and checkpoint conventions.
+E. Save checkpoints at epochs 40,100,160-pre-decay,180-pre-decay,200. Save
+   training history, wall time, peak CUDA memory, class counts used, hashes,
+   config, and noise manifest reference.
+F. Evaluate final epoch-200 checkpoints once after all three conditions finish.
+   Report:
+   - Overall top-1;
+   - Many/Medium/Few macro-class top-1 using CLEAN LT class-count groups;
+   - raw-logit and logit-compensated top-1 (separate);
+   - per-class accuracy and 100x100 confusion matrix;
+   - train observed-label accuracy (do not call this clean-label accuracy);
+   - optional offline train-label agreement against latent clean labels ONLY
+     in a separate audit file, never used for training or model selection.
+G. Write one summary CSV/JSON comparing 0%,20%,40% noise and absolute deltas
+   from clean. Include per-group training time and peak memory.
+H. Add unit tests for noise generation, manifest integrity, dataset wrapper
+   not leaking clean labels, noisy class-count propagation into both losses,
+   and clean path equivalence.
+I. Run all tests, then run a 1-batch forward/backward smoke for each noise
+   condition before the 200-epoch jobs. Verify finite loss/gradients and
+   model parameter update. Smoke must use training data only and may not
+   instantiate the test dataset.
+J. Run the three conditions sequentially. After each run, verify checkpoints
+   and logs before proceeding. Final TEST evaluation occurs after all runs.
+
+DATA / PATH / SAFETY
+--------------------
+- Use the exact local CIFAR root and indices path from the fresh preflight
+  report or existing approved run metadata. Do not guess paths.
+- Never download data automatically.
+- Never regenerate or modify the fixed LT indices.
+- Do not commit datasets, checkpoints, generated NPZ/NPY, logs, event files,
+  or predictions. Commit only source, tests, compact text/CSV/JSON reports.
+- Preserve all existing outputs; use a fresh output root:
+  BCL_AUDIT/outputs/noisy_label_baseline_seed42_20261123
+  If it exists, choose the next unused suffix.
+- Do not run the old Stage -1 offline diagnostic again.
+- Do not add ELR, DivideMix, Co-teaching, prototype filtering, sample
+  reweighting, label correction, pseudo-labeling, confidence gates, or any
+  proposed anti-noise mechanism in this task.
+- Do not claim real-world noisy-label robustness from synthetic symmetric
+  noise alone.
+
+RUN / ACCEPTANCE
+----------------
+Before training:
+1. Confirm exact branch and clean worktree; preserve unrelated changes.
+2. Run:
+   python -B -m pytest BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
+3. Run the new noise tests and all existing BCL tests.
+4. Run 3-condition one-batch smoke; verify no clean-label leakage.
+5. Check CUDA memory and environment. Reuse the current-source preflight
+   only if executable source has not changed since its tested commit; because
+   this task adds executable source, perform a fresh small GPU capacity
+   preflight for the exact noise runner before full training.
+6. If any precondition fails, stop before long training.
+
+Then execute 0%,20%,40% sequentially. Do not start anti-noise method design
+until these baseline results are reviewed.
+
+FINAL REPORT
+------------
+Return:
+- branch, HEAD, git status, changed files;
+- test and smoke results;
+- exact data/index/noise manifest hashes;
+- noise transition matrices and exact flip counts;
+- observed class counts used for LC/BCL;
+- all training settings, completion status, run time and peak memory;
+- raw and compensated Overall/Many/Medium/Few test metrics;
+- per-class and confusion outputs locations;
+- any deviations/failures;
+- explicit statement that no anti-noise method was implemented.
