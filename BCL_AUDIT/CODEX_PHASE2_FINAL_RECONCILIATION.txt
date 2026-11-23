@@ -1,0 +1,236 @@
+BCL CIFAR-100-LT — PHASE 2 FINAL RECONCILIATION + ONE-SHOT EXECUTION
+========================================================================
+
+Repository: LuoQiuXu/xin
+Required existing branch: research/bcl-cifar100lt-audit-20261122
+
+PURPOSE
+-------
+Execute the already designed Phase 2 H1-H3 offline diagnosis exactly once,
+after a narrow implementation audit. Gemini's review is accepted as a
+methodological checklist, NOT as permission to duplicate existing code or
+expand the research scope.
+
+The existing implementation already contains:
+- Few-class DINO Many-neighbor / same-superclass / max-similarity exposure;
+- adjusted standardized beta and partial Spearman, controlling baseline
+  accuracy and log training count (and baseline Tail-to-Head confusion for
+  that confusion outcome);
+- unadjusted Spearman sensitivity and 2,000 Few-class bootstrap replicates;
+- pair-level nearest-baseline matching with replacement and Many/Few
+  endpoint-cluster bootstrap;
+- five-checkpoint common-input eval and native three-view train-mode
+  gradient diagnostics;
+- train-probe and read-only saved-TEST margin trajectories;
+- per-batch BN running-buffer restoration and equality verification;
+- a bounded decision rule that recommends at most one direct counterfactual
+  intervention and does not execute it.
+
+Do NOT rewrite or duplicate these completed components. First inspect the
+actual source and tests; preserve correct implementations.
+
+A. SAFETY AND REPOSITORY
+------------------------
+1. Confirm repo LuoQiuXu/xin and branch exactly
+   research/bcl-cifar100lt-audit-20261122. Do not switch branches or create
+   another branch.
+2. Record starting commit and full git status.
+3. Preserve all staged, unstaged, and untracked files. Never reset, clean,
+   stash, checkout, or discard changes.
+4. Do not touch H2T, PI-H2T, CC-SAM, CC-MIA, or TP-MAG.
+5. Read:
+   - BCL_AUDIT/BCL_PROTOCOL_AUDIT.md
+   - BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt
+   - BCL_AUDIT/scripts/analyze_paired_bcl.py
+   - BCL_AUDIT/scripts/phase2_decision_audit.py
+   - BCL_AUDIT/tests/test_phase2_decision_audit.py
+   - BCL_AUDIT/outputs/stage_minus1_seed42_20261122_01/STAGE_MINUS1_PHASE1_FINAL_REPORT.md
+   - this instruction file.
+
+B. ONLY REQUIRED IMPLEMENTATION GAP: FEW-CLASS INFLUENCE SENSITIVITY
+--------------------------------------------------------------------
+The existing H2 association uses 30 Few classes. A bootstrap interval alone
+does not show whether 2-3 influential classes dominate the association.
+
+Extend the existing H2 association output with leave-one-Few-class-out (LOCO)
+sensitivity. Do not add a new model, data pass, or diagnostic probe.
+
+For every existing exposure x outcome combination in
+_build_h2_associations (three exposures x two outcomes):
+1. Compute the full-sample adjusted standardized beta and partial Spearman
+   exactly as currently implemented.
+2. For each of the 30 Few classes, omit that one class and recompute both
+   adjusted statistics using the same controls and the same estimator.
+3. Report:
+   - LOCO valid count (expected 30 where estimable);
+   - minimum and maximum LOCO beta;
+   - minimum and maximum LOCO partial Spearman;
+   - fraction of valid LOCO estimates with the same sign as the full-sample
+     estimate;
+   - number of omitted classes that reverse the full-sample sign;
+   - class ID/name whose omission causes the largest absolute beta change;
+   - class ID/name whose omission causes the largest absolute partial-Spearman
+     change;
+   - maximum absolute change from full-sample beta and partial Spearman.
+4. If the full-sample estimate is zero/non-finite, report sign stability as
+   unavailable rather than inventing a sign.
+5. Preserve the current 2,000-replicate Few-class bootstrap and its valid
+   replicate counts. LOCO is a sensitivity analysis, not a replacement.
+6. Include a short interpretation note: LOCO checks single-class influence
+   conditional on this one trained seed; it is not training-seed uncertainty,
+   causal identification, or independent replication.
+7. Add explicit descriptive exposure-group summaries for each exposure
+   definition and outcome: exposed/unexposed n, mean, median, and mean
+   difference. For continuous max similarity, use a clearly specified
+   descriptive split (median split, ties handled deterministically) ONLY for
+   descriptive visualization; do not replace continuous regression with it.
+   Keep DINO-neighbor and same-superclass flags separate.
+8. Keep all results in the existing
+   phase2_h2_adjusted_associations.csv (one row per existing exposure/outcome
+   pair; fields may be expanded). Do not add another analysis family or
+   output file unless the existing schema makes this impossible.
+
+C. TESTS
+--------
+Add unit tests covering:
+- LOCO recovers stable sign when association is diffuse and robust;
+- one deliberately influential observation is detected by LOCO sign reversal
+  or large max-deviation;
+- constant/degenerate exposure and non-finite values are handled without
+  crashing and are reported as non-estimable;
+- descriptive exposed/unexposed summaries handle binary flags and continuous
+  median split deterministically, including ties.
+
+Run:
+  python -m pytest -q
+All tests must pass before Phase 2 starts. Do not weaken or delete existing
+tests to make the new tests pass.
+
+D. SINGLE COMPLETE PHASE 2 RUN
+------------------------------
+Use the existing completed Phase 1 output root; do not train again and do not
+create a new Phase 1 root.
+
+Data root:
+  D:\xiangmuxunlian\xin\H2T\data\cifar100
+
+Fixed IF=100 indices:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
+
+Static/DINO audit directory:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01
+
+Phase 1 output root:
+  BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01
+
+Before running, inspect the output root. If ANY Phase 2 output from the existing
+guard is already present, STOP and preserve it. Do not rerun, overwrite, delete,
+or use a fresh copy/root to bypass this stop condition.
+
+Run the existing merged analyzer exactly once, with the already specified
+arguments:
+  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01" --output-root "BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01" --probe-per-class 5 --probe-seed 777 --batch-size 128
+
+Do not run separate H1/H2/H3 scripts. Do not rerun only a failed subsection. If the run fails after producing artifacts, preserve all partial artifacts and report the exact failure. Do not silently retry or change output root.
+
+E. REQUIRED VALIDATION AND SCIENTIFIC BOUNDARIES
+------------------------------------------------
+Retain every precondition and prohibition in CODEX_STAGE_MINUS1_PHASE2.txt,
+including:
+- complete Phase 1 provenance and paired-stream validation;
+- exact fixed indices and six-file DINO package validation;
+- DINO TRAIN-only provenance and test_split_loaded=false;
+- reconstruction of all 1,050 Many-Few pair relations from the saved similarity
+  matrix and symmetric-union Top-5 rule;
+- no TEST forward, no TEST autograd, no TEST gradient, no TEST checkpoint
+  selection; use saved epoch-200 prediction/logit archives only;
+- no training, fine-tuning, optimizer step, Oracle, extra seed, new method,
+  extra topology, or additional passive probe;
+- preserve all existing artifacts.
+
+H1:
+- 100-class delta-accuracy distribution and group summaries;
+- Few top 10 and bottom 10;
+- do not call the distribution bimodal based only on visual inspection.
+
+H2:
+- 30 Few-class exposure rows bridging H1 to all 1,050 Many-Few pairs;
+- separate DINO-neighbor and same-superclass exposure;
+- max DINO similarity continuous exposure;
+- adjusted beta / partial Spearman and unadjusted Spearman sensitivity;
+- LC-only baseline accuracy and log training count controls for gain;
+- additionally LC-only Tail-to-Head confusion control for confusion change;
+- 2,000 Few-class bootstrap intervals and valid counts;
+- LOCO sensitivity and descriptive exposed/unexposed summaries from section B;
+- Head-to-Tail and Tail-to-Head kept separate;
+- same-superclass and DINO Top-5 pair relations kept separate;
+- nearest-baseline matching with replacement;
+- two-endpoint Many/Few class-cluster bootstrap, recomputing matching in every
+  replicate; never treat 1,050 pairs as independent samples.
+
+H3:
+- all five checkpoints 40/100/160/180/200;
+- common-input eval and native three-view train-mode gradient estimands remain
+  separate;
+- report W_y and feature gradients, conflict fractions, raw and
+  objective-weighted norm ratios;
+- retain global backbone/input gradient diagnostics;
+- train margins on fixed LT TRAIN probe; TEST margins read-only from saved
+  epoch-200 logits;
+- verify running_mean, running_var, num_batches_tracked are byte/equality
+  unchanged after EVERY native diagnostic batch; raise on any mismatch.
+
+F. DECISION GATE — NO PASSIVE-DIAGNOSTIC SLIPPERY SLOPE
+-----------------------------------------------------
+The decision brief must answer:
+1. What specific BCL weakness, if any, is supported?
+2. How strong is the evidence given one paired training seed?
+3. What is the single best direct counterfactual, or should this BCL-specific
+   route stop?
+
+Evidence levels:
+- Strongly mechanism-consistent (still exploratory): H1 class-level exposure
+  association remains directionally stable under LOCO; H2 baseline-matched
+  directional pair effect supports the same localized relation; H3 shows a
+  temporally coherent, exposure-stratified gradient/margin pattern.
+- Intermediate: only part of H1/H2/H3 aligns, or LOCO shows substantial
+  influential-class sensitivity. Permit at most ONE direct 1-seed
+  counterfactual intervention, selected to falsify the most specific supported
+  mechanism. Do not add passive observation probes.
+- Unsupported: no stable localized pattern, or effects disappear under
+  baseline matching / LOCO. Stop this BCL-specific route; do not invent a
+  mechanism.
+
+Do not turn an association into causality. Do not infer cross-seed
+reproducibility from bootstrap intervals. Do not use arbitrary post-hoc p-value
+or effect-size thresholds.
+
+A recommended counterfactual is a recommendation only. DO NOT execute it.
+The intervention must be singular and precisely specified. If it is later
+approved and fails to improve the identified low-gain exposed Few classes
+without unacceptable Many-class loss, stop this BCL-specific direction.
+
+G. OUTPUTS AND FINAL RETURN
+---------------------------
+Preserve all existing Phase 2 output names from CODEX_STAGE_MINUS1_PHASE2.txt.
+Update the existing H2 CSV schema for LOCO/descriptive fields and ensure the
+output-existence guard remains correct.
+
+The final PHASE2_DECISION_BRIEF.md must include:
+- H1 full gain heterogeneity;
+- H2 adjusted and unadjusted associations, bootstrap valid counts, LOCO
+  robustness/influential class results, exposure-group descriptive summaries,
+  pair matched DID and endpoint-cluster intervals;
+- H3 five-checkpoint common/native gradient and margin trajectory;
+- actual BN-buffer equality verification;
+- the three decision questions;
+- one direct intervention at most and explicit stop condition.
+
+Return exact repo/branch, start/end commit, git status, pytest result, all
+precondition validation results, output paths, the decision brief conclusion,
+and explicit confirmation that no training, Oracle, TEST forward/autograd,
+new method, extra seed, or additional passive probe was executed.
+
+Do not commit generated datasets, model weights, checkpoints, logs, or arrays.
+Commit only the minimal BCL_AUDIT source/tests/documentation changes if the
+repository workflow requires a commit; preserve unrelated worktree state.
