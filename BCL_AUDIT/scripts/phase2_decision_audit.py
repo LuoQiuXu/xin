@@ -735,7 +735,7 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
             "higher for exposed Few classes at one or more checkpoints; and the exposed group "
             "has a smaller BCL-minus-LC final TEST margin change."
         )
-    elif dino_ci_support or superclass_ci_support:
+    elif dino_ci_support or superclass_ci_support or class_association_support:
         candidate = (
             "One localized counterfactual: suppress only the high-overlap Many-Few "
             "negative-prototype interactions identified by the supported topology slice. "
