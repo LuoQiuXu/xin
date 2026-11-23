@@ -496,6 +496,10 @@ def compute_bcl_gradient_rows(
                 "same_f_feature_conflict_fraction": float(np.mean(f_cos[class_mask] < 0)),
                 "same_f_LC_gradient_norm_mean": float(np.mean(f_lc_norm[class_mask])),
                 "same_f_BCL_gradient_norm_mean": float(np.mean(f_bcl_norm[class_mask])),
+                "same_f_BCL_to_LC_norm_ratio": float(
+                    np.mean(f_bcl_norm[class_mask])
+                    / max(float(np.mean(f_lc_norm[class_mask])), 1e-12)
+                ),
                 "same_f_objective_weighted_LC_gradient_norm_mean": float(
                     np.mean(f_lc_weighted_norm[class_mask])
                 ),
@@ -788,6 +792,9 @@ def compute_native_three_view_gradient_diagnostics(
             )
             row[f"feature_gradient_LC_{suffix}_norm_mean"] = float(np.mean(values["lc_norm"]))
             row[f"feature_gradient_BCL_{suffix}_norm_mean"] = float(np.mean(values["bcl_norm"]))
+            row[f"feature_gradient_BCL_to_LC_{suffix}_norm_ratio"] = float(
+                np.mean(values["bcl_norm"]) / max(np.mean(values["lc_norm"]), 1e-12)
+            )
             row[f"feature_gradient_objective_weighted_LC_{suffix}_norm_mean"] = float(
                 LAMBDA_LC * np.mean(values["lc_norm"])
             )
@@ -1307,6 +1314,7 @@ def main():
             "same_f_feature_conflict_fraction",
             "same_f_LC_gradient_norm_mean",
             "same_f_BCL_gradient_norm_mean",
+            "same_f_BCL_to_LC_norm_ratio",
             "same_f_objective_weighted_LC_gradient_norm_mean",
             "same_f_objective_weighted_BCL_gradient_norm_mean",
             "same_f_objective_weighted_BCL_to_LC_norm_ratio",
@@ -1328,16 +1336,19 @@ def main():
             "W_y_objective_weighted_BCL_to_LC_norm_ratio",
             "feature_gradient_cosine_v1_mean", "feature_gradient_conflict_v1_fraction",
             "feature_gradient_LC_v1_norm_mean", "feature_gradient_BCL_v1_norm_mean",
+            "feature_gradient_BCL_to_LC_v1_norm_ratio",
             "feature_gradient_objective_weighted_LC_v1_norm_mean",
             "feature_gradient_objective_weighted_BCL_v1_norm_mean",
             "feature_gradient_objective_weighted_BCL_to_LC_v1_norm_ratio",
             "feature_gradient_cosine_v2_mean", "feature_gradient_conflict_v2_fraction",
             "feature_gradient_LC_v2_norm_mean", "feature_gradient_BCL_v2_norm_mean",
+            "feature_gradient_BCL_to_LC_v2_norm_ratio",
             "feature_gradient_objective_weighted_LC_v2_norm_mean",
             "feature_gradient_objective_weighted_BCL_v2_norm_mean",
             "feature_gradient_objective_weighted_BCL_to_LC_v2_norm_ratio",
             "feature_gradient_cosine_v3_mean", "feature_gradient_conflict_v3_fraction",
             "feature_gradient_LC_v3_norm_mean", "feature_gradient_BCL_v3_norm_mean",
+            "feature_gradient_BCL_to_LC_v3_norm_ratio",
             "feature_gradient_objective_weighted_LC_v3_norm_mean",
             "feature_gradient_objective_weighted_BCL_v3_norm_mean",
             "feature_gradient_objective_weighted_BCL_to_LC_v3_norm_ratio",
