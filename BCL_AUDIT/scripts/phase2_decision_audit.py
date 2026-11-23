@@ -693,13 +693,48 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
     dino_ci_support = _finite_float(dino_t2h["bootstrap_ci_2_5"]) > 0 and math.isfinite(_finite_float(dino_t2h["bootstrap_ci_97_5"]))
     superclass_ci_support = _finite_float(superclass_t2h["bootstrap_ci_2_5"]) > 0 and math.isfinite(_finite_float(superclass_t2h["bootstrap_ci_97_5"]))
 
-    if dino_ci_support and positive_w_conflict_epochs > 0:
+    maxsim_gain = next(
+        r for r in h2_associations
+        if r["exposure"] == "max_dino_similarity_to_many" and r["outcome"] == "delta_accuracy_pp"
+    )
+    maxsim_confusion = next(
+        r for r in h2_associations
+        if r["exposure"] == "max_dino_similarity_to_many"
+        and r["outcome"] == "delta_tail_to_head_mean_confusion_pp"
+    )
+    class_association_support = (
+        _finite_float(maxsim_gain["standardized_beta"]) < 0
+        and _finite_float(maxsim_gain["standardized_beta_bootstrap_ci_high"]) < 0
+        and _finite_float(maxsim_confusion["standardized_beta"]) > 0
+        and _finite_float(maxsim_confusion["standardized_beta_bootstrap_ci_low"]) > 0
+    )
+    dino_test_margin_rows = [
+        r for r in h3_margins
+        if r["exposure_definition"] == "dino_many_neighbor"
+        and r["source_split"] == "balanced_TEST_read_only"
+        and int(r["epoch"]) == 200
+    ]
+    dino_test_exposed = next((r for r in dino_test_margin_rows if r["exposure_group"] == "exposed"), None)
+    dino_test_unexposed = next((r for r in dino_test_margin_rows if r["exposure_group"] == "unexposed"), None)
+    dino_test_margin_gap = (
+        _finite_float(dino_test_exposed["mean_delta_raw_margin_BCL_minus_LC"])
+        - _finite_float(dino_test_unexposed["mean_delta_raw_margin_BCL_minus_LC"])
+        if dino_test_exposed is not None and dino_test_unexposed is not None else float("nan")
+    )
+
+    if dino_ci_support and class_association_support and positive_w_conflict_epochs > 0 and dino_test_margin_gap < 0:
         candidate = (
             "One stop-gradient counterfactual: detach classifier weights only on the "
             "classifier-derived prototype path (prototype_mlp(W.detach())). Keep forward "
             "prototypes unchanged; remove only BCL-to-W gradient flow."
         )
-        candidate_reason = "DINO-neighbor Tail-to-Head matched confusion DID has a positive endpoint-cluster lower bound, and exposed Few classes show higher native-train W_y conflict at one or more checkpoints."
+        candidate_reason = (
+            "The max-similarity class-level associations point to lower Few gain and higher "
+            "Tail-to-Head confusion after baseline controls; DINO-neighbor Tail-to-Head matched "
+            "confusion DID has a positive endpoint-cluster lower bound; native W_y conflict is "
+            "higher for exposed Few classes at one or more checkpoints; and the exposed group "
+            "has a smaller BCL-minus-LC final TEST margin change."
+        )
     elif dino_ci_support or superclass_ci_support:
         candidate = (
             "One localized counterfactual: suppress only the high-overlap Many-Few "
@@ -853,6 +888,8 @@ Rationale: {candidate_reason}
         "h2_same_superclass_tail_to_head_matched_delta_confusion_pp": superclass_t2h["matched_did_exposed_minus_control"],
         "h2_same_superclass_tail_to_head_cluster_ci": [superclass_t2h["bootstrap_ci_2_5"], superclass_t2h["bootstrap_ci_97_5"]],
         "h3_dino_exposed_higher_native_W_conflict_epochs": positive_w_conflict_epochs,
+        "h2_max_similarity_adjusted_association_support": class_association_support,
+        "h3_dino_exposed_minus_unexposed_test_raw_margin_gap": dino_test_margin_gap,
         "candidate_intervention": candidate, "candidate_intervention_reason": candidate_reason,
         "no_training_executed": True, "no_oracle_executed": True, "no_new_method_executed": True,
         "class_and_pair_bootstrap_is_not_seed_uncertainty": True, "dino_test_split_loaded": False,
