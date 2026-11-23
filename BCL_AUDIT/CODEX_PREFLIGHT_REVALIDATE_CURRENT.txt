@@ -64,16 +64,22 @@ Run exactly:
 
 Record complete output, exit code, elapsed time and warnings. Tests must cover:
 - exact IF=100 split and train-only file boundary;
+- static audit summary/class-count validation and byte-identical index-file
+  cross-check between data_audit_dir and the supplied indices_file;
 - LC-only v1-only supervision and exact lambda=2.0 / mu=0.6 objective;
 - strict missing-index failure;
-- paired epoch-seed / sample-order audit;
+- paired epoch-seed / sample-order audit, including expected seed sequence,
+  10,847 sample count and 10,847 unique fixed source indices;
 - saved init_seed42.pth reload and SHA-256 verification for both groups;
 - identical three-view dataset contract and BatchNorm hooks;
 - BCL loss formula and gradient routes;
 - DINO sidecar immutability and synthetic graph degree/superclass-overlap
   schema (the production run must emit 100 class rows);
 - read-only TEST margins;
-- common-input and native train-mode gradient probes;
+- common-input and native train-mode gradient probes, including objective-
+  weighted gradient norms/ratios for LC=2.0 and BCL=0.6;
+- per-sample native gradient norm scaling by actual minibatch size divided by
+  total probe count (B/N normalization);
 - restoration of BatchNorm running buffers.
 
 If any test fails, stop. Repair only a real defect, commit it, then restart this
@@ -108,7 +114,8 @@ GPU / training:
 - exact ResNet-32 and original BCL graph;
 - with set_seed(42), instantiate one BCLCIFARModel, save its complete
   state_dict to the ignored preflight directory as init_seed42.pth, and store
-  seed=42 plus state_dict_sha256 in the checkpoint payload;
+  seed=42 plus model_state_sha256 (the exact key expected by
+  load_initial_model_state()) in the checkpoint payload;
 - load that file independently for LC-only and BCL via
   load_initial_model_state() and verify the same saved state-dict SHA-256;
 - LC-only: concatenate three views through backbone, take only v1 logits,

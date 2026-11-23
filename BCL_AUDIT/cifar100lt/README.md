@@ -20,7 +20,9 @@ The training and offline-probe paths use `CIFAR100TrainOnly`. Do not replace
 it with stock `torchvision.datasets.CIFAR100(train=True)`: torchvision 0.29.1
 checks both train and test file integrity even for `train=True`. The static
 topology/DINO audit reads only the original TRAIN and meta pickle files.
-The balanced test dataset is instantiated only after both training runs.
+The balanced test dataset is instantiated only after both training runs and
+uses download=False. The test split must already be present locally; the
+training/evaluation pipeline never downloads or replaces it.
 
 ## Run the one-seed paired pilot
 
@@ -45,7 +47,7 @@ Then run the two training groups sequentially. The test split is instantiated on
 after both 200-epoch training runs have completed:
 
 \`\`\`powershell
-python -m BCL_AUDIT.cifar100lt.train --data-root "D:\datasets\cifar100" --output-root "BCL_AUDIT\outputs" --indices-file "BCL_AUDIT\outputs\data_audit\cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
+python -m BCL_AUDIT.cifar100lt.train --data-root "D:\datasets\cifar100" --output-root "BCL_AUDIT\outputs\stage_minus1_seed42_20261123_01" --indices-file "BCL_AUDIT\outputs\<exact_preflight_data_audit_dir>\cifar100lt_if100_train_indices_seed0.npy" --num-workers 0
 \`\`\`
 
 Fixed pilot protocol:
@@ -74,9 +76,11 @@ scientific gradient conflict exists.
 ## Outputs
 
 All generated outputs are local and ignored by Git:
-- BCL_AUDIT/outputs/LC_only_seed42/
-- BCL_AUDIT/outputs/BCL_seed42/
-- BCL_AUDIT/outputs/paired_pilot_summary.json
+- <stage_output_root>/init_seed42.pth
+- <stage_output_root>/LC_only_seed42/
+- <stage_output_root>/BCL_seed42/
+- <stage_output_root>/paired_data_stream_audit.json
+- <stage_output_root>/paired_pilot_summary.json
 
 Both LC-only and BCL use the same three-view dataset output. All three views are
 concatenated through the shared backbone in both groups; LC-only applies its
@@ -90,7 +94,8 @@ The training script saves complete epoch 40, 100, 160-pre-decay, 180-pre-decay,
 and 200 checkpoints, including model, optimizer, protocol, initial-state hash
 and RNG states. Each epoch has a deterministic paired seed; the full sample
 order and first augmented three-view minibatch are hashed and compared across
-LC-only/BCL before TEST is opened. Missing preflight indices are a hard error:
+LC-only/BCL before TEST is opened. Every epoch must visit exactly 10,847 unique
+source indices from the fixed LT TRAIN subset. Missing preflight indices are a hard error:
 the training entry point never silently regenerates a split. Do not upload
 checkpoints, arrays, or raw predictions unless asked.
 

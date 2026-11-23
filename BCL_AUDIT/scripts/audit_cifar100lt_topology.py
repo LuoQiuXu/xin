@@ -691,10 +691,80 @@ def _dino_outputs_complete(out_dir: Path) -> bool:
     if not any(path.exists() or path.is_symlink() for path in paths):
         return False
     if all(path.is_file() and path.stat().st_size > 0 for path in paths):
-        with (out_dir / "data_audit_dino_summary.json").open(encoding="utf-8") as f:
-            summary = json.load(f)
-        if isinstance(summary, dict) and summary.get("dino_enrichment_completed") is True:
+        try:
+            with (out_dir / "data_audit_dino_summary.json").open(encoding="utf-8") as f:
+                summary = json.load(f)
+            with (out_dir / "dino_metadata.json").open(encoding="utf-8") as f:
+                metadata = json.load(f)
+            class_means = np.load(out_dir / "DINO_CLASS_MEAN_FEATURES.npy")
+            similarity = np.load(out_dir / "DINO_CLASS_SIMILARITY.npy")
+            with (out_dir / "DINO_CLASS_TOPOLOGY.csv").open(
+                "r", newline="", encoding="utf-8-sig"
+            ) as f:
+                class_rows = list(csv.DictReader(f))
+
+            num_classes = int(class_means.shape[0]) if class_means.ndim == 2 else -1
+            topk = int(metadata.get("topk", 0))
+            class_ids = {int(row["fine_id"]) for row in class_rows}
+            if (
+                not isinstance(summary, dict)
+                or summary.get("dino_enrichment_completed") is not True
+                or metadata.get("test_split_loaded") is not False
+                or "training split" not in str(metadata.get("source_split", ""))
+                or num_classes < 2
+                or similarity.shape != (num_classes, num_classes)
+                or not np.isfinite(class_means).all()
+                or not np.isfinite(similarity).all()
+                or len(class_rows) != num_classes
+                or class_ids != set(range(num_classes))
+                or not (1 <= topk < num_classes)
+            ):
+                raise ValueError("DINO metadata, arrays or class-topology rows are inconsistent")
+
+            degrees = []
+            for row in class_rows:
+                degree = int(row["symmetric_union_degree"])
+                same_degree = int(row["symmetric_union_same_superclass_degree"])
+                cross_degree = int(row["symmetric_union_cross_superclass_degree"])
+                neighbors = [
+                    value for value in row["directed_topk_neighbor_ids"].split(";") if value
+                ]
+                neighbor_ids = [int(value) for value in neighbors]
+                if degree != same_degree + cross_degree or len(neighbor_ids) != topk:
+                    raise ValueError("DINO class-topology degree / neighbor fields are inconsistent")
+                if (
+                    len(set(neighbor_ids)) != topk
+                    or any(value < 0 or value >= num_classes for value in neighbor_ids)
+                    or int(row["fine_id"]) in neighbor_ids
+                ):
+                    raise ValueError("DINO class-topology neighbor list is invalid")
+                degrees.append(degree)
+
+            if (
+                int(summary.get("dino_topk_union_degree_min", -1)) != int(np.min(degrees))
+                or not np.isclose(
+                    float(summary.get("dino_topk_union_degree_median", float("nan"))),
+                    float(np.median(degrees)),
+                    rtol=0.0,
+                    atol=1e-9,
+                )
+                or int(summary.get("dino_topk_union_degree_max", -1)) != int(np.max(degrees))
+                or int(summary.get("dino_topk_union_edge_count_all_classes", -1)) * 2
+                    != int(np.sum(degrees))
+                or int(summary.get("dino_topk_union_same_superclass_edge_count_all_classes", -1))
+                    + int(summary.get("dino_topk_union_cross_superclass_edge_count_all_classes", -1))
+                    != int(summary.get("dino_topk_union_edge_count_all_classes", -2))
+                or not np.isfinite(float(summary.get(
+                    "dino_topk_directed_same_superclass_random_expectation", float("nan")
+                )))
+                or not np.isfinite(float(summary.get(
+                    "dino_topk_directed_same_superclass_enrichment_ratio", float("nan")
+                )))
+            ):
+                raise ValueError("DINO summary statistics do not match the class-topology table")
             return True
+        except (KeyError, TypeError, ValueError, OSError, EOFError, json.JSONDecodeError):
+            pass
     raise FileExistsError(
         "DINOv2 outputs are partial or inconsistent. Refusing to overwrite existing files in "
         f"{out_dir}"

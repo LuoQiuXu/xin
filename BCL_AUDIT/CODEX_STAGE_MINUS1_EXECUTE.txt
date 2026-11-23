@@ -69,7 +69,17 @@ require a new READY result before resuming.
 
 D. DINOv2 TRAIN-ONLY TOPOLOGY
 -----------------------------
-If all DINO outputs already exist and are complete, validate and reuse them.
+If all DINO outputs already exist, reuse them only after validating:
+- all six expected files are present and non-empty;
+- DINO_CLASS_TOPOLOGY.csv has exactly 100 rows with fine IDs 0..99;
+- DINO_CLASS_MEAN_FEATURES.npy has 100 rows and
+  DINO_CLASS_SIMILARITY.npy is 100x100;
+- every class row has exactly five unique, non-self directed neighbors and
+  symmetric_union_degree = same_superclass_degree + cross_superclass_degree;
+- dino_metadata.json certifies the original TRAIN split and
+  test_split_loaded=false;
+- the summary's union-degree min/median/max and directed Top-5 superclass
+  random expectation/enrichment agree with the class-topology output.
 If absent, run:
   python BCL_AUDIT/scripts/audit_cifar100lt_topology.py --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --output-dir "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01" --compute-dino --reuse-static-audit --dino-model dinov2_vits14 --dino-batch-size 16 --topk 5
 
@@ -108,16 +118,19 @@ Protocol is locked:
 - all three views concatenated through the shared backbone for BOTH groups;
 - standard nn.Linear(64,100), no NormedLinear or s=30 scale.
 
-The trainer must verify paired epoch seeds, full sample-order hashes and
-first-minibatch three-view hashes for all 200 epochs. If any mismatch occurs,
-stop before TEST evaluation.
+The trainer must verify the exact expected epoch seed, full sample-order hash,
+first-minibatch three-view hash, and 10,847/10,847 unique fixed LT source
+indices for every epoch in both groups. If any mismatch occurs, stop before
+TEST evaluation.
 
 If batch 256 FP32 OOMs, STOP. Do not reduce batch size, enable AMP or add
 gradient accumulation.
 
 The trainer may instantiate TEST only after both 200-epoch runs and paired
-data-stream verification have completed. Evaluate only final epoch-200
-checkpoints; do not select checkpoints or tune hyperparameters using TEST.
+data-stream verification have completed. TEST data must already exist locally:
+the evaluator uses download=False and must not download or replace the dataset.
+Evaluate only final epoch-200 checkpoints; do not select checkpoints or tune
+hyperparameters using TEST.
 
 F. HARD STOP — HUMAN ACCEPTANCE
 -------------------------------

@@ -23,7 +23,10 @@ from BCL_AUDIT.cifar100lt.train import (
     state_dict_sha256,
     verify_paired_data_streams,
 )
-from BCL_AUDIT.scripts.analyze_paired_bcl import summarize_did
+from BCL_AUDIT.scripts.analyze_paired_bcl import (
+    summarize_did,
+    validate_static_data_audit,
+)
 from BCL_AUDIT.scripts.audit_cifar100lt_topology import _load_existing_static_audit
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
@@ -45,6 +48,44 @@ def test_cifar100_train_only_integrity_never_checks_test_files(monkeypatch, tmp_
     monkeypatch.setattr(data_module, "check_integrity", fake_check_integrity)
     assert loader._check_integrity() is True
     assert checked_files == ["train"]
+
+
+def test_static_audit_validator_checks_split_and_exact_indices_file(tmp_path):
+    audit_dir = tmp_path / "audit"
+    audit_dir.mkdir()
+    counts = cifar100lt_class_counts()
+    indices = np.arange(int(counts.sum()), dtype=np.int64)
+    static_indices = audit_dir / "cifar100lt_if100_train_indices_seed0.npy"
+    np.save(static_indices, indices)
+    supplied_indices = tmp_path / "indices.npy"
+    supplied_indices.write_bytes(static_indices.read_bytes())
+
+    class_lines = ["fine_id,train_count"] + [
+        f"{class_id},{int(count)}" for class_id, count in enumerate(counts)
+    ]
+    (audit_dir / "class_counts.csv").write_text("\n".join(class_lines) + "\n", encoding="utf-8")
+    (audit_dir / "superclass_counts.csv").write_text("coarse_id,count\n", encoding="utf-8")
+    (audit_dir / "head_tail_pair_topology.csv").write_text("head_fine_id,tail_fine_id\n", encoding="utf-8")
+    (audit_dir / "data_audit_summary.json").write_text(
+        json.dumps({
+            "source_split": "original balanced CIFAR-100 training split only",
+            "test_split_loaded": False,
+            "split_seed": 0,
+            "imbalance_factor": 0.01,
+            "class_counts": counts.tolist(),
+            "long_tail_train_size": 10_847,
+        }),
+        encoding="utf-8",
+    )
+
+    result = validate_static_data_audit(audit_dir, supplied_indices)
+    assert result["num_lt_train_samples"] == 10_847
+    assert result["test_split_loaded"] is False
+
+    mismatched_indices = tmp_path / "mismatched_indices.npy"
+    np.save(mismatched_indices, indices[::-1])
+    with pytest.raises(RuntimeError, match="not byte-identical"):
+        validate_static_data_audit(audit_dir, mismatched_indices)
 
 
 def test_reuse_static_audit_loads_without_rewriting(tmp_path):
@@ -395,6 +436,23 @@ def test_training_refuses_to_regenerate_missing_preflight_indices(tmp_path):
         )
 
 
+def test_cifar100lt_refuses_missing_or_omitted_preflight_indices_before_data_access(tmp_path):
+    with pytest.raises(FileNotFoundError, match="preflight-generated IF=100 indices"):
+        CIFAR100LT(
+            root=tmp_path,
+            mode="lc",
+            indices_file=tmp_path / "missing_indices.npy",
+            download=False,
+        )
+    with pytest.raises(ValueError, match="requires the exact preflight-generated"):
+        CIFAR100LT(
+            root=tmp_path,
+            mode="lc",
+            indices_file=None,
+            download=False,
+        )
+
+
 def test_epoch_seed_and_paired_data_stream_audit(tmp_path):
     assert epoch_seed_for(42, 0) == 4_200_000
     assert epoch_seed_for(42, 199) == 4_200_199
@@ -408,6 +466,8 @@ def test_epoch_seed_and_paired_data_stream_audit(tmp_path):
                     "epoch": epoch_index + 1,
                     "epoch_seed": epoch_seed_for(42, epoch_index),
                     "sample_order_sha256": f"order-{epoch_index}",
+                    "sample_count": 10_847,
+                    "unique_sample_count": 10_847,
                     "first_batch_views_sha256": f"views-{epoch_index}",
                 }
                 stream.write(json.dumps(row) + "\n")
@@ -418,6 +478,33 @@ def test_epoch_seed_and_paired_data_stream_audit(tmp_path):
     assert report["mismatch_count"] == 0
     assert (tmp_path / "paired_data_stream_audit.json").is_file()
 
+
+
+def test_paired_data_stream_audit_rejects_wrong_epoch_seed_and_duplicate_samples(tmp_path):
+    for group in ("LC_only", "BCL"):
+        run_dir = tmp_path / f"{group}_seed42"
+        run_dir.mkdir(parents=True)
+        with (run_dir / "history.jsonl").open("w", encoding="utf-8") as stream:
+            for epoch_index in range(200):
+                row = {
+                    "epoch": epoch_index + 1,
+                    "epoch_seed": epoch_seed_for(42, epoch_index),
+                    "sample_order_sha256": f"order-{epoch_index}",
+                    "sample_count": 10_847,
+                    "unique_sample_count": 10_847,
+                    "first_batch_views_sha256": f"views-{epoch_index}",
+                }
+                if group == "BCL" and epoch_index == 10:
+                    row["epoch_seed"] += 1
+                if group == "LC_only" and epoch_index == 20:
+                    row["unique_sample_count"] = 10_846
+                stream.write(json.dumps(row) + "\n")
+
+    with pytest.raises(RuntimeError, match="data streams diverged"):
+        verify_paired_data_streams(tmp_path)
+    report = json.loads((tmp_path / "paired_data_stream_audit.json").read_text(encoding="utf-8"))
+    assert report["paired_data_streams_identical"] is False
+    assert report["mismatch_count"] >= 2
 
 def test_both_groups_can_verify_the_saved_initial_checkpoint(tmp_path):
     model = BCLCIFARModel()

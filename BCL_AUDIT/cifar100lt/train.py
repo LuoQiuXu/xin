@@ -72,6 +72,14 @@ def state_dict_sha256(state_dict: dict[str, torch.Tensor]) -> str:
     return digest.hexdigest()
 
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def classification_logits_v1(all_logits: torch.Tensor, batch_size: int) -> torch.Tensor:
     """Return only v1 logits from a concatenated [v1,v2,v3] forward."""
     if all_logits.ndim != 2 or all_logits.shape[0] != 3 * int(batch_size):
@@ -133,12 +141,45 @@ def verify_paired_data_streams(output_root: Path) -> dict:
         )
 
     mismatches = []
-    fields = ("epoch", "epoch_seed", "sample_order_sha256", "first_batch_views_sha256")
-    for left, right in zip(histories["LC_only"], histories["BCL"]):
+    fields = (
+        "epoch",
+        "epoch_seed",
+        "sample_order_sha256",
+        "first_batch_views_sha256",
+        "sample_count",
+        "unique_sample_count",
+    )
+    expected_sample_count = 10_847
+    for epoch_index, (left, right) in enumerate(
+        zip(histories["LC_only"], histories["BCL"])
+    ):
+        expected_epoch = epoch_index + 1
+        expected_seed = epoch_seed_for(TRAIN_SEED, epoch_index)
+        for group, row in (("LC_only", left), ("BCL", right)):
+            if row.get("epoch") != expected_epoch:
+                mismatches.append({
+                    "epoch": expected_epoch, "group": group,
+                    "field": "expected_epoch", "observed": row.get("epoch"),
+                })
+            if row.get("epoch_seed") != expected_seed:
+                mismatches.append({
+                    "epoch": expected_epoch, "group": group,
+                    "field": "expected_epoch_seed", "observed": row.get("epoch_seed"),
+                })
+            if row.get("sample_count") != expected_sample_count:
+                mismatches.append({
+                    "epoch": expected_epoch, "group": group,
+                    "field": "sample_count", "observed": row.get("sample_count"),
+                })
+            if row.get("unique_sample_count") != expected_sample_count:
+                mismatches.append({
+                    "epoch": expected_epoch, "group": group,
+                    "field": "unique_sample_count", "observed": row.get("unique_sample_count"),
+                })
         for field in fields:
             if left.get(field) != right.get(field):
                 mismatches.append({
-                    "epoch": left.get("epoch"),
+                    "epoch": expected_epoch,
                     "field": field,
                     "LC_only": left.get(field),
                     "BCL": right.get(field),
@@ -432,6 +473,7 @@ def train_group(
         correct = 0
         seen = 0
         sample_order_digest = hashlib.sha256()
+        sample_order_indices = []
         first_views_digest = None
 
         if device.type == "cuda":
@@ -440,9 +482,11 @@ def train_group(
         epoch_start = time.perf_counter()
 
         for batch_index, (images, labels, source_indices) in enumerate(loader):
-            sample_order_digest.update(
-                source_indices.detach().cpu().numpy().astype(np.int64, copy=False).tobytes()
+            source_index_array = source_indices.detach().cpu().numpy().astype(
+                np.int64, copy=False
             )
+            sample_order_digest.update(source_index_array.tobytes())
+            sample_order_indices.extend(source_index_array.tolist())
             if batch_index == 0:
                 first_views_digest = first_batch_views_sha256(images)
             labels = labels.to(device, non_blocking=True)
@@ -503,10 +547,27 @@ def train_group(
 
         if first_views_digest is None:
             raise RuntimeError("DataLoader produced no batches in this epoch")
+        expected_indices = np.sort(dataset.indices.astype(np.int64, copy=False))
+        observed_indices = np.asarray(sample_order_indices, dtype=np.int64)
+        unique_sample_count = int(np.unique(observed_indices).size)
+        if seen != len(dataset) or observed_indices.size != len(dataset):
+            raise RuntimeError(
+                f"{group} epoch {human_epoch}: observed {observed_indices.size} "
+                f"indices / {seen} samples, expected {len(dataset)}"
+            )
+        if unique_sample_count != len(dataset) or not np.array_equal(
+            np.sort(observed_indices), expected_indices
+        ):
+            raise RuntimeError(
+                f"{group} epoch {human_epoch}: sampler did not visit every fixed "
+                "LT TRAIN source index exactly once"
+            )
         summary = {
             "epoch": epoch_index + 1,
             "epoch_seed": epoch_seed,
             "sample_order_sha256": sample_order_digest.hexdigest(),
+            "sample_count": int(observed_indices.size),
+            "unique_sample_count": unique_sample_count,
             "first_batch_views_sha256": first_views_digest,
             "lr": lr,
             "loss_lc": loss_lc_sum / max(seen, 1),
@@ -619,7 +680,7 @@ def evaluate_final_checkpoint(
     device: torch.device,
 ):
     # This function is called only after BOTH training groups have finished.
-    test_set = CIFAR100BalancedTest(root=data_root, download=True)
+    test_set = CIFAR100BalancedTest(root=data_root, download=False)
     loader = DataLoader(
         test_set,
         batch_size=BATCH_SIZE,
@@ -730,6 +791,7 @@ def main():
             f"Required preflight-generated IF=100 indices are missing: {indices_file}. "
             "Do not regenerate or download the split in the training entry point."
         )
+    indices_file_sha256 = file_sha256(indices_file)
     output_root.mkdir(parents=True, exist_ok=True)
 
     existing_run_artifacts = [
@@ -767,6 +829,8 @@ def main():
         "num_workers": args.num_workers,
         "seed": TRAIN_SEED,
         "precision": "fp32",
+        "indices_file": str(indices_file),
+        "indices_file_sha256": indices_file_sha256,
     }
     if device.type == "cuda":
         free_memory, total_memory = torch.cuda.mem_get_info(device)
@@ -847,6 +911,7 @@ def main():
         "initial_model_checkpoint": str(initial_state_path),
         "initial_model_state_sha256": initial_state_sha256,
         "indices_file": str(indices_file),
+        "indices_file_sha256": indices_file_sha256,
         "paired_data_stream_audit": paired_data_stream_audit,
         "LC_only_training": lc_summary,
         "BCL_training": bcl_summary,

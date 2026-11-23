@@ -13,7 +13,9 @@ Read:
 - BCL_AUDIT/CODEX_STAGE_MINUS1.txt
 - BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt
 - Phase 1 paired_pilot_summary.json
-- Phase 1 paired_data_stream_audit.json
+- Phase 1 paired_data_stream_audit.json and paired_pilot_summary.json
+- the saved init_seed42.pth and its recorded model-state SHA-256
+- both groups' training_summary.json
 - both groups' final_test_predictions.npz and final_test_metrics.json
 - all five checkpoints per group
 - the exact data_audit_output_dir and indices_file recorded by preflight
@@ -40,7 +42,9 @@ five-per-class probe selected from the saved IF=100 LT TRAIN indices. The
 selected samples are globally shuffled with the fixed probe seed before they
 are batched, avoiding class-major diagnostic minibatches while retaining five
 samples per class.
-The probe cache must explicitly record test_split_loaded=false.
+The probe cache must explicitly record test_split_loaded=false, the SHA-256
+of the exact IF=100 indices file, the probe seed, five-per-class quotas, and
+the global-shuffle selection order. Reject stale or mismatched caches.
 
 TEST is allowed only for:
 - read-only margins from the saved final logits;
@@ -75,16 +79,24 @@ D. REQUIRED DIAGNOSTICS
 3. Common-input eval gradient probe (BCL checkpoints only):
    - model.eval(), BN running stats frozen;
    - use exactly the same v2 feature tensor f(x) for LC and BCL;
-   - report per-class W_y cosine/norm/ratio;
-   - report same-feature gradient cosine, norms and negative-cosine fraction.
+   - report per-class W_y cosine, raw component norms/ratio, and objective-
+     weighted norms/ratio using LC=2.0 and BCL=0.6;
+   - report same-feature gradient cosine, raw and weighted norms/ratio, and
+     negative-cosine fraction.
 
 4. Native three-view train-mode gradient probe (BCL checkpoints only):
    - fixed LT TRAIN probe v1/v2/v3;
    - concatenate [v1,v2,v3] and use one model.train() forward;
    - LC uses v1 logits only; BCL uses v2/v3 embeddings and classifier-derived
      prototypes;
-   - report per-class W_y gradients, per-view feature gradients, full
-     backbone-parameter gradient cosine/norms, and per-view input gradients;
+   - report per-class W_y cosine/raw and objective-weighted norms/ratios,
+     per-view feature cosine/conflict fractions and raw/weighted norms, full
+     backbone-parameter gradient cosine/raw and weighted norms/ratios, and
+     per-view input-gradient cosine/conflict fractions and raw/weighted norms;
+   - the losses are batch means: scale each per-sample feature/input gradient
+     by B/N (actual minibatch size divided by the 500-sample probe count) before
+     aggregating norm statistics, so all rows use the full-probe mean-objective
+     scale and the final 116-sample batch is comparable to 128-sample batches;
    - restore running_mean, running_var and num_batches_tracked after each
      diagnostic batch. Checkpoint buffers must remain unchanged.
    - label this result separately from common-input eval; they are different

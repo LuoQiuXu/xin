@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import random
 from pathlib import Path
@@ -15,6 +16,7 @@ from PIL import Image
 from BCL_AUDIT.cifar100lt.data import CIFAR100TrainOnly, build_cifar_transforms, cifar100lt_class_counts
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
+from BCL_AUDIT.cifar100lt.train import LAMBDA_LC, MU_BCL, state_dict_sha256
 
 
 CHECKPOINTS = [
@@ -37,6 +39,71 @@ def set_probe_seed(seed: int):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_static_data_audit(data_audit_dir: Path, indices_file: Path) -> dict[str, Any]:
+    """Cross-check the analyzer's static audit directory against the exact indices file."""
+    required = (
+        "class_counts.csv",
+        "superclass_counts.csv",
+        "head_tail_pair_topology.csv",
+        "data_audit_summary.json",
+        "cifar100lt_if100_train_indices_seed0.npy",
+    )
+    missing = [name for name in required if not (data_audit_dir / name).is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "Static TRAIN-only data-audit artifacts are missing: " + ", ".join(missing)
+        )
+    if not indices_file.is_file():
+        raise FileNotFoundError(f"Missing fixed IF=100 indices: {indices_file}")
+
+    static_indices_path = data_audit_dir / "cifar100lt_if100_train_indices_seed0.npy"
+    indices_hash = file_sha256(indices_file)
+    if file_sha256(static_indices_path) != indices_hash:
+        raise RuntimeError(
+            "The analyzer indices_file is not byte-identical to the static audit's saved indices"
+        )
+
+    with (data_audit_dir / "data_audit_summary.json").open(encoding="utf-8") as stream:
+        summary = json.load(stream)
+    expected_counts = cifar100lt_class_counts()
+    if (
+        summary.get("test_split_loaded") is not False
+        or "training split" not in str(summary.get("source_split", ""))
+        or summary.get("split_seed") != 0
+        or abs(float(summary.get("imbalance_factor", -1.0)) - 0.01) > 1e-12
+        or not np.array_equal(
+            np.asarray(summary.get("class_counts", []), dtype=np.int64), expected_counts
+        )
+        or int(summary.get("long_tail_train_size", -1)) != 10_847
+    ):
+        raise RuntimeError("Static data-audit summary does not certify the fixed TRAIN-only IF=100 split")
+
+    class_rows = read_csv(data_audit_dir / "class_counts.csv")
+    if len(class_rows) != 100 or {int(row["fine_id"]) for row in class_rows} != set(range(100)):
+        raise RuntimeError("class_counts.csv must contain each official fine class exactly once")
+    observed_counts = np.asarray(
+        [int(next(row["train_count"] for row in class_rows if int(row["fine_id"]) == class_id))
+         for class_id in range(100)],
+        dtype=np.int64,
+    )
+    if not np.array_equal(observed_counts, expected_counts):
+        raise RuntimeError("class_counts.csv does not match the fixed CIFAR-100-LT IF=100 vector")
+
+    return {
+        "indices_file_sha256": indices_hash,
+        "num_lt_train_samples": int(expected_counts.sum()),
+        "test_split_loaded": False,
+    }
 
 
 def write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]):
@@ -110,18 +177,15 @@ def load_or_create_probe_cache(
     per_class: int,
     seed: int,
 ):
-    """Create fixed multi-view probes from the selected LT TRAIN subset only."""
-    if cache_path.is_file():
-        cache = safe_torch_load(cache_path, map_location="cpu")
-        expected = 100 * per_class
-        if cache["labels"].numel() != expected:
-            raise RuntimeError(
-                f"Probe cache has {cache['labels'].numel()} rows; expected {expected}"
-            )
-        return cache
-
+    """Create/reuse a fixed, globally shuffled multi-view probe from LT TRAIN only."""
     if not indices_file.is_file():
         raise FileNotFoundError(f"Missing fixed CIFAR-100-LT indices: {indices_file}")
+
+    selected_lt_indices = np.load(indices_file).astype(np.int64)
+    if selected_lt_indices.ndim != 1:
+        raise RuntimeError("The LT index file must be one-dimensional")
+    if np.unique(selected_lt_indices).size != selected_lt_indices.size:
+        raise RuntimeError("The LT index file contains duplicate source indices")
 
     train_set = CIFAR100TrainOnly(
         root=str(data_root),
@@ -130,13 +194,53 @@ def load_or_create_probe_cache(
         transform=None,
     )
     source_labels = np.asarray(train_set.targets, dtype=np.int64)
-    selected_lt_indices = np.load(indices_file).astype(np.int64)
-    if selected_lt_indices.ndim != 1:
-        raise RuntimeError("The LT index file must be one-dimensional")
     if np.any(selected_lt_indices < 0) or np.any(selected_lt_indices >= len(source_labels)):
         raise RuntimeError("The LT index file contains out-of-range source indices")
-    if np.unique(selected_lt_indices).size != selected_lt_indices.size:
-        raise RuntimeError("The LT index file contains duplicate source indices")
+    expected_lt_counts = cifar100lt_class_counts()
+    observed_lt_counts = np.bincount(source_labels[selected_lt_indices], minlength=100)
+    if not np.array_equal(observed_lt_counts, expected_lt_counts):
+        raise RuntimeError("The fixed indices file does not match CIFAR-100-LT IF=100")
+    indices_file_sha256 = file_sha256(indices_file)
+    expected_probe_order = "per-class fixed-count selection followed by seeded global shuffle"
+    expected_count = 100 * per_class
+
+    if cache_path.is_file():
+        cache = safe_torch_load(cache_path, map_location="cpu")
+        required_keys = {"view1", "view2", "view3", "view_eval", "labels", "source_indices", "metadata"}
+        if not required_keys.issubset(cache):
+            raise RuntimeError("Probe cache is incomplete; use a fresh Phase-2 output root")
+        labels = cache["labels"].detach().cpu().numpy().astype(np.int64, copy=False)
+        source_indices = cache["source_indices"].detach().cpu().numpy().astype(np.int64, copy=False)
+        metadata = cache.get("metadata", {})
+        if labels.shape != (expected_count,) or source_indices.shape != (expected_count,):
+            raise RuntimeError("Probe cache has an unexpected sample count; use a fresh Phase-2 output root")
+        if np.unique(source_indices).size != expected_count:
+            raise RuntimeError("Probe cache contains duplicate source indices")
+        if not np.isin(source_indices, selected_lt_indices).all():
+            raise RuntimeError("Probe cache contains images outside the fixed LT TRAIN subset")
+        if not np.array_equal(labels, source_labels[source_indices]):
+            raise RuntimeError("Probe cache labels do not match the original TRAIN source indices")
+        if not np.array_equal(np.bincount(labels, minlength=100), np.full(100, per_class)):
+            raise RuntimeError("Probe cache does not contain the requested fixed count per class")
+        expected_metadata = {
+            "test_split_loaded": False,
+            "per_class": per_class,
+            "probe_seed": seed,
+            "probe_order": expected_probe_order,
+            "indices_file_sha256": indices_file_sha256,
+        }
+        for key, expected_value in expected_metadata.items():
+            if metadata.get(key) != expected_value:
+                raise RuntimeError(
+                    f"Probe cache metadata mismatch for {key}; use a fresh Phase-2 output root"
+                )
+        if "training split" not in str(metadata.get("source_split", "")):
+            raise RuntimeError("Probe cache does not certify the original TRAIN split")
+        for key in ("view1", "view2", "view3", "view_eval"):
+            tensor = cache[key]
+            if not torch.is_tensor(tensor) or tensor.shape != (expected_count, 3, 32, 32):
+                raise RuntimeError(f"Probe cache tensor {key} has an invalid shape")
+        return cache
 
     rng = np.random.RandomState(seed)
     probe_indices = []
@@ -151,8 +255,7 @@ def load_or_create_probe_cache(
             rng.choice(pool, size=per_class, replace=False).astype(np.int64).tolist()
         )
     probe_indices = np.asarray(probe_indices, dtype=np.int64)
-    # Keep five samples per class but mix class identities across diagnostic
-    # minibatches so train-mode BN is not exposed to class-major batches.
+    # Keep the class quota fixed but mix class identities across diagnostic batches.
     probe_indices = probe_indices[rng.permutation(probe_indices.size)]
 
     transform_v1, transform_sim, transform_eval = build_cifar_transforms()
@@ -178,7 +281,8 @@ def load_or_create_probe_cache(
             "test_split_loaded": False,
             "per_class": per_class,
             "probe_seed": seed,
-            "probe_order": "per-class fixed-count selection followed by seeded global shuffle",
+            "probe_order": expected_probe_order,
+            "indices_file_sha256": indices_file_sha256,
             "class_order": "official fine-label IDs 0..99",
         },
     }
@@ -209,10 +313,28 @@ def margins_from_logits(logits: torch.Tensor, labels: torch.Tensor):
     return true_logits - masked.max(dim=1).values
 
 
-def load_model_checkpoint(path: Path, device: torch.device):
+def load_model_checkpoint(
+    path: Path,
+    device: torch.device,
+    expected_group: str,
+    expected_epoch: int,
+    expected_initial_sha256: str,
+):
     if not path.is_file():
         raise FileNotFoundError(f"Missing checkpoint: {path}")
     checkpoint = safe_torch_load(path, map_location="cpu")
+    expected = {
+        "group": expected_group,
+        "seed": 42,
+        "epoch": expected_epoch,
+        "initial_model_state_sha256": expected_initial_sha256,
+    }
+    for key, expected_value in expected.items():
+        if checkpoint.get(key) != expected_value:
+            raise RuntimeError(
+                f"Checkpoint provenance mismatch for {path.name}: "
+                f"{key}={checkpoint.get(key)!r}, expected {expected_value!r}"
+            )
     model = BCLCIFARModel()
     model.load_state_dict(checkpoint["model_state"], strict=True)
     model.to(device)
@@ -325,10 +447,14 @@ def compute_bcl_gradient_rows(
     w_cos = safe_rowwise_cosine(grad_lc_w, grad_bcl_w).detach().cpu().numpy()
     w_lc_norm = grad_lc_w.norm(dim=1).detach().cpu().numpy()
     w_bcl_norm = grad_bcl_w.norm(dim=1).detach().cpu().numpy()
+    w_lc_weighted_norm = LAMBDA_LC * w_lc_norm
+    w_bcl_weighted_norm = MU_BCL * w_bcl_norm
 
     f_cos = safe_rowwise_cosine(grad_lc_f, grad_bcl_f).detach().cpu().numpy()
     f_lc_norm = grad_lc_f.norm(dim=1).detach().cpu().numpy()
     f_bcl_norm = grad_bcl_f.norm(dim=1).detach().cpu().numpy()
+    f_lc_weighted_norm = LAMBDA_LC * f_lc_norm
+    f_bcl_weighted_norm = MU_BCL * f_bcl_norm
     labels_np = labels.detach().cpu().numpy()
 
     rows = []
@@ -344,6 +470,8 @@ def compute_bcl_gradient_rows(
                 "class_id": class_id,
                 "coarse_id": meta["coarse_id"],
                 "shot_group": meta["shot_group"],
+                "lc_objective_weight": float(LAMBDA_LC),
+                "bcl_objective_weight": float(MU_BCL),
                 "W_y_gradient_cosine": float(w_cos[class_id]),
                 "W_y_conflict_negative_cosine": bool(w_cos[class_id] < 0),
                 "W_y_LC_gradient_norm": float(w_lc_norm[class_id]),
@@ -351,11 +479,26 @@ def compute_bcl_gradient_rows(
                 "W_y_BCL_to_LC_norm_ratio": float(
                     w_bcl_norm[class_id] / max(w_lc_norm[class_id], 1e-12)
                 ),
+                "W_y_objective_weighted_LC_gradient_norm": float(w_lc_weighted_norm[class_id]),
+                "W_y_objective_weighted_BCL_gradient_norm": float(w_bcl_weighted_norm[class_id]),
+                "W_y_objective_weighted_BCL_to_LC_norm_ratio": float(
+                    w_bcl_weighted_norm[class_id] / max(w_lc_weighted_norm[class_id], 1e-12)
+                ),
                 "same_f_feature_gradient_cosine_mean": float(np.mean(f_cos[class_mask])),
                 "same_f_feature_gradient_cosine_median": float(np.median(f_cos[class_mask])),
                 "same_f_feature_conflict_fraction": float(np.mean(f_cos[class_mask] < 0)),
                 "same_f_LC_gradient_norm_mean": float(np.mean(f_lc_norm[class_mask])),
                 "same_f_BCL_gradient_norm_mean": float(np.mean(f_bcl_norm[class_mask])),
+                "same_f_objective_weighted_LC_gradient_norm_mean": float(
+                    np.mean(f_lc_weighted_norm[class_mask])
+                ),
+                "same_f_objective_weighted_BCL_gradient_norm_mean": float(
+                    np.mean(f_bcl_weighted_norm[class_mask])
+                ),
+                "same_f_objective_weighted_BCL_to_LC_norm_ratio": float(
+                    np.mean(f_bcl_weighted_norm[class_mask])
+                    / max(float(np.mean(f_lc_weighted_norm[class_mask])), 1e-12)
+                ),
             }
         )
     return rows
@@ -478,11 +621,12 @@ def compute_native_three_view_gradient_diagnostics(
                 allow_unused=True,
             )
 
+            probe_mean_scale = current_batch / float(count_all)
             weight_lc_sum += (
-                gradients_lc[0].detach().cpu().double() * current_batch
+                gradients_lc[0].detach().cpu().double() * probe_mean_scale
             )
             weight_bcl_sum += (
-                gradients_bcl[0].detach().cpu().double() * current_batch
+                gradients_bcl[0].detach().cpu().double() * probe_mean_scale
             )
 
             backbone_lc = _flatten_gradient_tensors(
@@ -494,13 +638,16 @@ def compute_native_three_view_gradient_diagnostics(
             if backbone_lc_sum is None:
                 backbone_lc_sum = torch.zeros_like(backbone_lc)
                 backbone_bcl_sum = torch.zeros_like(backbone_bcl)
-            backbone_lc_sum += backbone_lc * current_batch
-            backbone_bcl_sum += backbone_bcl * current_batch
+            backbone_lc_sum += backbone_lc * probe_mean_scale
+            backbone_bcl_sum += backbone_bcl * probe_mean_scale
 
-            feature_lc = gradients_lc[1].detach()
-            feature_bcl = gradients_bcl[1].detach()
-            input_lc = gradients_lc[-1].detach()
-            input_bcl = gradients_bcl[-1].detach()
+            # Losses are batch means. Scale each row by B/N to undo its local
+            # 1/B reduction and express per-sample rows on the full-probe mean
+            # objective scale. This also corrects the smaller final batch.
+            feature_lc = gradients_lc[1].detach() * probe_mean_scale
+            feature_bcl = gradients_bcl[1].detach() * probe_mean_scale
+            input_lc = gradients_lc[-1].detach() * probe_mean_scale
+            input_bcl = gradients_bcl[-1].detach() * probe_mean_scale
             labels_np = labels.detach().cpu().numpy()
 
             for view_index in (1, 2, 3):
@@ -554,6 +701,8 @@ def compute_native_three_view_gradient_diagnostics(
     weight_cos = safe_rowwise_cosine(weight_lc_sum, weight_bcl_sum).numpy()
     weight_lc_norm = weight_lc_sum.norm(dim=1).numpy()
     weight_bcl_norm = weight_bcl_sum.norm(dim=1).numpy()
+    weight_lc_weighted_norm = LAMBDA_LC * weight_lc_norm
+    weight_bcl_weighted_norm = MU_BCL * weight_bcl_norm
 
     class_rows = []
     for class_id in sorted(class_feature_records):
@@ -566,12 +715,20 @@ def compute_native_three_view_gradient_diagnostics(
             "class_id": class_id,
             "coarse_id": meta["coarse_id"],
             "shot_group": meta["shot_group"],
+            "lc_objective_weight": float(LAMBDA_LC),
+            "bcl_objective_weight": float(MU_BCL),
             "W_y_gradient_cosine": float(weight_cos[class_id]),
             "W_y_conflict_negative_cosine": bool(weight_cos[class_id] < 0),
             "W_y_LC_gradient_norm": float(weight_lc_norm[class_id]),
             "W_y_BCL_gradient_norm": float(weight_bcl_norm[class_id]),
             "W_y_BCL_to_LC_norm_ratio": float(
                 weight_bcl_norm[class_id] / max(weight_lc_norm[class_id], 1e-12)
+            ),
+            "W_y_objective_weighted_LC_gradient_norm": float(weight_lc_weighted_norm[class_id]),
+            "W_y_objective_weighted_BCL_gradient_norm": float(weight_bcl_weighted_norm[class_id]),
+            "W_y_objective_weighted_BCL_to_LC_norm_ratio": float(
+                weight_bcl_weighted_norm[class_id]
+                / max(weight_lc_weighted_norm[class_id], 1e-12)
             ),
         }
         for view_index in (1, 2, 3):
@@ -583,6 +740,16 @@ def compute_native_three_view_gradient_diagnostics(
             )
             row[f"feature_gradient_LC_{suffix}_norm_mean"] = float(np.mean(values["lc_norm"]))
             row[f"feature_gradient_BCL_{suffix}_norm_mean"] = float(np.mean(values["bcl_norm"]))
+            row[f"feature_gradient_objective_weighted_LC_{suffix}_norm_mean"] = float(
+                LAMBDA_LC * np.mean(values["lc_norm"])
+            )
+            row[f"feature_gradient_objective_weighted_BCL_{suffix}_norm_mean"] = float(
+                MU_BCL * np.mean(values["bcl_norm"])
+            )
+            row[f"feature_gradient_objective_weighted_BCL_to_LC_{suffix}_norm_ratio"] = float(
+                MU_BCL * np.mean(values["bcl_norm"])
+                / max(LAMBDA_LC * np.mean(values["lc_norm"]), 1e-12)
+            )
         class_rows.append(row)
 
     global_row = {
@@ -590,6 +757,8 @@ def compute_native_three_view_gradient_diagnostics(
         "source_split": "LT_train_probe",
         "bn_mode": "train",
         "epoch": epoch,
+        "lc_objective_weight": float(LAMBDA_LC),
+        "bcl_objective_weight": float(MU_BCL),
         "backbone_gradient_cosine": _scalar_cosine(
             backbone_lc_sum, backbone_bcl_sum
         ),
@@ -597,6 +766,16 @@ def compute_native_three_view_gradient_diagnostics(
         "backbone_BCL_gradient_norm": float(backbone_bcl_sum.norm().item()),
         "backbone_BCL_to_LC_norm_ratio": float(
             backbone_bcl_sum.norm().item() / max(backbone_lc_sum.norm().item(), 1e-12)
+        ),
+        "backbone_objective_weighted_LC_gradient_norm": float(
+            LAMBDA_LC * backbone_lc_sum.norm().item()
+        ),
+        "backbone_objective_weighted_BCL_gradient_norm": float(
+            MU_BCL * backbone_bcl_sum.norm().item()
+        ),
+        "backbone_objective_weighted_BCL_to_LC_norm_ratio": float(
+            MU_BCL * backbone_bcl_sum.norm().item()
+            / max(LAMBDA_LC * backbone_lc_sum.norm().item(), 1e-12)
         ),
         "bn_running_buffers_restored": True,
         "gradient_source_split": "LT_train_probe_only",
@@ -610,6 +789,16 @@ def compute_native_three_view_gradient_diagnostics(
         )
         global_row[f"input_gradient_LC_{suffix}_norm_mean"] = float(np.mean(values["lc_norm"]))
         global_row[f"input_gradient_BCL_{suffix}_norm_mean"] = float(np.mean(values["bcl_norm"]))
+        global_row[f"input_gradient_objective_weighted_LC_{suffix}_norm_mean"] = float(
+            LAMBDA_LC * np.mean(values["lc_norm"])
+        )
+        global_row[f"input_gradient_objective_weighted_BCL_{suffix}_norm_mean"] = float(
+            MU_BCL * np.mean(values["bcl_norm"])
+        )
+        global_row[f"input_gradient_objective_weighted_BCL_to_LC_{suffix}_norm_ratio"] = float(
+            MU_BCL * np.mean(values["bcl_norm"])
+            / max(LAMBDA_LC * np.mean(values["lc_norm"]), 1e-12)
+        )
     return class_rows, global_row
 
 
@@ -785,6 +974,99 @@ def summarize_did(effects: list[dict[str, Any]]):
     return summaries
 
 
+def validate_phase1_artifacts(output_root: Path, indices_file: Path) -> dict[str, Any]:
+    """Refuse Phase-2 analysis unless the paired Phase-1 pilot is complete."""
+    required = [
+        output_root / "paired_data_stream_audit.json",
+        output_root / "paired_pilot_summary.json",
+        output_root / "init_seed42.pth",
+    ]
+    for group in ("LC_only", "BCL"):
+        group_root = output_root / f"{group}_seed42"
+        required.extend([
+            group_root / "training_summary.json",
+            group_root / "final_test_metrics.json",
+            group_root / "final_test_predictions.npz",
+        ])
+        required.extend(
+            group_root / "checkpoints" / filename for _, filename in CHECKPOINTS
+        )
+    missing = [str(path) for path in required if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "Phase-1 artifacts are incomplete; do not run Phase 2: " + ", ".join(missing)
+        )
+
+    with (output_root / "paired_data_stream_audit.json").open(encoding="utf-8") as stream:
+        stream_audit = json.load(stream)
+    if (
+        stream_audit.get("paired_data_streams_identical") is not True
+        or stream_audit.get("epochs_compared") != 200
+        or stream_audit.get("mismatch_count") != 0
+    ):
+        raise RuntimeError("Phase-1 paired data-stream audit is not a complete 200/200 pass")
+
+    with (output_root / "paired_pilot_summary.json").open(encoding="utf-8") as stream:
+        paired_summary = json.load(stream)
+    if paired_summary.get("seed") != 42 or paired_summary.get("epochs") != 200:
+        raise RuntimeError("Phase-1 summary does not describe the required seed-42 200-epoch pilot")
+    if not indices_file.is_file():
+        raise FileNotFoundError(f"Missing fixed IF=100 indices: {indices_file}")
+    actual_indices_hash = file_sha256(indices_file)
+    if paired_summary.get("indices_file_sha256") != actual_indices_hash:
+        raise RuntimeError("Phase-1 summary index SHA-256 does not match the supplied fixed indices")
+
+    initial_hash = paired_summary.get("initial_model_state_sha256")
+    if not isinstance(initial_hash, str) or len(initial_hash) != 64:
+        raise RuntimeError("Phase-1 summary is missing the initial model-state SHA-256")
+    initial_checkpoint = safe_torch_load(output_root / "init_seed42.pth", map_location="cpu")
+    initial_state = initial_checkpoint.get("model_state")
+    if (
+        initial_checkpoint.get("seed") != 42
+        or initial_checkpoint.get("model_state_sha256") != initial_hash
+        or not isinstance(initial_state, dict)
+        or state_dict_sha256(initial_state) != initial_hash
+    ):
+        raise RuntimeError("Saved init_seed42.pth does not match the paired initial-state SHA-256")
+    for group in ("LC_only", "BCL"):
+        group_root = output_root / f"{group}_seed42"
+        with (group_root / "training_summary.json").open(encoding="utf-8") as stream:
+            training_summary = json.load(stream)
+        if (
+            training_summary.get("group") != group
+            or training_summary.get("seed") != 42
+            or training_summary.get("epochs") != 200
+            or training_summary.get("initial_model_state_sha256") != initial_hash
+        ):
+            raise RuntimeError(f"{group} training summary is inconsistent with the paired pilot")
+        with np.load(group_root / "final_test_predictions.npz") as archive:
+            required_arrays = {"labels", "predictions", "logits", "adjusted_logits"}
+            if not required_arrays.issubset(set(archive.files)):
+                raise RuntimeError(f"{group} final TEST archive is incomplete")
+            labels = archive["labels"]
+            predictions = archive["predictions"]
+            logits = archive["logits"]
+            adjusted_logits = archive["adjusted_logits"]
+            if (
+                labels.shape != (10_000,)
+                or predictions.shape != (10_000,)
+                or logits.shape != (10_000, 100)
+                or adjusted_logits.shape != (10_000, 100)
+                or not np.array_equal(np.bincount(labels.astype(np.int64), minlength=100),
+                                      np.full(100, 100, dtype=np.int64))
+            ):
+                raise RuntimeError(f"{group} final TEST archive has invalid shapes or class counts")
+        with (group_root / "final_test_metrics.json").open(encoding="utf-8") as stream:
+            metrics = json.load(stream)
+        if metrics.get("group") != group or metrics.get("seed") != 42:
+            raise RuntimeError(f"{group} final TEST metrics are not paired seed-42 results")
+    return {
+        "paired_data_stream_audit": stream_audit,
+        "initial_model_state_sha256": initial_hash,
+        "indices_file_sha256": actual_indices_hash,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Offline paired BCL diagnostics: margins, dual-layer gradients, Head-Tail DID"
@@ -808,6 +1090,32 @@ def main():
         else output_root / "data_audit"
     )
     output_root.mkdir(parents=True, exist_ok=True)
+
+    phase2_output_names = (
+        "offline_probe_margin_metrics.csv",
+        "offline_dual_gradient_metrics.csv",
+        "offline_native_three_view_gradient_class_metrics.csv",
+        "offline_native_three_view_gradient_global_metrics.csv",
+        "offline_test_margin_metrics.csv",
+        "offline_test_margin_summary.json",
+        "head_tail_pair_effects.csv",
+        "head_tail_did_summary.csv",
+        "stage_gate.json",
+    )
+    existing_phase2_outputs = [
+        str(output_root / name) for name in phase2_output_names
+        if (output_root / name).exists()
+    ]
+    if existing_phase2_outputs:
+        raise FileExistsError(
+            "Refusing to overwrite Phase-2 diagnostics; preserve the previous "
+            "analysis and use a fresh, separately copied Phase-1 output root: "
+            + ", ".join(existing_phase2_outputs)
+        )
+    static_audit = validate_static_data_audit(data_audit_dir, indices_file)
+    phase1_artifacts = validate_phase1_artifacts(output_root, indices_file)
+    if phase1_artifacts["indices_file_sha256"] != static_audit["indices_file_sha256"]:
+        raise RuntimeError("Phase-1 pilot and static data-audit indices SHA-256 differ")
 
     if not (1 <= args.probe_per_class <= 5):
         parser.error("--probe-per-class must be between 1 and 5 for the fixed IF=100 split")
@@ -866,7 +1174,13 @@ def main():
     for group in ("LC_only", "BCL"):
         run_dir = output_root / f"{group}_seed42" / "checkpoints"
         for epoch, filename in CHECKPOINTS:
-            model = load_model_checkpoint(run_dir / filename, device)
+            model = load_model_checkpoint(
+                run_dir / filename,
+                device,
+                expected_group=group,
+                expected_epoch=epoch,
+                expected_initial_sha256=phase1_artifacts["initial_model_state_sha256"],
+            )
             all_margin_rows.extend(
                 compute_probe_margin_rows(
                     model=model,
@@ -923,13 +1237,20 @@ def main():
         [
             "probe_mode", "source_split", "bn_mode", "epoch", "class_id", "coarse_id", "shot_group",
             "W_y_gradient_cosine", "W_y_conflict_negative_cosine",
+            "lc_objective_weight", "bcl_objective_weight",
             "W_y_LC_gradient_norm", "W_y_BCL_gradient_norm",
             "W_y_BCL_to_LC_norm_ratio",
+            "W_y_objective_weighted_LC_gradient_norm",
+            "W_y_objective_weighted_BCL_gradient_norm",
+            "W_y_objective_weighted_BCL_to_LC_norm_ratio",
             "same_f_feature_gradient_cosine_mean",
             "same_f_feature_gradient_cosine_median",
             "same_f_feature_conflict_fraction",
             "same_f_LC_gradient_norm_mean",
             "same_f_BCL_gradient_norm_mean",
+            "same_f_objective_weighted_LC_gradient_norm_mean",
+            "same_f_objective_weighted_BCL_gradient_norm_mean",
+            "same_f_objective_weighted_BCL_to_LC_norm_ratio",
         ],
     )
 
@@ -940,14 +1261,27 @@ def main():
             "probe_mode", "source_split", "bn_mode", "epoch", "class_id",
             "coarse_id", "shot_group",
             "W_y_gradient_cosine", "W_y_conflict_negative_cosine",
+            "lc_objective_weight", "bcl_objective_weight",
             "W_y_LC_gradient_norm", "W_y_BCL_gradient_norm",
             "W_y_BCL_to_LC_norm_ratio",
+            "W_y_objective_weighted_LC_gradient_norm",
+            "W_y_objective_weighted_BCL_gradient_norm",
+            "W_y_objective_weighted_BCL_to_LC_norm_ratio",
             "feature_gradient_cosine_v1_mean", "feature_gradient_conflict_v1_fraction",
             "feature_gradient_LC_v1_norm_mean", "feature_gradient_BCL_v1_norm_mean",
+            "feature_gradient_objective_weighted_LC_v1_norm_mean",
+            "feature_gradient_objective_weighted_BCL_v1_norm_mean",
+            "feature_gradient_objective_weighted_BCL_to_LC_v1_norm_ratio",
             "feature_gradient_cosine_v2_mean", "feature_gradient_conflict_v2_fraction",
             "feature_gradient_LC_v2_norm_mean", "feature_gradient_BCL_v2_norm_mean",
+            "feature_gradient_objective_weighted_LC_v2_norm_mean",
+            "feature_gradient_objective_weighted_BCL_v2_norm_mean",
+            "feature_gradient_objective_weighted_BCL_to_LC_v2_norm_ratio",
             "feature_gradient_cosine_v3_mean", "feature_gradient_conflict_v3_fraction",
             "feature_gradient_LC_v3_norm_mean", "feature_gradient_BCL_v3_norm_mean",
+            "feature_gradient_objective_weighted_LC_v3_norm_mean",
+            "feature_gradient_objective_weighted_BCL_v3_norm_mean",
+            "feature_gradient_objective_weighted_BCL_to_LC_v3_norm_ratio",
         ],
     )
     write_csv(
@@ -955,15 +1289,28 @@ def main():
         all_native_gradient_global_rows,
         [
             "probe_mode", "source_split", "bn_mode", "epoch",
+            "lc_objective_weight", "bcl_objective_weight",
             "backbone_gradient_cosine", "backbone_LC_gradient_norm",
             "backbone_BCL_gradient_norm", "backbone_BCL_to_LC_norm_ratio",
+            "backbone_objective_weighted_LC_gradient_norm",
+            "backbone_objective_weighted_BCL_gradient_norm",
+            "backbone_objective_weighted_BCL_to_LC_norm_ratio",
             "bn_running_buffers_restored", "gradient_source_split",
             "input_gradient_cosine_v1_mean", "input_gradient_conflict_v1_fraction",
             "input_gradient_LC_v1_norm_mean", "input_gradient_BCL_v1_norm_mean",
+            "input_gradient_objective_weighted_LC_v1_norm_mean",
+            "input_gradient_objective_weighted_BCL_v1_norm_mean",
+            "input_gradient_objective_weighted_BCL_to_LC_v1_norm_ratio",
             "input_gradient_cosine_v2_mean", "input_gradient_conflict_v2_fraction",
             "input_gradient_LC_v2_norm_mean", "input_gradient_BCL_v2_norm_mean",
+            "input_gradient_objective_weighted_LC_v2_norm_mean",
+            "input_gradient_objective_weighted_BCL_v2_norm_mean",
+            "input_gradient_objective_weighted_BCL_to_LC_v2_norm_ratio",
             "input_gradient_cosine_v3_mean", "input_gradient_conflict_v3_fraction",
             "input_gradient_LC_v3_norm_mean", "input_gradient_BCL_v3_norm_mean",
+            "input_gradient_objective_weighted_LC_v3_norm_mean",
+            "input_gradient_objective_weighted_BCL_v3_norm_mean",
+            "input_gradient_objective_weighted_BCL_to_LC_v3_norm_ratio",
         ],
     )
 

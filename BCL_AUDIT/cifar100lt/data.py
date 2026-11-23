@@ -164,6 +164,16 @@ class CIFAR100LT(Dataset):
                 "the combined CIFAR archive (which also contains the TEST split). "
                 "Place the extracted CIFAR-100 TRAIN and meta files locally first."
             )
+        if indices_file is None:
+            raise ValueError(
+                "CIFAR100LT requires the exact preflight-generated IF=100 indices_file; "
+                "it will not regenerate a split."
+            )
+        indices_path = Path(indices_file)
+        if not indices_path.is_file():
+            raise FileNotFoundError(
+                f"Required preflight-generated IF=100 indices are missing: {indices_path}"
+            )
         self.base = CIFAR100TrainOnly(
             root=str(root),
             train=True,
@@ -174,32 +184,21 @@ class CIFAR100LT(Dataset):
         self.targets = np.asarray(self.base.targets, dtype=np.int64)
         self.cls_num_list = cifar100lt_class_counts()
 
-        if indices_file is not None and Path(indices_file).is_file():
-            self.indices = np.load(indices_file).astype(np.int64)
-            if self.indices.ndim != 1:
-                raise RuntimeError("Provided train indices must be a one-dimensional array")
-            if self.indices.size != int(self.cls_num_list.sum()):
-                raise RuntimeError(
-                    f"Provided train indices have {self.indices.size} rows; "
-                    f"expected {int(self.cls_num_list.sum())}"
-                )
-            if np.any(self.indices < 0) or np.any(self.indices >= len(self.targets)):
-                raise RuntimeError("Provided train indices contain out-of-range values")
-            if np.unique(self.indices).size != self.indices.size:
-                raise RuntimeError("Provided train indices contain duplicates")
-            observed = np.bincount(self.targets[self.indices], minlength=100)
-            if not np.array_equal(observed, self.cls_num_list):
-                raise RuntimeError("Provided train indices do not match the IF=100 class counts")
-        else:
-            _, self.indices = make_cifar100lt_indices(
-                self.targets,
-                split_seed=split_seed,
-                imb_factor=0.01,
+        self.indices = np.load(indices_path).astype(np.int64)
+        if self.indices.ndim != 1:
+            raise RuntimeError("Provided train indices must be a one-dimensional array")
+        if self.indices.size != int(self.cls_num_list.sum()):
+            raise RuntimeError(
+                f"Provided train indices have {self.indices.size} rows; "
+                f"expected {int(self.cls_num_list.sum())}"
             )
-            if indices_file is not None:
-                path = Path(indices_file)
-                path.parent.mkdir(parents=True, exist_ok=True)
-                np.save(path, self.indices)
+        if np.any(self.indices < 0) or np.any(self.indices >= len(self.targets)):
+            raise RuntimeError("Provided train indices contain out-of-range values")
+        if np.unique(self.indices).size != self.indices.size:
+            raise RuntimeError("Provided train indices contain duplicates")
+        observed = np.bincount(self.targets[self.indices], minlength=100)
+        if not np.array_equal(observed, self.cls_num_list):
+            raise RuntimeError("Provided train indices do not match the IF=100 class counts")
 
         self.transform_v1, self.transform_sim, self.transform_eval = build_cifar_transforms()
 
@@ -224,7 +223,7 @@ class CIFAR100LT(Dataset):
 class CIFAR100BalancedTest(Dataset):
     """Balanced CIFAR-100 test set; instantiate only after both training runs finish."""
 
-    def __init__(self, root: str | Path, download: bool = True):
+    def __init__(self, root: str | Path, download: bool = False):
         self.base = datasets.CIFAR100(
             root=str(root),
             train=False,

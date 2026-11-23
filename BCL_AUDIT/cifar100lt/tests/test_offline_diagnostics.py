@@ -77,7 +77,13 @@ def test_native_three_view_train_probe_reports_gradients_and_restores_bn():
     assert global_row["probe_mode"] == "native_three_view_train"
     assert global_row["bn_running_buffers_restored"] is True
     assert np.isfinite(global_row["backbone_gradient_cosine"])
+    assert global_row["lc_objective_weight"] == 2.0
+    assert global_row["bcl_objective_weight"] == 0.6
+    raw_ratio = global_row["backbone_BCL_to_LC_norm_ratio"]
+    weighted_ratio = global_row["backbone_objective_weighted_BCL_to_LC_norm_ratio"]
+    assert np.isclose(weighted_ratio, raw_ratio * (0.6 / 2.0), rtol=1e-5, atol=1e-7)
     assert all(np.isfinite(row["W_y_gradient_cosine"]) for row in class_rows)
+    assert all("W_y_objective_weighted_BCL_to_LC_norm_ratio" in row for row in class_rows)
     bn_after = {
         name: buffer.detach().clone()
         for name, buffer in model.named_buffers()

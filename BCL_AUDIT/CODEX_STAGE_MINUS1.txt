@@ -310,8 +310,10 @@ approval before Phase 2.
 
 Human acceptance checklist:
 - [ ] Both groups completed exactly 200 epochs and saved all five checkpoints.
-- [ ] paired_data_stream_audit.json reports 200/200 identical epoch seeds,
-      sample-order hashes and first-minibatch three-view hashes.
+- [ ] paired_data_stream_audit.json reports 200/200 identical expected epoch
+      seeds, sample-order hashes and first-minibatch three-view hashes.
+- [ ] Every epoch records 10,847 source indices and 10,847 unique indices;
+      the observed source-index set equals the fixed IF=100 index set.
 - [ ] init_seed42.pth SHA-256 is recorded and both groups loaded that exact state.
 - [ ] Standard CIFAR ResNet-32 and nn.Linear(64,100) are present; no ImageNet
       NormedLinear or s=30 scale was introduced.
@@ -365,13 +367,23 @@ G3. Dual-mode gradient diagnostics — LT TRAIN only
 - LC: classifier W and logit-compensated CE.
 - BCL: same f(x) through sample MLP, paired with v3, plus classifier W through
   prototype MLP.
-- At classifier row W_y report cosine(grad_W_y LC, grad_W_y BCL), both norms,
-  and norm ratio.
-- For Probe A, at the same f(x), report cosine(grad_f LC, grad_f BCL), both
-  norms and negative-cosine fraction.
-- For Probe B, report per-class W_y gradient cosine/norms; per-view feature
-  gradient cosine/conflict fractions; global backbone-parameter gradient
-  cosine/norms; and per-view input-gradient norms/cosines.
+- At classifier row W_y report cosine(grad_W_y LC, grad_W_y BCL), raw
+  component norms/ratio, and objective-weighted norms/ratio using the actual
+  coefficients 2.0 for LC and 0.6 for BCL.
+- Preserve the raw component values; do not silently replace them with weighted
+  values. The cosine is unchanged by the positive scalar objective weights.
+- For Probe A, at the same f(x), report cosine(grad_f LC, grad_f BCL), raw
+  norms, objective-weighted norms, weighted norm ratio and negative-cosine
+  fraction.
+- For Probe B, report per-class W_y gradient cosine/raw and objective-weighted
+  norms/ratios; per-view feature gradient cosine/conflict fractions and both
+  raw/weighted norms; global backbone-parameter gradient cosine/raw and
+  objective-weighted norms/ratios; and per-view input-gradient norms/cosines.
+- Probe-B losses are batch means. Scale each per-sample feature/input gradient
+  by B/N (actual minibatch size divided by the total 500-sample probe count)
+  before aggregating norm statistics. This removes the local 1/B loss factor
+  while keeping every row on the full-probe mean-objective scale; it also
+  corrects the final 116-sample minibatch relative to 128-sample minibatches.
 - Restore all BN running_mean/running_var/num_batches_tracked buffers after
   every train-mode diagnostic batch; do not mutate checkpoint state.
 - Do not count prototype MLP as a separate conflict site.

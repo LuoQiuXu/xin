@@ -120,6 +120,8 @@ def test_dino_sidecars_preserve_static_audit(static_audit, monkeypatch, pairs, e
     metadata = {
         "model": "dinov2_vits14", "elapsed_seconds": 0,
         "peak_cuda_memory_bytes": 0, "topk": 5,
+        "source_split": "original balanced CIFAR-100 training split only",
+        "test_split_loaded": False,
     }
     calls = []
 

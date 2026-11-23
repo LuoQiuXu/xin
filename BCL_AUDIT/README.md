@@ -78,8 +78,9 @@ Fixed protocol: seed 42, 200 epochs, batch 256, FP32, SGD, base LR 0.15,
 5e-4, LC coefficient 2.0, BCL coefficient 0.6, temperature 0.1.
 Both groups use the same saved initial state; each epoch has the same
 group-independent epoch seed, full sample-order hash and first-minibatch
-three-view fingerprint. The trainer refuses to regenerate missing indices and
-does not open TEST until both histories pass the paired data-stream audit.
+three-view fingerprint. It also verifies that every epoch visits all 10,847
+fixed LT source indices exactly once. The trainer refuses to regenerate missing
+indices and does not open TEST until both histories pass the paired audit.
 
 ## Two-phase Stage -1 execution
 
@@ -104,9 +105,13 @@ python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\\datasets\\cifar1
 
 Training margins and both gradient probes use only the fixed LT TRAIN probe.
 The common-input probe runs in eval mode; the native three-view probe runs
-with train-mode BN and restores all BN running buffers. TEST margins and
-Head/Tail confusion/DID are read-only calculations from saved final logits
-and predictions. No TEST gradient is computed.
+with train-mode BN and restores all BN running buffers. Gradient diagnostics
+retain raw component norms and additionally report objective-weighted norms
+and ratios for the actual 2.0×LC + 0.6×BCL objective. Native per-sample
+feature/input gradients are scaled by B/N (actual minibatch size divided by
+the total probe count) before norm aggregation.
+TEST margins and Head/Tail confusion/DID are read-only calculations from saved
+final logits and predictions. No TEST gradient is computed.
 
 ## Expected outputs
 
