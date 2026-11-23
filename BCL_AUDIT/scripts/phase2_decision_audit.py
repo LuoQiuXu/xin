@@ -855,7 +855,7 @@ Mixed positive and negative Few-class gains: **{h1_summary['few_gain_mixed_sign'
 
 Few-class exposure is reported separately as (1) any Many-class neighbor in the symmetric-union DINO Top-5 graph, (2) any same-superclass Many class, and (3) maximum DINO cosine similarity to the 35 Many classes.
 
-Class-level adjusted associations control LC-only TEST accuracy and log training count for gain; Tail-to-Head confusion change additionally controls LC-only baseline Tail-to-Head confusion. Standardized beta and partial Spearman intervals are descriptive Few-class bootstrap intervals.
+Class-level adjusted associations control LC-only TEST accuracy and log training count for gain; Tail-to-Head confusion change additionally controls LC-only baseline Tail-to-Head confusion. The table also reports unadjusted Spearman as a sensitivity check: because delta accuracy is BCL accuracy minus LC-only accuracy, controlling LC-only accuracy can create mathematical coupling/regression-to-mean sensitivity. All intervals are descriptive Few-class bootstrap intervals.
 
 | Exposure | Outcome | Adjusted standardized beta [95% class-bootstrap interval] | Adjusted partial Spearman [95% class-bootstrap interval] | Unadjusted Spearman [95% class-bootstrap interval] |
 |---|---|---:|---:|---:|
