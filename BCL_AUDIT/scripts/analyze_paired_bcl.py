@@ -17,6 +17,10 @@ from BCL_AUDIT.cifar100lt.data import CIFAR100TrainOnly, build_cifar_transforms,
 from BCL_AUDIT.cifar100lt.losses import BalancedContrastiveLoss, LogitCompensatedCE
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
 from BCL_AUDIT.cifar100lt.train import LAMBDA_LC, MU_BCL, state_dict_sha256
+from BCL_AUDIT.scripts.phase2_decision_audit import (
+    load_and_validate_dino_topology,
+    run_phase2_decision_audit,
+)
 
 
 CHECKPOINTS = [
@@ -720,6 +724,14 @@ def compute_native_three_view_gradient_diagnostics(
             # restore running buffers so the checkpoint remains byte-identical.
             _restore_bn_running_buffers(model, bn_snapshot)
 
+    current_bn_snapshot = _snapshot_bn_running_buffers(model)
+    if current_bn_snapshot.keys() != bn_snapshot.keys() or any(
+        not torch.equal(current_bn_snapshot[name], bn_snapshot[name])
+        for name in bn_snapshot
+    ):
+        model.train(was_training)
+        raise RuntimeError("Native three-view gradient probe changed a BatchNorm running buffer")
+    bn_buffers_restored = True
     model.train(was_training)
 
     if backbone_lc_sum is None or backbone_bcl_sum is None:
@@ -804,7 +816,7 @@ def compute_native_three_view_gradient_diagnostics(
             MU_BCL * backbone_bcl_sum.norm().item()
             / max(LAMBDA_LC * backbone_lc_sum.norm().item(), 1e-12)
         ),
-        "bn_running_buffers_restored": True,
+        "bn_running_buffers_restored": bn_buffers_restored,
         "gradient_source_split": "LT_train_probe_only",
     }
     for view_index in (1, 2, 3):
@@ -1128,6 +1140,14 @@ def main():
         "head_tail_pair_effects.csv",
         "head_tail_did_summary.csv",
         "stage_gate.json",
+        "phase2_h1_class_gain.csv",
+        "phase2_h2_few_exposure.csv",
+        "phase2_h2_adjusted_associations.csv",
+        "phase2_h2_pair_matched_did.csv",
+        "phase2_h3_overlap_gradient_summary.csv",
+        "phase2_h3_overlap_margin_trajectory.csv",
+        "PHASE2_DECISION_BRIEF.md",
+        "phase2_decision_summary.json",
     )
     existing_phase2_outputs = [
         str(output_root / name) for name in phase2_output_names
@@ -1166,6 +1186,9 @@ def main():
     if set(class_meta) != set(range(100)):
         raise RuntimeError("class_counts.csv must contain all official fine IDs 0..99")
 
+    # Validate all saved DINO artifacts and the complete 35x30 pair sidecar before
+    # creating probe caches or running any expensive gradient diagnostics.
+    topology = load_and_validate_dino_topology(data_audit_dir, class_meta)
     pair_rows = load_pair_topology(data_audit_dir)
 
     probe_cache_path = output_root / "offline_probe" / (
@@ -1437,6 +1460,15 @@ def main():
         ],
     )
 
+    # H1-H3 synthesis is part of this same one-shot offline pass; it reuses
+    # the saved predictions, existing margin/gradient CSVs and TRAIN-only DINO graph.
+    decision_summary = run_phase2_decision_audit(
+        output_root=output_root,
+        data_audit_dir=data_audit_dir,
+        class_meta=class_meta,
+        topology=topology,
+    )
+
     metric_names = (
         "overall_top1",
         "many_top1_macro_class",
@@ -1462,6 +1494,7 @@ def main():
             "cannot establish repeatability. Do not run an Oracle from this result alone."
         ),
         "paired_performance_delta_BCL_minus_LC_only": performance_delta,
+        "phase2_hypothesis_decision": decision_summary,
         "gradient_diagnostics": (
             "All gradient probes use the fixed LT TRAIN-only probe cache. The common-input "
             "probe uses model.eval() and the same v2 feature tensor for LC/BCL gradients. "
