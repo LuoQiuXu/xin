@@ -172,6 +172,43 @@ def test_dino_sidecars_preserve_static_audit(static_audit, monkeypatch, pairs, e
     assert _hashes(out_dir) == after
 
 
+def test_dino_reuse_rejects_inconsistent_directed_superclass_statistics(
+    static_audit, monkeypatch, pairs
+):
+    out_dir, _ = static_audit
+    class_means = np.ones((7, 2), dtype=np.float32)
+    similarity = np.eye(7, dtype=np.float32)
+    similarity[6, 1:4] = similarity[1:4, 6] = [0.375, 0.125, -0.625]
+    metadata = {
+        "model": "dinov2_vits14",
+        "elapsed_seconds": 0,
+        "peak_cuda_memory_bytes": 0,
+        "topk": 5,
+        "source_split": "original balanced CIFAR-100 training split only",
+        "test_split_loaded": False,
+    }
+    monkeypatch.setattr(
+        topology,
+        "_compute_dino_similarity",
+        lambda **_: (class_means, similarity, {(1, 6), (2, 6)}, metadata),
+    )
+    topology.main()
+
+    topology_path = out_dir / "DINO_CLASS_TOPOLOGY.csv"
+    rows = analysis.read_csv(topology_path)
+    target = next(row for row in rows if row["fine_id"] == "6")
+    target["directed_topk_same_superclass_count"] = "0"
+    target["directed_topk_same_superclass_fraction"] = "0.0"
+    _write_pairs(topology_path, rows)
+
+    def unexpected_load(*args, **kwargs):
+        pytest.fail("Inconsistent DINO reuse must be rejected before loading TRAIN data")
+
+    monkeypatch.setattr(topology, "_load_original_train", unexpected_load)
+    with pytest.raises(FileExistsError, match="DINOv2 outputs are partial or inconsistent"):
+        topology.main()
+
+
 @pytest.mark.parametrize("existing_output", DINO_FILES)
 def test_partial_dino_outputs_stop_before_loading_data(static_audit, monkeypatch, existing_output):
     out_dir, _ = static_audit

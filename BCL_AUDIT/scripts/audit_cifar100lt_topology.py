@@ -721,8 +721,26 @@ def _dino_outputs_complete(out_dir: Path) -> bool:
             ):
                 raise ValueError("DINO metadata, arrays or class-topology rows are inconsistent")
 
+            class_to_coarse = {
+                int(row["fine_id"]): int(row["coarse_id"]) for row in class_rows
+            }
+            if set(class_to_coarse) != set(range(num_classes)):
+                raise ValueError("DINO class-topology fine/coarse mapping is incomplete")
+            coarse_ids, coarse_sizes = np.unique(
+                np.asarray(list(class_to_coarse.values()), dtype=np.int64),
+                return_counts=True,
+            )
+            coarse_size_by_id = {
+                int(coarse_id): int(size)
+                for coarse_id, size in zip(coarse_ids.tolist(), coarse_sizes.tolist())
+            }
             degrees = []
+            same_degrees = []
+            cross_degrees = []
+            directed_same_total = 0
             for row in class_rows:
+                fine_id = int(row["fine_id"])
+                coarse_id = int(row["coarse_id"])
                 degree = int(row["symmetric_union_degree"])
                 same_degree = int(row["symmetric_union_same_superclass_degree"])
                 cross_degree = int(row["symmetric_union_cross_superclass_degree"])
@@ -735,10 +753,50 @@ def _dino_outputs_complete(out_dir: Path) -> bool:
                 if (
                     len(set(neighbor_ids)) != topk
                     or any(value < 0 or value >= num_classes for value in neighbor_ids)
-                    or int(row["fine_id"]) in neighbor_ids
+                    or fine_id in neighbor_ids
                 ):
                     raise ValueError("DINO class-topology neighbor list is invalid")
+                same_count = sum(
+                    class_to_coarse[neighbor_id] == coarse_id
+                    for neighbor_id in neighbor_ids
+                )
+                recorded_same_count = int(row["directed_topk_same_superclass_count"])
+                recorded_same_fraction = float(
+                    row["directed_topk_same_superclass_fraction"]
+                )
+                if (
+                    recorded_same_count != same_count
+                    or not np.isclose(
+                        recorded_same_fraction, same_count / float(topk),
+                        rtol=0.0, atol=1e-9,
+                    )
+                ):
+                    raise ValueError(
+                        "DINO directed Top-5 superclass counts do not match neighbor IDs"
+                    )
+                directed_same_total += same_count
                 degrees.append(degree)
+                same_degrees.append(same_degree)
+                cross_degrees.append(cross_degree)
+
+            union_edge_count = int(summary.get("dino_topk_union_edge_count_all_classes", -1))
+            union_same_edge_count = int(
+                summary.get("dino_topk_union_same_superclass_edge_count_all_classes", -1)
+            )
+            union_cross_edge_count = int(
+                summary.get("dino_topk_union_cross_superclass_edge_count_all_classes", -1)
+            )
+            directed_edge_count = num_classes * topk
+            directed_same_fraction = directed_same_total / float(directed_edge_count)
+            random_same_expectation = float(np.mean([
+                (coarse_size_by_id[class_to_coarse[class_id]] - 1)
+                / float(num_classes - 1)
+                for class_id in range(num_classes)
+            ]))
+            directed_enrichment = (
+                directed_same_fraction / random_same_expectation
+                if random_same_expectation > 0 else float("nan")
+            )
 
             if (
                 int(summary.get("dino_topk_union_degree_min", -1)) != int(np.min(degrees))
@@ -749,17 +807,31 @@ def _dino_outputs_complete(out_dir: Path) -> bool:
                     atol=1e-9,
                 )
                 or int(summary.get("dino_topk_union_degree_max", -1)) != int(np.max(degrees))
-                or int(summary.get("dino_topk_union_edge_count_all_classes", -1)) * 2
-                    != int(np.sum(degrees))
-                or int(summary.get("dino_topk_union_same_superclass_edge_count_all_classes", -1))
-                    + int(summary.get("dino_topk_union_cross_superclass_edge_count_all_classes", -1))
-                    != int(summary.get("dino_topk_union_edge_count_all_classes", -2))
-                or not np.isfinite(float(summary.get(
-                    "dino_topk_directed_same_superclass_random_expectation", float("nan")
-                )))
-                or not np.isfinite(float(summary.get(
-                    "dino_topk_directed_same_superclass_enrichment_ratio", float("nan")
-                )))
+                or union_edge_count * 2 != int(np.sum(degrees))
+                or union_same_edge_count * 2 != int(np.sum(same_degrees))
+                or union_cross_edge_count * 2 != int(np.sum(cross_degrees))
+                or union_same_edge_count + union_cross_edge_count != union_edge_count
+                or int(summary.get("dino_topk_directed_edge_count", -1)) != directed_edge_count
+                or int(summary.get("dino_topk_directed_same_superclass_edge_count", -1))
+                    != directed_same_total
+                or not np.isclose(
+                    float(summary.get(
+                        "dino_topk_directed_same_superclass_fraction", float("nan")
+                    )),
+                    directed_same_fraction, rtol=0.0, atol=1e-9,
+                )
+                or not np.isclose(
+                    float(summary.get(
+                        "dino_topk_directed_same_superclass_random_expectation", float("nan")
+                    )),
+                    random_same_expectation, rtol=0.0, atol=1e-9,
+                )
+                or not np.isclose(
+                    float(summary.get(
+                        "dino_topk_directed_same_superclass_enrichment_ratio", float("nan")
+                    )),
+                    directed_enrichment, rtol=0.0, atol=1e-9,
+                )
             ):
                 raise ValueError("DINO summary statistics do not match the class-topology table")
             return True

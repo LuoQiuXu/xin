@@ -73,8 +73,10 @@ Record complete output, exit code, elapsed time and warnings. Tests must cover:
 - saved init_seed42.pth reload and SHA-256 verification for both groups;
 - identical three-view dataset contract and BatchNorm hooks;
 - BCL loss formula and gradient routes;
-- DINO sidecar immutability and synthetic graph degree/superclass-overlap
-  schema (the production run must emit 100 class rows);
+- DINO sidecar immutability, synthetic graph degree/superclass-overlap
+  schema, and rejection of corrupted directed Top-5 superclass counts,
+  fractions, union-degree partitions, and summary enrichment values (the
+  production run must emit 100 class rows);
 - read-only TEST margins;
 - common-input and native train-mode gradient probes, including objective-
   weighted gradient norms/ratios for LC=2.0 and BCL=0.6;
