@@ -698,6 +698,14 @@ def _format(value, digits=3):
 def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients, h3_margins):
     few = h1_summary["by_shot_group"]["few"]
     top10, bottom10 = h1_summary["few_top10"], h1_summary["few_bottom10"]
+    group_lines = [
+        "| " + group + " | " + str(values["num_classes"]) + " | "
+        + _format(values["mean_gain_pp"]) + " | " + _format(values["median_gain_pp"]) + " | "
+        + _format(values["std_gain_pp"]) + " | " + _format(values["q25_gain_pp"]) + "–"
+        + _format(values["q75_gain_pp"]) + " | " + str(values["positive_classes"]) + "/"
+        + str(values["zero_classes"]) + "/" + str(values["negative_classes"]) + " |"
+        for group, values in h1_summary["by_shot_group"].items()
+    ]
     dino_t2h = next(r for r in h2_pair_did if r["relation"] == "dino_topk_union" and r["direction"] == "Tail_to_Head" and r["metric"] == "delta_confusion_BCL_minus_LC")
     superclass_t2h = next(r for r in h2_pair_did if r["relation"] == "same_superclass" and r["direction"] == "Tail_to_Head" and r["metric"] == "delta_confusion_BCL_minus_LC")
     w_conflicts = [
@@ -854,6 +862,10 @@ Few classes: {few['num_classes']}; positive/zero/negative BCL-minus-LC gains: {f
 Mean/median gain: {_format(few['mean_gain_pp'])}/{_format(few['median_gain_pp'])} pp; IQR: {_format(few['q25_gain_pp'])} to {_format(few['q75_gain_pp'])} pp; range: {_format(few['min_gain_pp'])} to {_format(few['max_gain_pp'])} pp.
 Mixed positive and negative Few-class gains: **{h1_summary['few_gain_mixed_sign']}**.
 
+| Group | Classes | Mean gain (pp) | Median gain (pp) | SD (pp) | IQR (pp) | Positive/zero/negative |
+|---|---:|---:|---:|---:|---:|---:|
+{chr(10).join(group_lines)}
+
 ### Few-class top 10 gains
 
 | Class | ID | Gain (pp) |
@@ -911,6 +923,7 @@ Rationale: {candidate_reason}
         "status": "ONE_SEED_EXPLORATORY_HUMAN_REVIEW",
         "seed": 42,
         "h1_few_gain_summary": few,
+        "h1_by_shot_group": h1_summary["by_shot_group"],
         "h1_few_gain_mixed_sign": h1_summary["few_gain_mixed_sign"],
         "h2_dino_tail_to_head_matched_delta_confusion_pp": dino_t2h["matched_did_exposed_minus_control"],
         "h2_dino_tail_to_head_cluster_ci": [dino_t2h["bootstrap_ci_2_5"], dino_t2h["bootstrap_ci_97_5"]],
