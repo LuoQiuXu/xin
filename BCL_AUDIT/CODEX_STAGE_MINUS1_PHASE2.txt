@@ -177,13 +177,14 @@ H3 — FIVE-CHECKPOINT OPTIMIZATION AND MARGIN TRAJECTORY
 2. Stratify Few classes by DINO Many-neighbor exposure and same-superclass
    Many-exposure separately.
 3. Common-input eval-mode gradients:
-   - W_y gradient cosine, conflict fraction, objective-weighted BCL/LC norm
-     ratio;
-   - same f(x) feature-gradient cosine, conflict fraction and weighted norm
-     ratio.
+   - W_y gradient cosine, conflict fraction, raw BCL/LC norm ratio and
+     objective-weighted BCL/LC norm ratio;
+   - same f(x) feature-gradient cosine, conflict fraction, raw norm ratio and
+     objective-weighted norm ratio.
 4. Native three-view train-mode gradients:
-   - W_y gradient cosine/conflict/norm ratio;
-   - v1/v2/v3 feature gradient cosine/conflict/norm ratio;
+   - W_y gradient cosine/conflict/raw norm ratio/weighted norm ratio;
+   - v1/v2/v3 feature gradient cosine/conflict/raw norm ratio/weighted norm
+     ratio;
    - retain the existing global backbone and input-gradient diagnostics.
 5. Keep common-input eval and native train-mode results as different gradient
    estimands. Do not merge them into one average.
