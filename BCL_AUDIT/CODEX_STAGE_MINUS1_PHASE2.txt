@@ -12,13 +12,20 @@ Do not repeat DINO, training, checkpoint creation or TEST evaluation.
 Read:
 - BCL_AUDIT/CODEX_STAGE_MINUS1.txt
 - BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt
-- Phase 1 paired_pilot_summary.json
 - Phase 1 paired_data_stream_audit.json and paired_pilot_summary.json
 - the saved init_seed42.pth and its recorded model-state SHA-256
 - both groups' training_summary.json
 - both groups' final_test_predictions.npz and final_test_metrics.json
 - all five checkpoints per group
 - the exact data_audit_output_dir and indices_file recorded by preflight
+
+Before creating a probe cache or running diagnostics, the analyzer hard-checks
+that the Phase-1 paired stream audit is a complete 200/200 pass, the static
+audit indices and supplied indices file are byte-identical, init_seed42.pth
+matches its recorded state-dict SHA-256, both training summaries and all ten
+checkpoints carry matching seed/group/epoch/initial-state provenance, and both
+saved TEST archives contain exactly 10,000 balanced labels. It refuses to
+overwrite any existing Phase-2 result file.
 
 A. BRANCH / OUTPUT SAFETY
 -------------------------
