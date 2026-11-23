@@ -766,7 +766,12 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
             "negative-prototype interactions identified by the supported topology slice. "
             "Do not add a general semantic gate or modify other pairs."
         )
-        candidate_reason = "A topology-localized Tail-to-Head confusion increase remains after matching on LC-only baseline confusion, but shared-W conflict is not clearly localized."
+        candidate_reason = (
+            "At least one baseline-adjusted Few-class exposure association or baseline-matched "
+            "Many-Few directional pair effect is directionally supported, but the complete "
+            "H1-H3 chain does not localize a shared-W conflict plus margin shrink. The only "
+            "permitted next step is one relation-specific falsification, not more passive probes."
+        )
     elif few["std_gain_pp"] > 1e-12:
         candidate = (
             "At most one falsification experiment: detach the classifier-derived prototype "
