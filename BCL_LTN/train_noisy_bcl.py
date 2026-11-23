@@ -191,6 +191,12 @@ def train(args):
     if not np.array_equal(clean_counts, np.bincount(clean_labels, minlength=100)):
         raise RuntimeError("Clean IF=100 labels differ from canonical class-count vector")
 
+    import csv
+    with (output_root / "class_counts_comparison.csv").open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["class_id", "clean_count", "observed_noisy_count"])
+        writer.writerows((i, int(clean_counts[i]), int(observed_counts[i])) for i in range(100))
+
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     if device.type == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA requested but unavailable")
@@ -420,6 +426,7 @@ def train(args):
         f"- Flipped: {manifest['num_flipped']} / {manifest['num_train_samples']}",
         f"- Index SHA256: {manifest['indices_sha256']}",
         f"- Noisy-label SHA256: {manifest['noisy_labels_sha256']}",
+        "- Full clean vs. observed noisy per-class counts: class_counts_comparison.csv in the run directory.",
         f"- Clean-label SHA256 (offline only): {manifest['clean_labels_sha256']}",
         f"- Mask SHA256 (offline only): {manifest['is_noisy_sha256']}", "",
         "## Five-checkpoint TRAIN diagnostics",
@@ -465,7 +472,7 @@ def train(args):
         "- TEST is instantiated once after epoch 200; no TEST access during label generation, training or checkpoint diagnostics.",
         "- This is synthetic instance-independent symmetric noise; it does not establish robustness to real-world annotation noise.",
     ]
-    report_path = output_root / "BCL_sym04_baseline_report.md"
+    report_path = output_root.parent / "BCL_sym04_baseline_report.md"
     report_path.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
     print(f"Report: {report_path}")
     print(json.dumps(test_metrics, indent=2, ensure_ascii=False))
