@@ -1,0 +1,293 @@
+{
+  "groups": {
+    "LC-only": {
+      "status": "passed",
+      "optimizer_steps": 1,
+      "last_stage": "completed",
+      "initial_state_sha256": "11c52fe9e2b082b0c36ef025f19ae2d963dbc19c456e0d5aa17aac14fffdf440",
+      "initial_checkpoint_sha256": "6a86b7fe21062c079970856f08489c844543942ae260291c87e518572a3e2421",
+      "reloaded_with_train_load_initial_model_state": true,
+      "batch_sha256": "59158b5332a0b03f6b18ee091c81847a94ef1b367c72c287eb95e07e0585ba21",
+      "before": {
+        "driver_free_bytes": 7338983424,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 0,
+        "reserved_bytes": 0,
+        "peak_allocated_bytes": 0,
+        "peak_reserved_bytes": 0
+      },
+      "backbone_input_shape": [
+        768,
+        3,
+        32,
+        32
+      ],
+      "backbone_input_dtype": "torch.float32",
+      "backbone_forward_calls": 1,
+      "step_seconds": 0.7448057000001427,
+      "after": {
+        "driver_free_bytes": 4772069376,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 93057024,
+        "reserved_bytes": 2403336192,
+        "peak_allocated_bytes": 2021376000,
+        "peak_reserved_bytes": 2403336192
+      },
+      "losses": {
+        "LC": 6.886635780334473,
+        "BCL": 0.0,
+        "total": 13.773271560668945
+      },
+      "optimizer_lr": 0.15,
+      "finite_losses": true,
+      "finite_fp32_gradients": true,
+      "finite_parameters_after_update": true,
+      "successful_parameter_update": true,
+      "optimizer_momentum": 0.9,
+      "optimizer_weight_decay": 0.0005,
+      "parameters_with_gradient": {
+        "backbone": 93,
+        "classifier": 2
+      },
+      "parameter_tensors_changed": {
+        "backbone": 93,
+        "classifier": 2
+      }
+    },
+    "BCL": {
+      "status": "passed",
+      "optimizer_steps": 1,
+      "last_stage": "completed",
+      "initial_state_sha256": "11c52fe9e2b082b0c36ef025f19ae2d963dbc19c456e0d5aa17aac14fffdf440",
+      "initial_checkpoint_sha256": "6a86b7fe21062c079970856f08489c844543942ae260291c87e518572a3e2421",
+      "reloaded_with_train_load_initial_model_state": true,
+      "batch_sha256": "59158b5332a0b03f6b18ee091c81847a94ef1b367c72c287eb95e07e0585ba21",
+      "before": {
+        "driver_free_bytes": 7083130880,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 67108864,
+        "reserved_bytes": 92274688,
+        "peak_allocated_bytes": 67108864,
+        "peak_reserved_bytes": 92274688
+      },
+      "backbone_input_shape": [
+        768,
+        3,
+        32,
+        32
+      ],
+      "backbone_input_dtype": "torch.float32",
+      "backbone_forward_calls": 1,
+      "sample_embedding_shape": [
+        768,
+        128
+      ],
+      "prototype_shape": [
+        100,
+        128
+      ],
+      "step_seconds": 0.5159648000262678,
+      "after": {
+        "driver_free_bytes": 4744806400,
+        "driver_total_bytes": 8546484224,
+        "allocated_bytes": 95363072,
+        "reserved_bytes": 2430599168,
+        "peak_allocated_bytes": 2022882304,
+        "peak_reserved_bytes": 2430599168
+      },
+      "losses": {
+        "LC": 6.886635780334473,
+        "BCL": 5.707252025604248,
+        "total": 17.197622299194336
+      },
+      "optimizer_lr": 0.15,
+      "finite_losses": true,
+      "finite_fp32_gradients": true,
+      "finite_parameters_after_update": true,
+      "successful_parameter_update": true,
+      "optimizer_momentum": 0.9,
+      "optimizer_weight_decay": 0.0005,
+      "parameters_with_gradient": {
+        "backbone": 93,
+        "classifier": 2,
+        "sample_mlp": 6,
+        "prototype_mlp": 6
+      },
+      "parameter_tensors_changed": {
+        "backbone": 93,
+        "classifier": 2,
+        "sample_mlp": 6,
+        "prototype_mlp": 6
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+    "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "torch": "2.14.1+cu132",
+    "torchvision": "0.29.1+cu132",
+    "cuda_runtime": "13.2",
+    "cuda_visible_devices": null,
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "device": "cuda:0",
+    "cudnn": 92400,
+    "memory_start": {
+      "driver_free_bytes": 7338983424,
+      "driver_total_bytes": 8546484224,
+      "allocated_bytes": 0,
+      "reserved_bytes": 0,
+      "peak_allocated_bytes": 0,
+      "peak_reserved_bytes": 0
+    },
+    "amp": false,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false,
+    "torch_float32_matmul_precision": "highest",
+    "nvidia_tf32_override": null,
+    "torch_allow_tf32_cublas_override": null
+  },
+  "batch_size": 256,
+  "backbone_batch_size": 768,
+  "num_workers": 0,
+  "precision": "fp32",
+  "grad_accumulation": false,
+  "dino_invoked": false,
+  "formal_training_started": false,
+  "test_evaluation_started": false,
+  "epochs_completed": {
+    "LC-only": 0,
+    "BCL": 0
+  },
+  "training_checkpoint_written": false,
+  "source_commit": "cdcc085c207297d3d6d382b526bcadf03ac19b04",
+  "tested_source_commit": "cdcc085c207297d3d6d382b526bcadf03ac19b04",
+  "preflight_head": "cdcc085c207297d3d6d382b526bcadf03ac19b04",
+  "branch": "research/bcl-cifar100lt-audit-20261122",
+  "data_root": "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100",
+  "data_audit_output_dir": "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01",
+  "indices_file": "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01\\cifar100lt_if100_train_indices_seed0.npy",
+  "indices_sha256": "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7",
+  "real_cifar_open_events": {
+    "train": 4,
+    "meta": 4,
+    "test": 0
+  },
+  "training_seed": 42,
+  "num_views": 3,
+  "optimizer": "SGD",
+  "shared_initial_state_sha256": "11c52fe9e2b082b0c36ef025f19ae2d963dbc19c456e0d5aa17aac14fffdf440",
+  "initial_checkpoint_file": "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\preflight_recheck_20261122_03\\init_seed42.pth",
+  "initial_checkpoint_sha256": "6a86b7fe21062c079970856f08489c844543942ae260291c87e518572a3e2421",
+  "paired_data_stream": {
+    "modes": {
+      "lc": {
+        "mode": "lc",
+        "epoch_seed": 4200000,
+        "sample_count": 10847,
+        "unique_sample_count": 10847,
+        "fixed_index_set_matches": true,
+        "sample_order_sha256": "4900ae2f520eec1547f6f213a970e78a3a43341fb4304f5b9308777524aa615b",
+        "first_batch_source_indices_sha256": "8fe5d09256557fc70e84f23286ee00fc914a5d0b622fd8daa022571025f9416f",
+        "first_batch_labels_sha256": "2a2109ee39ae7a9da3c837d971de3ff635d7639c354a04791d969409c75d369b",
+        "first_batch_views_sha256": "68ca753a0506e00aa62b6d86ea44d906cd32c847ad3314667e35355c9c4f9133",
+        "per_view_sha256": [
+          "d446e49604b31a028bb8efdf9555a87bbd7db811abc990c9d265c24d3557b2e2",
+          "31e7117c5849e6d1d54297d92426854e319f249c3e37a805a4f80e2c02b0d1c7",
+          "039ce367be03e65179f0d0d01939f003918d8acbb6f01738e5ef96e6953671a4"
+        ],
+        "first_batch_sha256": "59158b5332a0b03f6b18ee091c81847a94ef1b367c72c287eb95e07e0585ba21",
+        "batches_observed": 43,
+        "stream_seconds": 23.968484599987278
+      },
+      "bcl": {
+        "mode": "bcl",
+        "epoch_seed": 4200000,
+        "sample_count": 10847,
+        "unique_sample_count": 10847,
+        "fixed_index_set_matches": true,
+        "sample_order_sha256": "4900ae2f520eec1547f6f213a970e78a3a43341fb4304f5b9308777524aa615b",
+        "first_batch_source_indices_sha256": "8fe5d09256557fc70e84f23286ee00fc914a5d0b622fd8daa022571025f9416f",
+        "first_batch_labels_sha256": "2a2109ee39ae7a9da3c837d971de3ff635d7639c354a04791d969409c75d369b",
+        "first_batch_views_sha256": "68ca753a0506e00aa62b6d86ea44d906cd32c847ad3314667e35355c9c4f9133",
+        "per_view_sha256": [
+          "d446e49604b31a028bb8efdf9555a87bbd7db811abc990c9d265c24d3557b2e2",
+          "31e7117c5849e6d1d54297d92426854e319f249c3e37a805a4f80e2c02b0d1c7",
+          "039ce367be03e65179f0d0d01939f003918d8acbb6f01738e5ef96e6953671a4"
+        ],
+        "first_batch_sha256": "59158b5332a0b03f6b18ee091c81847a94ef1b367c72c287eb95e07e0585ba21",
+        "batches_observed": 43,
+        "stream_seconds": 24.010601000016322
+      }
+    },
+    "matched": true,
+    "matched_fields": [
+      "epoch_seed",
+      "sample_count",
+      "unique_sample_count",
+      "sample_order_sha256",
+      "first_batch_source_indices_sha256",
+      "first_batch_labels_sha256",
+      "first_batch_views_sha256",
+      "per_view_sha256",
+      "first_batch_sha256"
+    ],
+    "epoch_index": 0,
+    "epoch_seed": 4200000,
+    "sample_count": 10847,
+    "unique_sample_count": 10847,
+    "sample_order_sha256": "4900ae2f520eec1547f6f213a970e78a3a43341fb4304f5b9308777524aa615b",
+    "first_batch_views_sha256": "68ca753a0506e00aa62b6d86ea44d906cd32c847ad3314667e35355c9c4f9133",
+    "first_batch_source_indices_sha256": "8fe5d09256557fc70e84f23286ee00fc914a5d0b622fd8daa022571025f9416f",
+    "all_three_first_batch_views_identical_across_modes": true
+  },
+  "loader": {
+    "type": "BCL_AUDIT.cifar100lt.data.CIFAR100TrainOnly",
+    "entry_point": "BCL_AUDIT.cifar100lt.train.make_train_loader",
+    "train": true,
+    "download": false,
+    "substituted": false,
+    "long_tail_train_samples": 10847,
+    "original_train_samples": 50000,
+    "original_samples_per_class": 500,
+    "saved_index_used": true,
+    "observed_lt_counts_match_static": true,
+    "num_workers": 0
+  },
+  "real_batch": {
+    "sha256": "59158b5332a0b03f6b18ee091c81847a94ef1b367c72c287eb95e07e0585ba21",
+    "label_classes": 64,
+    "shapes": [
+      [
+        256,
+        3,
+        32,
+        32
+      ],
+      [
+        256,
+        3,
+        32,
+        32
+      ],
+      [
+        256,
+        3,
+        32,
+        32
+      ]
+    ],
+    "dtype": "torch.float32",
+    "first_batch_views_sha256": "68ca753a0506e00aa62b6d86ea44d906cd32c847ad3314667e35355c9c4f9133",
+    "first_batch_source_indices_sha256": "8fe5d09256557fc70e84f23286ee00fc914a5d0b622fd8daa022571025f9416f",
+    "per_view_sha256": [
+      "d446e49604b31a028bb8efdf9555a87bbd7db811abc990c9d265c24d3557b2e2",
+      "31e7117c5849e6d1d54297d92426854e319f249c3e37a805a4f80e2c02b0d1c7",
+      "039ce367be03e65179f0d0d01939f003918d8acbb6f01738e5ef96e6953671a4"
+    ]
+  },
+  "initial_checkpoint_byte_identical_after_steps": true,
+  "test_split_loaded": false,
+  "conclusion": "READY FOR FULL PILOT"
+}
