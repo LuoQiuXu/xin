@@ -83,8 +83,11 @@ _build_h2_associations (three exposures x two outcomes):
    definition and outcome: exposed/unexposed n, mean, median, and mean
    difference. For continuous max similarity, use a clearly specified
    descriptive split (median split, ties handled deterministically) ONLY for
-   descriptive visualization; do not replace continuous regression with it.
-   Keep DINO-neighbor and same-superclass flags separate.
+   descriptive visualization; sort by (max DINO similarity, class_id) ascending and
+   assign the first 15 to the lower group and the remaining 15 to the upper
+   group, so ties are deterministic. Do not replace continuous regression
+   with this descriptive split. Keep DINO-neighbor and same-superclass flags
+   separate.
 8. Keep all results in the existing
    phase2_h2_adjusted_associations.csv (one row per existing exposure/outcome
    pair; fields may be expanded). Do not add another analysis family or
