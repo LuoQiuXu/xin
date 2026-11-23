@@ -1,140 +1,270 @@
-BCL CIFAR-100-LT — STAGE -1 PHASE 2 OFFLINE DIAGNOSTICS
-==========================================================
+BCL CIFAR-100-LT — PHASE 2 ONE-SHOT H1-H3 OFFLINE DIAGNOSIS
+===============================================================
 
 Repository: LuoQiuXu/xin
 Required branch: research/bcl-cifar100lt-audit-20261122
 
-PRECONDITION
-------------
-Run this task only after the user explicitly accepts the Phase 1 report.
-Do not repeat DINO, training, checkpoint creation or TEST evaluation.
+PURPOSE
+-------
+Run exactly one merged offline diagnosis that completes H1, H2 and H3.
+Phase 1 has already completed. Do not repeat training, DINO extraction,
+checkpoint evaluation, TEST inference, or any Phase 1 work.
 
-Read:
-- BCL_AUDIT/CODEX_STAGE_MINUS1.txt
-- BCL_AUDIT/CODEX_STAGE_MINUS1_PHASE2.txt
-- Phase 1 paired_data_stream_audit.json and paired_pilot_summary.json
-- the saved init_seed42.pth and its recorded model-state SHA-256
-- both groups' training_summary.json
-- both groups' final_test_predictions.npz and final_test_metrics.json
-- all five checkpoints per group
-- the exact data_audit_output_dir and indices_file recorded by preflight
+The purpose is to decide whether the observed BCL gain heterogeneity is
+localized to semantically exposed Many-Few class relations and whether the
+existing gradient/margin diagnostics provide a mechanism-consistent explanation.
 
-Before creating a probe cache or running diagnostics, the analyzer hard-checks
-that the Phase-1 paired stream audit is a complete 200/200 pass, the static
-audit indices and supplied indices file are byte-identical, init_seed42.pth
-matches its recorded state-dict SHA-256, both training summaries and all ten
-checkpoints carry matching seed/group/epoch/initial-state provenance, and both
-saved TEST archives contain exactly 10,000 balanced labels. It refuses to
-overwrite any existing Phase-2 result file.
+BCL is only the diagnostic base. Do not assume that it has a defect and do not
+design a new method during this task.
 
-A. BRANCH / OUTPUT SAFETY
--------------------------
-Confirm repository and branch exactly:
-  LuoQiuXu/xin
-  research/bcl-cifar100lt-audit-20261122
-
-Use the SAME dedicated Stage-1 output root that contains:
-  LC_only_seed42/
-  BCL_seed42/
-
-Do not pass the generic BCL_AUDIT/outputs parent directory. If any
-Phase-2 analyzer output already exists in this training root, STOP and report
-it; do not overwrite it and do not choose a new subdirectory, because the
-analyzer discovers checkpoints directly beneath this same root.
-
-B. SOURCE / TEST SPLIT SEPARATION
+A. GIT / BRANCH / WORKTREE SAFETY
 ---------------------------------
-All gradient diagnostics and training margins must use only the fixed
-five-per-class probe selected from the saved IF=100 LT TRAIN indices. The
-selected samples are globally shuffled with the fixed probe seed before they
-are batched, avoiding class-major diagnostic minibatches while retaining five
-samples per class.
-The probe cache must explicitly record test_split_loaded=false, the SHA-256
-of the exact IF=100 indices file, the probe seed, five-per-class quotas, and
-the global-shuffle selection order. Reject stale or mismatched caches.
+Confirm exactly:
+  repository: LuoQiuXu/xin
+  branch: research/bcl-cifar100lt-audit-20261122
 
-TEST is allowed only for:
-- read-only margins from the saved final logits;
-- Head->Tail / Tail->Head confusion;
-- paired DID from saved final predictions/logits.
+Read before execution:
+- BCL_AUDIT/BCL_PROTOCOL_AUDIT.md
+- BCL_AUDIT/CODEX_STAGE_MINUS1.txt
+- this file
+- BCL_AUDIT/outputs/stage_minus1_seed42_20261122_01/STAGE_MINUS1_PHASE1_FINAL_REPORT.md
+- BCL_AUDIT/scripts/analyze_paired_bcl.py
+- BCL_AUDIT/scripts/phase2_decision_audit.py
+- BCL_AUDIT/tests/test_phase2_decision_audit.py
 
-Never run autograd, gradient calculation, backward, optimizer updates or a
-new model forward on TEST. Do not instantiate CIFAR100(train=False) again.
+Do not switch branches, create another branch, reset, clean, stash, or discard
+any pre-existing changes. Preserve unrelated staged/unstaged/untracked files,
+including the H2T_repro_audit folders and any pre-existing .gitignore changes.
+Record the exact starting commit and git status.
 
-C. RUN ONE MERGED OFFLINE ANALYSIS
-----------------------------------
-Run:
-  python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01" --output-root "BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01" --probe-per-class 5 --probe-seed 777 --batch-size 128
+B. INPUT PATHS — USE THE EXISTING PHASE 1 ROOT
+----------------------------------------------
+Data root:
+  D:\xiangmuxunlian\xin\H2T\data\cifar100
 
-The command must reuse the exact Phase 1 output root. If the actual fresh paths
-differ, use only the exact paths recorded in the newest preflight report.
+Fixed IF=100 indices:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
 
-D. REQUIRED DIAGNOSTICS
------------------------
-1. Training margins:
-   - fixed 5-per-class LT TRAIN probe;
-   - deterministic eval view;
-   - LC-only and BCL checkpoints 40/100/160/180/200;
-   - raw and logit-adjusted true-class margins.
+Static/DINO audit directory:
+  D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01
 
-2. TEST margins:
-   - read saved final_test_predictions.npz only;
-   - compute raw and adjusted true-class margins by class;
-   - report Many/Medium/Few summaries;
-   - no TEST forward or autograd.
+Phase 1 output root:
+  BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01
 
-3. Common-input eval gradient probe (BCL checkpoints only):
-   - model.eval(), BN running stats frozen;
-   - use exactly the same v2 feature tensor f(x) for LC and BCL;
-   - report per-class W_y cosine, raw component norms/ratio, and objective-
-     weighted norms/ratio using LC=2.0 and BCL=0.6;
-   - report same-feature gradient cosine, raw and weighted norms/ratio, and
-     negative-cosine fraction.
+Use the exact paths above unless the newest preflight report in the same branch
+records a different exact path. Do not pass the generic BCL_AUDIT\outputs
+parent directory. Do not create a new output root: the analyzer locates the ten
+Phase 1 checkpoints directly beneath the existing paired root.
 
-4. Native three-view train-mode gradient probe (BCL checkpoints only):
-   - fixed LT TRAIN probe v1/v2/v3;
-   - concatenate [v1,v2,v3] and use one model.train() forward;
-   - LC uses v1 logits only; BCL uses v2/v3 embeddings and classifier-derived
-     prototypes;
-   - report per-class W_y cosine/raw and objective-weighted norms/ratios,
-     per-view feature cosine/conflict fractions and raw/weighted norms, full
-     backbone-parameter gradient cosine/raw and weighted norms/ratios, and
-     per-view input-gradient cosine/conflict fractions and raw/weighted norms;
-   - the losses are batch means: scale each per-sample feature/input gradient
-     by B/N (actual minibatch size divided by the 500-sample probe count) before
-     aggregating norm statistics, so all rows use the full-probe mean-objective
-     scale and the final 116-sample batch is comparable to 128-sample batches;
-   - restore running_mean, running_var and num_batches_tracked after each
-     diagnostic batch. Checkpoint buffers must remain unchanged.
-   - label this result separately from common-input eval; they are different
-     gradient estimands.
+C. PRE-RUN VALIDATION — STOP BEFORE COMPUTE IF ANY CHECK FAILS
+-------------------------------------------------------------
+1. Verify the Phase 1 paired stream audit is a complete 200/200 pass with zero
+   mismatches, seed 42, and the exact saved initial-state SHA-256.
+2. Verify both groups' training summaries, final TEST archives, final metrics,
+   and all ten checkpoints carry consistent seed/group/epoch/initial-state
+   provenance.
+3. Verify the saved TEST archives each contain 10,000 labels, 100 per class,
+   with identical label order across LC-only and BCL.
+4. Verify the fixed IF=100 indices are byte-identical to the static audit copy.
+5. Verify the complete six-file DINO package already exists:
+   - DINO_CLASS_MEAN_FEATURES.npy
+   - DINO_CLASS_SIMILARITY.npy
+   - dino_metadata.json
+   - head_tail_pair_topology_dino.csv
+   - DINO_CLASS_TOPOLOGY.csv
+   - data_audit_dino_summary.json
+6. Verify DINO metadata and summary both certify TRAIN-only provenance and
+   test_split_loaded=false. Verify the similarity matrix is finite, symmetric,
+   100x100, and has unit diagonal. Verify the DINO symmetric-union Top-5 rule.
+7. Reconstruct the symmetric-union Top-5 graph from DINO_CLASS_SIMILARITY.npy
+   and verify every row in head_tail_pair_topology_dino.csv, including all
+   1,050 Many-Few pairs, cosine similarities and Top-5 flags.
+8. Run the repository tests:
+     python -m pytest -q
+   All tests must pass before the offline analysis starts.
 
-5. Directional confusion and DID:
-   - use only saved final epoch-200 TEST predictions/logits;
+The upgraded analyzer validates the DINO package before creating the probe
+cache or running gradients. If any DINO artifact is missing or inconsistent,
+STOP. Do not recompute DINO, do not substitute the static superclass-only
+pair table, and do not proceed with an incomplete H2.
+
+If any Phase 2 output already exists in the Phase 1 output root, STOP and
+preserve it. Do not overwrite, delete, or move it.
+
+D. SINGLE MERGED OFFLINE RUN
+----------------------------
+Run exactly once:
+
+python -m BCL_AUDIT.scripts.analyze_paired_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --data-audit-dir "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01" --output-root "BCL_AUDIT\outputs\stage_minus1_seed42_20261122_01" --probe-per-class 5 --probe-seed 777 --batch-size 128
+
+Do not launch a second analyzer, do not rerun only a failed subsection, and do
+not start a new training run. If the run fails after creating output files,
+preserve all artifacts and report the exact failure; do not silently delete
+partial results or change the output root.
+
+E. REQUIRED ANALYSES
+--------------------
+
+H1 — CLASS-LEVEL GAIN HETEROGENEITY
+1. Use only the saved final epoch-200 TEST prediction archives. Do not run a
+   new TEST forward.
+2. Compute LC-only and BCL class accuracy for all 100 classes and
+   delta_accuracy_pp = BCL - LC-only.
+3. Report Many/Medium/Few class-level mean, median, standard deviation, IQR,
+   minimum/maximum, and positive/zero/negative class counts.
+4. Rank all 30 Few classes by gain. Report top 10 and bottom 10.
+5. Do not label a distribution "bimodal" solely from visual inspection. Give
+   the full per-class distribution and describe its shape conservatively.
+
+H2 — MANY-EXPOSURE, CONFOUND CONTROL, AND PAIR-LEVEL DID
+1. Bridge the 30 Few classes to the 1,050 Many-Few pairs with three distinct
+   exposure fields:
+   - binary: at least one Many class is a symmetric-union DINO Top-5 neighbor;
+   - binary: at least one Many class shares the CIFAR-100 superclass;
+   - continuous: maximum DINO cosine similarity from the Few class to any of
+     the 35 Many classes.
+   Keep DINO Top-5 and same-superclass exposure separate; do not merge them
+   into one post-hoc definition.
+2. For each Few class, attach:
+   - LC-only TEST baseline accuracy;
+   - BCL-minus-LC TEST accuracy gain;
+   - training count and log(training count);
+   - mean LC-only Tail-to-Head confusion rate across all Many targets;
+   - mean BCL-minus-LC Tail-to-Head confusion change across all Many targets.
+3. Class-level adjusted association:
+   - outcomes: Few-class delta accuracy and Few-class mean Tail-to-Head
+     confusion change;
+   - exposures: maximum DINO similarity, DINO-neighbor flag, same-superclass
+     Many-exposure flag;
+   - control delta accuracy by LC-only baseline accuracy and log training count;
+   - additionally control Tail-to-Head confusion change by LC-only baseline
+     Tail-to-Head confusion rate;
+   - report standardized multiple-regression beta and partial Spearman;
+   - report 2,000-replicate Few-class bootstrap intervals and valid replicate
+     counts;
+   - explicitly state that 30-class bootstrap uncertainty is conditional on
+     this trained seed and is not training-seed uncertainty.
+4. Pair-level directional confusion:
    - C[a->b] = P(prediction=b | true=a);
-   - report Head->Tail and Tail->Head separately;
-   - DID = E[Delta C | SameSuperclass] - E[Delta C | DifferentSuperclass];
-   - DINO Top-5 symmetric-union relation remains a separate exogenous slice;
-   - report pair counts and margins. One seed is descriptive only.
+   - report Head-to-Tail and Tail-to-Head separately;
+   - delta C = BCL - LC-only;
+   - report SameSuperclass and DINO symmetric-union Top-5 slices separately.
+5. Baseline-confusion matching:
+   - for each direction and relation, match every exposed pair with replacement
+     to the nearest unexposed pair by LC-only baseline directional confusion
+     rate;
+   - report exposed/control pair counts, matched count, unadjusted DID,
+     matched DID, baseline-confusion standardized mean difference before and
+     after matching, and mean absolute matched baseline gap;
+   - report confusion DID in percentage points; report raw/adjusted pair-margin
+     DID in logit-margin units.
+6. Pair bootstrap:
+   - do NOT bootstrap the 1,050 pairs as if they were independent;
+   - independently resample Many class IDs and Few class IDs with replacement;
+   - pair weight = Many endpoint multiplicity x Few endpoint multiplicity;
+   - recompute the baseline-confusion matching inside every replicate;
+   - use 2,000 replicates and report valid replicate counts and percentile
+     intervals;
+   - explicitly label this a two-endpoint class-cluster bootstrap, not a
+     training-seed confidence interval.
 
-E. STOP CONDITIONS
-------------------
-- Do not train or evaluate checkpoints again.
-- Do not add seeds or groups.
-- Do not run any Oracle or introduce a method.
-- If TEST is found in a gradient path, stop and report the code location.
-- If BN buffers change after the native train-mode probe, stop and report.
-- No post-hoc numeric threshold or significance claim from one seed.
+H3 — FIVE-CHECKPOINT OPTIMIZATION AND MARGIN TRAJECTORY
+1. Reuse existing checkpoints 40/100/160/180/200 and the fixed 500-image
+   LT TRAIN probe. Do not create another probe or checkpoint.
+2. Stratify Few classes by DINO Many-neighbor exposure and same-superclass
+   Many-exposure separately.
+3. Common-input eval-mode gradients:
+   - W_y gradient cosine, conflict fraction, objective-weighted BCL/LC norm
+     ratio;
+   - same f(x) feature-gradient cosine, conflict fraction and weighted norm
+     ratio.
+4. Native three-view train-mode gradients:
+   - W_y gradient cosine/conflict/norm ratio;
+   - v1/v2/v3 feature gradient cosine/conflict/norm ratio;
+   - retain the existing global backbone and input-gradient diagnostics.
+5. Keep common-input eval and native train-mode results as different gradient
+   estimands. Do not merge them into one average.
+6. Training margins:
+   - fixed LT TRAIN probe raw and logit-adjusted margins at all five
+     checkpoints, paired BCL-minus-LC per class;
+   - summarize exposed versus unexposed Few classes.
+7. TEST margins:
+   - read-only from saved epoch-200 logits;
+   - no TEST forward, autograd, gradient, or checkpoint selection.
+8. Verify actual BatchNorm buffer equality before and after every native
+   train-mode diagnostic. The analyzer must raise if running_mean, running_var,
+   or num_batches_tracked changed. Report the verified result.
 
-F. RETURN PACKAGE
------------------
+F. REQUIRED OUTPUT PACKAGE
+--------------------------
+All outputs must be written under the existing Phase 1 output root:
+
+Base Phase-2 outputs:
+- offline_probe_margin_metrics.csv
+- offline_dual_gradient_metrics.csv
+- offline_native_three_view_gradient_class_metrics.csv
+- offline_native_three_view_gradient_global_metrics.csv
+- offline_test_margin_metrics.csv
+- offline_test_margin_summary.json
+- head_tail_pair_effects.csv
+- head_tail_did_summary.csv
+- stage_gate.json
+
+H1-H3 synthesis outputs:
+- phase2_h1_class_gain.csv
+- phase2_h2_few_exposure.csv
+- phase2_h2_adjusted_associations.csv
+- phase2_h2_pair_matched_did.csv
+- phase2_h3_overlap_gradient_summary.csv
+- phase2_h3_overlap_margin_trajectory.csv
+- phase2_decision_summary.json
+- PHASE2_DECISION_BRIEF.md
+
+The brief must answer exactly these three questions:
+1. What specific BCL weakness, if any, is supported by the evidence?
+2. How strong is the evidence, given that the current comparison has only one
+   paired training seed?
+3. What is the single best next counterfactual intervention, or should this
+   BCL-specific direction stop?
+
+Decision boundary:
+- Do not declare a BCL defect from gain heterogeneity alone.
+- Require agreement between class-level exposure association, baseline-matched
+  directional pair effects, and the relevant five-checkpoint gradient/margin
+  trajectory before describing a topology-localized mechanism as supported.
+- If evidence is intermediate, recommend at most ONE direct 1-seed
+  counterfactual intervention. Do not add another passive observation probe.
+- The decision brief may recommend that one counterfactual, but DO NOT execute
+  it in this task. Wait for human review.
+- If the direct counterfactual later fails to change the identified low-gain
+  Few classes without unacceptable Many-class loss, stop this BCL-specific
+  route.
+- No post-hoc numeric go/no-go thresholds, p-value claims, or claims of
+  cross-seed reproducibility.
+
+G. ABSOLUTE PROHIBITIONS
+-----------------------
+- no training, fine-tuning, optimizer step, or checkpoint regeneration;
+- no new TEST dataset instantiation or TEST forward;
+- no TEST autograd or gradient calculation;
+- no DINO extraction or new topology definition;
+- no extra seeds, groups, Oracles, or method implementation;
+- no automatic checkpoint selection or hyperparameter tuning;
+- no deleting/overwriting Phase 1 or Phase 2 artifacts;
+- no new passive probe after this merged diagnosis.
+
+H. RETURN TO THE USER
+---------------------
 Return:
-- exact branch, commit and output root;
-- training-probe provenance and proof test_split_loaded=false;
-- training and TEST margin tables;
-- common-input gradient summary;
-- native three-view W_y/feature/backbone/input gradient summary;
-- proof BN buffers restored;
-- Head->Tail/Tail->Head confusion deltas, DID and pair counts;
-- stage gate HOLD / replicate / stop with evidence;
-- explicit confirmation: no training, no Oracle, no new method.
+1. exact repository, branch, starting/ending commit, git status and output root;
+2. pytest result;
+3. DINO artifact validation and proof test_split_loaded=false;
+4. H1 class-gain distribution, Few top/bottom 10, and class-level heterogeneity;
+5. H2 exposure counts, adjusted beta/partial Spearman, pair counts, matched DID,
+   endpoint-cluster bootstrap intervals and valid replicate counts;
+6. H3 five-checkpoint common-input/native gradient summaries and margin
+   trajectories, including actual BN-buffer equality verification;
+7. PHASE2_DECISION_BRIEF.md conclusions;
+8. the one recommended counterfactual, if any, and the explicit stop condition;
+9. explicit confirmation that no training, no Oracle, no new method and no
+   additional passive probe were executed.
