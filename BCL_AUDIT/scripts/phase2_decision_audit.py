@@ -678,7 +678,7 @@ def _format(value, digits=3):
     return "NA" if not math.isfinite(number) else f"{number:.{digits}f}"
 
 
-def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients):
+def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients, h3_margins):
     few = h1_summary["by_shot_group"]["few"]
     top10, bottom10 = h1_summary["few_top10"], h1_summary["few_bottom10"]
     dino_t2h = next(r for r in h2_pair_did if r["relation"] == "dino_topk_union" and r["direction"] == "Tail_to_Head" and r["metric"] == "delta_confusion_BCL_minus_LC")
