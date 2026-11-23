@@ -140,6 +140,9 @@ H2 — MANY-EXPOSURE, CONFOUND CONTROL, AND PAIR-LEVEL DID
    - additionally control Tail-to-Head confusion change by LC-only baseline
      Tail-to-Head confusion rate;
    - report standardized multiple-regression beta and partial Spearman;
+   - also report unadjusted Spearman as a sensitivity check because delta
+     accuracy contains the LC-only baseline with a negative sign; explain
+     mathematical-coupling/regression-to-mean sensitivity;
    - report 2,000-replicate Few-class bootstrap intervals and valid replicate
      counts;
    - explicitly state that 30-class bootstrap uncertainty is conditional on
