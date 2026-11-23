@@ -794,8 +794,13 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
         ]
         for metric in ("W_y_gradient_cosine", "W_y_conflict_fraction", "feature_v2_conflict_fraction"):
             values = [r for r in rows if r["metric"] == metric]
-            signs = sum(_finite_float(r["difference_exposed_minus_unexposed"]) > 0 for r in values)
-            trajectory_lines.append(f"- {relation} / {metric}: exposed-minus-unexposed > 0 at {signs}/{len(values)} checkpoints.")
+            if metric == "W_y_gradient_cosine":
+                signs = sum(_finite_float(r["difference_exposed_minus_unexposed"]) < 0 for r in values)
+                direction_text = "exposed-minus-unexposed < 0 (lower cosine / more opposed)"
+            else:
+                signs = sum(_finite_float(r["difference_exposed_minus_unexposed"]) > 0 for r in values)
+                direction_text = "exposed-minus-unexposed > 0 (higher conflict fraction)"
+            trajectory_lines.append(f"- {relation} / {metric}: {direction_text} at {signs}/{len(values)} checkpoints.")
 
     margin_lines = []
     for relation in ("dino_many_neighbor", "same_superclass_many"):
