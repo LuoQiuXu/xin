@@ -723,6 +723,15 @@ def compute_native_three_view_gradient_diagnostics(
             # Train-mode BN uses current-batch statistics in the forward pass;
             # restore running buffers so the checkpoint remains byte-identical.
             _restore_bn_running_buffers(model, bn_snapshot)
+            batch_bn_snapshot = _snapshot_bn_running_buffers(model)
+            if batch_bn_snapshot.keys() != bn_snapshot.keys() or any(
+                not torch.equal(batch_bn_snapshot[name], bn_snapshot[name])
+                for name in bn_snapshot
+            ):
+                raise RuntimeError(
+                    "Native three-view gradient probe failed to restore a BatchNorm buffer "
+                    "after the current diagnostic batch"
+                )
 
     current_bn_snapshot = _snapshot_bn_running_buffers(model)
     if current_bn_snapshot.keys() != bn_snapshot.keys() or any(
