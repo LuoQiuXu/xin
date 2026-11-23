@@ -1,0 +1,196 @@
+CODEX TASK — BCL_LTN INDEPENDENT SYMMETRIC-NOISE BASELINE
+=============================================================
+
+REPOSITORY: LuoQiuXu/xin
+BRANCH: research/bcl-ltn-independent-20261123
+
+NON-NEGOTIABLE ISOLATION
+------------------------
+1. Work only on branch research/bcl-ltn-independent-20261123.
+2. BCL_AUDIT/ is strictly read-only. Do not edit, add, delete, rename, format,
+   regenerate, or move any file under BCL_AUDIT/. Do not run commands that write
+   into BCL_AUDIT/. Existing history remains byte-for-byte unchanged.
+3. New source, tests, generated arrays, checkpoints, logs and reports belong
+   under BCL_LTN/ only. Do not touch other research branches or folders.
+4. Existing BCL_AUDIT modules may be imported read-only:
+   BCL_AUDIT.cifar100lt.data, losses, models, and audited training helpers.
+   Reuse the exact ResNet-32, transforms, BalancedContrastiveLoss and
+   LogitCompensatedCE implementations. Do not copy/fork/change them.
+5. Preserve unrelated local changes. Do not commit datasets, .npy/.npz,
+   checkpoints, logs, event files, predictions or generated arrays.
+
+READ FIRST
+----------
+- BCL_LTN/README.md
+- BCL_LTN/make_noisy_lt.py
+- BCL_AUDIT/cifar100lt/data.py
+- BCL_AUDIT/cifar100lt/models.py
+- BCL_AUDIT/cifar100lt/losses.py
+- BCL_AUDIT/cifar100lt/train.py
+- BCL_AUDIT/outputs/preflight_report.md
+
+FIXED DATA PROTOCOL
+-------------------
+Use the existing CIFAR-100-LT IF=100 index file exactly:
+D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy
+
+Expected SHA256:
+be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
+
+Data root:
+D:\xiangmuxunlian\xin\H2T\data\cifar100
+
+Do not regenerate indices, re-order the selected index file, re-sample LT images,
+download data, or access TEST during noise creation/training/checkpoint diagnostics.
+Use strict TRAIN-only loader CIFAR100LT/CIFAR100TrainOnly (download=False).
+
+STEP 1 — GENERATE LABELS
+------------------------
+Run from repository root in the user's xiaoju conda environment:
+
+python -m BCL_LTN.make_noisy_lt --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --output-dir "BCL_LTN\data" --noise-rate 0.4 --seed 42
+
+Semantics are locked:
+- 10,847 selected images only.
+- For EACH selected example independently draw Bernoulli(0.4).
+- If flipped, replace its label uniformly among the other 99 classes; never
+  retain the source class.
+- Seed 42; deterministic output. Do NOT force exactly 40% flips.
+- Save:
+  BCL_LTN/data/cifar100lt_if100_sym04_seed42.npy
+  BCL_LTN/data/cifar100lt_if100_clean_seed42.npy
+  BCL_LTN/data/cifar100lt_if100_is_noisy_seed42.npy
+  BCL_LTN/data/noise_manifest.json
+- Verify exact index SHA, 10,847 rows, unique indices, clean counts identical
+  to the existing IF=100 class count vector, valid labels, unchanged unflipped
+  labels, changed flipped labels, observed counts sum 10,847, and realized
+  noise rate close to 0.4 (it need not equal 0.4 exactly).
+- Print Many/Medium/Few class counts and source sample counts before/after
+  corruption. Define groups by CLEAN IF=100 class counts: Many >100,
+  Medium 20..100 inclusive, Few <20. Report source class group and destination
+  label group distinctly; do not imply that source-group counts remain fixed
+  after symmetric noise.
+- Keep clean labels and is_noisy mask separate. These are offline-only
+  diagnostic truth and MUST NOT be passed to training dataset, loss, prior,
+  scheduler, optimizer, checkpoint selection or any model update.
+
+STEP 2 — ORIGINAL BCL TRAINING
+------------------------------
+Implement BCL_LTN/train_noisy_bcl.py. Import and reuse, without modifying:
+- BCLCIFARModel from BCL_AUDIT.cifar100lt.models
+- CIFAR100LT, build_cifar_transforms, CIFAR100BalancedTest from data.py
+- LogitCompensatedCE, BalancedContrastiveLoss from losses.py
+- the same three-view transforms and original BCL batch construction/objective.
+
+Training dataset:
+- Instantiate the audited CIFAR100LT(mode="bcl", fixed indices, download=False).
+- Build a copy of the full 50k target array, replace ONLY targets at the fixed
+  selected indices with the saved noisy labels, and assign this noisy target
+  array to the training dataset instance. The dataset's __getitem__ must return
+  only (three augmented views, noisy label, original source index).
+- The train loop must never receive clean labels or is_noisy.
+- Verify every epoch covers exactly 10,847 unique fixed indices once.
+
+Noisy prior:
+- observed_counts = bincount(noisy_labels, minlength=100), require every count > 0.
+- Instantiate LogitCompensatedCE(observed_counts). This is the ONLY class prior
+  used. Do not call clean class counts for loss/prior.
+- Reuse BalancedContrastiveLoss(class_counts=observed_counts, temperature=0.1)
+  and exact BCL implementation. Do not use clean labels for any BCL operation.
+- Objective exactly 2.0*LC + 0.6*BCL.
+
+Locked optimizer and training:
+- seed 42; 200 epochs; batch 256; FP32; no AMP, TF32 or gradient accumulation.
+- SGD, LR 0.15, momentum 0.9, weight decay 5e-4.
+- 5 epoch linear warmup; LR drops after 160 and 180 completed epochs (gamma 0.1).
+- Keep ResNet-32 and BCL three-view concatenation / forward path identical.
+- Generate a fresh initial BCLCIFARModel state using the same set_seed(42)
+  and constructor as the original BCL train.py. Save its state hash and reload
+  that exact initial state before training.
+- deterministic epoch seed convention: 42*100000 + zero_based_epoch_index;
+  seed global RNGs and DataLoader generator identically at each epoch.
+- Sequential single run only. No AMP/batch-size changes if OOM; stop and report.
+- Save model+optimizer+RNG/protocol metadata checkpoints at epochs
+  40,100,160,180,200. Use unique fresh output root:
+  BCL_LTN/outputs/BCL_sym04_seed42
+  If it exists, select the next unused suffix; never overwrite.
+
+CHECKPOINT TRAIN-ONLY DIAGNOSTICS
+---------------------------------
+At each of the five checkpoints, set model.eval() and perform a deterministic
+full pass over the SAME 10,847 training images using only the standard
+normalization/eval transform (no random augmentations). This is an offline
+metric pass; it must not call backward, update BN, optimizer or scheduler.
+
+Metrics:
+(a) Clean subset accuracy: only examples where is_noisy == False, prediction
+    compared with clean labels. Split Many/Medium/Few by each sample's original
+    clean class membership.
+(b) Noisy subset wrong-label memorization rate: only examples where is_noisy
+    == True, compute fraction prediction == noisy observed label. Split by
+    each sample's ORIGINAL clean source class group, not destination class.
+(c) Include sample counts and numerators/denominators for every metric.
+The diagnostic evaluator may read clean labels/mask, but must be a separate
+function/dataset and its outputs must never influence training or checkpoint
+selection. All five checkpoints are predeclared; do not select based on these
+metrics. Save checkpoint diagnostics JSON/CSV under the run output.
+
+TEST ISOLATION
+--------------
+Do NOT instantiate, read, hash, open, evaluate or otherwise touch CIFAR-100 TEST
+during label generation, training, or any checkpoint diagnostic.
+Only after epoch 200 training and its train-only diagnostics have completed,
+instantiate CIFAR100BalancedTest(download=False) once and evaluate the final
+epoch-200 model exactly once. Never use TEST for checkpoint selection or tuning.
+Compare its raw-logit Overall/Many/Medium/Few results with the clean BCL
+reference values below. Use the same class-group macro averaging convention
+as the existing BCL evaluator.
+
+CLEAN BCL REFERENCE (report side-by-side)
+-----------------------------------------
+Overall 50.76%
+Many 66.54%
+Medium 49.40%
+Few 31.20%
+
+REPORT
+------
+Generate BCL_LTN/outputs/BCL_sym04_baseline_report.md with:
+- experiment purpose and exact protocol;
+- source/index/noise array SHA256;
+- requested and realized noise rates and flip count;
+- clean and observed noisy class counts (100-vector in JSON/CSV);
+- Many/Medium/Few group counts and noise statistics;
+- 5-checkpoint clean-subset accuracy and noisy-label memorization tables;
+- final TEST raw-logit Overall/Many/Medium/Few versus clean reference and deltas;
+- runtime, peak CUDA memory, environment, checkpoint paths;
+- explicit no-clean-label-leakage audit and TEST access timing;
+- deviations, failures, or OOMs (do not conceal).
+Do not claim synthetic symmetric noise proves robustness to real-world noise.
+
+TESTS / SMOKE / EXECUTION ORDER
+-------------------------------
+1. Confirm branch exactly and clean worktree; confirm BCL_AUDIT has no diff.
+2. Run pytest for BCL_LTN tests and existing BCL_AUDIT tests (read-only):
+   python -B -m pytest BCL_LTN/tests BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
+3. Generate labels and verify manifest before model training.
+4. Run a one-batch FP32 forward/backward smoke with the noisy training dataset.
+   Assert loss and all gradients finite and optimizer changes parameters.
+   Assert train batch tuple contains no clean labels/mask.
+5. Verify GPU environment and memory. A fresh GPU smoke/capacity preflight
+   is required because this is a new trainer. If batch 256 FP32 OOMs, STOP.
+6. Run 200 epochs. Do not start TEST evaluation until all five checkpoint
+   train diagnostics complete.
+7. Evaluate TEST once after full training. Generate report.
+8. Check git diff: only BCL_LTN source/tests/report tracked changes. BCL_AUDIT
+   must have zero changed files. Never commit local arrays/checkpoints/logs.
+
+COMMAND
+-------
+python -m BCL_LTN.train_noisy_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --noise-dir "BCL_LTN\data" --output-root "BCL_LTN\outputs\BCL_sym04_seed42" --num-workers 0
+
+FINAL RESPONSE
+--------------
+Return branch, HEAD, status; BCL_AUDIT diff check; tests and smoke output;
+noise manifest values and hashes; five diagnostic tables; final test metrics
+and comparison; checkpoint paths; runtime/memory; report path; all deviations.
