@@ -1550,6 +1550,12 @@ def main():
     print(f"TEST margin rows: {output_root / 'offline_test_margin_metrics.csv'}")
     print(f"Pair effects: {output_root / 'head_tail_pair_effects.csv'}")
     print(f"DID summary: {output_root / 'head_tail_did_summary.csv'}")
+    print(f"H1 class gains: {output_root / 'phase2_h1_class_gain.csv'}")
+    print(f"H2 adjusted associations: {output_root / 'phase2_h2_adjusted_associations.csv'}")
+    print(f"H2 matched pair DID: {output_root / 'phase2_h2_pair_matched_did.csv'}")
+    print(f"H3 overlap gradients: {output_root / 'phase2_h3_overlap_gradient_summary.csv'}")
+    print(f"H3 margin trajectory: {output_root / 'phase2_h3_overlap_margin_trajectory.csv'}")
+    print(f"Phase 2 decision brief: {output_root / 'PHASE2_DECISION_BRIEF.md'}")
     print(f"Stage gate: {output_root / 'stage_gate.json'}")
     print("Oracle execution: NOT RUN (single-seed gate is not sufficient).")
 
