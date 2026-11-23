@@ -473,6 +473,8 @@ def train(args):
         "- This is synthetic instance-independent symmetric noise; it does not establish robustness to real-world annotation noise.",
     ]
     report_path = output_root.parent / "BCL_sym04_baseline_report.md"
+    if report_path.exists():
+        raise FileExistsError(f"Refusing to overwrite existing report: {report_path}")
     report_path.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
     print(f"Report: {report_path}")
     print(json.dumps(test_metrics, indent=2, ensure_ascii=False))
