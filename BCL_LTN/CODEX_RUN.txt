@@ -48,7 +48,7 @@ STEP 1 — GENERATE LABELS
 ------------------------
 Run from repository root in the user's xiaoju conda environment:
 
-python -m BCL_LTN.make_noisy_lt --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --output-dir "BCL_LTN\data" --noise-rate 0.4 --seed 42
+python -B -m BCL_LTN.make_noisy_lt --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --output-dir "BCL_LTN\data" --noise-rate 0.4 --seed 42
 
 Semantics are locked:
 - 10,847 selected images only.
@@ -171,6 +171,7 @@ Do not claim synthetic symmetric noise proves robustness to real-world noise.
 TESTS / SMOKE / EXECUTION ORDER
 -------------------------------
 1. Confirm branch exactly and clean worktree; confirm BCL_AUDIT has no diff.
+   Set `$env:PYTHONDONTWRITEBYTECODE='1'` in PowerShell and use `python -B` for every command so imports/tests cannot create __pycache__ under the read-only BCL_AUDIT tree. Do not run formatters, linters with autofix, or scripts that write there.
 2. Run pytest for BCL_LTN tests and existing BCL_AUDIT tests (read-only):
    python -B -m pytest BCL_LTN/tests BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
 3. Generate labels and verify manifest before model training.
@@ -187,7 +188,7 @@ TESTS / SMOKE / EXECUTION ORDER
 
 COMMAND
 -------
-python -m BCL_LTN.train_noisy_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --noise-dir "BCL_LTN\data" --output-root "BCL_LTN\outputs\BCL_sym04_seed42" --num-workers 0
+python -B -m BCL_LTN.train_noisy_bcl --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" --noise-dir "BCL_LTN\data" --output-root "BCL_LTN\outputs\BCL_sym04_seed42" --num-workers 0
 
 FINAL RESPONSE
 --------------
