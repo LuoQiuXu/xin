@@ -1,0 +1,114 @@
+{
+  "status": "HOLD_SINGLE_SEED_RECONNAISSANCE",
+  "oracle_allowed": false,
+  "seed": 42,
+  "reason": "A single paired seed can reveal candidate directional patterns but cannot establish repeatability. Do not run an Oracle from this result alone.",
+  "paired_performance_delta_BCL_minus_LC_only": {
+    "overall_top1": 2.930000000000007,
+    "many_top1_macro_class": 3.971428571428568,
+    "medium_top1_macro_class": 2.5428571428571303,
+    "few_top1_macro_class": 2.166666666666668
+  },
+  "phase2_hypothesis_decision": {
+    "status": "ONE_SEED_EXPLORATORY_HUMAN_REVIEW",
+    "seed": 42,
+    "h1_few_gain_summary": {
+      "num_classes": 30,
+      "mean_gain_pp": 2.1666666666666665,
+      "median_gain_pp": 1.4999999999999993,
+      "std_gain_pp": 6.319722216117484,
+      "q25_gain_pp": -2.0000000000000018,
+      "q75_gain_pp": 7.000000000000001,
+      "min_gain_pp": -8.000000000000002,
+      "max_gain_pp": 15.999999999999998,
+      "positive_classes": 16,
+      "zero_classes": 2,
+      "negative_classes": 12
+    },
+    "h1_by_shot_group": {
+      "many": {
+        "num_classes": 35,
+        "mean_gain_pp": 3.9714285714285724,
+        "median_gain_pp": 3.9999999999999925,
+        "std_gain_pp": 5.028409088288628,
+        "q25_gain_pp": 1.0000000000000009,
+        "q75_gain_pp": 7.0,
+        "min_gain_pp": -6.999999999999995,
+        "max_gain_pp": 18.999999999999993,
+        "positive_classes": 28,
+        "zero_classes": 3,
+        "negative_classes": 4
+      },
+      "medium": {
+        "num_classes": 35,
+        "mean_gain_pp": 2.5428571428571423,
+        "median_gain_pp": 2.0000000000000018,
+        "std_gain_pp": 4.649687283757339,
+        "q25_gain_pp": -0.5000000000000004,
+        "q75_gain_pp": 6.000000000000003,
+        "min_gain_pp": -5.000000000000004,
+        "max_gain_pp": 12.0,
+        "positive_classes": 21,
+        "zero_classes": 5,
+        "negative_classes": 9
+      },
+      "few": {
+        "num_classes": 30,
+        "mean_gain_pp": 2.1666666666666665,
+        "median_gain_pp": 1.4999999999999993,
+        "std_gain_pp": 6.319722216117484,
+        "q25_gain_pp": -2.0000000000000018,
+        "q75_gain_pp": 7.000000000000001,
+        "min_gain_pp": -8.000000000000002,
+        "max_gain_pp": 15.999999999999998,
+        "positive_classes": 16,
+        "zero_classes": 2,
+        "negative_classes": 12
+      }
+    },
+    "h1_few_gain_mixed_sign": true,
+    "h2_dino_tail_to_head_matched_delta_confusion_pp": 0.19354838709677424,
+    "h2_dino_tail_to_head_cluster_ci": [
+      -2.018653198653199,
+      3.3090394491129778
+    ],
+    "h2_same_superclass_tail_to_head_matched_delta_confusion_pp": 1.0857142857142856,
+    "h2_same_superclass_tail_to_head_cluster_ci": [
+      -2.4375625000000003,
+      2.466842105263157
+    ],
+    "h3_dino_exposed_higher_native_W_conflict_epochs": 0,
+    "h2_max_similarity_adjusted_association_support": false,
+    "h2_max_similarity_gain_loco_support": false,
+    "h2_max_similarity_confusion_loco_support": false,
+    "h3_dino_exposure_trajectory_coherent": false,
+    "h3_dino_exposed_minus_unexposed_test_raw_margin_gap": 0.10046637332865171,
+    "evidence_level": "UNSUPPORTED",
+    "specific_weakness": "No topology-localized BCL weakness is supported by the seed-42 evidence.",
+    "candidate_intervention": "Stop this BCL-specific direction at Phase 2.",
+    "candidate_intervention_reason": "Few-class gain heterogeneity alone leaves the mechanism unresolved. The pre-specified class direction and matched Tail-to-Head contrasts provide insufficient stable localization.",
+    "stop_condition": "Stop this BCL-specific direction at Phase 2.",
+    "bn_running_buffers_verified_all_five_checkpoints": true,
+    "no_training_executed": true,
+    "no_oracle_executed": true,
+    "no_new_method_executed": true,
+    "class_and_pair_bootstrap_is_not_seed_uncertainty": true,
+    "dino_test_split_loaded": false
+  },
+  "gradient_diagnostics": "All gradient probes use the fixed LT TRAIN-only probe cache. The common-input probe uses model.eval() and the same v2 feature tensor for LC/BCL gradients. The native_three_view_train probe concatenates v1/v2/v3 in one train-mode forward and reports W_y, feature, backbone-parameter and input gradients; BatchNorm running buffers are restored after each diagnostic batch.",
+  "margin_data_sources": "Training margins use the fixed five-per-class LT TRAIN probe. TEST margins are computed read-only from saved final logits; no TEST autograd or gradient calculation is performed.",
+  "head_tail_diagnostics": "C[a->b] = P(prediction=b | true=a); Head-to-Tail and Tail-to-Head are separate. DID = mean(delta C | same CIFAR-100 coarse superclass) - mean(delta C | different superclass), with delta C = BCL - LC-only. DINO Top-K union is reported as a separate exogenous relation when available.",
+  "no_circular_overlap_definition": true,
+  "oracle_menu_not_executed": {
+    "prototype": "replace W-derived prototypes with balanced reference-feature prototypes",
+    "relation": "suppress or down-weight same-superclass negative prototypes",
+    "gradient": "project BCL gradient against LC only when conflicting: g2* = g2 - min(0, g1^T g2)/(||g1||^2 + eps) * g1"
+  },
+  "stage_gate": [
+    "Repeat the paired comparison across additional seeds before claiming a stable effect.",
+    "Gradient direction/norm, margin change, directional confusion change, and Many/Medium/Few/Overall performance must tell a coherent mechanism-consistent story.",
+    "Only then run the Oracle aligned with the observed mechanism; do not run all Oracles as a fishing expedition.",
+    "Stop if the Oracle has no stable benefit or improves one group only by sacrificing other groups."
+  ],
+  "numeric_thresholds": "No numeric go/no-go threshold was pre-registered; do not invent one after seeing results."
+}

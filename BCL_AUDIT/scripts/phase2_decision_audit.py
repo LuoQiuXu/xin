@@ -392,6 +392,79 @@ def _build_h2_exposure_rows(class_rows, h1_rows, pair_effect_rows, topology):
     return rows
 
 
+def _leave_one_few_class_out(exposure, outcome, controls, classes, full_result):
+    """Refit the existing adjusted estimators after each single-class omission."""
+    positions = np.arange(len(classes))
+    estimates = []
+    for omitted in positions:
+        keep = positions != omitted
+        estimates.append((
+            _standardized_beta(exposure[keep], outcome[keep], controls[keep]),
+            _partial_spearman(exposure[keep], outcome[keep], controls[keep]),
+        ))
+    result = {"loco_omissions_requested": len(classes)}
+    for (name, full_key), values in zip(
+        (("beta", "standardized_beta"), ("rho", "partial_spearman")),
+        np.asarray(estimates, dtype=np.float64).reshape(-1, 2).T,
+    ):
+        valid = np.flatnonzero(np.isfinite(values))
+        valid_values = values[valid]
+        minimum = maximum = same_sign = reversals = class_id = class_name = max_change = None
+        if valid.size:
+            minimum, maximum = float(valid_values.min()), float(valid_values.max())
+            full_value = full_result[full_key]
+            if math.isfinite(full_value):
+                changes = np.abs(values - full_value)
+                strongest = min(valid, key=lambda i: (-changes[i], int(classes[i]["class_id"])))
+                class_id = int(classes[strongest]["class_id"])
+                class_name = classes[strongest]["fine_name"]
+                max_change = float(changes[strongest])
+                if full_value != 0:
+                    sign = np.sign(full_value)
+                    same_sign = float(np.mean(np.sign(valid_values) == sign))
+                    reversals = int(np.count_nonzero(np.sign(valid_values) == -sign))
+        prefix = f"loco_{name}"
+        result.update({
+            f"{prefix}_valid_count": int(valid.size),
+            f"{prefix}_min": minimum,
+            f"{prefix}_max": maximum,
+            f"{prefix}_same_sign_fraction": same_sign,
+            f"{prefix}_sign_reversals": reversals,
+            f"{prefix}_largest_change_class_id": class_id,
+            f"{prefix}_largest_change_class_name": class_name,
+            f"{prefix}_max_abs_change": max_change,
+        })
+    return result
+
+
+def _describe_exposure_groups(exposure, outcome, class_ids, *, continuous):
+    """Summarize finite outcomes in the binary or rank-defined groups."""
+    if continuous:
+        valid = np.flatnonzero(np.isfinite(exposure))
+        ordered = valid[np.lexsort((class_ids[valid], exposure[valid]))]
+        unexposed, exposed = np.split(ordered, [ordered.size // 2])
+        rule = (
+            "Descriptive split only. Sort finite similarity by (max similarity, class ID) "
+            "ascending. For 30 classes ranks 1–15 are lower and ranks 16–30 are upper."
+        )
+    else:
+        unexposed, exposed = np.flatnonzero(exposure == 0), np.flatnonzero(exposure == 1)
+        rule = "The binary exposure flag defines each group."
+    result = {"descriptive_group_rule": rule}
+    for label, positions in (("exposed", exposed), ("unexposed", unexposed)):
+        values = outcome[positions]
+        values = values[np.isfinite(values)]
+        result.update({
+            f"descriptive_{label}_n": int(values.size),
+            f"descriptive_{label}_mean": float(values.mean()) if values.size else float("nan"),
+            f"descriptive_{label}_median": float(np.median(values)) if values.size else float("nan"),
+        })
+    result["descriptive_mean_difference_exposed_minus_unexposed"] = (
+        result["descriptive_exposed_mean"] - result["descriptive_unexposed_mean"]
+    )
+    return result
+
+
 def _build_h2_associations(exposure_rows):
     exposures = (
         ("max_dino_similarity_to_many", "Max DINO similarity to any Many class"),
@@ -405,12 +478,13 @@ def _build_h2_associations(exposure_rows):
          ("LC_only_test_accuracy_pct", "log_train_count", "LC_tail_to_head_mean_confusion_pp")),
     )
     rng = np.random.RandomState(BOOTSTRAP_SEED)
+    class_ids = np.asarray([int(row["class_id"]) for row in exposure_rows])
     rows = []
     for exposure_key, exposure_label in exposures:
         for outcome_key, outcome_label, control_keys in outcomes:
-            x = np.asarray([float(row[exposure_key]) for row in exposure_rows])
-            y = np.asarray([float(row[outcome_key]) for row in exposure_rows])
-            controls = np.column_stack([[float(row[key]) for row in exposure_rows] for key in control_keys])
+            x = np.asarray([_numeric_or_bool(row[exposure_key]) for row in exposure_rows])
+            y = np.asarray([_finite_float(row[outcome_key]) for row in exposure_rows])
+            controls = np.column_stack([[_finite_float(row[key]) for row in exposure_rows] for key in control_keys])
             result = _association_with_bootstrap(x, y, controls, rng)
             unadjusted = _association_with_bootstrap(
                 x, y, np.empty((len(x), 0), dtype=np.float64), rng
@@ -426,9 +500,16 @@ def _build_h2_associations(exposure_rows):
                 "unadjusted_spearman": unadjusted["partial_spearman"],
                 "unadjusted_spearman_ci_low": unadjusted["partial_spearman_bootstrap_ci_low"],
                 "unadjusted_spearman_ci_high": unadjusted["partial_spearman_bootstrap_ci_high"],
+                "unadjusted_rho_valid_bootstrap_reps": unadjusted["rho_valid_bootstrap_reps"],
+                **_leave_one_few_class_out(x, y, controls, exposure_rows, result),
+                **_describe_exposure_groups(
+                    x, y, class_ids, continuous=exposure_key == "max_dino_similarity_to_many"
+                ),
                 "interpretation_note": (
-                    "Exploratory class-level association only; bootstrap resamples the 30 Few classes, "
-                    "not training seeds, and does not establish causality. Delta accuracy contains the "
+                    "Exploratory class-level association. Bootstrap resamples the 30 Few classes "
+                    "conditional on seed 42. LOCO checks single-class influence within the same "
+                    "trained seed. Neither quantifies training-seed uncertainty, identifies a causal "
+                    "effect, or supplies independent replication. Delta accuracy contains the "
                     "LC-only baseline with a negative sign, so baseline-adjusted and unadjusted results "
                     "must be read together to assess mathematical-coupling/regression-to-mean sensitivity."
                 ),
@@ -695,6 +776,18 @@ def _format(value, digits=3):
     return "NA" if not math.isfinite(number) else f"{number:.{digits}f}"
 
 
+def _loco_supports_direction(row, direction):
+    return (
+        direction * _finite_float(row["standardized_beta"]) > 0
+        and direction * _finite_float(row["partial_spearman"]) > 0
+        and all(
+            row[f"loco_{name}_valid_count"] == row["loco_omissions_requested"]
+            and row[f"loco_{name}_same_sign_fraction"] == 1.0
+            for name in ("beta", "rho")
+        )
+    )
+
+
 def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients, h3_margins):
     few = h1_summary["by_shot_group"]["few"]
     top10, bottom10 = h1_summary["few_top10"], h1_summary["few_bottom10"]
@@ -702,7 +795,9 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
         "| " + group + " | " + str(values["num_classes"]) + " | "
         + _format(values["mean_gain_pp"]) + " | " + _format(values["median_gain_pp"]) + " | "
         + _format(values["std_gain_pp"]) + " | " + _format(values["q25_gain_pp"]) + "–"
-        + _format(values["q75_gain_pp"]) + " | " + str(values["positive_classes"]) + "/"
+        + _format(values["q75_gain_pp"]) + " | "
+        + _format(values["min_gain_pp"]) + "–" + _format(values["max_gain_pp"]) + " | "
+        + str(values["positive_classes"]) + "/"
         + str(values["zero_classes"]) + "/" + str(values["negative_classes"]) + " |"
         for group, values in h1_summary["by_shot_group"].items()
     ]
@@ -727,65 +822,101 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
         if r["exposure"] == "max_dino_similarity_to_many"
         and r["outcome"] == "delta_tail_to_head_mean_confusion_pp"
     )
-    class_association_support = (
+    gain_bootstrap_support = (
         _finite_float(maxsim_gain["standardized_beta"]) < 0
         and _finite_float(maxsim_gain["standardized_beta_bootstrap_ci_high"]) < 0
-        and _finite_float(maxsim_confusion["standardized_beta"]) > 0
+    )
+    confusion_bootstrap_support = (
+        _finite_float(maxsim_confusion["standardized_beta"]) > 0
         and _finite_float(maxsim_confusion["standardized_beta_bootstrap_ci_low"]) > 0
     )
-    dino_test_margin_rows = [
-        r for r in h3_margins
-        if r["exposure_definition"] == "dino_many_neighbor"
-        and r["source_split"] == "balanced_TEST_read_only"
-        and int(r["epoch"]) == 200
-    ]
-    dino_test_exposed = next((r for r in dino_test_margin_rows if r["exposure_group"] == "exposed"), None)
-    dino_test_unexposed = next((r for r in dino_test_margin_rows if r["exposure_group"] == "unexposed"), None)
-    dino_test_margin_gap = (
-        _finite_float(dino_test_exposed["mean_delta_raw_margin_BCL_minus_LC"])
-        - _finite_float(dino_test_unexposed["mean_delta_raw_margin_BCL_minus_LC"])
-        if dino_test_exposed is not None and dino_test_unexposed is not None else float("nan")
+    class_association_support = gain_bootstrap_support and confusion_bootstrap_support
+    gain_loco_support = gain_bootstrap_support and _loco_supports_direction(maxsim_gain, -1)
+    confusion_loco_support = confusion_bootstrap_support and _loco_supports_direction(maxsim_confusion, 1)
+
+    margin_groups = {}
+    for row in h3_margins:
+        key = (row["exposure_definition"], row["source_split"], int(row["epoch"]))
+        margin_groups.setdefault(key, {})[row["exposure_group"]] = row
+    margin_gaps = {}
+    for key, groups in margin_groups.items():
+        if {"exposed", "unexposed"}.issubset(groups):
+            margin_gaps[key] = tuple(
+                _finite_float(groups["exposed"][field]) - _finite_float(groups["unexposed"][field])
+                for field in ("mean_delta_raw_margin_BCL_minus_LC", "mean_delta_adjusted_margin_BCL_minus_LC")
+            )
+    missing_gaps = (float("nan"), float("nan"))
+    dino_test_margin_gap = margin_gaps.get(
+        ("dino_many_neighbor", "balanced_TEST_read_only", 200), missing_gaps
+    )[0]
+    h3_coherent = (
+        positive_w_conflict_epochs == len(EXPECTED_EPOCHS)
+        and dino_test_margin_gap < 0
+        and all(
+            margin_gaps.get(("dino_many_neighbor", "LT_train_probe", epoch), missing_gaps)[0] < 0
+            for epoch in EXPECTED_EPOCHS
+        )
     )
 
-    if dino_ci_support and class_association_support and positive_w_conflict_epochs > 0 and dino_test_margin_gap < 0:
+    if dino_ci_support and gain_loco_support and confusion_loco_support and h3_coherent:
+        evidence_level = "STRONGLY_MECHANISM_CONSISTENT_EXPLORATORY"
+        weakness = "The seed-42 evidence supports a candidate DINO-localized Few-to-Many conflict on classifier weights."
         candidate = (
-            "One stop-gradient counterfactual: detach classifier weights only on the "
+            "Test one seed-42 stop-gradient intervention by detaching classifier weights only on the "
             "classifier-derived prototype path (prototype_mlp(W.detach())). Keep forward "
-            "prototypes unchanged; remove only BCL-to-W gradient flow."
+            "prototypes unchanged and remove only BCL-to-W gradient flow."
         )
         candidate_reason = (
             "The max-similarity class-level associations point to lower Few gain and higher "
-            "Tail-to-Head confusion after baseline controls; DINO-neighbor Tail-to-Head matched "
-            "confusion DID has a positive endpoint-cluster lower bound; native W_y conflict is "
-            "higher for exposed Few classes at one or more checkpoints; and the exposed group "
-            "has a smaller BCL-minus-LC final TEST margin change."
+            "Tail-to-Head confusion after baseline controls with stable LOCO directions. "
+            "DINO-neighbor matched confusion supports the same direction. Exposed Few classes "
+            "show higher native W_y conflict and smaller raw TRAIN margin gains at every checkpoint "
+            "with a smaller raw margin gain on saved final TEST logits."
         )
-    elif dino_ci_support or superclass_ci_support or class_association_support:
+    elif dino_ci_support or superclass_ci_support:
+        evidence_level = "INTERMEDIATE"
+        relation = "DINO symmetric-union Top-5" if dino_ci_support else "same-superclass"
+        weakness = (
+            f"The {relation} Tail-to-Head matched confusion contrast supports a localized candidate. "
+            "The class, pair and trajectory evidence does not jointly establish the shared-W mechanism."
+        )
         candidate = (
-            "One localized counterfactual: suppress only the high-overlap Many-Few "
-            "negative-prototype interactions identified by the supported topology slice. "
-            "Do not add a general semantic gate or modify other pairs."
+            f"Test one seed-42 counterfactual that suppresses only {relation} Many-class "
+            "negative-prototype terms for Few-class anchors in the BCL objective."
         )
         candidate_reason = (
-            "At least one baseline-adjusted Few-class exposure association or baseline-matched "
-            "Many-Few directional pair effect is directionally supported, but the complete "
-            "H1-H3 chain does not localize a shared-W conflict plus margin shrink. The only "
-            "permitted next step is one relation-specific falsification, not more passive probes."
+            "The supported localization comes from the baseline-matched Tail-to-Head contrast. "
+            "A relation-specific falsification directly targets those interactions."
         )
-    elif few["std_gain_pp"] > 1e-12:
+    elif gain_loco_support or confusion_loco_support:
+        evidence_level = "INTERMEDIATE"
+        weakness = (
+            "Max-similarity exposure retains a directionally stable class association. "
+            "The matched pair and trajectory evidence leaves the mechanism unresolved."
+        )
         candidate = (
-            "At most one falsification experiment: detach the classifier-derived prototype "
-            "gradient path into W while preserving forward prototypes. If it does not change "
-            "the low-gain Few classes without unacceptable Many-class loss, stop this BCL-specific route."
+            "Test one seed-42 stop-gradient falsification with prototype_mlp(W.detach()) "
+            "to isolate the classifier-derived prototype gradient into W while preserving "
+            "the forward prototypes."
         )
         candidate_reason = (
-            "Few-class gains have a non-degenerate class-level spread, but one-seed H2/H3 "
-            "evidence does not localize a more specific mechanism. This is the single "
-            "bounded falsification allowed by the intermediate decision tier."
+            "A class association survives the influence check. The single bounded "
+            "intervention tests whether the classifier-prototype gradient route contributes."
         )
     else:
-        candidate = "No mechanism-aligned intervention is justified; stop the BCL-specific direction."
-        candidate_reason = "The one-seed evidence does not show a sufficiently localized pattern to justify another intervention."
+        evidence_level = "UNSUPPORTED"
+        weakness = "No topology-localized BCL weakness is supported by the seed-42 evidence."
+        candidate = "Stop this BCL-specific direction at Phase 2."
+        candidate_reason = (
+            "Few-class gain heterogeneity alone leaves the mechanism unresolved. "
+            "The pre-specified class direction and matched Tail-to-Head contrasts provide "
+            "insufficient stable localization."
+        )
+    stop_condition = (
+        candidate if evidence_level == "UNSUPPORTED"
+        else "If the approved single counterfactual fails to improve the identified low-gain exposed "
+             "Few classes without unacceptable Many-class loss, stop this BCL-specific direction."
+    )
 
     association_lines = [
         "| " + r["exposure"] + " | " + r["outcome"] + " | "
@@ -795,69 +926,67 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
         + ", " + _format(r["partial_spearman_bootstrap_ci_high"]) + "] | "
         + _format(r["unadjusted_spearman"]) + " ["
         + _format(r["unadjusted_spearman_ci_low"]) + ", "
-        + _format(r["unadjusted_spearman_ci_high"]) + "] |"
+        + _format(r["unadjusted_spearman_ci_high"]) + "] | "
+        + f"{r['beta_valid_bootstrap_reps']} / {r['rho_valid_bootstrap_reps']} / "
+        + f"{r['unadjusted_rho_valid_bootstrap_reps']} of {r['bootstrap_reps_requested']} |"
         for r in h2_associations
     ]
-    did_lines = [
-        "| " + r["relation"] + " | " + r["direction"] + " | "
-        + str(r["exposed_pair_count"]) + "/" + str(r["control_pair_count"]) + " | "
-        + _format(r["matched_did_exposed_minus_control"]) + " pp ["
-        + _format(r["bootstrap_ci_2_5"]) + ", " + _format(r["bootstrap_ci_97_5"]) + "] | "
-        + _format(r["baseline_confusion_smd_before_matching"]) + " → "
-        + _format(r["baseline_confusion_smd_after_matching"]) + " |"
-        for r in h2_pair_did if r["metric"] == "delta_confusion_BCL_minus_LC"
+    loco_lines = []
+    for row in h2_associations:
+        for stat, label in (("beta", "Adjusted beta"), ("rho", "Partial Spearman")):
+            prefix = f"loco_{stat}"
+            influence_id = row[f"{prefix}_largest_change_class_id"]
+            influence = (
+                "NA" if influence_id is None
+                else f"{row[f'{prefix}_largest_change_class_name']} ({influence_id})"
+            )
+            reversals = row[f"{prefix}_sign_reversals"]
+            loco_lines.append(
+                f"| {row['exposure']} | {row['outcome']} | {label} | "
+                f"{row[f'{prefix}_valid_count']}/{row['loco_omissions_requested']} | "
+                f"[{_format(row[f'{prefix}_min'])}, {_format(row[f'{prefix}_max'])}] | "
+                f"{_format(row[f'{prefix}_same_sign_fraction'])} | "
+                f"{'NA' if reversals is None else reversals} | "
+                f"{influence} | {_format(row[f'{prefix}_max_abs_change'])} |"
+            )
+    descriptive_lines = [
+        f"| {row['exposure']} | {row['outcome']} | "
+        f"{row['descriptive_exposed_n']} / {row['descriptive_unexposed_n']} | "
+        f"{_format(row['descriptive_exposed_mean'])} / {_format(row['descriptive_unexposed_mean'])} | "
+        f"{_format(row['descriptive_exposed_median'])} / {_format(row['descriptive_unexposed_median'])} | "
+        f"{_format(row['descriptive_mean_difference_exposed_minus_unexposed'])} |"
+        for row in h2_associations
     ]
-    trajectory_lines = []
-    for relation in ("dino_many_neighbor", "same_superclass_many"):
-        rows = [
-            r for r in h3_gradients
-            if r["exposure_definition"] == relation
-            and r["probe_mode"] == "native_three_view_train"
-            and r["metric"] in {"W_y_gradient_cosine", "W_y_conflict_fraction", "feature_v2_conflict_fraction"}
-        ]
-        for metric in ("W_y_gradient_cosine", "W_y_conflict_fraction", "feature_v2_conflict_fraction"):
-            values = [r for r in rows if r["metric"] == metric]
-            if metric == "W_y_gradient_cosine":
-                signs = sum(_finite_float(r["difference_exposed_minus_unexposed"]) < 0 for r in values)
-                direction_text = "exposed-minus-unexposed < 0 (lower cosine / more opposed)"
-            else:
-                signs = sum(_finite_float(r["difference_exposed_minus_unexposed"]) > 0 for r in values)
-                direction_text = "exposed-minus-unexposed > 0 (higher conflict fraction)"
-            trajectory_lines.append(f"- {relation} / {metric}: {direction_text} at {signs}/{len(values)} checkpoints.")
-
-    margin_lines = []
-    for relation in ("dino_many_neighbor", "same_superclass_many"):
-        for source_split, epochs in (("LT_train_probe", EXPECTED_EPOCHS), ("balanced_TEST_read_only", (200,))):
-            for epoch in epochs:
-                rows = [
-                    r for r in h3_margins
-                    if r["exposure_definition"] == relation
-                    and r["source_split"] == source_split
-                    and int(r["epoch"]) == epoch
-                ]
-                exposed = next((r for r in rows if r["exposure_group"] == "exposed"), None)
-                unexposed = next((r for r in rows if r["exposure_group"] == "unexposed"), None)
-                if exposed is not None and unexposed is not None:
-                    raw_gap = (
-                        _finite_float(exposed["mean_delta_raw_margin_BCL_minus_LC"])
-                        - _finite_float(unexposed["mean_delta_raw_margin_BCL_minus_LC"])
-                    )
-                    adjusted_gap = (
-                        _finite_float(exposed["mean_delta_adjusted_margin_BCL_minus_LC"])
-                        - _finite_float(unexposed["mean_delta_adjusted_margin_BCL_minus_LC"])
-                    )
-                    margin_lines.append(
-                        f"- {relation} / {source_split} / epoch {epoch}: "
-                        f"exposed-minus-unexposed BCL-LC raw margin={_format(raw_gap)}, "
-                        f"adjusted margin={_format(adjusted_gap)}."
-                    )
+    did_lines = [
+        f"| {r['relation']} | {r['direction']} | {r['metric']} | "
+        f"{r['exposed_pair_count']}/{r['control_pair_count']}/{r['matched_exposed_pair_count']} | "
+        f"{_format(r['unadjusted_did_exposed_minus_control'])} | "
+        f"{_format(r['matched_did_exposed_minus_control'])} "
+        f"[{_format(r['bootstrap_ci_2_5'])}, {_format(r['bootstrap_ci_97_5'])}] | "
+        f"{r['valid_two_way_class_cluster_bootstrap_reps']}/{r['bootstrap_reps_requested']} | "
+        f"{_format(r['baseline_confusion_smd_before_matching'])} → {_format(r['baseline_confusion_smd_after_matching'])} |"
+        for r in h2_pair_did
+    ]
+    trajectories = {}
+    for row in h3_gradients:
+        key = (row["probe_mode"], row["exposure_definition"], row["metric"])
+        trajectories.setdefault(key, {})[int(row["epoch"])] = row["difference_exposed_minus_unexposed"]
+    trajectory_lines = [
+        f"| {mode} | {relation} | {metric} | "
+        + " | ".join(_format(values.get(epoch)) for epoch in EXPECTED_EPOCHS) + " |"
+        for (mode, relation, metric), values in trajectories.items()
+    ]
+    margin_lines = [
+        f"| {relation} | {split} | {epoch} | {_format(raw)} | {_format(adjusted)} |"
+        for (relation, split, epoch), (raw, adjusted) in margin_gaps.items()
+    ]
 
     brief = f"""# Phase 2 H1-H3 Decision Brief
 
 ## Scope and evidential boundary
 
 - Dataset/protocol: CIFAR-100-LT IF=100, ResNet-32, paired LC-only vs BCL, seed 42.
-- This is one paired seed. Class/pair bootstrap intervals quantify class-endpoint sampling uncertainty conditional on this trained seed; they do **not** quantify training-seed variability and do not establish reproducibility or causality.
+- This is one paired seed. The bootstrap intervals quantify class or class-endpoint sampling uncertainty conditional on seed 42. There is no independent replication or causal identification.
 - DINOv2 topology is TRAIN-only and fixed before final TEST analysis. TEST is read only from saved epoch-200 prediction/logit archives. No TEST forward or autograd is used.
 - No new training, Oracle, extra seed, or method is executed by this analysis.
 
@@ -867,9 +996,11 @@ Few classes: {few['num_classes']}; positive/zero/negative BCL-minus-LC gains: {f
 Mean/median gain: {_format(few['mean_gain_pp'])}/{_format(few['median_gain_pp'])} pp; IQR: {_format(few['q25_gain_pp'])} to {_format(few['q75_gain_pp'])} pp; range: {_format(few['min_gain_pp'])} to {_format(few['max_gain_pp'])} pp.
 Mixed positive and negative Few-class gains: **{h1_summary['few_gain_mixed_sign']}**.
 
-| Group | Classes | Mean gain (pp) | Median gain (pp) | SD (pp) | IQR (pp) | Positive/zero/negative |
-|---|---:|---:|---:|---:|---:|---:|
+| Group | Classes | Mean gain (pp) | Median gain (pp) | SD (pp) | Q1–Q3 (pp) | Min–max (pp) | Positive/zero/negative |
+|---|---:|---:|---:|---:|---:|---:|---:|
 {chr(10).join(group_lines)}
+
+The [class-level gain table](phase2_h1_class_gain.csv) contains all 100 observations.
 
 ### Few-class top 10 gains
 
@@ -887,42 +1018,55 @@ Mixed positive and negative Few-class gains: **{h1_summary['few_gain_mixed_sign'
 
 Few-class exposure is reported separately as (1) any Many-class neighbor in the symmetric-union DINO Top-5 graph, (2) any same-superclass Many class, and (3) maximum DINO cosine similarity to the 35 Many classes.
 
-Class-level adjusted associations control LC-only TEST accuracy and log training count for gain; Tail-to-Head confusion change additionally controls LC-only baseline Tail-to-Head confusion. The table also reports unadjusted Spearman as a sensitivity check: because delta accuracy is BCL accuracy minus LC-only accuracy, controlling LC-only accuracy can create mathematical coupling/regression-to-mean sensitivity. All intervals are descriptive Few-class bootstrap intervals.
+Class-level adjusted associations control LC-only TEST accuracy and log training count for gain. Tail-to-Head confusion change also controls LC-only baseline Tail-to-Head confusion. Delta accuracy contains the LC-only baseline with a negative sign, which can couple it to that control. Read the unadjusted Spearman alongside the adjusted estimates. Intervals use the 2,000-replicate Few-class bootstrap.
 
-| Exposure | Outcome | Adjusted standardized beta [95% class-bootstrap interval] | Adjusted partial Spearman [95% class-bootstrap interval] | Unadjusted Spearman [95% class-bootstrap interval] |
-|---|---|---:|---:|---:|
+| Exposure | Outcome | Adjusted standardized beta [95% class-bootstrap interval] | Adjusted partial Spearman [95% class-bootstrap interval] | Unadjusted Spearman [95% class-bootstrap interval] | Valid replicates (beta / partial ρ / unadjusted ρ) |
+|---|---|---:|---:|---:|---:|
 {chr(10).join(association_lines)}
 
-Pair-level DID uses C[a→b] = P(prediction=b | true=a), delta C = BCL − LC-only. Each exposed pair is matched with replacement to the nearest unexposed pair on LC-only baseline directional confusion. Intervals use two-way endpoint cluster bootstrap: Many IDs and Few IDs are independently resampled; pair weights are the product of endpoint multiplicities.
+LOCO refits both adjusted estimators after dropping each Few class in turn. The results measure single-class influence conditional on this trained seed. They provide neither training-seed uncertainty nor evidence of causal identification or independent replication. A zero or non-finite full estimate has no sign-stability statistic. A zero omission estimate is not a sign reversal.
 
-| Relation | Direction | Exposed/control pairs | Matched DID in delta C (pp) [95% endpoint-cluster interval] | Baseline-confusion SMD before → after |
-|---|---|---:|---:|---:|
+| Exposure | Outcome | Estimator | Valid omissions | LOCO range | Fraction with same sign | Sign reversals | Largest change when omitted (name and ID) | Max absolute change |
+|---|---|---|---:|---:|---:|---:|---|---:|
+{chr(10).join(loco_lines)}
+
+For the continuous exposure the descriptive groups use ranks 1–15 (lower) and 16–30 (upper) after sorting ascending by (maximum DINO similarity, class ID). This split is for descriptions only. The associations use the continuous values. Group counts include finite outcomes.
+
+| Exposure | Outcome | Exposed / unexposed n | Exposed / unexposed mean (pp) | Exposed / unexposed median (pp) | Exposed minus unexposed mean (pp) |
+|---|---|---:|---:|---:|---:|
+{chr(10).join(descriptive_lines)}
+
+Pair-level DID uses C[a→b] = P(prediction=b given true=a) and delta C = BCL − LC-only. Each exposed pair is matched with replacement to the nearest unexposed pair on the LC-only baseline directional confusion. The endpoint bootstrap independently resamples Many and Few IDs, weights pairs by the product of multiplicities, and recomputes matching in each replicate. Confusion effects are in percentage points and margins are in logit units.
+
+| Relation | Direction | Outcome | Exposed/control/matched pairs | Unadjusted DID | Matched DID [95% endpoint-cluster interval] | Valid replicates | Baseline-confusion SMD before → after |
+|---|---|---|---:|---:|---:|---:|---:|
 {chr(10).join(did_lines)}
 
 ## H3 — Optimization and margin trajectory
 
-Five-checkpoint diagnostics are stratified by both Few-class exposure definitions. Common-input eval and native three-view train-mode gradients are separate estimands. Positive conflict-fraction differences indicate more negative-cosine observations in the exposed group; lower W_y cosine indicates more opposed branch gradients.
+The gradient table shows exposed-minus-unexposed contrasts at each checkpoint. Common-input eval and native three-view train-mode gradients are separate estimands. Positive conflict-fraction differences mean more negative-cosine observations in the exposed group. Raw and objective-weighted ratios use the existing LC and BCL gradient norms. The [global native diagnostics](offline_native_three_view_gradient_global_metrics.csv) include backbone and per-view input results.
 
+| Mode | Exposure | Metric | 40 | 100 | 160 | 180 | 200 |
+|---|---|---|---:|---:|---:|---:|---:|
 {chr(10).join(trajectory_lines)}
 
-Exposed-minus-unexposed margin trajectory (each margin is already BCL-minus-LC):
+The margin table compares the BCL-minus-LC change between exposed and unexposed classes.
+
+| Exposure | Source | Epoch | Raw margin contrast | Logit-adjusted margin contrast |
+|---|---|---:|---:|---:|
 {chr(10).join(margin_lines)}
 
-The margin table includes fixed LT TRAIN probe margins at epochs 40/100/160/180/200 and read-only TEST margin differences from saved final logits at epoch 200. Native train-mode BN restoration is checked after every diagnostic batch.
+The saved native diagnostics verified equality of running_mean, running_var and num_batches_tracked after every diagnostic batch at all five checkpoints. The TEST margin rows come from the saved epoch-200 logits.
 
 ## Required decision questions
 
-1. **Specific candidate weakness:** The only candidate supported by this design is a possible mismatch between global class-level contrastive balancing and local Many–Few semantic-neighbor interactions. This is a hypothesis, not an established BCL defect.
-2. **Evidence strength:** Exploratory, single-seed, conditional on seed 42. Even a positive class/pair bootstrap interval is not evidence of cross-seed reproducibility.
-3. **At most one next intervention:** **{candidate}**
-
-Rationale: {candidate_reason}
+1. **Specific weakness.** {weakness}
+2. **Evidence strength.** {evidence_level}. Exploratory evidence conditional on seed 42.
+3. **Counterfactual or stop.** **{candidate}** {candidate_reason}
 
 ## Stop line
 
-- Do not add passive probes, extra metrics, extra seeds, or additional topology definitions after seeing this report.
-- If the single recommended counterfactual is approved and fails to change the identified low-gain/high-overlap Few classes without unacceptable Many-class loss, stop this BCL-specific direction.
-- Do not turn these results into a method claim until an independently repeated paired seed supports the same direction.
+{stop_condition} Human review is required before any further experiment.
 """
     decision = {
         "status": "ONE_SEED_EXPLORATORY_HUMAN_REVIEW",
@@ -936,8 +1080,15 @@ Rationale: {candidate_reason}
         "h2_same_superclass_tail_to_head_cluster_ci": [superclass_t2h["bootstrap_ci_2_5"], superclass_t2h["bootstrap_ci_97_5"]],
         "h3_dino_exposed_higher_native_W_conflict_epochs": positive_w_conflict_epochs,
         "h2_max_similarity_adjusted_association_support": class_association_support,
+        "h2_max_similarity_gain_loco_support": gain_loco_support,
+        "h2_max_similarity_confusion_loco_support": confusion_loco_support,
+        "h3_dino_exposure_trajectory_coherent": h3_coherent,
         "h3_dino_exposed_minus_unexposed_test_raw_margin_gap": dino_test_margin_gap,
+        "evidence_level": evidence_level,
+        "specific_weakness": weakness,
         "candidate_intervention": candidate, "candidate_intervention_reason": candidate_reason,
+        "stop_condition": stop_condition,
+        "bn_running_buffers_verified_all_five_checkpoints": True,
         "no_training_executed": True, "no_oracle_executed": True, "no_new_method_executed": True,
         "class_and_pair_bootstrap_is_not_seed_uncertainty": True, "dino_test_split_loaded": False,
     }
