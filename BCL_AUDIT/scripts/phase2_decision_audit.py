@@ -748,6 +748,33 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
             signs = sum(_finite_float(r["difference_exposed_minus_unexposed"]) > 0 for r in values)
             trajectory_lines.append(f"- {relation} / {metric}: exposed-minus-unexposed > 0 at {signs}/{len(values)} checkpoints.")
 
+    margin_lines = []
+    for relation in ("dino_many_neighbor", "same_superclass_many"):
+        for source_split, epochs in (("LT_train_probe", EXPECTED_EPOCHS), ("balanced_TEST_read_only", (200,))):
+            for epoch in epochs:
+                rows = [
+                    r for r in h3_margins
+                    if r["exposure_definition"] == relation
+                    and r["source_split"] == source_split
+                    and int(r["epoch"]) == epoch
+                ]
+                exposed = next((r for r in rows if r["exposure_group"] == "exposed"), None)
+                unexposed = next((r for r in rows if r["exposure_group"] == "unexposed"), None)
+                if exposed is not None and unexposed is not None:
+                    raw_gap = (
+                        _finite_float(exposed["mean_delta_raw_margin_BCL_minus_LC"])
+                        - _finite_float(unexposed["mean_delta_raw_margin_BCL_minus_LC"])
+                    )
+                    adjusted_gap = (
+                        _finite_float(exposed["mean_delta_adjusted_margin_BCL_minus_LC"])
+                        - _finite_float(unexposed["mean_delta_adjusted_margin_BCL_minus_LC"])
+                    )
+                    margin_lines.append(
+                        f"- {relation} / {source_split} / epoch {epoch}: "
+                        f"exposed-minus-unexposed BCL-LC raw margin={_format(raw_gap)}, "
+                        f"adjusted margin={_format(adjusted_gap)}."
+                    )
+
     brief = f"""# Phase 2 H1-H3 Decision Brief
 
 ## Scope and evidential boundary
@@ -797,7 +824,10 @@ Five-checkpoint diagnostics are stratified by both Few-class exposure definition
 
 {chr(10).join(trajectory_lines)}
 
-Margin trajectories are in phase2_h3_overlap_margin_trajectory.csv. They include fixed LT TRAIN probe margins at epochs 40/100/160/180/200 and read-only TEST margin differences from saved final logits at epoch 200. Native train-mode BN restoration is required to pass the analyzer integrity check.
+Exposed-minus-unexposed margin trajectory (each margin is already BCL-minus-LC):
+{chr(10).join(margin_lines)}
+
+The margin table includes fixed LT TRAIN probe margins at epochs 40/100/160/180/200 and read-only TEST margin differences from saved final logits at epoch 200. Native train-mode BN restoration is checked after every diagnostic batch.
 
 ## Required decision questions
 
@@ -835,22 +865,25 @@ def run_phase2_decision_audit(output_root: Path, data_audit_dir: Path, class_met
     class_rows = _read_csv(data_audit_dir / "class_counts.csv")
     accuracy_lc, accuracy_bcl = _load_test_class_accuracy(output_root)
     h1_rows, h1_summary = _build_h1_rows(class_rows, accuracy_lc, accuracy_bcl)
-    _write_csv(output_root / "phase2_h1_class_gain.csv", h1_rows)
 
     pair_effect_rows = _read_csv(output_root / "head_tail_pair_effects.csv")
     h2_exposure_rows = _build_h2_exposure_rows(class_rows, h1_rows, pair_effect_rows, topology)
-    _write_csv(output_root / "phase2_h2_few_exposure.csv", h2_exposure_rows)
     h2_associations = _build_h2_associations(h2_exposure_rows)
-    _write_csv(output_root / "phase2_h2_adjusted_associations.csv", h2_associations)
     h2_pair_did = _build_h2_pair_matched_did(pair_effect_rows, topology)
-    _write_csv(output_root / "phase2_h2_pair_matched_did.csv", h2_pair_did)
 
     h3_gradients = _build_h3_gradient_summary(output_root, topology)
-    _write_csv(output_root / "phase2_h3_overlap_gradient_summary.csv", h3_gradients)
     h3_margins = _build_h3_margin_trajectory(output_root, topology)
-    _write_csv(output_root / "phase2_h3_overlap_margin_trajectory.csv", h3_margins)
+    brief, decision = _build_decision_brief(
+        h1_summary, h2_associations, h2_pair_did, h3_gradients, h3_margins
+    )
 
-    brief, decision = _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients)
+    # Compute and validate every table before creating any Phase-2 synthesis file.
+    _write_csv(output_root / "phase2_h1_class_gain.csv", h1_rows)
+    _write_csv(output_root / "phase2_h2_few_exposure.csv", h2_exposure_rows)
+    _write_csv(output_root / "phase2_h2_adjusted_associations.csv", h2_associations)
+    _write_csv(output_root / "phase2_h2_pair_matched_did.csv", h2_pair_did)
+    _write_csv(output_root / "phase2_h3_overlap_gradient_summary.csv", h3_gradients)
+    _write_csv(output_root / "phase2_h3_overlap_margin_trajectory.csv", h3_margins)
     with (output_root / "PHASE2_DECISION_BRIEF.md").open("x", encoding="utf-8") as stream:
         stream.write(brief)
     _write_json(output_root / "phase2_decision_summary.json", decision)
