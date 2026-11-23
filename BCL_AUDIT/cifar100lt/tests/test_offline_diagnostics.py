@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import torch
 
 from BCL_AUDIT.cifar100lt.data import cifar100lt_class_counts
@@ -8,6 +9,7 @@ from BCL_AUDIT.scripts.analyze_paired_bcl import (
     compute_bcl_gradient_rows,
     compute_native_three_view_gradient_diagnostics,
     compute_test_margin_rows,
+    scale_batch_mean_gradient,
 )
 
 
@@ -19,6 +21,21 @@ def _class_meta():
         }
         for class_id in range(100)
     }
+
+
+def test_batch_mean_gradient_uses_actual_batch_over_total_probe_scale():
+    gradient = torch.tensor([[2.0, -4.0], [6.0, 8.0]])
+    scaled_full_batch = scale_batch_mean_gradient(gradient, batch_size=2, total_count=5)
+    assert torch.allclose(scaled_full_batch, gradient * (2.0 / 5.0))
+
+    final_partial_batch = torch.tensor([[10.0, -5.0]])
+    scaled_partial_batch = scale_batch_mean_gradient(
+        final_partial_batch, batch_size=1, total_count=5
+    )
+    assert torch.allclose(scaled_partial_batch, final_partial_batch * (1.0 / 5.0))
+
+    with pytest.raises(ValueError, match="Invalid batch/probe sizes"):
+        scale_batch_mean_gradient(gradient, batch_size=6, total_count=5)
 
 
 def test_test_margin_is_read_only_and_class_conditional():

@@ -533,6 +533,19 @@ def _flatten_gradient_tensors(gradients) -> torch.Tensor:
     return torch.cat(pieces)
 
 
+def scale_batch_mean_gradient(
+    gradient: torch.Tensor,
+    batch_size: int,
+    total_count: int,
+) -> torch.Tensor:
+    """Rescale a batch-mean loss gradient to the full-probe mean-objective scale."""
+    if batch_size <= 0 or total_count <= 0 or batch_size > total_count:
+        raise ValueError(
+            f"Invalid batch/probe sizes: batch_size={batch_size}, total_count={total_count}"
+        )
+    return gradient.detach() * (float(batch_size) / float(total_count))
+
+
 def _scalar_cosine(a: torch.Tensor, b: torch.Tensor) -> float:
     denominator = float(a.norm().item() * b.norm().item())
     if denominator <= 1e-30:
@@ -621,13 +634,12 @@ def compute_native_three_view_gradient_diagnostics(
                 allow_unused=True,
             )
 
-            probe_mean_scale = current_batch / float(count_all)
-            weight_lc_sum += (
-                gradients_lc[0].detach().cpu().double() * probe_mean_scale
-            )
-            weight_bcl_sum += (
-                gradients_bcl[0].detach().cpu().double() * probe_mean_scale
-            )
+            weight_lc_sum += scale_batch_mean_gradient(
+                gradients_lc[0], current_batch, count_all
+            ).cpu().double()
+            weight_bcl_sum += scale_batch_mean_gradient(
+                gradients_bcl[0], current_batch, count_all
+            ).cpu().double()
 
             backbone_lc = _flatten_gradient_tensors(
                 gradients_lc[2 : 2 + len(backbone_parameters)]
@@ -638,16 +650,28 @@ def compute_native_three_view_gradient_diagnostics(
             if backbone_lc_sum is None:
                 backbone_lc_sum = torch.zeros_like(backbone_lc)
                 backbone_bcl_sum = torch.zeros_like(backbone_bcl)
-            backbone_lc_sum += backbone_lc * probe_mean_scale
-            backbone_bcl_sum += backbone_bcl * probe_mean_scale
+            backbone_lc_sum += scale_batch_mean_gradient(
+                backbone_lc, current_batch, count_all
+            )
+            backbone_bcl_sum += scale_batch_mean_gradient(
+                backbone_bcl, current_batch, count_all
+            )
 
             # Losses are batch means. Scale each row by B/N to undo its local
             # 1/B reduction and express per-sample rows on the full-probe mean
             # objective scale. This also corrects the smaller final batch.
-            feature_lc = gradients_lc[1].detach() * probe_mean_scale
-            feature_bcl = gradients_bcl[1].detach() * probe_mean_scale
-            input_lc = gradients_lc[-1].detach() * probe_mean_scale
-            input_bcl = gradients_bcl[-1].detach() * probe_mean_scale
+            feature_lc = scale_batch_mean_gradient(
+                gradients_lc[1], current_batch, count_all
+            )
+            feature_bcl = scale_batch_mean_gradient(
+                gradients_bcl[1], current_batch, count_all
+            )
+            input_lc = scale_batch_mean_gradient(
+                gradients_lc[-1], current_batch, count_all
+            )
+            input_bcl = scale_batch_mean_gradient(
+                gradients_bcl[-1], current_batch, count_all
+            )
             labels_np = labels.detach().cpu().numpy()
 
             for view_index in (1, 2, 3):
