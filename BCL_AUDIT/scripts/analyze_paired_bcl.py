@@ -458,7 +458,10 @@ def compute_bcl_gradient_rows(
     labels_np = labels.detach().cpu().numpy()
 
     rows = []
-    for class_id in range(100):
+    # Emit only classes actually represented in the probe. The production
+    # five-per-class cache covers all 100 classes; smaller unit fixtures need
+    # not generate misleading empty-class NaN rows.
+    for class_id in sorted(np.unique(labels_np).tolist()):
         class_mask = labels_np == class_id
         meta = class_meta[class_id]
         rows.append(

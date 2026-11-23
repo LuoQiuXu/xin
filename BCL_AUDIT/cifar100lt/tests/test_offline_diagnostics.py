@@ -91,8 +91,8 @@ def test_common_input_eval_gradient_probe_reports_objective_weighted_conflicts()
         batch_size=4,
     )
 
-    assert len(rows) == 100
-    observed = [row for row in rows if row["class_id"] in (0, 1)]
+    assert len(rows) == 2
+    observed = rows
     assert all(row["probe_mode"] == "common_input_eval" for row in observed)
     assert all(row["bn_mode"] == "eval" for row in observed)
     assert all(np.isfinite(row["W_y_gradient_cosine"]) for row in observed)
