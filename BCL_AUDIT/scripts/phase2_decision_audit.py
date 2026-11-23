@@ -412,14 +412,25 @@ def _build_h2_associations(exposure_rows):
             y = np.asarray([float(row[outcome_key]) for row in exposure_rows])
             controls = np.column_stack([[float(row[key]) for row in exposure_rows] for key in control_keys])
             result = _association_with_bootstrap(x, y, controls, rng)
+            unadjusted = _association_with_bootstrap(
+                x, y, np.empty((len(x), 0), dtype=np.float64), rng
+            )
             rows.append({
                 "exposure": exposure_key, "exposure_label": exposure_label,
                 "outcome": outcome_key, "outcome_label": outcome_label,
                 "n_few_classes": len(exposure_rows), "control_variables": ";".join(control_keys),
                 **result,
+                "unadjusted_standardized_beta": unadjusted["standardized_beta"],
+                "unadjusted_standardized_beta_ci_low": unadjusted["standardized_beta_bootstrap_ci_low"],
+                "unadjusted_standardized_beta_ci_high": unadjusted["standardized_beta_bootstrap_ci_high"],
+                "unadjusted_spearman": unadjusted["partial_spearman"],
+                "unadjusted_spearman_ci_low": unadjusted["partial_spearman_bootstrap_ci_low"],
+                "unadjusted_spearman_ci_high": unadjusted["partial_spearman_bootstrap_ci_high"],
                 "interpretation_note": (
                     "Exploratory class-level association only; bootstrap resamples the 30 Few classes, "
-                    "not training seeds, and does not establish causality."
+                    "not training seeds, and does not establish causality. Delta accuracy contains the "
+                    "LC-only baseline with a negative sign, so baseline-adjusted and unadjusted results "
+                    "must be read together to assess mathematical-coupling/regression-to-mean sensitivity."
                 ),
             })
     return rows
@@ -758,7 +769,10 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
         + _format(r["standardized_beta"]) + " [" + _format(r["standardized_beta_bootstrap_ci_low"])
         + ", " + _format(r["standardized_beta_bootstrap_ci_high"]) + "] | "
         + _format(r["partial_spearman"]) + " [" + _format(r["partial_spearman_bootstrap_ci_low"])
-        + ", " + _format(r["partial_spearman_bootstrap_ci_high"]) + "] |"
+        + ", " + _format(r["partial_spearman_bootstrap_ci_high"]) + "] | "
+        + _format(r["unadjusted_spearman"]) + " ["
+        + _format(r["unadjusted_spearman_ci_low"]) + ", "
+        + _format(r["unadjusted_spearman_ci_high"]) + "] |"
         for r in h2_associations
     ]
     did_lines = [
@@ -843,8 +857,8 @@ Few-class exposure is reported separately as (1) any Many-class neighbor in the 
 
 Class-level adjusted associations control LC-only TEST accuracy and log training count for gain; Tail-to-Head confusion change additionally controls LC-only baseline Tail-to-Head confusion. Standardized beta and partial Spearman intervals are descriptive Few-class bootstrap intervals.
 
-| Exposure | Outcome | Standardized beta [95% class-bootstrap interval] | Partial Spearman [95% class-bootstrap interval] |
-|---|---|---:|---:|
+| Exposure | Outcome | Adjusted standardized beta [95% class-bootstrap interval] | Adjusted partial Spearman [95% class-bootstrap interval] | Unadjusted Spearman [95% class-bootstrap interval] |
+|---|---|---:|---:|---:|
 {chr(10).join(association_lines)}
 
 Pair-level DID uses C[a→b] = P(prediction=b | true=a), delta C = BCL − LC-only. Each exposed pair is matched with replacement to the nearest unexposed pair on LC-only baseline directional confusion. Intervals use two-way endpoint cluster bootstrap: Many IDs and Few IDs are independently resampled; pair weights are the product of endpoint multiplicities.
