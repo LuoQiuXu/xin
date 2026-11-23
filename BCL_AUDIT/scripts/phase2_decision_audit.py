@@ -753,13 +753,17 @@ def _build_decision_brief(h1_summary, h2_associations, h2_pair_did, h3_gradients
             "Do not add a general semantic gate or modify other pairs."
         )
         candidate_reason = "A topology-localized Tail-to-Head confusion increase remains after matching on LC-only baseline confusion, but shared-W conflict is not clearly localized."
-    elif h1_summary["few_gain_mixed_sign"]:
+    elif few["std_gain_pp"] > 1e-12:
         candidate = (
             "At most one falsification experiment: detach the classifier-derived prototype "
             "gradient path into W while preserving forward prototypes. If it does not change "
-            "the identified low-gain Few classes, stop this BCL-specific route."
+            "the low-gain Few classes without unacceptable Many-class loss, stop this BCL-specific route."
         )
-        candidate_reason = "Few-class gains are mixed, but one-seed topology/mechanism evidence does not localize a more specific intervention."
+        candidate_reason = (
+            "Few-class gains have a non-degenerate class-level spread, but one-seed H2/H3 "
+            "evidence does not localize a more specific mechanism. This is the single "
+            "bounded falsification allowed by the intermediate decision tier."
+        )
     else:
         candidate = "No mechanism-aligned intervention is justified; stop the BCL-specific direction."
         candidate_reason = "The one-seed evidence does not show a sufficiently localized pattern to justify another intervention."
