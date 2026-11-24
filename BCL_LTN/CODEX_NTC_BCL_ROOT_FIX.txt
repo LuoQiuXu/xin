@@ -36,7 +36,13 @@
 
 `n_raw = (n_obs - eta*N/(K-1)) / (1-eta-eta/(K-1))`
 
-再投影到满足 `sum(n_hat)=N`、`n_hat[c]>=5` 的欧氏最近下界单纯形。这里的下界 5 来自本实验 CIFAR-100-LT IF=100 协议的已知最小类频次，不得读取 clean label 数组。实现一个纯 NumPy、带单元测试的 lower-bounded simplex projection；记录 n_obs、n_raw、n_hat、投影改变量、prior SHA256。不得直接把负数简单截断后不归一化。
+不使用 IF=100 最小频次、类别数下界或其他由数据集真实长尾结构提供的 oracle 约束。改为：
+
+`n_positive = maximum(n_raw, epsilon)`
+
+`n_hat = n_positive * (N / sum(n_positive))`
+
+其中 `epsilon=1.0` 是反演计数空间的数值正下界，归一化后保证所有类别先验严格为正且 `sum(n_hat)=N`。实现时检查 finite、positive 和总数误差；记录 n_obs、n_raw、n_hat、epsilon、prior SHA256。不得将负数简单截断后不归一化。
 
 `pi_clean_hat = n_hat / N`，LC 使用 `log(pi_clean_hat)`。原始 observed prior 只保留作报告对照，不进入新方法的 LC 或 BCL。
 
@@ -64,9 +70,13 @@
 
 从同一次三视图 forward 的 logits 计算不带 log-prior 的软类别分布：
 
-`q_i = softmax(mean(logits_v1, logits_v2, logits_v3).detach())`
+`q_i = softmax(mean(logits_v1, logits_v2, logits_v3) / T_q)`
 
-理由：BCL/Logit Compensation 中 raw logits 作为类条件证据使用；这里不再叠加长尾 prior，避免把头部先验重新灌入软分配。q 必须 detach，不允许 BCL 通过 q 的路径反向操纵分类器概率。
+v1/v2/v3 logits 必须来自 concat 后的同一次 backbone forward，顺序为 [all v1, all v2, all v3]。q 使用原始 logits，严禁叠加 `log(pi_clean_hat)` 或任何 observed/clean prior。实现 `soft_targets_from_three_view_logits`，并在函数输出和 Soft-BCL 内部均保证 detach；任何 BCL 梯度不得通过 q 回到分类器。默认 `T_q=1.0`，本轮不额外引入温度搜索。
+
+**冷启动保护是强制要求：** C 组 Epoch index 0–19 不使用 q、类别原型或跨样本/跨类软正关系，Soft-BCL 暂时退化为纯实例级 NT-Xent：只保留同一图像 v2-v3 配对为唯一正样本，其余不同图像视图作为负样本。Epoch index >=20 才启用 q 软类别关系和原型正关系。该 warmup 长度固定为 20 epochs，不做本轮调参。
+
+为避免冷启动时无意义地更新原型分支，C 组 Epoch 0–19 应调用 `model(all_views, compute_contrastive=False)` 取得 features/logits，再显式调用 `model.sample_mlp(features)` 得到样本投影；不要调用 `prototype_mlp`。Epoch >=20 再使用正常 `compute_contrastive=True` forward。训练日志必须记录当前 BCL 模式（`instance_warmup` 或 `soft_semantic`）。
 
 定义连续置信度衰减（不使用硬阈值）：
 
@@ -84,7 +94,9 @@
 8. 为保留 BCL 类均衡分母，令 candidate class mass 矩阵为 Qcand，`class_occurrences = Qcand.sum(0)`；candidate 的期望类别计数为 `Qcand @ class_occurrences`；每个 anchor-candidate 的分母权重为该期望计数减去该 pair 的软正权重。必须检查所有有效分母权重严格为正、finite。
 9. 对每个 anchor，按软正权重归一化其 positive log-prob，再对 2B anchors 求均值。
 10. 当 q 是严格 one-hot 且 r=1 时，soft BCL 必须数值等价于现有 `BalancedContrastiveLoss`（包括 class occurrences、分母和 loss）；这是强制单元测试。
-11. q 均匀时，跨样本和 prototype 正关系应趋近 0，但 v2-v3 自视图正对仍为 1，避免早期不可靠预测把全 batch 拉成一个簇。
+11. q 均匀时，语义跨样本和 prototype 正关系应为 0，但 v2-v3 自视图正对仍为 1。
+12. Epoch 0–19 的 instance warmup 必须不读取 q、不读取 class prototypes；仅 v2-v3 是正对，loss 等价于标准 instance-level NT-Xent，且 finite。
+13. Epoch 20 起的 q 由三视图原始 logits 平均后 softmax 得到，不能加 log prior；q 和 loss 反传后的 q 源 logits 梯度必须为 None/zero（通过 detach 切断）。
 
 保留原 BCL 权重 `mu_bcl=0.6`。不得把被拒绝样本当作负样本；所有样本仍保留自己的 v2-v3 正对。此版本不使用 P_Many、margin 阈值或 clean/noisy 真值。
 
@@ -124,20 +136,23 @@
 
 1. eta=0 时 forward-corrected LC 等于 `CE(logits+log(pi), observed_labels)`。
 2. eta=0.4 时 transition matrix 每行和为 1、对角 0.6、非对角 0.4/99。
-3. 先验反演输出非负、总和 N、每类不少于 5；已知模拟 clean counts 经期望对称转移后，反演/投影能恢复合理 long-tail 形状。
+3. 先验反演输出严格为正、总和 N；不允许断言每类不少于 5。用 epsilon=1.0 的 max 截断+归一化测试，且确认实现不读取 IF 或 clean labels。
 4. soft BCL one-hot q 与原 BCL 数值等价。
 5. soft BCL uniform q 仍保留自视图正对，loss finite。
-6. 所有 loss 对 features/prototypes 有有限梯度；q 不接收梯度。
+6. 所有启用分支的 loss 对其实际参与计算的 features/prototypes 有有限梯度；Soft-BCL 的 q 源 logits 不接收梯度。instance warmup 阶段 prototype_mlp 是预期未使用分支，Smoke 不得把它的 grad=None 误报为失败；其余实际参与的参数必须有有限梯度。
 7. batch size=1、batch 中缺类、极端置信度、有限/NaN 输入处理正确。
-8. 两种训练 arm 的真实 3-view GPU Smoke 各完成恰好 1 次 SGD 更新，所有模型梯度 finite、参数确实更新。
-9. 现有 BCL_LTN tests 全部继续通过。
-10. `BCL_AUDIT/` 与原始 baseline 文件 SHA256 前后不变。
+8. q 构造使用三视图原始 logits 均值，不加 log_prior；改变 log_prior 不得改变 q。
+9. instance warmup 不调用 prototype_mlp，且仅同一实例的 v2-v3 配对是正样本。
+10. B、C 两种训练 arm 的真实 3-view GPU Smoke 各完成恰好 1 次 SGD 更新；C 的 warmup Smoke 允许 prototype_mlp 参数 grad=None，其余参与参数梯度必须 finite 且参数确实更新。
+11. 现有 BCL_LTN tests 全部继续通过。
+12. `BCL_AUDIT/` 与原始 baseline 文件 SHA256 前后不变。
+
 
 ## 6. Smoke 后正式训练
 
 先运行 CPU pytest，再在 RTX 5070 Laptop GPU 上对两个 arm 分别做真实数据、真实三视图、FP32、batch256 的单步 Smoke。Smoke 输出写到独立目录；不得复用旧 Smoke receipt。
 
-Smoke 通过后，立即从 Epoch 0 正式运行两个 200-epoch arm，不要停下来新增纯审计任务。
+Smoke 通过后，立即从 Epoch 0 正式运行两个 200-epoch arm，不要停下来新增纯审计任务。C 组必须按固定 20-epoch instance warmup 执行；B 组保持原始 hard-label BCL，不加入该 warmup。
 
 独立输出目录：
 `BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/`
@@ -145,7 +160,7 @@ Smoke 通过后，立即从 Epoch 0 正式运行两个 200-epoch arm，不要停
 每组保存：
 - epoch 40/100/160/180/200 checkpoint；
 - history.jsonl；
-- 每 epoch 的 loss_lc、loss_bcl、weighted loss、训练准确率、observed class count；
+- 每 epoch 的 loss_lc、loss_bcl、weighted loss、训练准确率、observed class count；C 组额外记录 BCL mode，Epoch 0–19 为 instance_warmup，Epoch 20–199 为 soft_semantic；
 - 每 checkpoint 的 TRAIN-only clean-source accuracy / wrong-label memorization（仅在模型预测保存后做离线 join）；
 - corrected prior / transition matrix / source hash / checkpoint hash / optimizer state；
 - final TEST 指标（全部训练完成后只打开一次）。
