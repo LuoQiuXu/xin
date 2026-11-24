@@ -263,7 +263,7 @@ def stratified_bootstrap_ci(
 
 def threshold_metrics(labels: np.ndarray, scores: np.ndarray, threshold: float) -> dict:
     labels = np.asarray(labels, dtype=np.int64)
-    predicted_clean = np.asarray(scores, dtype=np.float64) >= float(threshold)
+    predicted_clean = np.asarray(scores, dtype=np.float64) > float(threshold)
     clean = labels == 1
     noisy = labels == 0
     tp = int(np.sum(predicted_clean & clean))
@@ -542,7 +542,7 @@ def build_report(summary: dict, metric_rows: list[dict], threshold_rows: list[di
     lines += [
         "",
         "## Threshold operating points",
-        "Thresholds are fixed at score >= 0 and at score quantiles of the unlabeled score distribution; no clean/noisy labels select a threshold.",
+        "Thresholds use score > threshold at zero and at quantiles of the unlabeled score distribution; no clean/noisy labels select a threshold.",
         "",
         "| Group | Score | Rule | Threshold | Precision(clean) | Recall(clean) | Noisy acceptance |",
         "|---|---|---|---:|---:|---:|---:|",
@@ -601,6 +601,11 @@ def run_audit(args):
     device = torch.device(args.device)
     if device.type == "cuda":
         torch.cuda.set_device(device)
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        torch.set_float32_matmul_precision("highest")
 
     # Load only protocol metadata and observed noisy labels before inference.
     # Clean labels and the flip mask are deliberately deferred until predictions are fixed.
@@ -676,6 +681,8 @@ def run_audit(args):
 
     model = BCLCIFARModel()
     model.load_state_dict(checkpoint["model_state"], strict=True)
+    if any(parameter.dtype != torch.float32 for parameter in model.parameters()):
+        raise RuntimeError("Frozen audit model must remain FP32")
     model_hash_before = state_dict_sha256(model.state_dict())
     if model_hash_before != checkpoint["model_state_sha256"]:
         raise RuntimeError("Loaded model state SHA256 differs from the checkpoint receipt")
@@ -693,6 +700,8 @@ def run_audit(args):
     with torch.inference_mode():
         for images, positions in loader:
             images = images.to(device, non_blocking=True)
+            if images.dtype != torch.float32:
+                raise RuntimeError("Eval transform must provide FP32 image tensors")
             _, batch_logits, _, _ = model(images, compute_contrastive=False)
             if not bool(torch.isfinite(batch_logits).all()):
                 raise RuntimeError("Nonfinite logits during epoch-160 TRAIN-only audit")
@@ -802,6 +811,9 @@ def run_audit(args):
         "epoch": 160,
         "seed": 42,
         "device": str(device),
+        "precision": "fp32",
+        "amp": False,
+        "tf32": False,
         "batch_size": int(args.batch_size),
         "num_workers": 0,
         "bootstrap_reps": int(args.bootstrap_reps),
