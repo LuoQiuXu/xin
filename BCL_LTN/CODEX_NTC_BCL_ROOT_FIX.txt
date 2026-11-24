@@ -1,0 +1,184 @@
+# NTC-BCL v1：从 Epoch 0 修复 40% 对称标签噪声下的 BCL
+
+目标：不再做纯离线审计，不从 Epoch 160 打补丁。直接实现并训练一个从 Epoch 0 开始的噪声转移校正 BCL（暂称 NTC-BCL），同时修复类别先验、LC 分类监督和 BCL 正样本关系三条污染路径。
+
+## 0. 仓库与保护边界
+
+- 仓库：`LuoQiuXu/xin`
+- 当前分支：`research/bcl-ltn-root-correction-20261124`
+- 基于：`experiment/bcl-ltn-source-attribution-40e-20261124`
+- 所有新代码只放在 `BCL_LTN/`。
+- `BCL_AUDIT/`、原始 BCL_LTN 训练脚本、原始噪声数组、历史报告和所有历史产物只读，禁止修改/覆盖。
+- 不使用 Epoch-160/180/200 checkpoint；新方法全部从 Epoch 0、原始 Seed-42 初始化开始。
+- 不再增加 P_Many / margin 纯审计任务；本任务直接实现方法、Smoke、正式训练和最终评估。
+
+## 1. 问题定义和本轮适用范围
+
+当前实验是 CIFAR-100-LT IF=100，固定 10,847 张 TRAIN，实例独立对称标签噪声 NR=0.4，错误标签均匀采样自其余 99 类，Seed=42。
+
+本轮第一版明确利用合成噪声生成协议已知的 `eta=0.4` 和对称转移矩阵。这不是声称已经解决未知噪声率/任意真实噪声；报告必须明确该假设。严禁读取 `clean_labels` 或 `is_noisy` 来计算训练先验、样本权重、伪标签或损失。它们只允许在预测完成后用于离线诊断。
+
+## 2. 三个必须同时处理的机制
+
+### 2.1 由带噪观测频次反演干净类别先验
+
+令 K=100、N=10847、eta=0.4，观测标签计数为 n_obs[j]。转移矩阵定义为：
+
+- T[i,j] = 1-eta，当 i=j；
+- T[i,j] = eta/(K-1)，当 i!=j；
+- 行表示 clean class i，列表示 observed class j。
+
+对称噪声下：
+
+`n_obs[j] = (1-eta-eta/(K-1))*n_clean[j] + eta*N/(K-1)`
+
+先计算未约束反演：
+
+`n_raw = (n_obs - eta*N/(K-1)) / (1-eta-eta/(K-1))`
+
+再投影到满足 `sum(n_hat)=N`、`n_hat[c]>=5` 的欧氏最近下界单纯形。这里的下界 5 来自本实验 CIFAR-100-LT IF=100 协议的已知最小类频次，不得读取 clean label 数组。实现一个纯 NumPy、带单元测试的 lower-bounded simplex projection；记录 n_obs、n_raw、n_hat、投影改变量、prior SHA256。不得直接把负数简单截断后不归一化。
+
+`pi_clean_hat = n_hat / N`，LC 使用 `log(pi_clean_hat)`。原始 observed prior 只保留作报告对照，不进入新方法的 LC 或 BCL。
+
+### 2.2 用 Forward Correction 修复 LC 的逐样本错误监督
+
+对 v1 logits z，先按 BCL 原始 Logit Compensation 语义构造干净标签后验：
+
+`p_clean = softmax(z + log(pi_clean_hat))`
+
+再映射到观测标签空间：
+
+`p_observed = p_clean @ T`
+
+分类损失：
+
+`L_LC_FC = mean(-log(p_observed[i, observed_label[i]]))`
+
+使用 log-space / clamp 保证数值稳定；T 注册为 buffer。禁止把 noisy label 当成 clean class 直接做普通 CE。保留原损失系数 `lambda_lc=2.0`。
+
+实现独立模块，例如 `ForwardCorrectedLogitCompensation`，不要改 `BCL_AUDIT/cifar100lt/losses.py`。
+
+### 2.3 用模型软类别分布替换 BCL 的硬 noisy-label 正样本关系
+
+当前 BCL 的硬 `targets` 同时决定 sample-sample positives 和 sample-prototype positives；而 prototypes 是 `prototype_mlp(classifier.weight)`。新完整方法不能再用观测 noisy labels 构造 BCL positives。
+
+从同一次三视图 forward 的 logits 计算不带 log-prior 的软类别分布：
+
+`q_i = softmax(mean(logits_v1, logits_v2, logits_v3).detach())`
+
+理由：BCL/Logit Compensation 中 raw logits 作为类条件证据使用；这里不再叠加长尾 prior，避免把头部先验重新灌入软分配。q 必须 detach，不允许 BCL 通过 q 的路径反向操纵分类器概率。
+
+定义连续置信度衰减（不使用硬阈值）：
+
+`r_i = clamp((max_c q_i[c] - 1/K)/(1 - 1/K), 0, 1)`
+
+实现 `NoiseAwareSoftBalancedContrastiveLoss`，保留原 BCL 的候选结构和 class-complement / class-averaging 思路：
+
+1. Anchors：v2、v3 两视图，共 2B。
+2. Candidates：v2、v3 样本视图，共 2B；再加 C 个 class prototypes。
+3. Sample candidate 的类别分布为 q_i；prototype candidate 为 one-hot class vector。
+4. Anchor/candidate 的 sample-sample 软正关系为 `r_i*r_j*dot(q_i,q_j)`。
+5. Anchor i 到 prototype c 的软正关系为 `r_i*q_i[c]`。
+6. 同一原始样本的 v2-v3 配对必须始终保留权重 1 的自视图正对，不受 r_i 影响。
+7. 排除 anchor 自身作为 candidate（diagonal logits mask）。
+8. 为保留 BCL 类均衡分母，令 candidate class mass 矩阵为 Qcand，`class_occurrences = Qcand.sum(0)`；candidate 的期望类别计数为 `Qcand @ class_occurrences`；每个 anchor-candidate 的分母权重为该期望计数减去该 pair 的软正权重。必须检查所有有效分母权重严格为正、finite。
+9. 对每个 anchor，按软正权重归一化其 positive log-prob，再对 2B anchors 求均值。
+10. 当 q 是严格 one-hot 且 r=1 时，soft BCL 必须数值等价于现有 `BalancedContrastiveLoss`（包括 class occurrences、分母和 loss）；这是强制单元测试。
+11. q 均匀时，跨样本和 prototype 正关系应趋近 0，但 v2-v3 自视图正对仍为 1，避免早期不可靠预测把全 batch 拉成一个簇。
+
+保留原 BCL 权重 `mu_bcl=0.6`。不得把被拒绝样本当作负样本；所有样本仍保留自己的 v2-v3 正对。此版本不使用 P_Many、margin 阈值或 clean/noisy 真值。
+
+## 3. 训练组：只跑两个新方法组，旧 A 组直接复用
+
+旧原始带噪 BCL Seed42、200 epoch 的正式结果作为 baseline A（Overall 32.22 / Many 50.43 / Medium 35.66 / Few 6.967），不得重跑。
+
+从 Epoch 0 训练两个新组：
+
+- Arm B `NTC_LC_HARD_BCL`：反演先验 + Forward-Corrected LC；BCL 暂时保留原始 hard observed-label BCL。此组是组件消融，用来回答只修 LC/先验是否足够。
+- Arm C `NTC_FULL_SOFT_BCL`：反演先验 + Forward-Corrected LC + Noise-Aware Soft BCL。此组是完整候选方法。
+
+两组使用完全相同的初始模型、数据顺序、三视图增强、训练轮数和 SGD 配置。严格复用原 BCL：
+- ResNet-32 / BCLCIFARModel；
+- batch 256、FP32、seed 42、200 epochs、num_workers=0；
+- SGD lr=0.15、momentum=0.9、weight_decay=5e-4；
+- 原 warmup / LR milestones 160、180 / gamma 0.1；
+- 三视图 concat 过 backbone，保持原 BatchNorm 行为；
+- 总目标仍为 `2.0*L_LC + 0.6*L_BCL`；
+- 不做 Epoch-160 恢复，不做 early stopping，不做 TEST 选模。
+
+优先加载原始 baseline 运行保存的 Seed42 init checkpoint，并核对其 model_state SHA256 与原始 baseline training_summary/environment 中的 `initial_model_state_sha256` 完全一致。若本地没有初始权重文件，可按原始入口 set_seed(42)+BCLCIFARModel 初始化并逐字节核对该 SHA256；不匹配必须停止，禁止换权重。
+
+## 4. 实现文件
+
+新增：
+- `BCL_LTN/noise_robust_losses.py`：prior inversion、simplex projection、transition matrix、forward-corrected LC、soft BCL。
+- `BCL_LTN/train_ntc_bcl.py`：独立训练入口；复用现有 BCL_LTN/BCL_AUDIT 数据与模型接口，但不改原文件。
+- `BCL_LTN/tests/test_noise_robust_losses.py`：损失、先验、梯度和退化情形测试。
+- `BCL_LTN/CODEX_NTC_BCL_ROOT_FIX.txt`：本指令副本。
+
+训练代码允许调用现有 `load_verified_noise` 验证 noisy label 文件，但必须把训练 adapter 与 offline diagnostic 分开。训练 step 只能拿到图像、observed noisy labels、source index；clean labels/is_noisy 不得进入 loss/prior/pseudo-target/optimizer。
+
+## 5. 强制测试
+
+至少覆盖：
+
+1. eta=0 时 forward-corrected LC 等于 `CE(logits+log(pi), observed_labels)`。
+2. eta=0.4 时 transition matrix 每行和为 1、对角 0.6、非对角 0.4/99。
+3. 先验反演输出非负、总和 N、每类不少于 5；已知模拟 clean counts 经期望对称转移后，反演/投影能恢复合理 long-tail 形状。
+4. soft BCL one-hot q 与原 BCL 数值等价。
+5. soft BCL uniform q 仍保留自视图正对，loss finite。
+6. 所有 loss 对 features/prototypes 有有限梯度；q 不接收梯度。
+7. batch size=1、batch 中缺类、极端置信度、有限/NaN 输入处理正确。
+8. 两种训练 arm 的真实 3-view GPU Smoke 各完成恰好 1 次 SGD 更新，所有模型梯度 finite、参数确实更新。
+9. 现有 BCL_LTN tests 全部继续通过。
+10. `BCL_AUDIT/` 与原始 baseline 文件 SHA256 前后不变。
+
+## 6. Smoke 后正式训练
+
+先运行 CPU pytest，再在 RTX 5070 Laptop GPU 上对两个 arm 分别做真实数据、真实三视图、FP32、batch256 的单步 Smoke。Smoke 输出写到独立目录；不得复用旧 Smoke receipt。
+
+Smoke 通过后，立即从 Epoch 0 正式运行两个 200-epoch arm，不要停下来新增纯审计任务。
+
+独立输出目录：
+`BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/`
+
+每组保存：
+- epoch 40/100/160/180/200 checkpoint；
+- history.jsonl；
+- 每 epoch 的 loss_lc、loss_bcl、weighted loss、训练准确率、observed class count；
+- 每 checkpoint 的 TRAIN-only clean-source accuracy / wrong-label memorization（仅在模型预测保存后做离线 join）；
+- corrected prior / transition matrix / source hash / checkpoint hash / optimizer state；
+- final TEST 指标（全部训练完成后只打开一次）。
+
+官方 TEST 必须在两个 arm 的全部 200 epochs 和 TRAIN 诊断全部完成后才评估；不能用于训练、阈值选择或 checkpoint 选择。
+
+## 7. 最终比较与报告
+
+生成 `NTC_BCL_ROOT_FIX_REPORT.md` 和 `comparison_summary.json`，并排比较：
+- A 原始 noisy BCL（历史结果，不重训）；
+- B NTC_LC_HARD_BCL；
+- C NTC_FULL_SOFT_BCL。
+
+必须报告 Overall / Many / Medium / Few、训练 Clean subset accuracy、错误标签记忆率、LC/BCL loss、prior estimate、训练耗时、显存峰值、官方 TEST 访问次数。
+
+重点回答：
+1. 修正 prior + forward correction 是否恢复分类器学习？
+2. 加入 soft BCL 后，Few 是否进一步改善？
+3. 原型是否不再由硬 noisy-label 正样本关系驱动？
+4. 训练收益是否来自 LC 纠错、BCL 软关系，还是二者协同？
+
+不允许仅凭一个 Seed42 结果宣称方法已稳定或 SOTA。若有效，再安排多种子和不同噪声率；当前先把完整方法跑通。
+
+## 8. 重要禁止事项
+
+- 不要再从 Epoch160 checkpoint 恢复。
+- 不要再做 P_Many 工作点、margin AUC、ROC/PR 等纯审计。
+- 不得使用 clean label 或 is_noisy 参与任何训练计算。
+- 不得把 observed noisy class counts 当作 clean prior。
+- 不得让 noisy observed labels 直接决定完整方法的 BCL positives。
+- 不得修改 `BCL_AUDIT/`、旧 BCL 训练代码或历史结果。
+- 不得在正式训练前打开官方 TEST。
+- 不得用 Smoke 结果冒充正式训练。
+- 不得因为某个 arm 的指标不理想就临时改阈值、权重或训练预算；任何改动必须新建方法版本和新输出目录。
+
+完成后提供：Git commit、pytest结果、两组 Smoke receipt、两组200epoch训练结果、最终报告和关键文件SHA256。
