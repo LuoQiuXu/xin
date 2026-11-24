@@ -175,8 +175,8 @@ def run(args) -> dict:
         raise FileNotFoundError(f"Local offline-only sample_scores.csv not found: {sample_path}")
     if not manifest_path.is_file():
         raise FileNotFoundError(f"Noise manifest not found: {manifest_path}")
-    if output_dir.exists():
-        raise FileExistsError(f"Refusing to overwrite attribution output: {output_dir}")
+    if not output_dir.is_dir():
+        raise FileNotFoundError(f"Attribution output directory must be created fresh by main(): {output_dir}")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     clean_counts = np.asarray(manifest["clean_class_counts"], dtype=np.int64)
@@ -231,6 +231,9 @@ def run(args) -> dict:
         if actual != expected:
             raise RuntimeError(f"{name} bucket mismatch: expected {expected}, got {actual}")
         group_rows.append({"observed_group": name, **actual})
+    pd.DataFrame(group_rows).to_csv(
+        output_dir / "observed_group_composition.csv", index=False, encoding="utf-8-sig"
+    )
 
     if int(frame["is_clean"].sum()) != int(manifest["num_unflipped"]):
         raise RuntimeError("Global clean count disagrees with the noise manifest")
@@ -363,9 +366,6 @@ def run(args) -> dict:
              "No model loading or re-inference was performed."
     )
 
-    output_dir.mkdir(parents=True, exist_ok=False)
-    # The output directory must exist before the first CSV write; move creation
-    # above any write if this code is edited.
     return {
         "rows": int(len(frame)),
         "few_raw_margin_pooled_auc": float(pooled_raw),
@@ -443,6 +443,7 @@ def main():
         "",
         "## Outputs",
         "",
+        "- observed_group_composition.csv",
         "- noisy_source_to_observed_counts.csv",
         "- noisy_source_to_observed_row_percent.csv",
         "- few_source_breakdown.csv",
