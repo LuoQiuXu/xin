@@ -14,6 +14,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
+from BCL_AUDIT.cifar100lt.data import CIFAR100LT
 from BCL_AUDIT.cifar100lt.train import state_dict_sha256
 from BCL_LTN.make_noisy_lt import group_class_ids
 from BCL_LTN.train_noisy_bcl import OfficialTestAudit, load_verified_noise, safe_torch_load
@@ -116,7 +117,7 @@ def build_margin_scores(
         values = raw[selected]
         mean = float(values.mean())
         std = float(values.std(ddof=0))
-        scale = std if std >= eps else 1.0
+        scale = std + eps
         normalized[selected] = (values - mean) / scale
         class_stats.append({
             "class_id": int(class_id),
@@ -590,13 +591,35 @@ def run_audit(args):
     if device.type == "cuda":
         torch.cuda.set_device(device)
 
-    # Install the guard before opening any data. It blocks official TEST access.
+    # Load only protocol metadata and observed noisy labels before inference.
+    # Clean labels and the flip mask are deliberately deferred until predictions are fixed.
     test_guard = OfficialTestAudit(data_root)
-    base, manifest, noisy_labels, clean_labels, is_noisy = load_verified_noise(
-        data_root, indices_path, noise_dir
-    )
     manifest_path = noise_dir / "noise_manifest.json"
+    manifest = read_json(manifest_path)
     manifest_sha = sha256_file(manifest_path)
+    if sha256_file(indices_path) != manifest.get("indices_sha256"):
+        raise RuntimeError("Fixed IF=100 index SHA256 differs from the noise manifest")
+    noisy_path = noise_dir / manifest.get("noisy_labels_file", "")
+    if not noisy_path.is_file() or sha256_file(noisy_path) != manifest.get("noisy_labels_sha256"):
+        raise RuntimeError("Observed noisy-label file is missing or its SHA256 differs from the manifest")
+    noisy_labels = np.load(noisy_path, allow_pickle=False)
+    if noisy_labels.shape != (10_847,) or noisy_labels.dtype != np.int64:
+        raise RuntimeError("Observed noisy-label array must be int64 with exactly 10,847 entries")
+    if np.any((noisy_labels < 0) | (noisy_labels >= 100)):
+        raise RuntimeError("Observed noisy labels are outside [0,99]")
+    observed_counts = np.bincount(noisy_labels, minlength=100).astype(np.int64)
+    if observed_counts.tolist() != manifest.get("observed_noisy_class_counts"):
+        raise RuntimeError("Observed noisy-label counts differ from the noise manifest")
+    clean_counts = np.asarray(manifest["clean_class_counts"], dtype=np.int64)
+
+    # The dataset object supplies TRAIN pixels, fixed indices and the eval transform.
+    # EvalOnlyTrainDataset returns no labels, and the model receives only images.
+    base = CIFAR100LT(
+        root=data_root, mode="bcl", indices_file=indices_path,
+        split_seed=0, download=False,
+    )
+    if len(base.indices) != 10_847 or np.unique(base.indices).size != 10_847:
+        raise RuntimeError("Fixed IF=100 TRAIN indices are not a unique 10,847-element vector")
     checkpoint_sha = sha256_file(checkpoint_path)
     training_summary = read_json(training_summary_path)
     diagnostic = read_json(diagnostic_path)
@@ -656,6 +679,15 @@ def run_audit(args):
         raise RuntimeError("Frozen model state changed during inference")
     if test_guard.opens != 0 or test_guard.denied != 0:
         raise RuntimeError("Official TEST was accessed during the margin audit")
+
+    # Only now load clean labels and the corruption mask, strictly for offline evaluation.
+    verified_base, verified_manifest, verified_noisy, clean_labels, is_noisy = load_verified_noise(
+        data_root, indices_path, noise_dir
+    )
+    if (not np.array_equal(verified_noisy, noisy_labels)
+            or not np.array_equal(verified_base.indices, base.indices)
+            or sha256_file(manifest_path) != manifest_sha):
+        raise RuntimeError("Post-inference label-truth verification differs from pre-inference inputs")
 
     scores, log_prior, class_stats = build_margin_scores(logits, noisy_labels, observed_counts)
     metric_rows, threshold_rows, macro_by_group, masks, class_groups = summarize_metrics(
