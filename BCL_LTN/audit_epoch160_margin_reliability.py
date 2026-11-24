@@ -28,6 +28,15 @@ SCORE_NAMES = (
 )
 GROUP_NAMES = ("Overall", "Many", "Medium", "Few")
 THRESHOLD_QUANTILES = (10, 25, 50, 75, 90)
+EXPECTED_CHECKPOINT_SHA256 = "10f0cb41db390f04a9d401433cc121396ab67fad7eb11dee0095c40350d75428"
+EXPECTED_MODEL_STATE_SHA256 = "ef1a96e6d018a0dc2f6888b8816643935ab100856b6ad41655371a4ec5498102"
+EXPECTED_MANIFEST_SHA256 = "0903d755db1e490cdf7a507f38a2c05ccdb32c7ecbd01d029487ea95205bd5e8"
+EXPECTED_INDICES_SHA256 = "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7"
+EXPECTED_NOISY_LABELS_SHA256 = "691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f"
+EXPECTED_TRAIN_SOURCE_SHA256 = {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -599,11 +608,27 @@ def run_audit(args):
     manifest_path = noise_dir / "noise_manifest.json"
     manifest = read_json(manifest_path)
     manifest_sha = sha256_file(manifest_path)
-    if sha256_file(indices_path) != manifest.get("indices_sha256"):
-        raise RuntimeError("Fixed IF=100 index SHA256 differs from the noise manifest")
+    if manifest_sha != EXPECTED_MANIFEST_SHA256:
+        raise RuntimeError("Noise-manifest SHA256 differs from the locked experiment receipt")
+    indices_sha = sha256_file(indices_path)
+    if indices_sha != EXPECTED_INDICES_SHA256 or indices_sha != manifest.get("indices_sha256"):
+        raise RuntimeError("Fixed IF=100 index SHA256 differs from the locked receipt/manifest")
+    if (manifest.get("seed") != 42 or manifest.get("noise_rate_requested") != 0.4
+            or manifest.get("num_train_samples") != 10_847 or manifest.get("num_classes") != 100
+            or manifest.get("num_flipped") != 4_379 or manifest.get("num_unflipped") != 6_468):
+        raise RuntimeError("Noise manifest does not match the locked NR=0.4 seed-42 protocol")
+    if manifest.get("train_source_sha256") != EXPECTED_TRAIN_SOURCE_SHA256:
+        raise RuntimeError("TRAIN/meta source hashes differ from the locked data receipt")
+    train_source_dir = data_root / "cifar-100-python"
+    for source_name, expected_sha in EXPECTED_TRAIN_SOURCE_SHA256.items():
+        if sha256_file(train_source_dir / source_name) != expected_sha:
+            raise RuntimeError(f"CIFAR-100 TRAIN source hash mismatch: {source_name}")
     noisy_path = noise_dir / manifest.get("noisy_labels_file", "")
-    if not noisy_path.is_file() or sha256_file(noisy_path) != manifest.get("noisy_labels_sha256"):
-        raise RuntimeError("Observed noisy-label file is missing or its SHA256 differs from the manifest")
+    if not noisy_path.is_file():
+        raise RuntimeError("Observed noisy-label file is missing")
+    noisy_sha = sha256_file(noisy_path)
+    if noisy_sha != EXPECTED_NOISY_LABELS_SHA256 or noisy_sha != manifest.get("noisy_labels_sha256"):
+        raise RuntimeError("Observed noisy-label SHA256 differs from the locked receipt/manifest")
     noisy_labels = np.load(noisy_path, allow_pickle=False)
     if noisy_labels.shape != (10_847,) or noisy_labels.dtype != np.int64:
         raise RuntimeError("Observed noisy-label array must be int64 with exactly 10,847 entries")
@@ -623,6 +648,8 @@ def run_audit(args):
     if len(base.indices) != 10_847 or np.unique(base.indices).size != 10_847:
         raise RuntimeError("Fixed IF=100 TRAIN indices are not a unique 10,847-element vector")
     checkpoint_sha = sha256_file(checkpoint_path)
+    if checkpoint_sha != EXPECTED_CHECKPOINT_SHA256:
+        raise RuntimeError("Epoch-160 checkpoint SHA256 differs from the locked experiment receipt")
     training_summary = read_json(training_summary_path)
     diagnostic = read_json(diagnostic_path)
     checkpoint_inventory_sha = training_summary.get("checkpoint_sha256", {}).get(checkpoint_path.name)
@@ -640,8 +667,9 @@ def run_audit(args):
     clean_counts = np.asarray(manifest["clean_class_counts"], dtype=np.int64)
     if checkpoint.get("class_counts_for_lc_and_bcl") != observed_counts.tolist():
         raise RuntimeError("Checkpoint LC/BCL class counts do not match observed noisy labels")
-    if checkpoint.get("model_state_sha256") != diagnostic.get("model_state_sha256"):
-        raise RuntimeError("Checkpoint model state does not match the saved epoch-160 diagnostic")
+    if (checkpoint.get("model_state_sha256") != EXPECTED_MODEL_STATE_SHA256
+            or checkpoint.get("model_state_sha256") != diagnostic.get("model_state_sha256")):
+        raise RuntimeError("Checkpoint model state does not match the locked epoch-160 diagnostic")
     protocol = checkpoint.get("protocol", {})
     if protocol.get("precision") != "fp32" or protocol.get("amp") is not False or protocol.get("tf32") is not False:
         raise RuntimeError("Unexpected checkpoint precision/AMP/TF32 protocol")
