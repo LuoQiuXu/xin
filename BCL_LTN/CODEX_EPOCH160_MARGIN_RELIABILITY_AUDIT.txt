@@ -27,6 +27,9 @@ LOCKED SCOPE / DO NOT VIOLATE
 6. Do not regenerate the LT indices, clean labels, noisy labels, or flip mask.
 7. Do not use clean labels or the flip mask to calculate scores or select
    thresholds. They are evaluation truth only, read after model inference.
+   Before inference, load only the manifest and observed noisy-label array.
+   Defer the load_verified_noise call that reads clean labels/mask until all
+   10,847 predictions have been produced and the model-state hash is checked.
 8. Generated predictions/scores/plots/CSV/JSON remain local and ignored by Git.
    Commit only the audit source, tests, and this instruction file.
 9. Preserve unrelated local changes. Do not overwrite any output directory.
