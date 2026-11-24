@@ -104,6 +104,22 @@ def test_stratified_bootstrap_is_reproducible_and_preserves_prevalence():
     assert set(first) == {"roc_auc", "average_precision", "pr_auc_trapezoid"}
 
 
+def test_class_normalization_handles_constant_within_class_margins():
+    logits = np.asarray([
+        [2.0, 1.0, 0.0],
+        [2.0, 1.0, 0.0],
+        [0.0, 2.0, 1.0],
+        [0.0, 2.0, 1.0],
+        [0.0, 1.0, 2.0],
+    ])
+    observed = np.asarray([0, 0, 1, 1, 2])
+    counts = np.asarray([2, 2, 1])
+    scores, _, stats = build_margin_scores(logits, observed, counts)
+    assert np.all(np.isfinite(scores["class_normalized_raw_margin"]))
+    assert stats[0]["zero_or_near_zero_std"] is True
+    np.testing.assert_allclose(scores["class_normalized_raw_margin"][:2], [0.0, 0.0])
+
+
 def test_eval_dataset_returns_only_image_and_position():
     raw = np.zeros((2, 32, 32, 3), dtype=np.uint8)
     dataset = EvalOnlyTrainDataset(raw, np.asarray([1]), transform=lambda image: np.asarray(image))
