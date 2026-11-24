@@ -384,6 +384,8 @@ def summarize_metrics(
                 name: binary_ranking_metrics(class_labels, values[class_selected])
                 for name, values in scores.items()
             })
+        if not class_rows:
+            raise RuntimeError(f"No observed classes with both clean and noisy samples in {group_name}")
         macro_by_group[group_name] = {
             name: {
                 metric: float(np.mean([row[name][metric] for row in class_rows]))
