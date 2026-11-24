@@ -1,0 +1,21 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "BCL_LTN/tests",
+    "BCL_AUDIT/cifar100lt/tests",
+    "-q",
+    "-rA",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42_execution_20261123_01\\pytest_tmp"
+  ],
+  "working_directory": "C:\\Users\\xiaoju\\AppData\\Local\\Temp\\codex-bcl-ltn-54a14ea44e8741c2b8422af07dae4227",
+  "exit_code": 0,
+  "seconds": 5.710135799949057,
+  "log": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42_execution_20261123_01\\pytest.log",
+  "log_sha256": "a27df331ccf3cd539cd40ed7fe76729664a4ab7d9c100c7c738951535f478b65"
+}

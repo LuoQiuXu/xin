@@ -1,0 +1,28 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-u",
+    "-m",
+    "BCL_LTN.train_noisy_bcl",
+    "--data-root",
+    "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100",
+    "--indices-file",
+    "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01\\cifar100lt_if100_train_indices_seed0.npy",
+    "--noise-dir",
+    "D:\\xiangmuxunlian\\xin\\BCL_LTN\\data",
+    "--output-root",
+    "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42_smoke",
+    "--num-workers",
+    "0",
+    "--smoke-only"
+  ],
+  "exit_code": 0,
+  "seconds": 4.705177000025287,
+  "log": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42_execution_20261123_01\\gpu_smoke.log",
+  "log_sha256": "c077ca68ab9f0816f01198de6a46a719eac67bfd9ba71d4e7b6612938cf9ffa8",
+  "out_of_memory": false,
+  "formal_training_started": false,
+  "smoke_report": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42_smoke\\smoke_report.json",
+  "smoke_report_sha256": "eeca2f4aa92b08c3f8b5d65eda5fe9d50ceb28e65622b9e8fc0e8737814387af"
+}

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+    "-B",
+    "-m",
+    "BCL_LTN.make_noisy_lt",
+    "--data-root",
+    "D:\\xiangmuxunlian\\xin\\H2T\\data\\cifar100",
+    "--indices-file",
+    "D:\\xiangmuxunlian\\xin\\BCL_AUDIT\\outputs\\data_audit_recheck_20261122_01\\cifar100lt_if100_train_indices_seed0.npy",
+    "--output-dir",
+    "D:\\xiangmuxunlian\\xin\\BCL_LTN\\data",
+    "--noise-rate",
+    "0.4",
+    "--seed",
+    "42"
+  ],
+  "exit_code": 0,
+  "seconds": 3.794645300018601,
+  "log_sha256": "d85bf60ae91b32c420379e1afefac2e2c6e64bf6a6ac0487d2e1de56b8cb7878",
+  "official_test_audit_zero": true
+}

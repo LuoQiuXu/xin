@@ -1,0 +1,36 @@
+{
+  "python": "3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]",
+  "python_executable": "D:\\app\\minicondaaa\\envs\\xiaoju\\python.exe",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "torch": "2.14.1+cu132",
+  "torchvision": "0.29.1+cu132",
+  "cuda": "13.2",
+  "cudnn": 92400,
+  "device": "cuda:0",
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "gpu_total_memory_bytes": 8546484224,
+  "gpu_free_before_model_bytes": 7338983424,
+  "amp": false,
+  "tf32": false,
+  "seed": 42,
+  "precision": "fp32",
+  "batch_size": 256,
+  "epochs": 200,
+  "indices_sha256": "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7",
+  "noisy_labels_sha256": "691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f",
+  "noise_manifest_sha256": "0903d755db1e490cdf7a507f38a2c05ccdb32c7ecbd01d029487ea95205bd5e8",
+  "train_source_sha256": {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+  },
+  "source_sha256": {
+    "BCL_LTN/CODEX_RUN.txt": "3cbf3f3924c3f21f6245e6d998ffedd5a61a0d36fc08c7268aa20aeedbc6313f",
+    "BCL_LTN/make_noisy_lt.py": "655f56facc3b31ab93c64c035beeec232014cad1474692a7c3e5fb0643e64a82",
+    "BCL_LTN/train_noisy_bcl.py": "6117d17e57579506bb5015ec2405cc8e38ca996d0759c5b84eb99df466962884",
+    "BCL_AUDIT/cifar100lt/data.py": "216bda58acd66cbb1decf606d9bde9bc67d060bb6f4d18a72a5982fb7e9bb735",
+    "BCL_AUDIT/cifar100lt/losses.py": "31af83140b3b12dd74686ff7b88e2848553c2465f21b3f03c4956a779782b4ae",
+    "BCL_AUDIT/cifar100lt/models.py": "2dc10c65e696cc772e6df95e1f782ce36a59aaec6a85eebb73d946d83fcc29cc",
+    "BCL_AUDIT/cifar100lt/train.py": "b1ba2b95369dc8a709bff56775d2a80cc7dcd3c03ae2c66f623e8b0126b21ec6"
+  },
+  "smoke_report_sha256": "eeca2f4aa92b08c3f8b5d65eda5fe9d50ceb28e65622b9e8fc0e8737814387af"
+}
