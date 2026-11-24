@@ -1,0 +1,420 @@
+CODEX TASK — EPOCH-160 SOURCE ATTRIBUTION, THEN 40-EPOCH BCL GATE COMPARISON
+================================================================================
+
+REPOSITORY
+----------
+LuoQiuXu/xin
+
+REQUIRED BRANCH
+---------------
+experiment/bcl-ltn-source-attribution-40e-20261124
+
+BASE COMMIT
+-----------
+b57b16323dd91dbc44d799715282dab07d14a484
+
+MISSION
+-------
+Run exactly one final CPU-only source-attribution table from the already saved
+Epoch-160 sample_scores.csv. Immediately after that script completes, regardless
+of whether Many->Few explains the Few AUC drop, proceed to the 40-epoch real
+training comparison from the existing Epoch-160 checkpoint.
+
+Do not add another standalone offline audit, do not reload the Epoch-160 model
+for another inference pass, and do not run a new mechanism-search phase.
+
+The three training arms are:
+  A. Original BCL continuation — no gate.
+  B. Global raw-margin gate — reliable iff m_i > 0.
+  C. Few-only class-adaptive margin gate — Many/Medium remain ungated; for
+     observed-Few labels use the fixed Epoch-160 class-normalized margin
+     q90 threshold in gate_reference.json.
+
+The 40-epoch run resumes epochs 161..200, not a fresh 40-epoch initialization.
+
+READ FIRST
+----------
+- BCL_LTN/README.md
+- BCL_LTN/train_noisy_bcl.py
+- BCL_LTN/make_noisy_lt.py
+- BCL_LTN/audit_epoch160_margin_reliability.py
+- BCL_AUDIT/cifar100lt/data.py
+- BCL_AUDIT/cifar100lt/models.py
+- BCL_AUDIT/cifar100lt/losses.py
+- BCL_AUDIT/cifar100lt/train.py
+- BCL_LTN/analyze_epoch160_source_attribution.py
+- BCL_LTN/tests/test_epoch160_source_attribution.py
+
+ABSOLUTE GUARDRAILS
+-------------------
+1. Work only on the required branch.
+2. BCL_AUDIT/ is strictly read-only. Do not edit, format, regenerate, rename,
+   or write any file under BCL_AUDIT/.
+3. Do not modify the existing baseline trainer BCL_LTN/train_noisy_bcl.py,
+   make_noisy_lt.py, BCL loss implementation, noise arrays, manifest, or
+   original Epoch-160/Epoch-200 checkpoints. Implement the continuation in a
+   new file under BCL_LTN/.
+4. Do not regenerate the fixed IF=100 indices or the noise realization.
+5. Do not download data or access CIFAR-100 TEST before all three 40-epoch
+   training arms and all TRAIN-only diagnostics have completed.
+6. Clean labels and is_noisy are evaluation truth only. They must never enter
+   the training dataset tuple, gate calculation, LC, BCL loss, optimizer,
+   scheduler, or model update. Gate decisions may use only current v1 logits,
+   observed noisy labels, class-frequency group IDs, and the score-only
+   gate_reference.json.
+7. The local sample_scores.csv, clean labels, is_noisy mask, sample-level
+   source-attribution tables, and sample-level logit diagnostics are offline
+   artifacts. Never commit or push them.
+8. Preserve unrelated local changes. Never overwrite any existing output path.
+9. No AMP, TF32, gradient accumulation, batch-size changes, or fallback
+   optimizer. Keep FP32 and batch size 256. If OOM occurs, stop and report;
+   do not silently change the protocol.
+
+PART 1 — FINAL CPU-ONLY SOURCE ATTRIBUTION
+------------------------------------------
+The audit writer was inspected. The existing sample_scores.csv contains:
+  position, original_train_index, observed_label, clean_label, is_clean,
+  observed_label_group, raw_margin, lc_plus_log_prior_margin,
+  inverse_prior_margin, class_normalized_raw_margin.
+
+It does NOT contain raw logits, predicted class, softmax probabilities,
+maximum head-class logit, or prediction entropy. Do not infer those values
+from a scalar margin. Do not load a checkpoint or run inference to recover
+them.
+
+Run the existing source-attribution script:
+  python -B -m pytest BCL_LTN/tests/test_epoch160_source_attribution.py -q -rA -p no:cacheprovider
+
+  python -B -m BCL_LTN.analyze_epoch160_source_attribution --sample-scores "BCL_LTN/outputs/epoch160_margin_reliability_audit_20261124/sample_scores.csv" --noise-manifest "BCL_LTN/data/noise_manifest.json" --output-dir "BCL_LTN/outputs/epoch160_source_attribution_20261124"
+
+The script must run without importing torch, initializing CUDA, loading a model,
+or performing inference.
+
+It must verify exactly 10,847 rows and the audited observed-label buckets:
+  Many:   6752 = 5237 clean + 1515 noisy
+  Medium: 2559 = 1037 clean + 1522 noisy
+  Few:    1536 =  194 clean + 1342 noisy
+
+Source group is derived from clean_label and the fixed clean IF=100 class-count
+vector. Destination/observed group is derived from observed_label and the same
+class-frequency group definitions:
+  Many > 100; Medium 20..100 inclusive; Few < 20.
+
+Required outputs:
+  observed_group_composition.csv
+  noisy_source_to_observed_counts.csv
+  noisy_source_to_observed_row_percent.csv
+  few_source_breakdown.csv
+  few_margin_distribution_summary.csv
+  few_pairwise_source_metrics.csv
+  few_auc_source_decomposition.csv
+  gate_reference.json
+  ATTRIBUTION_REPORT.md
+
+The source-wise pairwise AUCs must exactly reconstruct the pooled Few AUC when
+weighted by each noisy source group's share among the 1,342 noisy observed-Few
+samples. Stop if the reconstruction check fails.
+
+The report must directly answer:
+  - How many Few-destination noisy examples came from Many, Medium and Few?
+  - What share of the 1,342 observed-Few noisy examples is Many->Few?
+  - For each source group, how well do the four saved margins separate its
+    noisy Few-destination samples from the 194 Clean Few samples?
+  - Does the Many->Few pairwise AUC differ materially from the Medium->Few and
+    Few->Few pairwise AUCs?
+  - Can the source mixture account for the pooled Few AUC of about 0.677?
+
+The report must explicitly state that Epoch-160 max-head-logit/entropy cannot
+be tested from this CSV. Do not add another Epoch-160 inference pass.
+
+PART 2 — FIXED 40-EPOCH COMPARISON
+----------------------------------
+After Part 1 completes successfully, do not pause for another offline-analysis
+iteration. Implement and run the three training arms below.
+
+FIXED LOCAL INPUTS
+------------------
+Repository root:
+D:/xiangmuxunlian/xin
+
+CIFAR-100 TRAIN root:
+D:/xiangmuxunlian/xin/H2T/data/cifar100
+
+Fixed IF=100 indices:
+D:/xiangmuxunlian/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy
+
+Noise artifacts:
+BCL_LTN/data/noise_manifest.json
+BCL_LTN/data/cifar100lt_if100_sym04_seed42.npy
+BCL_LTN/data/cifar100lt_if100_clean_seed42.npy
+BCL_LTN/data/cifar100lt_if100_is_noisy_seed42.npy
+
+Epoch-160 checkpoint:
+BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42/checkpoints/epoch_160_pre_decay.pth
+
+Expected checkpoint SHA256:
+10f0cb41db390f04a9d401433cc121396ab67fad7eb11dee0095c40350d75428
+
+Expected model-state SHA256:
+ef1a96e6d018a0dc2f6888b8816643935ab100856b6ad41655371a4ec5498102
+
+Expected fixed-index SHA256:
+be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
+
+Expected noise-manifest SHA256:
+0903d755db1e490cdf7a507f38a2c05ccdb32c7ecbd01d029487ea95205bd5e8
+
+Expected observed noisy-label SHA256:
+691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f
+
+Before training, verify all paths and hashes. The checkpoint must contain:
+  epoch == 160
+  seed == 42
+  model_state
+  optimizer_state
+  rng_state
+  data_loader_generator_state
+  class_counts_for_lc_and_bcl
+  protocol metadata
+
+If optimizer_state is absent, mismatched, or cannot be restored, STOP. Do not
+silently resume from model weights alone.
+
+THREE ARMS — NO OTHER GROUPS
+----------------------------
+A. BCL_ORIGINAL
+   - Exact original BCL objective.
+   - No reliability gate.
+   - Use the existing BalancedContrastiveLoss implementation unchanged.
+
+B. BCL_GLOBAL_RAW_MARGIN
+   - For each training sample, compute v1 observed-label raw margin:
+       m_i = z_i[y_obs] - max_{k != y_obs} z_i[k]
+   - reliable_i = (m_i > 0).
+   - Apply this gate only to BCL relationships, never to LC.
+
+C. BCL_FEW_CLASS_ADAPTIVE_Q90
+   - Many and Medium observed-label samples are always reliable.
+   - For observed-Few samples, compute:
+       s_i = (m_i - mu[y_obs]) / (sigma[y_obs] + 1e-8)
+   - mu/sigma are the fixed per-observed-class Epoch-160 raw-margin
+     statistics from gate_reference.json.
+   - reliable_i = (s_i > few_q90_threshold).
+   - few_q90_threshold is the score-only 90th percentile over the 1,536
+     observed-Few normalized margins, written by Part 1.
+   - This is a predeclared unlabeled-score threshold, not tuned using
+     clean_label or is_clean. Do not optimize it after seeing source-attribution
+     results.
+   - At the Epoch-160 reference distribution it should retain approximately
+     the top 10% of observed-Few samples (about 154/1536); log the actual
+     acceptance rate during resumed training.
+
+For reference, the existing audit threshold table reports the Few-group
+class-normalized q90 threshold as approximately 1.1284409609. The script must
+use the value generated by gate_reference.json, not hard-code this rounded
+number.
+
+RESUME AND PAIRED TRAINING CONTRACT
+-----------------------------------
+- Every arm starts from the exact same Epoch-160 model_state and optimizer_state.
+- Independently instantiate the same BCLCIFARModel, load the same model state,
+  create SGD with the original hyperparameters, then load the checkpoint's
+  optimizer_state.
+- Verify all three arms have identical starting model-state hashes and
+  optimizer-state fingerprints.
+- Continue human epochs 161..200 (exactly 40 epochs).
+- For each zero-based epoch_index 160..199:
+    epoch_seed = epoch_seed_for(42, epoch_index)
+    set_seed(epoch_seed)
+    loader_generator.manual_seed(epoch_seed)
+    lr = learning_rate_for_epoch(epoch_index)
+- Expected LR:
+    epochs 161-180: 0.015
+    epochs 181-200: 0.0015
+- Keep the same CIFAR100LT(mode="bcl") three-view dataset, fixed sample set,
+  transforms, DataLoader batch=256, shuffle=True, num_workers=0, drop_last=False,
+  and original source-index ordering contract.
+- The per-epoch sample_order_sha256 and first-batch view fingerprint must be
+  identical across all three arms.
+- The no-gate A arm must reproduce the existing original BCL continuation:
+  its final epoch-200 model_state SHA256 must equal the original saved
+  epoch_200.pth model_state SHA256. If it does not, stop before interpreting
+  B/C; report the mismatch and debug the resume contract.
+- Save new checkpoints at epoch 180 and epoch 200 for each arm. Never overwrite
+  the original run directory or original checkpoints.
+
+LOSS AND GATE IMPLEMENTATION
+----------------------------
+Keep the original three-view forward path exactly:
+  all_views = cat([v1, v2, v3], dim=0)
+  model(all_views, compute_contrastive=True)
+  LC logits = first B rows of classifier logits
+  BCL features = v2/v3 projected embeddings
+  BCL prototypes = the original classifier-derived class prototypes
+
+LC MUST remain unchanged in all arms:
+  loss_lc = LogitCompensatedCE(observed_noisy_class_counts)(v1_logits, y_obs)
+  total = 2.0 * loss_lc + 0.6 * loss_bcl
+
+The gate must not alter:
+  - LC sample membership or LC targets;
+  - observed noisy class counts used by LC prior;
+  - model architecture, projection MLP, prototype generation;
+  - three-view concatenation or BatchNorm behavior;
+  - optimizer, momentum, weight decay, LR schedule.
+
+For gated arms, implement a separate masked BCL loss in the new BCL_LTN
+continuation script. Do not edit BCL_AUDIT/cifar100lt/losses.py.
+
+Required relation semantics for every gated sample:
+1. Every sample always retains its own v2-v3 positive pair, regardless of
+   reliability. This is the self-supervised safeguard.
+2. A reliable anchor may use reliable same-observed-label sample views as
+   cross-sample positives.
+3. An unreliable anchor must not use other samples as supervised positives.
+4. Unreliable sample views must be removed from every OTHER anchor's candidate
+   denominator; they must not silently become negatives.
+5. The unreliable anchor's observed-class prototype connection must be removed
+   from that anchor's denominator entirely: neither positive nor negative.
+   Reliable anchors retain the original same-class prototype positive and all
+   other class prototypes as negatives.
+6. The original class-prototype computation/parameters remain unchanged.
+7. Recompute per-anchor class-occurrence counts and denominator weights from
+   the actually allowed candidate set, including the anchor itself in the
+   class count before subtracting the positive indicator. Do not reuse the
+   ungated global counts after masking.
+8. Every anchor must have at least its own paired-view positive. All denominator
+   weights must be finite and strictly positive wherever a candidate is active.
+
+For each gated loss call, record:
+  - reliable/unreliable sample counts by observed group;
+  - self-view positive links;
+  - cross-sample positive links;
+  - prototype positive links;
+  - masked sample candidates;
+  - masked target-prototype candidates;
+  - active denominator candidate count.
+Do not read clean_label/is_noisy to form any of these masks.
+
+TESTS REQUIRED BEFORE TRAINING
+------------------------------
+Add CPU unit tests for:
+- all-reliable masked BCL loss numerically matches original BalancedContrastiveLoss;
+- an unreliable sample retains its own v2-v3 positive pair;
+- unreliable samples are not candidates/negatives for other anchors;
+- unreliable anchor's observed-class prototype is neither positive nor negative;
+- reliable anchor's prototype positive is retained;
+- per-anchor class counts and denominator weights match the masked candidate set;
+- all losses and gradients are finite;
+- raw-margin gate uses strict m>0;
+- class-adaptive gate affects only observed-Few labels and uses gate_reference q90;
+- changing clean_label/is_noisy cannot change gate decisions;
+- checkpoint restore reproduces the Epoch-160 starting model and optimizer state.
+
+Run:
+  python -B -m pytest BCL_LTN/tests BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
+
+Then run one real TRAIN minibatch forward/backward/SGD smoke for each arm from
+the same restored Epoch-160 state. Verify finite loss/gradients and that the
+expected parameters update. This is a smoke check, not an extra experiment.
+
+TRAIN-ONLY DIAGNOSTICS
+----------------------
+At epochs 180 and 200, perform one deterministic eval-mode pass over the same
+10,847 TRAIN images using the standard eval transform. No optimizer/backward/
+BN update. This is already the required TRAIN diagnostic pass; do not add a
+second pass just for logit analysis.
+
+For every arm/checkpoint, report:
+- clean subset accuracy: Overall/Many/Medium/Few, grouped by original clean
+  source class;
+- noisy wrong-label memorization rate: Overall/Many/Medium/Few, grouped by
+  original clean source class;
+- counts/numerators/denominators;
+- gate acceptance/rejection rates by observed group and, after the pass, by
+  clean/noisy status for offline reporting only;
+- the BCL relationship counts listed above.
+
+During this SAME eval pass, retain each sample's 100 logits long enough to
+compute (no extra model forward):
+- predicted class and predicted class group;
+- maximum raw logit among the 35 Many classes (max_head_logit);
+- softmax probability mass assigned to all Many classes;
+- maximum softmax probability;
+- predictive entropy.
+
+After all predictions/logit summaries have been produced and model-state hash
+is verified unchanged, join clean_label/is_noisy for offline evaluation and
+write local-only sample diagnostics. For the observed-Few bucket compare:
+  Clean Few (194 source-clean examples)
+  Many->Few noisy examples
+on max_head_logit, Many probability mass, maximum probability and entropy.
+Report n, mean, median, IQR and tie-aware AUC for each signal. For entropy,
+also report -entropy AUC so that higher score consistently means more
+Many->Few-like. This diagnostic is computed from the existing checkpoint
+evaluation pass, not by loading the model again or running an extra inference.
+
+Do not describe Epoch-160 max-head-logit/entropy as measured; it was not saved
+in the original sample_scores.csv. The new measurements are at epochs 180/200.
+
+FINAL TEST
+----------
+Do not instantiate/open CIFAR-100 TEST until all three arms have completed
+epoch 200 and their TRAIN-only diagnostics and checkpoint hashes are saved.
+Then evaluate each arm's epoch-200 checkpoint once on the same balanced
+CIFAR-100 TEST set. Report raw-logit Overall/Many/Medium/Few macro class
+accuracy. No checkpoint selection or hyperparameter tuning from TEST.
+
+OUTPUTS
+-------
+Create a fresh local output root:
+BCL_LTN/outputs/epoch160_gate_comparison_40e_20261124/
+
+Use subdirectories for:
+  BCL_ORIGINAL
+  BCL_GLOBAL_RAW_MARGIN
+  BCL_FEW_CLASS_ADAPTIVE_Q90
+
+Save:
+  environment.json
+  resume_verification.json
+  history.jsonl per arm
+  checkpoints/epoch_180.pth and epoch_200.pth per arm
+  train_diagnostics.csv and JSON per arm
+  gate_diagnostics.csv per arm
+  sample_logit_diagnostics_epoch180.csv per arm (local only)
+  sample_logit_diagnostics_epoch200.csv per arm (local only)
+  final_test_metrics.json per arm
+  comparison_summary.json
+  COMPARISON_REPORT.md
+
+All outputs remain local/ignored. Commit only the new source file, tests,
+and this task instruction. Never commit sample_scores.csv, clean labels,
+is_noisy, checkpoints, predictions, or sample-level diagnostics.
+
+FINAL ACCEPTANCE
+----------------
+- Part 1 CPU-only source attribution passes all count and AUC decomposition
+  checks; no torch/CUDA/model/inference is used.
+- The task proceeds to training regardless of whether Many->Few is the main
+  source of Few reliability degradation.
+- Exactly three 40-epoch arms; all resume from the same Epoch-160 model AND
+  SGD momentum state.
+- A arm reproduces the original Epoch-200 checkpoint model-state hash exactly.
+- All three arms have identical per-epoch sample order and augmentation
+  fingerprints.
+- LC is unchanged and uses every observed noisy-label sample.
+- Gate uses no clean labels/noisy mask.
+- Low-reliability samples retain own v2-v3 positive pairs and are not converted
+  into negatives; their observed-class prototype link is removed from their
+  own denominator.
+- TEST opens remain zero until all three training arms and TRAIN diagnostics
+  are complete.
+- No BCL_AUDIT/ files changed.
+- Report any deviations; do not silently relax acceptance checks.
+
+RUNTIME EXPECTATION
+-------------------
+The prior estimate is about 17 minutes per 40-epoch arm on the fixed machine;
+three arms are therefore roughly 50 minutes plus diagnostics/final TEST.
+Measure actual time; do not promise a fixed runtime.
