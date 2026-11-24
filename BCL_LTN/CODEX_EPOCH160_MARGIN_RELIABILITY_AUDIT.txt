@@ -112,6 +112,8 @@ D. Run exactly one deterministic eval-mode forward pass over all 10,847 fixed
    TRAIN images with the standard eval transform, batch size 256, num_workers 0.
    The model must remain in eval mode and its state hash must be identical
    before/after inference. No gradients or optimizer.
+   Enforce FP32 inference, disable TF32, set cuDNN deterministic=True and
+   benchmark=False; do not enable autocast.
 E. Define each sample's margin against its OBSERVED noisy label y_obs:
       m_i = z_i[y_obs] - max_{k != y_obs} z_i[k]
 F. Calculate four predeclared score variants:
