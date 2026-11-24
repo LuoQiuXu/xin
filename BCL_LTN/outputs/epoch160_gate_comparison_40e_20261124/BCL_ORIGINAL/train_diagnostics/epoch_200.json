@@ -1,0 +1,240 @@
+{
+  "epoch": 200,
+  "samples": 10847,
+  "checkpoint_sha256": "0db491881ff3f15b520ccfc6904f35606b57f24f59cd97d4e52426834b14bb23",
+  "model_state_sha256": "425cdbfe6b296ccbc7de11fca696e523bb6055c5760f2c86877de7057a502a2b",
+  "model_state_unchanged": true,
+  "eval_passes": 1,
+  "clean_subset_accuracy": {
+    "Overall": {
+      "correct": 5017,
+      "total": 6468,
+      "accuracy_percent": 77.5664811379097
+    },
+    "Many": {
+      "correct": 4216,
+      "total": 5237,
+      "accuracy_percent": 80.50410540385717
+    },
+    "Medium": {
+      "correct": 741,
+      "total": 1037,
+      "accuracy_percent": 71.45612343297975
+    },
+    "Few": {
+      "correct": 60,
+      "total": 194,
+      "accuracy_percent": 30.927835051546392
+    }
+  },
+  "noisy_subset_wrong_label_memorization_rate": {
+    "Overall": {
+      "predicted_as_corrupted_observed_label": 496,
+      "total_noisy_examples": 4379,
+      "memorization_rate_percent": 11.326786937657
+    },
+    "Many": {
+      "predicted_as_corrupted_observed_label": 414,
+      "total_noisy_examples": 3587,
+      "memorization_rate_percent": 11.541678282687483
+    },
+    "Medium": {
+      "predicted_as_corrupted_observed_label": 70,
+      "total_noisy_examples": 681,
+      "memorization_rate_percent": 10.279001468428781
+    },
+    "Few": {
+      "predicted_as_corrupted_observed_label": 12,
+      "total_noisy_examples": 111,
+      "memorization_rate_percent": 10.81081081081081
+    }
+  },
+  "gate_acceptance_by_observed_group_after_truth_join": {
+    "Overall": {
+      "all": {
+        "total": 10847,
+        "reliable": 10847,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "clean": {
+        "total": 6468,
+        "reliable": 6468,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "noisy": {
+        "total": 4379,
+        "reliable": 4379,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      }
+    },
+    "Many": {
+      "all": {
+        "total": 6752,
+        "reliable": 6752,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "clean": {
+        "total": 5237,
+        "reliable": 5237,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "noisy": {
+        "total": 1515,
+        "reliable": 1515,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      }
+    },
+    "Medium": {
+      "all": {
+        "total": 2559,
+        "reliable": 2559,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "clean": {
+        "total": 1037,
+        "reliable": 1037,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "noisy": {
+        "total": 1522,
+        "reliable": 1522,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      }
+    },
+    "Few": {
+      "all": {
+        "total": 1536,
+        "reliable": 1536,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "clean": {
+        "total": 194,
+        "reliable": 194,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      },
+      "noisy": {
+        "total": 1342,
+        "reliable": 1342,
+        "unreliable": 0,
+        "acceptance_rate": 1.0,
+        "rejection_rate": 0.0
+      }
+    }
+  },
+  "training_epoch_gate_and_relationship_counts": {
+    "Many_reliable": 6752,
+    "Many_unreliable": 0,
+    "Medium_reliable": 2559,
+    "Medium_unreliable": 0,
+    "Few_reliable": 1536,
+    "Few_unreliable": 0,
+    "self_view_positive_links": 21694,
+    "cross_sample_positive_links": 162000,
+    "prototype_positive_links": 21694,
+    "masked_sample_candidates": 0,
+    "masked_target_prototype_candidates": 0,
+    "active_denominator_candidates": 13193854
+  },
+  "few_logit_signals": {
+    "max_head_logit": {
+      "Clean_Few": {
+        "n": 194,
+        "mean": 3.652721881866455,
+        "median": 3.4636725187301636,
+        "q25": 2.839781939983368,
+        "q75": 4.349781513214111,
+        "iqr": 1.5099995732307434
+      },
+      "Many_to_Few": {
+        "n": 1097,
+        "mean": 4.4891767501831055,
+        "median": 4.296328544616699,
+        "q25": 3.2429001331329346,
+        "q75": 5.464713096618652,
+        "iqr": 2.2218129634857178
+      },
+      "auc_many_to_few_positive": 0.6514815476134538
+    },
+    "many_probability_mass": {
+      "Clean_Few": {
+        "n": 194,
+        "mean": 0.19987665299502883,
+        "median": 0.1846324374984858,
+        "q25": 0.10516720263099873,
+        "q75": 0.2606359812924045,
+        "iqr": 0.1554687786614058
+      },
+      "Many_to_Few": {
+        "n": 1097,
+        "mean": 0.3332706360662968,
+        "median": 0.2827553653102869,
+        "q25": 0.1823639382806049,
+        "q75": 0.4404825511221547,
+        "iqr": 0.2581186128415498
+      },
+      "auc_many_to_few_positive": 0.7080322153201327
+    },
+    "maximum_probability": {
+      "Clean_Few": {
+        "n": 194,
+        "mean": 0.28130817361136073,
+        "median": 0.2069675484341112,
+        "q25": 0.12082923726170229,
+        "q75": 0.3708089327214025,
+        "iqr": 0.24997969545970017
+      },
+      "Many_to_Few": {
+        "n": 1097,
+        "mean": 0.2866637009024035,
+        "median": 0.22080023252020617,
+        "q25": 0.13599493126906828,
+        "q75": 0.38463400306007944,
+        "iqr": 0.24863907179101116
+      },
+      "auc_many_to_few_positive": 0.5241145015929104
+    },
+    "entropy": {
+      "Clean_Few": {
+        "n": 194,
+        "mean": 3.0083130344132534,
+        "median": 3.313654881158393,
+        "q25": 2.569842616477894,
+        "q75": 3.7005735970472893,
+        "iqr": 1.1307309805693952
+      },
+      "Many_to_Few": {
+        "n": 1097,
+        "mean": 3.0128108217970664,
+        "median": 3.2308673827628156,
+        "q25": 2.6171653809754227,
+        "q75": 3.5914875005229603,
+        "iqr": 0.9743221195475376
+      },
+      "auc_many_to_few_positive": 0.47714009153361087,
+      "minus_entropy_auc_many_to_few_positive": 0.5228599084663891
+    }
+  },
+  "sample_diagnostics_local_only": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\epoch160_gate_comparison_40e_20261124\\BCL_ORIGINAL\\sample_logit_diagnostics_epoch200.csv"
+}
