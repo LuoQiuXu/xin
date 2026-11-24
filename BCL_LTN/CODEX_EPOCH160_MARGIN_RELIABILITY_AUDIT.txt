@@ -82,6 +82,9 @@ be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
 Expected noise-manifest SHA256:
 0903d755db1e490cdf7a507f38a2c05ccdb32c7ecbd01d029487ea95205bd5e8
 
+Expected noisy-label SHA256:
+691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f
+
 Expected Few observed-label bucket:
 - total: 1,536
 - clean/unflipped: 194
