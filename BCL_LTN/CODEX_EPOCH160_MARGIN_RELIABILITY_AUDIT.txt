@@ -1,0 +1,186 @@
+CODEX TASK — FROZEN EPOCH-160 MARGIN RELIABILITY AUDIT
+==========================================================
+
+REPOSITORY: LuoQiuXu/xin
+REQUIRED BRANCH: research/bcl-ltn-epoch160-margin-audit-20261124
+BASE BRANCH: research/bcl-ltn-independent-20261123
+
+MISSION
+-------
+Implement and run one offline reliability audit using the EXISTING BCL-LTN
+epoch_160_pre_decay.pth checkpoint. This is not a training task.
+
+The question:
+Can the observed-label margin rank unflipped (clean) examples above flipped
+(noisy) examples, especially inside the observed Few-label bucket?
+
+LOCKED SCOPE / DO NOT VIOLATE
+-----------------------------
+1. Work only on the required branch.
+2. BCL_AUDIT/ is strictly read-only. Do not edit, format, regenerate, rename,
+   or write any file under BCL_AUDIT/.
+3. Do not modify BCL_LTN/train_noisy_bcl.py, make_noisy_lt.py, BCL loss code,
+   the saved noise arrays, noise manifest, training summary, diagnostics,
+   or checkpoint.
+4. Do not retrain, fine-tune, run backward, call optimizer.step, or update BN.
+5. Do not instantiate, open, evaluate, or otherwise access CIFAR-100 TEST.
+6. Do not regenerate the LT indices, clean labels, noisy labels, or flip mask.
+7. Do not use clean labels or the flip mask to calculate scores or select
+   thresholds. They are evaluation truth only, read after model inference.
+8. Generated predictions/scores/plots/CSV/JSON remain local and ignored by Git.
+   Commit only the audit source, tests, and this instruction file.
+9. Preserve unrelated local changes. Do not overwrite any output directory.
+
+READ FIRST
+----------
+- BCL_LTN/README.md
+- BCL_LTN/outputs/BCL_sym04_baseline_report.md
+- BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42/training_summary.json
+- BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42/train_diagnostics/epoch_160.json
+- BCL_LTN/train_noisy_bcl.py
+- BCL_LTN/make_noisy_lt.py
+- BCL_AUDIT/cifar100lt/data.py
+- BCL_AUDIT/cifar100lt/models.py
+- BCL_AUDIT/cifar100lt/losses.py
+- BCL_AUDIT/cifar100lt/train.py
+
+FIXED LOCAL INPUTS
+------------------
+Repository root:
+D:/xiangmuxun/xin
+
+CIFAR-100 TRAIN root:
+D:/xiangmuxun/xin/H2T/data/cifar100
+
+Fixed IF=100 indices:
+D:/xiangmuxun/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy
+
+Noise artifacts:
+BCL_LTN/data/noise_manifest.json
+BCL_LTN/data/cifar100lt_if100_sym04_seed42.npy
+BCL_LTN/data/cifar100lt_if100_clean_seed42.npy
+BCL_LTN/data/cifar100lt_if100_is_noisy_seed42.npy
+
+Run directory:
+BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42
+
+Checkpoint:
+BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42/checkpoints/epoch_160_pre_decay.pth
+
+Expected checkpoint SHA256 from the saved training receipt:
+10f0cb41db390f04a9d401433cc121396ab67fad7eb11dee0095c40350d75428
+
+Expected model-state SHA256 from the Epoch-160 diagnostic:
+ef1a96e6d018a0dc2f6888b8816643935ab100856b6ad41655371a4ec5498102
+
+Expected fixed-index SHA256:
+be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
+
+Expected noise-manifest SHA256:
+0903d755db1e490cdf7a507f38a2c05ccdb32c7ecbd01d029487ea95205bd5e8
+
+Expected Few observed-label bucket:
+- total: 1,536
+- clean/unflipped: 194
+- noisy/flipped: 1,342
+- clean prevalence: 12.63%
+
+If any expected local artifact is missing or any SHA/provenance check fails,
+STOP before inference. Do not reconstruct or silently replace it.
+
+IMPLEMENTATION
+--------------
+Create:
+BCL_LTN/audit_epoch160_margin_reliability.py
+
+The audit must:
+A. Reuse BCL_LTN.train_noisy_bcl.load_verified_noise, OfficialTestAudit and
+   safe_torch_load. Reuse BCL_AUDIT.cifar100lt.models.BCLCIFARModel and the
+   audited state_dict_sha256 helper. No source changes in these modules.
+B. Verify the checkpoint file SHA against training_summary.json, checkpoint
+   epoch=160/seed=42, model-state hash against epoch_160.json, fixed-index SHA,
+   noise-manifest SHA, and observed noisy class counts used by LC/BCL.
+C. Create a TRAIN-only evaluation dataset that returns only (image, position).
+   It must not return clean labels, noisy labels, or flip masks to the model.
+D. Run exactly one deterministic eval-mode forward pass over all 10,847 fixed
+   TRAIN images with the standard eval transform, batch size 256, num_workers 0.
+   The model must remain in eval mode and its state hash must be identical
+   before/after inference. No gradients or optimizer.
+E. Define each sample's margin against its OBSERVED noisy label y_obs:
+      m_i = z_i[y_obs] - max_{k != y_obs} z_i[k]
+F. Calculate four predeclared score variants:
+   1. raw_margin: m_i from raw logits z.
+   2. lc_plus_log_prior_margin: margin from z + log(pi), matching the exact
+      LogitCompensatedCE training convention.
+   3. inverse_prior_margin: margin from z - log(pi), a diagnostic hypothesis.
+   4. class_normalized_raw_margin:
+      (raw_margin - mean_margin[observed_class]) /
+      std_margin[observed_class].
+   pi must use observed noisy-label class counts, not clean counts.
+   Class normalization must use observed class membership and score values
+   only, never clean/noisy status.
+G. Crucial grouping: report Many/Medium/Few by the OBSERVED LABEL's class
+   frequency group (class groups defined from the original clean IF=100 class
+   count vector). Do not group by original source class. Verify exact group
+   totals and clean positives against the noise manifest:
+      Many: 6752 total / 5237 clean / 1515 noisy
+      Medium: 2559 total / 1037 clean / 1522 noisy
+      Few: 1536 total / 194 clean / 1342 noisy
+H. Treat clean/unflipped as positive and flipped/noisy as negative. Report:
+   - pooled group ROC-AUC;
+   - average precision (step-wise AP);
+   - trapezoidal PR-AUC (label distinctly from AP);
+   - stratified-bootstrap 95% CIs for these ranking metrics;
+   - macro per-observed-class ROC-AUC/AP/PR-AUC within each group;
+   - per-class metrics and sample counts.
+I. Report threshold operating points at score >= 0 and at score quantiles
+   q10/q25/q50/q75/q90. Quantiles are computed from unlabeled scores only.
+   For each point report precision(clean), recall(clean), noisy acceptance
+   rate, clean rejection rate, TP/FP/FN/TN and selected count.
+J. Generate:
+   - margin_distributions.png (Many/Medium/Few x four score methods);
+   - roc_pr_curves.png;
+   - group_metrics.csv;
+   - threshold_metrics.csv;
+   - per_observed_class_metrics.csv;
+   - sample_scores.csv (offline-only, contains clean truth; never commit);
+   - audit_summary.json;
+   - AUDIT_REPORT.md.
+K. Add unit tests for target margin, log-prior signs, AUC/AP with ties,
+   within-class normalization invariance, observed-label grouping, threshold
+   metrics, deterministic stratified bootstrap, and eval dataset label isolation.
+
+RUN PROTOCOL
+------------
+In PowerShell, from repository root:
+
+$env:PYTHONDONTWRITEBYTECODE = "1"
+
+python -B -m pytest BCL_LTN/tests BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
+
+python -B -m BCL_LTN.audit_epoch160_margin_reliability --data-root "D:/xiangmuxun/xin/H2T/data/cifar100" --indices-file "D:/xiangmuxun/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy" --noise-dir "BCL_LTN/data" --run-dir "BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42" --output-dir "BCL_LTN/outputs/epoch160_margin_reliability_audit_20261124" --device cuda:0 --batch-size 256 --num-workers 0 --bootstrap-reps 300 --bootstrap-seed 20261124
+
+If the output directory already exists, choose a fresh suffix and update the
+command; never overwrite. If the checkpoint/data are missing, report the exact
+missing path and stop. Do not run the training command.
+
+ACCEPTANCE
+----------
+- All tests pass.
+- Checkpoint file SHA and model-state SHA match the receipts exactly.
+- Exactly 10,847 TRAIN images inferred once; all logits finite.
+- Model-state hash unchanged before/after inference.
+- TEST opens=0 and denied TEST opens=0.
+- Few observed bucket is exactly 1536 = 194 clean + 1342 noisy.
+- No clean/noisy truth was used to calculate score values or choose thresholds.
+- BCL_AUDIT/ has zero changes; no training/checkpoint/noise files are modified.
+- Git diff contains only BCL_LTN/audit_epoch160_margin_reliability.py,
+  BCL_LTN/tests/test_epoch160_margin_reliability.py, and this task file.
+- Do not start a 40-epoch run or implement any noise-filtering/gating method.
+
+FINAL REPORT
+------------
+Return branch and HEAD; git status; exact test output; checkpoint and manifest
+hash verification; 10,847-sample inference time; group composition; ROC-AUC,
+AP, trapezoidal PR-AUC and CIs; threshold table; macro/per-class outputs;
+plot paths; TEST access counts; and any deviations/failures.
