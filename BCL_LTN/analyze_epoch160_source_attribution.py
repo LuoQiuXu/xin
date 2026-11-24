@@ -443,6 +443,34 @@ def main():
     except Exception:
         # Preserve the partial local diagnostic directory for transparent debugging.
         raise
+    few_sources = pd.read_csv(args.output_dir / "few_source_breakdown.csv")
+    pairwise = pd.read_csv(args.output_dir / "few_pairwise_source_metrics.csv")
+    decomposition = pd.read_csv(args.output_dir / "few_auc_source_decomposition.csv")
+    raw_pairwise = pairwise[pairwise["score"] == "raw_margin"]
+    lc_pairwise = pairwise[pairwise["score"] == "lc_plus_log_prior_margin"]
+    pairwise_rows = []
+    for source in GROUP_ORDER:
+        raw_row = raw_pairwise[raw_pairwise["negative_subset"] == f"{source}_to_Few"]
+        lc_row = lc_pairwise[lc_pairwise["negative_subset"] == f"{source}_to_Few"]
+        if raw_row.empty:
+            continue
+        rr = raw_row.iloc[0]
+        lr = lc_row.iloc[0]
+        pairwise_rows.append(
+            f"| {source}->Few | {int(rr['n_negative_source'])} | "
+            f"{rr['roc_auc']:.4f} | {rr['average_precision']:.4f} | "
+            f"{lr['roc_auc']:.4f} | {lr['average_precision']:.4f} |"
+        )
+    source_rows = [
+        f"| {row.source_group} | {int(row.total)} | {int(row.clean)} | {int(row.noisy)} | "
+        f"{100.0 * row.fraction_of_few_noisy:.2f}% |"
+        for row in few_sources.itertuples(index=False)
+    ]
+    decomp_rows = [
+        f"| {row.score} | {row.pooled_few_auc:.6f} | "
+        f"{row.weighted_source_pairwise_auc:.6f} | {row.absolute_difference:.2e} |"
+        for row in decomposition.itertuples(index=False)
+    ]
     report_lines = [
         "# Epoch-160 source-to-observed-group attribution",
         "",
@@ -454,6 +482,24 @@ def main():
         f"({100.0 * result['many_to_few_share_of_few_noisy']:.2f}% of Few noise)",
         f"- Class-adaptive Few q90 threshold (score-only): {result['gate_reference']['few_q90_threshold']:.10f}",
         f"- Reference Few samples above q90: {result['gate_reference']['expected_few_acceptance_at_reference']}",
+        "",
+        "## Observed-Few source breakdown",
+        "",
+        "| Source group | Total in observed Few | Clean | Noisy | Share of Few noise |",
+        "|---|---:|---:|---:|---:|",
+        *source_rows,
+        "",
+        "## Pairwise separation: Clean Few vs noisy source-to-Few",
+        "",
+        "| Noisy source | n negatives | Raw-margin AUC | Raw-margin AP | LC+prior AUC | LC+prior AP |",
+        "|---|---:|---:|---:|---:|---:|",
+        *pairwise_rows,
+        "",
+        "## Pooled AUC decomposition check",
+        "",
+        "| Score | Pooled Few AUC | Weighted source AUC | Absolute difference |",
+        "|---|---:|---:|---:|",
+        *decomp_rows,
         "",
         "## Logit / entropy availability",
         "",
