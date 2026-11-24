@@ -5,6 +5,7 @@ import csv
 import hashlib
 import json
 import math
+import pickle
 import time
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
-from BCL_AUDIT.cifar100lt.data import CIFAR100LT
+from BCL_AUDIT.cifar100lt.data import build_cifar_transforms
 from BCL_AUDIT.cifar100lt.train import state_dict_sha256
 from BCL_LTN.make_noisy_lt import group_class_ids
 from BCL_LTN.train_noisy_bcl import OfficialTestAudit, load_verified_noise, safe_torch_load
@@ -59,6 +60,21 @@ def write_json(path: Path, value) -> None:
         json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
         encoding="utf-8",
     )
+
+
+def load_cifar100_train_pixels_only(data_root: Path) -> np.ndarray:
+    """Read the CIFAR-100 TRAIN pickle and retain only its image tensor."""
+    train_path = data_root / "cifar-100-python" / "train"
+    with train_path.open("rb") as stream:
+        payload = pickle.load(stream, encoding="bytes")
+    raw = payload.get(b"data", payload.get("data"))
+    if raw is None:
+        raise RuntimeError(f"CIFAR-100 TRAIN pickle has no data field: {train_path}")
+    raw = np.asarray(raw)
+    del payload  # Drop the unneeded fine-label field before inference.
+    if raw.shape != (50_000, 3 * 32 * 32) or raw.dtype != np.uint8:
+        raise RuntimeError(f"Unexpected CIFAR-100 TRAIN image array: shape={raw.shape}, dtype={raw.dtype}")
+    return raw.reshape(50_000, 3, 32, 32).transpose(0, 2, 3, 1).copy()
 
 
 class EvalOnlyTrainDataset(Dataset):
@@ -488,7 +504,7 @@ def build_report(summary: dict, metric_rows: list[dict], threshold_rows: list[di
         "- raw_margin: z[y_obs] - max(z[k], k != y_obs).",
         "- lc_plus_log_prior_margin: the exact training-loss adjustment z + log(pi), then the observed-label margin.",
         "- inverse_prior_margin: z - log(pi), an alternative scoring hypothesis, not a training change.",
-        "- class_normalized_raw_margin: (raw_margin - observed-class mean) / observed-class standard deviation.",
+        "- class_normalized_raw_margin: (raw_margin - observed-class mean) / (observed-class standard deviation + 1e-8).",
         "- pi is computed from the observed noisy-label class counts used by LC/BCL.",
         "- Class normalization uses all scores in each observed class and never reads clean/noisy status.",
         "",
@@ -622,8 +638,9 @@ def run_audit(args):
             or manifest.get("num_train_samples") != 10_847 or manifest.get("num_classes") != 100
             or manifest.get("num_flipped") != 4_379 or manifest.get("num_unflipped") != 6_468):
         raise RuntimeError("Noise manifest does not match the locked NR=0.4 seed-42 protocol")
-    if manifest.get("train_source_sha256") != EXPECTED_TRAIN_SOURCE_SHA256:
-        raise RuntimeError("TRAIN/meta source hashes differ from the locked data receipt")
+    manifest_train_hashes = manifest.get("train_source_sha256")
+    if manifest_train_hashes is not None and manifest_train_hashes != EXPECTED_TRAIN_SOURCE_SHA256:
+        raise RuntimeError("TRAIN/meta source hashes recorded in the manifest differ from the locked data receipt")
     train_source_dir = data_root / "cifar-100-python"
     for source_name, expected_sha in EXPECTED_TRAIN_SOURCE_SHA256.items():
         if sha256_file(train_source_dir / source_name) != expected_sha:
@@ -644,14 +661,14 @@ def run_audit(args):
         raise RuntimeError("Observed noisy-label counts differ from the noise manifest")
     clean_counts = np.asarray(manifest["clean_class_counts"], dtype=np.int64)
 
-    # The dataset object supplies TRAIN pixels, fixed indices and the eval transform.
-    # EvalOnlyTrainDataset returns no labels, and the model receives only images.
-    base = CIFAR100LT(
-        root=data_root, mode="bcl", indices_file=indices_path,
-        split_seed=0, download=False,
-    )
-    if len(base.indices) != 10_847 or np.unique(base.indices).size != 10_847:
-        raise RuntimeError("Fixed IF=100 TRAIN indices are not a unique 10,847-element vector")
+    # Load only the fixed index vector and raw TRAIN pixels before inference.
+    # The clean target array is deliberately not materialized in this phase.
+    indices = np.load(indices_path, allow_pickle=False).astype(np.int64, copy=False)
+    if (indices.shape != (10_847,) or np.unique(indices).size != 10_847
+            or np.any(indices < 0) or np.any(indices >= 50_000)):
+        raise RuntimeError("Fixed IF=100 TRAIN indices are not a valid unique 10,847-element vector")
+    raw_train_data = load_cifar100_train_pixels_only(data_root)
+    _, _, transform_eval = build_cifar_transforms()
     checkpoint_sha = sha256_file(checkpoint_path)
     if checkpoint_sha != EXPECTED_CHECKPOINT_SHA256:
         raise RuntimeError("Epoch-160 checkpoint SHA256 differs from the locked experiment receipt")
@@ -689,7 +706,7 @@ def run_audit(args):
     model = model.to(device)
     model.eval()
 
-    eval_set = EvalOnlyTrainDataset(base.data, base.indices, base.transform_eval)
+    eval_set = EvalOnlyTrainDataset(raw_train_data, indices, transform_eval)
     loader = DataLoader(
         eval_set, batch_size=args.batch_size, shuffle=False,
         num_workers=0, pin_memory=(device.type == "cuda"),
@@ -724,7 +741,7 @@ def run_audit(args):
         data_root, indices_path, noise_dir
     )
     if (not np.array_equal(verified_noisy, noisy_labels)
-            or not np.array_equal(verified_base.indices, base.indices)
+            or not np.array_equal(verified_base.indices, indices)
             or sha256_file(manifest_path) != manifest_sha):
         raise RuntimeError("Post-inference label-truth verification differs from pre-inference inputs")
 
@@ -787,7 +804,7 @@ def run_audit(args):
             )
             writer.writerow({
                 "position": position,
-                "original_train_index": int(base.indices[position]),
+                "original_train_index": int(indices[position]),
                 "observed_label": observed,
                 "clean_label": int(clean_labels[position]),
                 "is_clean": int(not is_noisy[position]),
