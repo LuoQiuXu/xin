@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Optional, Tuple
 
 import numpy as np
@@ -32,8 +33,8 @@ def estimate_clean_class_counts(
         raise ValueError("epsilon must be finite and positive")
 
     total = float(observed.sum())
-    if total <= 0:
-        raise ValueError("observed_counts must have positive total mass")
+    if not np.isfinite(total) or total <= 0:
+        raise ValueError("observed_counts must have finite positive total mass")
     k = observed.size
     diagonal_scale = 1.0 - float(noise_rate) - float(noise_rate) / (k - 1)
     noise_floor = float(noise_rate) * total / (k - 1)
@@ -41,7 +42,7 @@ def estimate_clean_class_counts(
 
     positive = np.maximum(raw, float(epsilon))
     corrected = positive * (total / float(positive.sum()))
-    if (not np.isfinite(corrected).all()
+    if (not np.isfinite(raw).all() or not np.isfinite(corrected).all()
             or np.any(corrected <= 0)
             or abs(float(corrected.sum()) - total) > max(1e-6, total * 1e-10)):
         raise RuntimeError("Clean-count inversion failed positivity or normalization checks")
@@ -78,15 +79,15 @@ def soft_targets_from_three_view_logits(
     """
     if all_logits.ndim != 2 or all_logits.shape[0] != 3 * int(batch_size):
         raise ValueError("all_logits must have shape [3 * batch_size, num_classes]")
-    if batch_size < 1 or temperature <= 0:
-        raise ValueError("batch_size and temperature must be positive")
-    if not bool(torch.isfinite(all_logits).all()):
-        raise ValueError("all_logits must be finite")
-    num_classes = int(all_logits.shape[1])
-    three_views = all_logits.reshape(3, int(batch_size), num_classes)
-    mean_raw_logits = three_views.mean(dim=0)
-    # q is a detached target; no gradient may flow through its construction.
-    return F.softmax(mean_raw_logits / float(temperature), dim=1).detach()
+    if batch_size < 1 or not math.isfinite(temperature) or temperature <= 0:
+        raise ValueError("batch_size and temperature must be finite and positive")
+    if all_logits.shape[1] < 2 or not all_logits.is_floating_point() or not bool(torch.isfinite(all_logits).all()):
+        raise ValueError("all_logits must be finite floating-point logits for at least two classes")
+    three_views = all_logits.detach().reshape(3, int(batch_size), all_logits.shape[1])
+    q = F.softmax(three_views.mean(dim=0) / float(temperature), dim=1)
+    if not bool(torch.isfinite(q).all()):
+        raise ValueError("Raw-logit soft targets must be finite")
+    return q.detach()
 
 
 class ForwardCorrectedLogitCompensation(nn.Module):
@@ -99,47 +100,49 @@ class ForwardCorrectedLogitCompensation(nn.Module):
         noise_rate: float = 0.4,
     ):
         super().__init__()
-        counts = torch.as_tensor(clean_class_counts, dtype=torch.float32)
+        counts = torch.as_tensor(clean_class_counts, dtype=torch.float32).detach()
         if counts.ndim != 1 or counts.numel() < 2 or not bool(torch.isfinite(counts).all()):
             raise ValueError("clean_class_counts must be a finite 1-D vector")
         if bool(torch.any(counts <= 0)):
             raise ValueError("Every corrected class count must be positive")
         log_prior = torch.log(counts / counts.sum())
+        if not bool(torch.isfinite(log_prior).all()):
+            raise ValueError("The corrected log prior must be finite")
         transition = symmetric_transition_matrix(
             int(counts.numel()), noise_rate, dtype=torch.float32
         )
         self.register_buffer("log_prior", log_prior)
         self.register_buffer("transition", transition)
-        self.register_buffer("log_transition", transition.log())
         self.noise_rate = float(noise_rate)
 
+    def _adjusted_logits(self, logits: torch.Tensor) -> torch.Tensor:
+        if logits.ndim != 2 or logits.shape[0] == 0 or logits.shape[1] != self.log_prior.numel():
+            raise ValueError("logits must have shape [nonempty batch, num_classes]")
+        if not logits.is_floating_point() or not bool(torch.isfinite(logits).all()):
+            raise ValueError("logits must be finite floating-point values")
+        return logits + self.log_prior.to(logits)
+
     def clean_probabilities(self, logits: torch.Tensor) -> torch.Tensor:
-        if logits.ndim != 2 or logits.shape[1] != self.log_prior.numel():
-            raise ValueError("logits must have shape [batch, num_classes]")
-        return F.softmax(
-            logits + self.log_prior.to(device=logits.device, dtype=logits.dtype),
-            dim=1,
-        )
+        return F.softmax(self._adjusted_logits(logits), dim=1)
 
     def observed_log_probabilities(self, logits: torch.Tensor) -> torch.Tensor:
-        log_p_clean = F.log_softmax(
-            logits + self.log_prior.to(device=logits.device, dtype=logits.dtype),
-            dim=1,
-        )
-        log_t = self.log_transition.to(device=logits.device, dtype=logits.dtype)
+        log_p_clean = F.log_softmax(self._adjusted_logits(logits), dim=1)
+        log_t = self.transition.to(logits).log()
         # log P(observed=j | x) = logsumexp_i(log P(clean=i | x) + log T[i,j]).
         return torch.logsumexp(log_p_clean.unsqueeze(2) + log_t.unsqueeze(0), dim=1)
 
     def forward(self, logits: torch.Tensor, observed_targets: torch.Tensor) -> torch.Tensor:
-        if logits.ndim != 2 or logits.shape[1] != self.log_prior.numel():
-            raise ValueError("logits must have shape [batch, num_classes]")
+        log_p_clean = F.log_softmax(self._adjusted_logits(logits), dim=1)
         if observed_targets.ndim != 1 or observed_targets.shape[0] != logits.shape[0]:
             raise ValueError("observed_targets must have shape [batch]")
+        if observed_targets.is_floating_point() or observed_targets.is_complex() or observed_targets.dtype == torch.bool:
+            raise ValueError("Observed labels must be integer IDs")
         targets = observed_targets.to(device=logits.device, dtype=torch.long)
         if bool(torch.any((targets < 0) | (targets >= logits.shape[1]))):
             raise ValueError("Observed label outside class range")
-        log_p_observed = self.observed_log_probabilities(logits)
-        return F.nll_loss(log_p_observed, targets)
+        # Only one observed column per sample contributes to the NLL.
+        log_t_for_target = self.transition.to(logits).T[targets].log()
+        return -torch.logsumexp(log_p_clean + log_t_for_target, dim=1).mean()
 
 
 class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
@@ -155,16 +158,18 @@ class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
         super().__init__()
         if num_classes < 2:
             raise ValueError("num_classes must be at least two")
-        if temperature <= 0:
-            raise ValueError("temperature must be positive")
+        if not math.isfinite(temperature) or temperature <= 0:
+            raise ValueError("temperature must be finite and positive")
         self.num_classes = int(num_classes)
         self.temperature = float(temperature)
 
     @staticmethod
     def confidence_reliability(q: torch.Tensor) -> torch.Tensor:
         k = q.shape[1]
-        max_probability = q.max(dim=1).values
-        return ((max_probability - 1.0 / k) / (1.0 - 1.0 / k)).clamp(0.0, 1.0)
+        min_probability, max_probability = torch.aminmax(q, dim=1)
+        reliability = ((max_probability - 1.0 / k) / (1.0 - 1.0 / k)).clamp(0.0, 1.0)
+        # A mathematically uniform row must have zero semantic weight despite normalization rounding.
+        return reliability.masked_fill(max_probability == min_probability, 0.0)
 
     def _instance_only_loss(self, two_view_features: torch.Tensor) -> torch.Tensor:
         batch_size = int(two_view_features.shape[0])
@@ -181,55 +186,17 @@ class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
         # Standard instance-level NT-Xent: exactly one positive per anchor.
         return F.cross_entropy(logits, paired_indices)
 
-    def forward(
-        self,
-        class_prototypes: Optional[torch.Tensor],
-        two_view_features: torch.Tensor,
-        soft_targets: Optional[torch.Tensor] = None,
-        *,
-        semantic_enabled: bool = True,
-    ) -> torch.Tensor:
-        if two_view_features.ndim != 3 or two_view_features.shape[1] != 2:
-            raise ValueError("two_view_features must have shape [batch, 2, feature_dim]")
-        batch_size = int(two_view_features.shape[0])
-        if batch_size < 1:
-            raise ValueError("batch must be non-empty")
-        if not bool(torch.isfinite(two_view_features).all()):
-            raise ValueError("two_view_features must be finite")
-
-        # Epochs 0..19 use pure instance-level contrastive learning. No q,
-        # class prototypes, or class-conditioned positive links are consulted.
-        if not semantic_enabled:
-            return self._instance_only_loss(two_view_features)
-
-        if class_prototypes is None:
-            raise ValueError("class_prototypes are required after the cold-start phase")
-        if class_prototypes.ndim != 2 or class_prototypes.shape[0] != self.num_classes:
-            raise ValueError("class_prototypes must have shape [num_classes, feature_dim]")
-        if two_view_features.shape[2] != class_prototypes.shape[1]:
-            raise ValueError("Feature dimensions of samples and prototypes must match")
-        if soft_targets is None or soft_targets.shape != (batch_size, self.num_classes):
-            raise ValueError("soft_targets must have shape [batch, num_classes]")
-        if not bool(torch.isfinite(soft_targets).all()) or bool(torch.any(soft_targets < 0)):
-            raise ValueError("soft_targets must be finite and non-negative")
-
+    def _semantic_weights(self, soft_targets: torch.Tensor, features: torch.Tensor):
         # Critical: detach before any q_i q_j or prototype-positive calculation.
-        q = soft_targets.detach().to(
-            device=two_view_features.device, dtype=two_view_features.dtype
-        )
+        q = soft_targets.detach().to(features)
+        if not bool(torch.isfinite(q).all() & (q >= 0).all()):
+            raise ValueError("soft_targets must be finite and non-negative")
         row_sums = q.sum(dim=1, keepdim=True)
-        if bool(torch.any(row_sums <= 0)):
-            raise ValueError("Every soft-target row must have positive mass")
+        if not bool(torch.isfinite(row_sums).all() & (row_sums > 0).all()):
+            raise ValueError("Every soft-target row must have finite positive mass")
         q = q / row_sums
+        batch_size = q.shape[0]
         reliability = self.confidence_reliability(q)
-
-        sample_features = torch.cat(
-            [two_view_features[:, 0, :], two_view_features[:, 1, :]], dim=0
-        )
-        prototypes = class_prototypes.to(
-            device=two_view_features.device, dtype=two_view_features.dtype
-        )
-        all_features = torch.cat([sample_features, prototypes], dim=0)
 
         prototype_q = torch.eye(
             self.num_classes, device=q.device, dtype=q.dtype
@@ -268,10 +235,39 @@ class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
         class_occurrences = candidate_q.sum(dim=0)
         candidate_class_mass = candidate_q @ class_occurrences
         per_entry_weight = candidate_class_mass.unsqueeze(0) - positive_weights
-        active_weights = per_entry_weight[logits_mask.bool()]
-        if (not bool(torch.isfinite(active_weights).all())
-                or bool(torch.any(active_weights <= 0))):
-            raise RuntimeError("Soft BCL produced a non-positive denominator weight")
+        if not bool(torch.isfinite(per_entry_weight).all() & (per_entry_weight > 0).all()):
+            raise RuntimeError("Soft BCL produced a non-finite or non-positive denominator weight")
+        return positive_weights, logits_mask, per_entry_weight, class_occurrences
+
+    def forward(
+        self,
+        class_prototypes: Optional[torch.Tensor],
+        two_view_features: torch.Tensor,
+        soft_targets: Optional[torch.Tensor] = None,
+        *,
+        semantic_enabled: bool = True,
+    ) -> torch.Tensor:
+        if (two_view_features.ndim != 3 or two_view_features.shape[1] != 2
+                or two_view_features.shape[0] == 0 or two_view_features.shape[2] == 0):
+            raise ValueError("two_view_features must have shape [nonempty batch, 2, feature_dim]")
+        if not two_view_features.is_floating_point() or not bool(torch.isfinite(two_view_features).all()):
+            raise ValueError("two_view_features must contain finite floating-point values")
+
+        if not semantic_enabled:
+            return self._instance_only_loss(two_view_features)
+
+        batch_size = two_view_features.shape[0]
+        if class_prototypes is None or class_prototypes.shape != (self.num_classes, two_view_features.shape[2]):
+            raise ValueError("class_prototypes must have shape [num_classes, feature_dim]")
+        if soft_targets is None or soft_targets.shape != (batch_size, self.num_classes):
+            raise ValueError("soft_targets must have shape [batch, num_classes]")
+        sample_features = torch.cat([two_view_features[:, 0, :], two_view_features[:, 1, :]], dim=0)
+        prototypes = class_prototypes.to(two_view_features)
+        if not bool(torch.isfinite(prototypes).all()):
+            raise ValueError("class_prototypes must be finite")
+        all_features = torch.cat([sample_features, prototypes], dim=0)
+        num_anchors = 2 * batch_size
+        positive_weights, logits_mask, per_entry_weight, _ = self._semantic_weights(soft_targets, two_view_features)
 
         logits = (all_features[:num_anchors] @ all_features.T) / self.temperature
         logits = logits - logits.max(dim=1, keepdim=True).values.detach()
