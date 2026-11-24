@@ -50,13 +50,13 @@ READ FIRST
 FIXED LOCAL INPUTS
 ------------------
 Repository root:
-D:/xiangmuxun/xin
+D:/xiangmuxunlian/xin
 
 CIFAR-100 TRAIN root:
-D:/xiangmuxun/xin/H2T/data/cifar100
+D:/xiangmuxunlian/xin/H2T/data/cifar100
 
 Fixed IF=100 indices:
-D:/xiangmuxun/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy
+D:/xiangmuxunlian/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy
 
 Noise artifacts:
 BCL_LTN/data/noise_manifest.json
@@ -108,6 +108,9 @@ B. Verify the checkpoint file SHA against training_summary.json, checkpoint
    noise-manifest SHA, and observed noisy class counts used by LC/BCL.
 C. Create a TRAIN-only evaluation dataset that returns only (image, position).
    It must not return clean labels, noisy labels, or flip masks to the model.
+   Do not instantiate CIFAR100LT before inference because its constructor
+   materializes clean targets. Load only raw TRAIN pixels and the fixed index
+   vector for the inference dataset; defer load_verified_noise until afterward.
 D. Run exactly one deterministic eval-mode forward pass over all 10,847 fixed
    TRAIN images with the standard eval transform, batch size 256, num_workers 0.
    The model must remain in eval mode and its state hash must be identical
@@ -123,7 +126,7 @@ F. Calculate four predeclared score variants:
    3. inverse_prior_margin: margin from z - log(pi), a diagnostic hypothesis.
    4. class_normalized_raw_margin:
       (raw_margin - mean_margin[observed_class]) /
-      std_margin[observed_class].
+      (std_margin[observed_class] + 1e-8).
    pi must use observed noisy-label class counts, not clean counts.
    Class normalization must use observed class membership and score values
    only, never clean/noisy status.
@@ -141,7 +144,7 @@ H. Treat clean/unflipped as positive and flipped/noisy as negative. Report:
    - stratified-bootstrap 95% CIs for these ranking metrics;
    - macro per-observed-class ROC-AUC/AP/PR-AUC within each group;
    - per-class metrics and sample counts.
-I. Report threshold operating points at score >= 0 and at score quantiles
+I. Report threshold operating points at score > 0 and at score quantiles
    q10/q25/q50/q75/q90. Quantiles are computed from unlabeled scores only.
    For each point report precision(clean), recall(clean), noisy acceptance
    rate, clean rejection rate, TP/FP/FN/TN and selected count.
@@ -160,13 +163,18 @@ K. Add unit tests for target margin, log-prior signs, AUC/AP with ties,
 
 RUN PROTOCOL
 ------------
-In PowerShell, from repository root:
+In PowerShell, first verify the actual repository root:
+
+Set-Location "D:/xiangmuxunlian/xin"
+if ((Get-Location).Path -ne "D:\xiangmuxunlian\xin") { throw "Unexpected repository root" }
+if (-not (Test-Path "H2T/data/cifar100/cifar-100-python/train")) { throw "TRAIN pickle missing" }
+if (-not (Test-Path "BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy")) { throw "Fixed IF=100 indices missing" }
 
 $env:PYTHONDONTWRITEBYTECODE = "1"
 
 python -B -m pytest BCL_LTN/tests BCL_AUDIT/cifar100lt/tests -q -rA -p no:cacheprovider
 
-python -B -m BCL_LTN.audit_epoch160_margin_reliability --data-root "D:/xiangmuxun/xin/H2T/data/cifar100" --indices-file "D:/xiangmuxun/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy" --noise-dir "BCL_LTN/data" --run-dir "BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42" --output-dir "BCL_LTN/outputs/epoch160_margin_reliability_audit_20261124" --device cuda:0 --batch-size 256 --num-workers 0 --bootstrap-reps 300 --bootstrap-seed 20261124
+python -B -m BCL_LTN.audit_epoch160_margin_reliability --data-root "D:/xiangmuxunlian/xin/H2T/data/cifar100" --indices-file "D:/xiangmuxunlian/xin/BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy" --noise-dir "BCL_LTN/data" --run-dir "BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42" --output-dir "BCL_LTN/outputs/epoch160_margin_reliability_audit_20261124" --device cuda:0 --batch-size 256 --num-workers 0 --bootstrap-reps 300 --bootstrap-seed 20261124
 
 If the output directory already exists, choose a fresh suffix and update the
 command; never overwrite. If the checkpoint/data are missing, report the exact
