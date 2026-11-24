@@ -846,7 +846,7 @@ def run_audit(args):
             "raw_margin": "z[y_obs] - max_{k!=y_obs} z[k]",
             "lc_plus_log_prior_margin": "margin computed from z + log(pi), matching LogitCompensatedCE training convention",
             "inverse_prior_margin": "margin computed from z - log(pi), diagnostic hypothesis only",
-            "class_normalized_raw_margin": "(raw_margin - observed-class mean) / observed-class std; computed without clean/noisy status",
+            "class_normalized_raw_margin": "(raw_margin - observed-class mean) / (observed-class std + 1e-8); computed without clean/noisy status",
         },
         "class_normalization_stats": class_stats,
         "group_composition": group_composition,
