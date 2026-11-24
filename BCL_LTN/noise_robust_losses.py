@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import torch
@@ -8,79 +8,44 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def project_lower_bounded_simplex(
-    values: np.ndarray,
-    *,
-    total: float,
-    lower_bound: float,
-) -> np.ndarray:
-    """Euclidean projection onto {x: sum(x)=total, x_i>=lower_bound}."""
-    v = np.asarray(values, dtype=np.float64)
-    if v.ndim != 1 or v.size == 0 or not np.isfinite(v).all():
-        raise ValueError("values must be a finite non-empty vector")
-    if not np.isfinite(total) or not np.isfinite(lower_bound):
-        raise ValueError("total and lower_bound must be finite")
-    remaining = float(total) - float(lower_bound) * v.size
-    if remaining < 0:
-        raise ValueError("total is smaller than the required lower-bound mass")
-    shifted = v - float(lower_bound)
-    ordered = np.sort(shifted)[::-1]
-    cumulative = np.cumsum(ordered) - remaining
-    indices = np.arange(1, v.size + 1, dtype=np.float64)
-    valid = ordered - cumulative / indices > 0
-    if not np.any(valid):
-        theta = cumulative[-1] / v.size
-    else:
-        rho = int(np.flatnonzero(valid)[-1])
-        theta = cumulative[rho] / float(rho + 1)
-    projected = np.maximum(shifted - theta, 0.0) + float(lower_bound)
-    # Remove floating-point sum drift without violating the lower bound.
-    drift = float(total) - float(projected.sum())
-    if abs(drift) > 1e-10:
-        free = np.flatnonzero(projected > lower_bound + 1e-12)
-        if free.size:
-            projected[free] += drift / free.size
-        elif abs(drift) > 1e-7:
-            raise RuntimeError("Could not correct simplex projection sum drift")
-    if (not np.isfinite(projected).all()
-            or np.any(projected < lower_bound - 1e-8)
-            or abs(float(projected.sum()) - float(total)) > 1e-6):
-        raise RuntimeError("Lower-bounded simplex projection failed its constraints")
-    return projected
-
-
 def estimate_clean_class_counts(
     observed_counts: np.ndarray,
     *,
     noise_rate: float = 0.4,
-    min_count: float = 5.0,
+    epsilon: float = 1.0,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Invert a known symmetric K-class noise channel, then project to the LT simplex.
+    """Invert a known symmetric K-class noise channel using observed counts only.
 
-    Returns (unconstrained_inverse_counts, projected_clean_count_estimate).
-    The caller must provide only counts of observed noisy labels; no clean labels
-    or corruption mask are used here.
+    Returns (unconstrained_inverse_counts, positive_renormalized_counts).
+    No dataset imbalance ratio, clean labels, or corruption mask is used.
+    epsilon is a small count-space floor before normalization, not a class-count
+    prior: the returned counts are renormalized to sum to the observed total.
     """
     observed = np.asarray(observed_counts, dtype=np.float64)
     if observed.ndim != 1 or observed.size < 2:
         raise ValueError("observed_counts must be a 1-D vector with at least two classes")
     if not np.isfinite(observed).all() or np.any(observed < 0):
         raise ValueError("observed_counts must be finite and non-negative")
-    if not 0.0 <= noise_rate < (observed.size - 1) / observed.size:
+    if not np.isfinite(noise_rate) or not 0.0 <= noise_rate < (observed.size - 1) / observed.size:
         raise ValueError("Symmetric transition is not invertible at this noise rate")
-    if not np.isfinite(min_count) or min_count < 0:
-        raise ValueError("min_count must be finite and non-negative")
+    if not np.isfinite(epsilon) or epsilon <= 0:
+        raise ValueError("epsilon must be finite and positive")
+
     total = float(observed.sum())
-    if total <= min_count * observed.size:
-        raise ValueError("Observed total is incompatible with the requested class floor")
+    if total <= 0:
+        raise ValueError("observed_counts must have positive total mass")
     k = observed.size
     diagonal_scale = 1.0 - float(noise_rate) - float(noise_rate) / (k - 1)
     noise_floor = float(noise_rate) * total / (k - 1)
     raw = (observed - noise_floor) / diagonal_scale
-    projected = project_lower_bounded_simplex(
-        raw, total=total, lower_bound=float(min_count)
-    )
-    return raw, projected
+
+    positive = np.maximum(raw, float(epsilon))
+    corrected = positive * (total / float(positive.sum()))
+    if (not np.isfinite(corrected).all()
+            or np.any(corrected <= 0)
+            or abs(float(corrected.sum()) - total) > max(1e-6, total * 1e-10)):
+        raise RuntimeError("Clean-count inversion failed positivity or normalization checks")
+    return raw, corrected
 
 
 def symmetric_transition_matrix(
@@ -98,6 +63,30 @@ def symmetric_transition_matrix(
     eye = torch.eye(num_classes, device=device, dtype=dtype)
     off_diagonal = (1.0 - eye) * (float(noise_rate) / (num_classes - 1))
     return eye * (1.0 - float(noise_rate)) + off_diagonal
+
+
+def soft_targets_from_three_view_logits(
+    all_logits: torch.Tensor,
+    batch_size: int,
+    *,
+    temperature: float = 1.0,
+) -> torch.Tensor:
+    """Build detached q from mean raw logits of concatenated [v1, v2, v3].
+
+    Deliberately does NOT add log class priors. The three-view logits must be
+    ordered as [all v1, all v2, all v3], matching the BCL backbone forward.
+    """
+    if all_logits.ndim != 2 or all_logits.shape[0] != 3 * int(batch_size):
+        raise ValueError("all_logits must have shape [3 * batch_size, num_classes]")
+    if batch_size < 1 or temperature <= 0:
+        raise ValueError("batch_size and temperature must be positive")
+    if not bool(torch.isfinite(all_logits).all()):
+        raise ValueError("all_logits must be finite")
+    num_classes = int(all_logits.shape[1])
+    three_views = all_logits.reshape(3, int(batch_size), num_classes)
+    mean_raw_logits = three_views.mean(dim=0)
+    # q is a detached target; no gradient may flow through its construction.
+    return F.softmax(mean_raw_logits / float(temperature), dim=1).detach()
 
 
 class ForwardCorrectedLogitCompensation(nn.Module):
@@ -142,6 +131,8 @@ class ForwardCorrectedLogitCompensation(nn.Module):
         return torch.logsumexp(log_p_clean.unsqueeze(2) + log_t.unsqueeze(0), dim=1)
 
     def forward(self, logits: torch.Tensor, observed_targets: torch.Tensor) -> torch.Tensor:
+        if logits.ndim != 2 or logits.shape[1] != self.log_prior.numel():
+            raise ValueError("logits must have shape [batch, num_classes]")
         if observed_targets.ndim != 1 or observed_targets.shape[0] != logits.shape[0]:
             raise ValueError("observed_targets must have shape [batch]")
         targets = observed_targets.to(device=logits.device, dtype=torch.long)
@@ -154,9 +145,10 @@ class ForwardCorrectedLogitCompensation(nn.Module):
 class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
     """BCL-style class-complement loss with detached soft clean-class assignments.
 
-    q is a model-derived class distribution, not a clean-label target. The
-    original two-view pair is always positive. Cross-sample and prototype
-    positive links are continuously attenuated by prediction confidence.
+    During cold start, semantic_enabled=False switches to instance-only NT-Xent:
+    the paired v2-v3 view is the sole positive and no class prototypes are used.
+    Once semantic links are enabled, q is detached and cross-sample/prototype
+    positives are continuously attenuated by prediction confidence.
     """
 
     def __init__(self, num_classes: int = 100, temperature: float = 0.1):
@@ -174,27 +166,54 @@ class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
         max_probability = q.max(dim=1).values
         return ((max_probability - 1.0 / k) / (1.0 - 1.0 / k)).clamp(0.0, 1.0)
 
+    def _instance_only_loss(self, two_view_features: torch.Tensor) -> torch.Tensor:
+        batch_size = int(two_view_features.shape[0])
+        features = torch.cat(
+            [two_view_features[:, 0, :], two_view_features[:, 1, :]], dim=0
+        )
+        features = F.normalize(features, dim=1)
+        logits = torch.matmul(features, features.T) / self.temperature
+        num_views = 2 * batch_size
+        diagonal = torch.eye(num_views, device=logits.device, dtype=torch.bool)
+        logits = logits.masked_fill(diagonal, torch.finfo(logits.dtype).min)
+        indices = torch.arange(num_views, device=logits.device)
+        paired_indices = (indices + batch_size) % num_views
+        # Standard instance-level NT-Xent: exactly one positive per anchor.
+        return F.cross_entropy(logits, paired_indices)
+
     def forward(
         self,
-        class_prototypes: torch.Tensor,
+        class_prototypes: Optional[torch.Tensor],
         two_view_features: torch.Tensor,
-        soft_targets: torch.Tensor,
+        soft_targets: Optional[torch.Tensor] = None,
+        *,
+        semantic_enabled: bool = True,
     ) -> torch.Tensor:
         if two_view_features.ndim != 3 or two_view_features.shape[1] != 2:
             raise ValueError("two_view_features must have shape [batch, 2, feature_dim]")
         batch_size = int(two_view_features.shape[0])
         if batch_size < 1:
             raise ValueError("batch must be non-empty")
+        if not bool(torch.isfinite(two_view_features).all()):
+            raise ValueError("two_view_features must be finite")
+
+        # Epochs 0..19 use pure instance-level contrastive learning. No q,
+        # class prototypes, or class-conditioned positive links are consulted.
+        if not semantic_enabled:
+            return self._instance_only_loss(two_view_features)
+
+        if class_prototypes is None:
+            raise ValueError("class_prototypes are required after the cold-start phase")
         if class_prototypes.ndim != 2 or class_prototypes.shape[0] != self.num_classes:
             raise ValueError("class_prototypes must have shape [num_classes, feature_dim]")
         if two_view_features.shape[2] != class_prototypes.shape[1]:
             raise ValueError("Feature dimensions of samples and prototypes must match")
-        if soft_targets.shape != (batch_size, self.num_classes):
+        if soft_targets is None or soft_targets.shape != (batch_size, self.num_classes):
             raise ValueError("soft_targets must have shape [batch, num_classes]")
         if not bool(torch.isfinite(soft_targets).all()) or bool(torch.any(soft_targets < 0)):
             raise ValueError("soft_targets must be finite and non-negative")
 
-        # Detach prevents the contrastive objective from gaming its own targets.
+        # Critical: detach before any q_i q_j or prototype-positive calculation.
         q = soft_targets.detach().to(
             device=two_view_features.device, dtype=two_view_features.dtype
         )
@@ -218,7 +237,8 @@ class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
         candidate_q = torch.cat([q, q, prototype_q], dim=0)
         anchor_q = torch.cat([q, q], dim=0)
         candidate_reliability = torch.cat(
-            [reliability, reliability, torch.ones(self.num_classes, device=q.device, dtype=q.dtype)],
+            [reliability, reliability,
+             torch.ones(self.num_classes, device=q.device, dtype=q.dtype)],
             dim=0,
         )
         anchor_reliability = torch.cat([reliability, reliability], dim=0)
@@ -243,8 +263,8 @@ class NoiseAwareSoftBalancedContrastiveLoss(nn.Module):
         positive_weights[anchor_indices, paired_view_indices] = 1.0
         positive_weights = positive_weights * logits_mask
 
-        # Soft expected class counts reduce exactly to BCL's integer counts
-        # when q is one-hot.
+        # Expected class occurrences reduce exactly to BCL's integer counts
+        # when q is one-hot; each candidate receives its expected class count.
         class_occurrences = candidate_q.sum(dim=0)
         candidate_class_mass = candidate_q @ class_occurrences
         per_entry_weight = candidate_class_mass.unsqueeze(0) - positive_weights
