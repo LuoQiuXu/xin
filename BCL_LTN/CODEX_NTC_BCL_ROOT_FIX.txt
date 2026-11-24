@@ -111,7 +111,7 @@
 ## 4. 实现文件
 
 新增：
-- `BCL_LTN/noise_robust_losses.py`：prior inversion、simplex projection、transition matrix、forward-corrected LC、soft BCL。
+- `BCL_LTN/noise_robust_losses.py`：已由本轮提交提供 prior inversion、simplex projection、transition matrix、forward-corrected LC、soft BCL 的第一版实现。Codex 必须先逐行审查并补充/修正必要边界处理，不要盲目覆盖；随后为其编写测试。
 - `BCL_LTN/train_ntc_bcl.py`：独立训练入口；复用现有 BCL_LTN/BCL_AUDIT 数据与模型接口，但不改原文件。
 - `BCL_LTN/tests/test_noise_robust_losses.py`：损失、先验、梯度和退化情形测试。
 - `BCL_LTN/CODEX_NTC_BCL_ROOT_FIX.txt`：本指令副本。
