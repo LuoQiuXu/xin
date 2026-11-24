@@ -135,16 +135,23 @@ def compute_gate_reference(frame: pd.DataFrame, class_lookup: np.ndarray) -> dic
         raise ValueError("Nonfinite values in saved margin scores")
 
     class_stats = []
+    reconstructed_zscore = np.empty_like(raw)
     for class_id in range(100):
-        values = raw[observed == class_id]
+        selected = observed == class_id
+        values = raw[selected]
         if values.size == 0:
             raise RuntimeError(f"Observed class {class_id} has no audit samples")
+        mean = float(values.mean())
+        std = float(values.std(ddof=0))
+        reconstructed_zscore[selected] = (values - mean) / (std + 1e-8)
         class_stats.append({
             "class_id": class_id,
             "observed_count": int(values.size),
-            "raw_margin_mean": float(values.mean()),
-            "raw_margin_std": float(values.std(ddof=0)),
+            "raw_margin_mean": mean,
+            "raw_margin_std": std,
         })
+    if not np.allclose(reconstructed_zscore, zscore, rtol=0.0, atol=1e-10):
+        raise RuntimeError("Saved class_normalized_raw_margin does not match reconstructed per-class z-scores")
 
     few_mask = np.asarray([class_lookup[c] == "Few" for c in observed], dtype=bool)
     few_z = zscore[few_mask]
@@ -305,29 +312,44 @@ def run(args) -> dict:
                 **metrics,
             })
 
-    # Decompose pooled Few AUC into the source-group pairwise AUCs.
-    raw_pairwise = [
-        row for row in pairwise_rows if row["score"] == "raw_margin"
-    ]
+    # Decompose each pooled Few AUC into source-group pairwise AUCs.
     total_few_noisy = int((few["is_clean"] == 0).sum())
-    weighted_auc = float(sum(
-        row["roc_auc"] * row["n_negative_source"] / total_few_noisy
-        for row in raw_pairwise
-    ))
-    pooled_raw = binary_ranking_metrics(
-        np.concatenate((
+    reconstruction_rows = []
+    pooled_metrics = {}
+    for score in SCORE_COLUMNS:
+        labels = np.concatenate((
             np.ones(len(clean_few), dtype=np.int64),
             np.zeros(total_few_noisy, dtype=np.int64),
-        )),
-        np.concatenate((
-            clean_few["raw_margin"].to_numpy(dtype=np.float64),
-            few.loc[few["is_clean"] == 0, "raw_margin"].to_numpy(dtype=np.float64),
-        )),
-    )["roc_auc"]
-    if not np.isclose(weighted_auc, pooled_raw, atol=1e-12):
-        raise RuntimeError(
-            f"Source-wise AUC decomposition failed: weighted={weighted_auc}, pooled={pooled_raw}"
-        )
+        ))
+        scores = np.concatenate((
+            clean_few[score].to_numpy(dtype=np.float64),
+            few.loc[few["is_clean"] == 0, score].to_numpy(dtype=np.float64),
+        ))
+        pooled = binary_ranking_metrics(labels, scores)
+        source_rows = [row for row in pairwise_rows if row["score"] == score]
+        weighted = float(sum(
+            row["roc_auc"] * row["n_negative_source"] / total_few_noisy
+            for row in source_rows
+        ))
+        if not np.isclose(weighted, pooled["roc_auc"], atol=1e-12):
+            raise RuntimeError(
+                f"{score} source-wise AUC decomposition failed: weighted={weighted}, pooled={pooled['roc_auc']}"
+            )
+        pooled_metrics[score] = pooled
+        reconstruction_rows.append({
+            "score": score,
+            "pooled_few_auc": pooled["roc_auc"],
+            "weighted_source_pairwise_auc": weighted,
+            "absolute_difference": abs(weighted - pooled["roc_auc"]),
+        })
+    pd.DataFrame(reconstruction_rows).to_csv(
+        output_dir / "few_auc_source_decomposition.csv", index=False, encoding="utf-8-sig"
+    )
+    pooled_raw = pooled_metrics["raw_margin"]["roc_auc"]
+    weighted_auc = next(
+        row["weighted_source_pairwise_auc"] for row in reconstruction_rows
+        if row["score"] == "raw_margin"
+    )
 
     for score in SCORE_COLUMNS:
         distribution_rows.append(distribution_row(few, "Observed_Few_All", score))
@@ -360,16 +382,20 @@ def run(args) -> dict:
         }
     ]
     logit_status = (
-        f"Available columns: {logit_columns}" if logit_columns
-        else "NOT AVAILABLE: sample_scores.csv stores labels and four margins only; "
-             "it contains no logits, predicted class, softmax probabilities or entropy. "
-             "No model loading or re-inference was performed."
+        "Unexpected logit-like columns were present but are not interpreted by this audit: "
+        f"{logit_columns}. No logits/entropy metrics are computed."
+        if logit_columns
+        else "NOT AVAILABLE: the audited sample_scores.csv writer stores position/index, "
+             "observed/clean labels, clean/noisy status, observed-label group and four margin "
+             "scores only. It contains no logits, predicted class, softmax probabilities or "
+             "entropy. No model loading or re-inference was performed."
     )
 
     return {
         "rows": int(len(frame)),
         "few_raw_margin_pooled_auc": float(pooled_raw),
         "few_raw_margin_weighted_source_auc": float(weighted_auc),
+        "few_pooled_metrics": pooled_metrics,
         "few_noisy_count": total_few_noisy,
         "many_to_few_count": int(len(source_subsets["Many_to_Few"])),
         "many_to_few_share_of_few_noisy": float(
@@ -426,6 +452,8 @@ def main():
         f"- Observed-Few noisy samples: {result['few_noisy_count']}",
         f"- Many-to-Few noisy samples: {result['many_to_few_count']} "
         f"({100.0 * result['many_to_few_share_of_few_noisy']:.2f}% of Few noise)",
+        f"- Class-adaptive Few q90 threshold (score-only): {result['gate_reference']['few_q90_threshold']:.10f}",
+        f"- Reference Few samples above q90: {result['gate_reference']['expected_few_acceptance_at_reference']}",
         "",
         "## Logit / entropy availability",
         "",
@@ -449,6 +477,7 @@ def main():
         "- few_source_breakdown.csv",
         "- few_margin_distribution_summary.csv",
         "- few_pairwise_source_metrics.csv",
+        "- few_auc_source_decomposition.csv",
         "- gate_reference.json (score-only; usable by the subsequent training gate)",
     ]
     (args.output_dir / "ATTRIBUTION_REPORT.md").write_text(
