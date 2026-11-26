@@ -34,6 +34,7 @@ EXPECTED_HUMAN_LABELS_NPZ_SHA256 = "e50697c3d0e956ea837ba689b298d6fc2ccd97841b07
 EXPECTED_SPLIT_NPZ_SHA256 = "2f2b478a349cf94f632f92b766aba5197cc18edc983b4ffea82582f7a000bc88"
 EXPECTED_INDICES_SHA256 = "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7"
 EXPECTED_CIFAR100N_LT_NOISE_RATE = 0.35973080114317324
+EXPECTED_V1_SYM04_NOISY_LABELS_SHA256 = "691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f"
 N, K = 10_847, 100
 
 
@@ -186,15 +187,16 @@ def main() -> None:
         raise RuntimeError("The selected clean subset is not CIFAR-100-LT IF=100")
 
     args.output_root.mkdir(parents=True, exist_ok=False)
-    rng = np.random.RandomState(args.seed)
-    flip_uniform = rng.rand(N)
-    replacement_draw = rng.randint(0, K - 1, size=N)
-    replacement = replacement_draw + (replacement_draw >= clean_lt)
     results = {}
     for rate, name in ((0.2, "sym02"), (0.4, "sym04"), (0.6, "sym06")):
-        mask = flip_uniform < rate
+        # Match the v1 generator exactly: Bernoulli mask first, then draw
+        # offsets only for flipped examples from {1,...,99}.
+        rng = np.random.RandomState(args.seed)
+        mask = rng.rand(N) < float(rate)
         observed = clean_lt.copy()
-        observed[mask] = replacement[mask]
+        if int(mask.sum()):
+            offsets = rng.randint(1, K, size=int(mask.sum()))
+            observed[mask] = (clean_lt[mask] + offsets) % K
         results[name] = write_regime(
             args.output_root, name, clean_lt, observed, indices,
             source="synthetic instance-independent symmetric noise; other 99 classes equally likely",
@@ -203,6 +205,9 @@ def main() -> None:
             source_sha256={"train": train_sha, "indices_file": indices_sha},
         )
 
+    if results["sym04"]["manifest"]["observed_labels_sha256"] != EXPECTED_V1_SYM04_NOISY_LABELS_SHA256:
+        raise RuntimeError("Generated Sym-0.4 labels do not exactly match the audited v1 noise realization")
+    
     with np.load(args.human_labels, allow_pickle=False) as human:
         human_clean = np.asarray(human["clean_label"], dtype=np.int64)
         human_noisy = np.asarray(human["noisy_label"], dtype=np.int64)
