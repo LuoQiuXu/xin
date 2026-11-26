@@ -59,7 +59,7 @@ def _global_template(row_counts: torch.Tensor, row_support: torch.Tensor, *,
         reliable = row_support > 0
     if not bool(reliable.any()):
         k = row_counts.shape[0]
-        diag = torch.tensor(0.8, device=row_counts.device, dtype=row_counts.dtype)
+        diag = torch.tensor(1.0 / k, device=row_counts.device, dtype=row_counts.dtype)
         eye = torch.eye(k, device=row_counts.device, dtype=row_counts.dtype)
         template = eye * diag + (1 - eye) * ((1 - diag) / (k - 1))
         return template, diag
@@ -122,9 +122,16 @@ def estimate_transition_and_prior(
 
     observed_one_hot = torch.nn.functional.one_hot(observed, k).to(dtype)
     eye = torch.eye(k, dtype=dtype, device=device)
-    transition = eye * 0.8 + (1 - eye) * (0.2 / (k - 1))
-    support = torch.zeros(k, dtype=dtype, device=device)
-    global_diag = torch.tensor(0.8, dtype=dtype, device=device)
+    # Data-driven initialization: teacher mass against observed labels. No eta or
+    # assumed diagonal-retention rate is injected into the estimator.
+    seed_counts = probs.T @ observed_one_hot
+    support = probs.sum(0)
+    template, global_diag = _global_template(
+        seed_counts, support, min_global_support=min_global_support, eps=eps
+    )
+    empirical = _normalize_rows(seed_counts)
+    shrink = (support / (support + float(shrinkage_mass))).unsqueeze(1)
+    transition = _normalize_rows(shrink * empirical + (1 - shrink) * template)
 
     for _ in range(iterations):
         clean_evidence = probs * prior.unsqueeze(0) if posterior_kind == "balanced_posterior" else probs
