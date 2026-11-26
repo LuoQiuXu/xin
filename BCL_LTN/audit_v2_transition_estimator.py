@@ -515,6 +515,12 @@ def evaluate_phase(args) -> None:
     if (sha256(manifest_path) != seal.get("protocol_manifest_sha256")
             or sha256(observed_path) != seal.get("observed_labels_sha256")):
         raise RuntimeError("Protocol manifest or observed-label file changed after estimation")
+    manifest = read_json(manifest_path)
+    if (estimator_only.get("truth_loaded") is not False
+            or estimator_only.get("truth_directory_opened") is not False
+            or estimator_only.get("official_test_opened") is not False
+            or estimator_only.get("regime") != manifest.get("regime")):
+        raise RuntimeError("Estimator receipt does not prove a truth-free estimate for this regime")
 
     # Truth is first accessed here, after the immutable estimator receipt verifies.
     truth_dir = protocol_dir / "truth"
@@ -525,6 +531,9 @@ def evaluate_phase(args) -> None:
         if not path.is_file():
             raise FileNotFoundError(f"Offline truth artifact missing: {path}")
     truth_manifest = read_json(truth_manifest_path)
+    if (truth_manifest.get("offline_only") is not True
+            or truth_manifest.get("regime") != manifest.get("regime")):
+        raise RuntimeError("Offline truth manifest does not match this protocol")
     if sha256(clean_path) != truth_manifest.get("clean_labels_sha256"):
         raise RuntimeError("Offline clean-label SHA256 mismatch")
     if sha256(empirical_transition_path) != truth_manifest.get("true_transition_sha256"):
