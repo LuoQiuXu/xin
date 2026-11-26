@@ -281,7 +281,7 @@ def main() -> None:
     )
     results["asym04_coarse_cycle"] = write_regime(
         args.output_root, "asym04_coarse_cycle", clean_lt, asym_observed, indices,
-        source="synthetic instance-dependent-free asymmetric noise: cyclic fine-class mapping within each CIFAR-100 superclass",
+        source="synthetic class-dependent asymmetric noise: fixed cyclic fine-class mapping within each CIFAR-100 superclass, with instance-independent Bernoulli flips",
         indices_sha256=indices_sha,
         requested_noise_rate=0.4,
         source_sha256={"train": train_sha, "indices_file": indices_sha},
