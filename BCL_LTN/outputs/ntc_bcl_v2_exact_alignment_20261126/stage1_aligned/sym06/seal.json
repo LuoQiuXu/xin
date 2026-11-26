@@ -1,0 +1,6 @@
+{
+  "state": "immutable_estimator_outputs",
+  "truth_loaded_before_seal": false,
+  "estimate_bundle_sha256": "6577c2cea72ed92d88608d7a6dfb5d0348a941f73d5cefb99ea2304aa6e734b4",
+  "estimator_only_sha256": "6cd33449ddd1c2966d9ea6d39137d1a1102681918a3585bc95d5d2dd2d9d7d8a"
+}

@@ -1,0 +1,166 @@
+{
+  "regime": "sym02",
+  "estimator": "estimate_anchored_transition_and_prior",
+  "convergence": {
+    "iterations": 18,
+    "converged": true,
+    "final_delta": 6.949966216843531e-07
+  },
+  "transition_and_prior": {
+    "reference_kind": "theoretical",
+    "estimated_noise_rate": 0.2485408555077826,
+    "realized_noise_rate": 0.20282105651332166,
+    "transition_reference": {
+      "mae": 0.005430940911624119,
+      "frobenius_norm": 2.7916513070904263,
+      "frobenius_rmse": 0.027916513070904262,
+      "diagonal_mae": 0.21998050684092696,
+      "row_total_variation_mean": 0.2715470455812059
+    },
+    "transition_empirical_finite_sample": {
+      "mae": 0.007264700697317439,
+      "frobenius_norm": 3.1151159762653067,
+      "diagonal_mae": 0.23096464103799302
+    },
+    "clean_prior": {
+      "mae": 0.0021549196679436105,
+      "l1": 0.21549196679436106,
+      "l2": 0.02766321322947753,
+      "kl_true_to_estimated": 0.04334237068587212,
+      "minimum_true": 0.00046095694662118557,
+      "minimum_estimated": 0.0006723779873331272,
+      "maximum_true": 0.04609569466211856,
+      "maximum_estimated": 0.0380317596975881
+    },
+    "frequency_groups": {
+      "Many": {
+        "classes": 35,
+        "prior_mass_true": 0.8134968193970683,
+        "prior_mass_estimated": 0.7078782387907561,
+        "prior_mass_absolute_error": 0.10561858060631224,
+        "transition_mae": 0.002506412725233713,
+        "transition_frobenius": 0.4609064639609934,
+        "transition_diagonal_mae": 0.05937452332097957,
+        "transition_row_tv_mean": 0.12532063626168566
+      },
+      "Medium": {
+        "classes": 35,
+        "prior_mass_true": 0.15838480685903936,
+        "prior_mass_estimated": 0.21631672478827874,
+        "prior_mass_absolute_error": 0.05793191792923938,
+        "transition_mae": 0.0058007101459679,
+        "transition_frobenius": 1.6336768052373496,
+        "transition_diagonal_mae": 0.23586878076154463,
+        "transition_row_tv_mean": 0.290035507298395
+      },
+      "Few": {
+        "classes": 30,
+        "prior_mass_true": 0.028118373743892325,
+        "prior_mass_estimated": 0.07580503642096535,
+        "prior_mass_absolute_error": 0.04768666267707303,
+        "transition_mae": 0.00841149302234518,
+        "transition_frobenius": 2.216299246015336,
+        "transition_diagonal_mae": 0.3888178347068117,
+        "transition_row_tv_mean": 0.42057465111725906
+      }
+    }
+  },
+  "detailed_group_metrics": {
+    "overall_spearman_prior": 0.9777267054831535,
+    "global_t_mae_emp": 0.007264700697317439,
+    "global_t_frob_emp": 3.1151159762653067,
+    "global_t_diag_mae_emp": 0.23096464103799302,
+    "global_row_tv_mean_emp": 0.36323503486587194,
+    "global_row_tv_mean_ref": 0.2715470455812059,
+    "groups": {
+      "Many": {
+        "classes": 35,
+        "prior_mass_true": 0.8134968193970683,
+        "prior_mass_estimated": 0.7078782387907561,
+        "prior_mass_ratio": 0.8701671867818825,
+        "prior_mae": 0.003133015220056616,
+        "prior_l1": 0.10965553270198156,
+        "prior_relative_l1": 0.13479528141640912,
+        "prior_kl_component": 0.11507578262815417,
+        "spearman_prior": 0.9952380952380953,
+        "cv_true": 0.4612034172450091,
+        "cv_estimated": 0.40997395370779655,
+        "classes_under_0_5x_true": 0,
+        "classes_over_2_0x_true": 0,
+        "t_diag_mae_ref": 0.05937452332097957,
+        "t_diag_mae_emp": 0.05974673129696254,
+        "row_tv_mean_ref": 0.12532063626168566,
+        "row_tv_mean_emp": 0.15374116875733668,
+        "group_noise_true_emp": 0.206482320942883,
+        "group_noise_estimated": 0.15793490839247082
+      },
+      "Medium": {
+        "classes": 35,
+        "prior_mass_true": 0.15838480685903936,
+        "prior_mass_estimated": 0.21631672478827874,
+        "prior_mass_ratio": 1.3657668881131895,
+        "prior_mae": 0.0016551976551211248,
+        "prior_l1": 0.05793191792923937,
+        "prior_relative_l1": 0.36576688811318947,
+        "prior_kl_component": -0.04601050736529658,
+        "spearman_prior": 0.919047619047619,
+        "cv_true": 0.4639359904039712,
+        "cv_estimated": 0.3277975898351098,
+        "classes_under_0_5x_true": 0,
+        "classes_over_2_0x_true": 5,
+        "t_diag_mae_ref": 0.23586878076154463,
+        "t_diag_mae_emp": 0.2440414010851621,
+        "row_tv_mean_ref": 0.290035507298395,
+        "row_tv_mean_emp": 0.39308031209310873,
+        "group_noise_true_emp": 0.189755529685681,
+        "group_noise_estimated": 0.42396857554462564
+      },
+      "Few": {
+        "classes": 30,
+        "prior_mass_true": 0.028118373743892325,
+        "prior_mass_estimated": 0.07580503642096535,
+        "prior_mass_ratio": 2.695925344453151,
+        "prior_mae": 0.0015968172054380036,
+        "prior_l1": 0.04790451616314011,
+        "prior_relative_l1": 1.703673071546166,
+        "prior_kl_component": -0.02572290457698546,
+        "spearman_prior": 0.5270709084265593,
+        "cv_true": 0.4111454493109657,
+        "cv_estimated": 0.34573762124992213,
+        "classes_under_0_5x_true": 0,
+        "classes_over_2_0x_true": 25,
+        "t_diag_mae_ref": 0.3888178347068117,
+        "t_diag_mae_emp": 0.4154626490141647,
+        "row_tv_mean_ref": 0.42057465111725906,
+        "row_tv_mean_emp": 0.5728250552273868,
+        "group_noise_true_emp": 0.17049180327868851,
+        "group_noise_estimated": 0.5940327867703744
+      }
+    }
+  },
+  "probability_accuracy": {
+    "raw_balanced_q": {
+      "Overall": 61.685258596847056,
+      "Many": 64.25657298277426,
+      "Medium": 55.47147846332945,
+      "Few": 22.295081967213115
+    },
+    "anchored_em_gamma": {
+      "Overall": 83.16585230939431,
+      "Many": 83.42021758839529,
+      "Medium": 82.77066356228173,
+      "Few": 78.0327868852459
+    }
+  },
+  "prior_stage1_joint_em_comparison": {
+    "converged": false,
+    "iterations": 50,
+    "final_delta": 0.0040446311087865006,
+    "estimated_noise_rate": 0.15678269758467356,
+    "t_mae": 0.004175194316882037,
+    "t_diag_mae": 0.1177579051990401,
+    "prior_kl": 0.0470417732046821,
+    "prior_min": 1.9363431296031625e-05,
+    "few_prior_mass_estimated": 0.06301410071336896
+  }
+}

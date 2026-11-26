@@ -1,0 +1,21 @@
+{
+  "regime": "asym04_coarse_cycle",
+  "estimator": "estimate_anchored_transition_and_prior",
+  "logits_sha256": "6f82d1af1902722284da45214ea8412e1231da7938f2962737b14f6cae3699e8",
+  "observed_labels_sha256": "4a3e13944be1889f59c4d7f2d730055143677b02e4aa815428e78587174bdacd",
+  "hyperparameters": {
+    "confidence_power": 2.0,
+    "shrinkage_mass": 10.0,
+    "prior_pseudocount": 1.0,
+    "max_iter": 200,
+    "tolerance": 1e-06
+  },
+  "iterations": 19,
+  "converged": true,
+  "final_delta": 8.787512759929144e-07,
+  "estimated_noise_rate": 0.2776861427109293,
+  "global_diagonal_retention": 0.7792668084334613,
+  "prior_min": 0.0003771549764830036,
+  "prior_max": 0.042759321207871084,
+  "truth_opens_before_seal": 0
+}

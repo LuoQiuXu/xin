@@ -1,0 +1,21 @@
+{
+  "regime": "sym06",
+  "estimator": "estimate_anchored_transition_and_prior",
+  "logits_sha256": "6f82d1af1902722284da45214ea8412e1231da7938f2962737b14f6cae3699e8",
+  "observed_labels_sha256": "29d03fff66830a51c9d05d3f284432355d8ed6ac319334358ad2c34f353372e7",
+  "hyperparameters": {
+    "confidence_power": 2.0,
+    "shrinkage_mass": 10.0,
+    "prior_pseudocount": 1.0,
+    "max_iter": 200,
+    "tolerance": 1e-06
+  },
+  "iterations": 47,
+  "converged": true,
+  "final_delta": 8.741537518702769e-07,
+  "estimated_noise_rate": 0.5620059924701352,
+  "global_diagonal_retention": 0.5112969756316161,
+  "prior_min": 0.00043464899610571835,
+  "prior_max": 0.029397483785738768,
+  "truth_opens_before_seal": 0
+}

@@ -984,6 +984,35 @@ def write_v2_report(
     (output_dir / "NTC_BCL_V2_REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def collect_source_provenance() -> Dict[str, object]:
+    """Capture git branch/HEAD, dirty paths, and SHA256 hashes of v2 source files."""
+    tracked_sources = (
+        "BCL_LTN/ntc_bcl_v2_losses.py",
+        "BCL_LTN/train_ntc_bcl_v2.py",
+        "BCL_LTN/noise_transition_estimator.py",
+    )
+    git_branch = subprocess.check_output(
+        ["git", "branch", "--show-current"], cwd=ROOT, text=True
+    ).strip()
+    git_head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+    ).strip()
+    git_dirty_raw = subprocess.check_output(
+        ["git", "status", "--porcelain", "--", *tracked_sources], cwd=ROOT, text=True
+    )
+    dirty_lines = [line for line in git_dirty_raw.splitlines() if line.strip()]
+    source_sha256 = {
+        rel: file_sha256(ROOT / rel) for rel in tracked_sources if (ROOT / rel).is_file()
+    }
+    return {
+        "git_branch": git_branch,
+        "git_head": git_head,
+        "v2_source_dirty": bool(dirty_lines),
+        "v2_source_status": dirty_lines,
+        "v2_source_sha256": source_sha256,
+    }
+
+
 def train_v2(args: argparse.Namespace) -> None:
     if args.output.exists() and any(args.output.iterdir()):
         raise FileExistsError(f"Refusing to overwrite non-empty output directory: {args.output}")
@@ -995,15 +1024,13 @@ def train_v2(args: argparse.Namespace) -> None:
     truth_gate.install()
     test_gate = OfficialTestAudit(args.data_root)
 
-    git_branch = subprocess.check_output(["git", "branch", "--show-current"], cwd=ROOT, text=True).strip()
-    git_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    source_prov = collect_source_provenance()
     dataset, observed_counts, regime_manifest = load_regime_observed_inputs(
         regime_dir, args.data_root, args.indices_file
     )
     init_state, init_meta = verified_seed42_initialization(args.base_root)
     provenance = {
-        "git_branch": git_branch,
-        "git_head": git_head,
+        **source_prov,
         "regime": args.regime,
         "regime_manifest_observed_sha256": regime_manifest["observed_labels_sha256"],
         "init": init_meta,

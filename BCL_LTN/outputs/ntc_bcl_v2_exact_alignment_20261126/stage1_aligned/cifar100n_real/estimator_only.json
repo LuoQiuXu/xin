@@ -1,0 +1,21 @@
+{
+  "regime": "cifar100n_real",
+  "estimator": "estimate_anchored_transition_and_prior",
+  "logits_sha256": "6f82d1af1902722284da45214ea8412e1231da7938f2962737b14f6cae3699e8",
+  "observed_labels_sha256": "a19cd32002d581a832ca314e2b7d0561a9e7e71cc8c6cad68141c81e45cb7d5c",
+  "hyperparameters": {
+    "confidence_power": 2.0,
+    "shrinkage_mass": 10.0,
+    "prior_pseudocount": 1.0,
+    "max_iter": 200,
+    "tolerance": 1e-06
+  },
+  "iterations": 29,
+  "converged": true,
+  "final_delta": 9.752793945663578e-07,
+  "estimated_noise_rate": 0.4100867554784161,
+  "global_diagonal_retention": 0.6312347085466365,
+  "prior_min": 0.00019305667831344826,
+  "prior_max": 0.04549379875814151,
+  "truth_opens_before_seal": 0
+}
