@@ -45,7 +45,7 @@ Base/v1 branch: research/bcl-ltn-root-correction-20261124
 Run from the repository root:
 
 ```powershell
-python -m pytest BCL_LTN/tests/test_noise_transition_estimator.py BCL_LTN/tests/test_v2_stage1_audit.py BCL_LTN/tests/test_noise_robust_losses.py -q
+python -m pytest BCL_LTN/tests/test_noise_transition_estimator.py BCL_LTN/tests/test_v2_stage1_audit.py BCL_LTN/tests/test_v2_noise_preparation.py BCL_LTN/tests/test_noise_robust_losses.py -q
 ```
 
 Also run the existing BCL_LTN and BCL_AUDIT CIFAR tests that were previously green. Do not weaken tests to make the new tests pass. Record exact command, exit code and test count.
