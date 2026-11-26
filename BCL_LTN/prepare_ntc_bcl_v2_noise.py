@@ -262,12 +262,15 @@ def main() -> None:
         if int(mask.sum()):
             offsets = rng.randint(1, K, size=int(mask.sum()))
             observed[mask] = (clean_lt[mask] + offsets) % K
+        theoretical_transition = np.full((K, K), float(rate) / (K - 1), dtype=np.float64)
+        np.fill_diagonal(theoretical_transition, 1.0 - float(rate))
         results[name] = write_regime(
             args.output_root, name, clean_lt, observed, indices,
             source="synthetic instance-independent symmetric noise; other 99 classes equally likely",
             indices_sha256=indices_sha,
             requested_noise_rate=rate,
             source_sha256={"train": train_sha, "indices_file": indices_sha},
+            theoretical_transition=theoretical_transition,
         )
 
     if results["sym04"]["manifest"]["observed_labels_sha256"] != EXPECTED_V1_SYM04_NOISY_LABELS_SHA256:
