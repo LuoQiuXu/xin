@@ -17,6 +17,7 @@ import numpy as np
 import torch
 
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
+from BCL_LTN.train_noisy_bcl import safe_torch_load
 from BCL_LTN.ntc_bcl_v2_core import (
     estimate_transition_em,
     evaluate_transition_estimate,
@@ -124,7 +125,9 @@ def aggregate_soft_bcl_diagnostics(
 
 
 def load_prototype_geometry(checkpoint_path: Path) -> dict:
-    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    # These are locally generated project checkpoints; the existing project loader
+    # preserves compatibility with the historical optimizer/RNG metadata payload.
+    checkpoint = safe_torch_load(checkpoint_path, torch.device("cpu"))
     state_key = "ema_model_state" if isinstance(checkpoint.get("ema_model_state"), dict) else "model_state"
     state = checkpoint.get(state_key)
     if not isinstance(state, dict):
