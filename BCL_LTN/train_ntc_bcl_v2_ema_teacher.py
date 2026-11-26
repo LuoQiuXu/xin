@@ -138,6 +138,7 @@ def main():
             or np.any((observed < 0) | (observed >= K))):
         raise RuntimeError("Invalid fixed TRAIN IDs or observed labels")
     if (manifest.get("num_samples") != N or manifest.get("num_classes") != K
+            or manifest.get("indices_sha256") != file_sha256(args.indices_file)
             or manifest.get("observed_labels_sha256") != file_sha256(args.observed_labels)
             or manifest.get("observed_class_counts") != np.bincount(observed, minlength=K).tolist()):
         raise RuntimeError("Observed-label file does not match its non-oracle manifest")
