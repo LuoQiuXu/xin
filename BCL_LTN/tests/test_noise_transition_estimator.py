@@ -105,6 +105,28 @@ def test_empirical_bayes_shrinkage_preserves_positive_tail_rows():
     assert torch.isfinite(result.clean_prior).all()
 
 
+def test_severely_long_tailed_prior_recovers_five_sample_tail_support():
+    counts = torch.round(
+        torch.logspace(math.log10(500), math.log10(5), 100)
+    ).to(torch.long)
+    clean = torch.repeat_interleave(torch.arange(100), counts)
+    probs = torch.full((len(clean), 100), 1e-5, dtype=torch.float64)
+    probs[torch.arange(len(clean)), clean] = 1.0 - 99e-5
+
+    result = estimate_transition_and_prior(
+        probs,
+        clean,
+        posterior_kind="long_tailed_posterior",
+        max_iter=50,
+        tolerance=1e-6,
+    )
+    true_prior = counts.to(torch.float64) / counts.sum()
+    assert result.converged
+    assert result.clean_prior[-1] > 0
+    torch.testing.assert_close(result.clean_prior, true_prior, atol=2e-4, rtol=0.05)
+    assert result.global_support_class_ids.numel() == 35
+
+
 def test_high_support_template_uses_a_fraction_of_supported_classes():
     counts = torch.arange(20, 0, -1, dtype=torch.long)
     clean = torch.repeat_interleave(torch.arange(20), counts)
