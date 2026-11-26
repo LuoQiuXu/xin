@@ -1,66 +1,173 @@
-# Codex task: NTC-BCL v2 Stage-1 estimator audit
+# Codex task: NTC-BCL v2 Stage-1 estimator audit (revised)
 
 Target branch: research/ntc-bcl-v2-unknown-transition-audit-20261126
+Current implementation line: convergence-controlled unknown T/pi estimator + two-phase offline audit.
 Base/v1 branch: research/bcl-ltn-root-correction-20261124
-Do not modify BCL_AUDIT/ or overwrite any v1 output/checkpoint.
 
-## What is already implemented on this branch
-- BCL_LTN/noise_transition_estimator.py
-  - T[c,j] = P(observed=j | clean=c)
-  - explicit posterior_kind prevents prior being multiplied zero or two times
-  - soft-EM clean posterior / clean prior updates
-  - empirical-Bayes row shrinkage toward a class-aware global off-diagonal template
-  - prototype_health_diagnostics for classifier ||W_c|| and pairwise prototype cosine
-- BCL_LTN/tests/test_noise_transition_estimator.py
+## Non-negotiable scope
 
-## Task A — run and repair unit tests first
+- Stay on the target branch above. Do not switch to the earlier experiment/ntc-bcl-v2-stage1-estimator-audit-20261126 branch.
+- Do not cherry-pick or run its training scripts. In particular, do not use the broken EMA-teacher import or the v1 history.jsonl count lock.
+- Do not modify anything under BCL_AUDIT/.
+- Do not modify the locked v1 generator BCL_LTN/make_noisy_lt.py, the v1 trainer, BCL losses, backbone, classifier, or projection architecture.
+- Do not run a new 200-epoch training job. This task is CPU/unit-test + data preparation + one frozen-checkpoint TRAIN-only audit.
+- Do not commit data arrays, logits, checkpoints, probability arrays, NPZ bundles, or generated outputs. Commit source, tests and compact reports only.
+- The epoch-200 v1 BCL checkpoint is a frozen teacher, NOT an EMA teacher. Do not relabel it as EMA.
+- The fixed teacher was trained on Sym-0.4. Applying it to Sym-0.2, Sym-0.6, Asym and CIFAR-100N is a fixed-teacher estimator sensitivity audit, not per-regime end-to-end training.
+
+## Implemented on this branch
+
+1. BCL_LTN/noise_transition_estimator.py
+   - T[c,j] = P(observed=j | clean=c).
+   - Explicit balanced_posterior vs long_tailed_posterior semantics.
+   - Data-driven initialization; no assumed eta/noise-rate prior.
+   - Soft EM with max_iter=50, tolerance=1e-6 and actual convergence reporting.
+   - Global empirical-Bayes template pools the highest-support 35% of supported classes by default; no absolute min-support=20 cutoff.
+   - Tail rows shrink toward the empirical class-aware template, not a uniform KxK matrix.
+   - Returns pi, T, gamma, effective support, high-support class IDs, iterations, convergence and final delta.
+2. BCL_LTN/prepare_ntc_bcl_v2_noise.py
+   - Sym-0.2 / 0.4 / 0.6, seed 42; Sym-0.4 must exactly reproduce the v1 observed-label SHA256.
+   - Asym-0.4 uses a clearly named CIFAR-100 coarse-superclass cyclic fine-class mapping. Do not describe this as the only canonical asymmetric-noise definition.
+   - CIFAR-100N real fine noisy_label, aligned to the previously audited fixed IF=100 TRAIN IDs.
+   - Clean labels, flip masks and true matrices live only under each protocol's truth/ directory.
+3. BCL_LTN/extract_v2_train_logits.py
+   - Deterministic eval-transform logits in fixed indices-file order.
+   - Reads TRAIN pixels only; does not load observed labels, clean-label sidecars, corruption masks or official TEST.
+   - Validates checkpoint, model-state, indices and TRAIN source hashes.
+4. BCL_LTN/audit_v2_transition_estimator.py
+   - --phase estimate reads public manifest + observed labels + logits only.
+   - It writes estimate_bundle.npz, estimator_only.json and seal.json before truth is accessed.
+   - --phase evaluate verifies the seal first, then reads truth/ for offline scoring.
+   - Reports T/pi errors, Many/Medium/Few q accuracy, prototype health and Soft-BCL positive/negative denominator diagnostics. No loss or training code is changed.
+
+## Step 1 — run focused tests before touching data
+
+Run from the repository root:
+
+```powershell
+python -m pytest BCL_LTN/tests/test_noise_transition_estimator.py BCL_LTN/tests/test_v2_stage1_audit.py BCL_LTN/tests/test_noise_robust_losses.py -q
+```
+
+Also run the existing BCL_LTN and BCL_AUDIT CIFAR tests that were previously green. Do not weaken tests to make the new tests pass. Record exact command, exit code and test count.
+
+## Step 2 — prepare independent noise protocols
+
+Use the already audited local files. Do not regenerate the fixed LT indices.
+
+```powershell
+python -B -m BCL_LTN.prepare_ntc_bcl_v2_noise `
+  --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" `
+  --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" `
+  --human-labels "D:\xiangmuxunlian\xin\H2T_repro_audit\noisy_lt_failure_screen\results\cifar100n_lt_seed42_20261029_01\primary_cache\inputs\human_labels.npz" `
+  --legacy-split "D:\xiangmuxunlian\xin\H2T_repro_audit\noisy_lt_failure_screen\results\cifar100n_lt_seed42_20261029_01\primary_cache\inputs\split.npz" `
+  --output-root "BCL_LTN\outputs\ntc_bcl_v2_stage1_data_20261126"
+```
+
+Required protocol directories:
+- sym02
+- sym04
+- sym06
+- asym04_coarse_cycle
+- cifar100n_real
+
+Hard checks:
+- fixed indices SHA256 = be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7
+- CIFAR TRAIN SHA256 = 735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b
+- Sym-0.4 observed-label SHA256 = 691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f
+- CIFAR-100N human-label cache and legacy split must match their hard-coded audited hashes.
+- Do not silently skip CIFAR-100N if either cache is missing or mismatched; stop and report.
+
+## Step 3 — extract the existing v1 teacher logits once
+
+The expected v1 BCL epoch-200 checkpoint is:
+BCL_LTN/outputs/BCL_sym04_seed42/BCL_sym04_seed42/checkpoints/epoch_200.pth
+
+Expected checkpoint file SHA256:
+e58e465a9cde73de3c5b499553cc5239225fcd876b3783a205f4dd8117d9cac5
+
 Run:
-  python -m pytest BCL_LTN/tests/test_noise_transition_estimator.py BCL_LTN/tests/test_noise_robust_losses.py -q
-Repair only the new estimator/tests if needed. Do not weaken existing tests or change v1 behavior.
 
-## Task B — implement a TRAIN-only estimator audit runner
-Create BCL_LTN/audit_v2_transition_estimator.py. It must:
-1. Reuse the exact CIFAR-100-LT IF=100 fixed train indices and the v1 verified observed-label array. Verify SHA256 against the v1 manifest/receipts before loading.
-2. Load the v1 baseline checkpoint(s) using the existing audited model factory and checkpoint loader. Inspect the checkpoint format; do not guess state-dict keys.
-3. Produce teacher probabilities for TRAIN images only. Use deterministic evaluation transforms (no random augmentation) and preserve dataset index order. If no EMA checkpoint exists in v1, explicitly label this audit as frozen-teacher initialization; do NOT call it EMA. Implement optional EMA teacher only as a separate v2 training component, not by relabeling a frozen checkpoint.
-4. Do not open clean_labels, is_noisy, CIFAR test labels, validation labels, or any held-out truth while estimating T/pi. Add an audit hook/guard equivalent to TruthReadGate. The estimation stage must accept only (teacher_probabilities, observed_labels).
-5. Save teacher probabilities, estimated T, estimated clean prior, gamma, row support, global diagonal retention, input hashes, checkpoint hash, posterior_kind, estimator hyperparameters and source hash in a compact JSON/NPZ receipt. Never commit image arrays, probability arrays, checkpoints, or NPZ outputs.
-6. Run explicit posterior semantics as two separate settings:
-   - balanced_posterior: p_bal(c|x), multiply estimated pi exactly once in Bayes posterior;
-   - long_tailed_posterior: p_LT(c|x), do not multiply pi again.
-   Do not silently infer the semantics from logits. Document how the chosen teacher output was calibrated.
-7. Add TRAIN-only diagnostics: estimated row-wise T diagonal, row entropy, pi distribution, Many/Medium/Few aggregates by *fixed clean-count groups only if these groups are derived from the public LT sampling protocol*, not clean labels. Report minimum/maximum pi, zero/near-zero rows, and effective support.
-8. For synthetic symmetric 0.2/0.4/0.6, use known T only AFTER predictions and estimates are sealed, in a separate offline evaluation process. Report Frobenius error, diagonal-retention error, prior error and per-frequency-group error. The training/estimation process must not read eta or true T.
-9. For CIFAR-100N-LT, reuse the old verified data protocol/indices, but re-run SHA/order/disjointness checks on this branch. Estimation must not read clean labels or noise mask. Keep truth-based matrix/prior evaluation in a separate offline process after the estimate receipt is immutable.
-10. Seed 42 only. This is a mechanism audit, not a full training sweep.
+```powershell
+python -B -m BCL_LTN.extract_v2_train_logits `
+  --checkpoint "BCL_LTN\outputs\BCL_sym04_seed42\BCL_sym04_seed42\checkpoints\epoch_200.pth" `
+  --expected-checkpoint-sha256 "e58e465a9cde73de3c5b499553cc5239225fcd876b3783a205f4dd8117d9cac5" `
+  --data-root "D:\xiangmuxunlian\xin\H2T\data\cifar100" `
+  --indices-file "D:\xiangmuxunlian\xin\BCL_AUDIT\outputs\data_audit_recheck_20261122_01\cifar100lt_if100_train_indices_seed0.npy" `
+  --output "BCL_LTN\outputs\ntc_bcl_v2_stage1_20261126\train_logits.npy" `
+  --device cuda:0 --batch-size 256
+```
 
-## Task C — correct three mathematical risks before any full training integration
-1. Prototype collapse:
-   - Do not edit BCL_AUDIT/cifar100lt/models.py.
-   - Log ||classifier.weight[c]|| and prototype pairwise cosine by class.
-   - Add a controlled diagnostic-only ablation that feeds F.normalize(classifier.weight, dim=1) into prototype_mlp. Do not change the default path or claim it is the final fix.
-   - Verify whether prototype_mlp BN running statistics are updated during cold start. Record this explicitly.
-2. Soft-BCL denominator/support:
-   - Keep the existing lower-bound check as numerical protection, but do not present it as the collapse fix.
-   - Log per-class expected occurrence mass, per-anchor positive mass, denominator weight min/median/max, and gradient norm on classifier rows.
-   - Add a diagnostic-only comparison of raw expected class_occurrences versus a documented smooth-support alternative. Preserve strict one-hot equivalence for the unmodified path.
-   - Test the suggested prototype anchor support from gamma as an isolated ablation; never silently add it to v1.
-3. Probability/prior semantics:
-   - Unit-test that balanced_posterior multiplies pi once and long_tailed_posterior does not multiply it again.
-   - No hard-coded eta=0.4 in the estimator.
-   - No uniform KxK pseudo-count smoothing. Shrink low-support rows toward a template estimated from supported rows; expose shrinkage_mass and min_global_support in receipts.
-   - Do not claim the full transition matrix is identifiable without assumptions. Report uncertainty/limitations, especially for five-example classes.
+If this exact checkpoint is unavailable or its hash differs, stop. Do not silently substitute the random init checkpoint or another training run. Ask for the correct verified checkpoint path/hash.
 
-## Task D — scope and stop conditions
-- No full 200-epoch v2 run yet.
-- No external baselines yet.
-- No changes to the v1 trainer defaults, BCL loss, backbone, classifier, projection architecture, or BCL_AUDIT/.
-- No use of clean labels for checkpoint selection, training, early stopping, hyperparameter selection, or estimator updates.
-- Stop and report if the teacher probabilities are uncalibrated/semantics cannot be established, if estimated T is degenerate, or if posterior/prior updates collapse tail classes.
-- Provide one report with: exact commands, source hashes, data hashes, test results, T/pi metrics, prototype collapse metrics, denominator diagnostics, failure cases, and a go/no-go recommendation.
+The logits receipt must show:
+- state=complete
+- teacher_type=frozen v1 checkpoint; not EMA
+- clean_labels_loaded=false
+- observed_labels_loaded=false
+- official_test_opened=false
+- shape=[10847,100], finite FP32 logits, fixed indices order.
 
-## Expected deliverables
-- BCL_LTN/audit_v2_transition_estimator.py
-- BCL_LTN/tests/test_noise_transition_estimator.py (passing)
-- BCL_LTN/outputs/... compact report only (no arrays/checkpoints)
-- A Codex completion summary stating exactly which truth files were opened, when, and by which offline-only stage.
+## Step 4 — run the two-phase audit for each protocol
+
+Use one unique output directory per regime. Example for Sym-0.4:
+
+```powershell
+python -B -m BCL_LTN.audit_v2_transition_estimator `
+  --phase estimate `
+  --protocol-dir "BCL_LTN\outputs\ntc_bcl_v2_stage1_data_20261126\sym04" `
+  --logits "BCL_LTN\outputs\ntc_bcl_v2_stage1_20261126\train_logits.npy" `
+  --checkpoint "BCL_LTN\outputs\BCL_sym04_seed42\BCL_sym04_seed42\checkpoints\epoch_200.pth" `
+  --output-dir "BCL_LTN\outputs\ntc_bcl_v2_stage1_20261126\sym04" `
+  --shrinkage-mass 10 --high-support-fraction 0.35 `
+  --max-iter 50 --tolerance 1e-6 --prior-pseudocount 0.05
+
+python -B -m BCL_LTN.audit_v2_transition_estimator `
+  --phase evaluate `
+  --protocol-dir "BCL_LTN\outputs\ntc_bcl_v2_stage1_data_20261126\sym04" `
+  --output-dir "BCL_LTN\outputs\ntc_bcl_v2_stage1_20261126\sym04"
+```
+
+Repeat for sym02, sym06, asym04_coarse_cycle and cifar100n_real, changing only the protocol and output directory. Reuse the same frozen logits. Do not train one model per regime.
+
+Important semantics:
+- Primary: balanced_posterior = softmax(raw logits); multiply estimated clean pi exactly once in gamma.
+- Sensitivity: long_tailed_posterior = softmax(raw logits + log observed noisy-label prior); do NOT multiply estimated clean pi again. This is an observed-prior proxy, not the true clean prior.
+- q diagnostics: raw balanced q, estimated-clean-prior-calibrated q, and EM gamma.
+- The clean labels and empirical/theoretical T may be opened only by --phase evaluate, after seal.json verifies the estimate bundle and estimator-only receipt hashes.
+- Do not read is_noisy.npy; it is not needed for the offline scoring.
+- No official CIFAR-100 TEST data or labels.
+
+## Step 5 — report and stop conditions
+
+For each regime, report:
+- T Frobenius norm, MAE, diagonal-retention MAE and row-TV error.
+- pi MAE/L1/L2/KL and Many/Medium/Few prior-mass error.
+- Raw q / prior-calibrated q / gamma accuracy, NLL and entropy for Overall, Many, Medium, Few.
+- Soft-BCL positive mass per anchor, negative inverse-denominator mass per anchor, denominator min/median/max and class-wise prototype positive/inverse-denominator mass. These are diagnostics only.
+- Classifier row norms, prototype pairwise cosine and number of near-zero rows.
+- EM iteration count, convergence flag, final delta, effective support and selected high-support class IDs.
+- Synthetic theoretical-T error and empirical finite-sample-T error separately. CIFAR-100N has no theoretical T; use its empirical TRAIN transition as an offline reference only.
+- State explicitly that the v1 epoch-200 teacher is weak on Few classes and was trained only on Sym-0.4. Cross-regime estimates are sensitivity results, not final model performance.
+
+Stop / no-go if:
+- EM fails to converge in 50 iterations or pi/T becomes non-finite/degenerate.
+- Tail pi collapses to zero, transition rows lose mass, or gamma becomes non-finite.
+- Checkpoint, indices, TRAIN, observed-label or CIFAR-100N cache hashes mismatch.
+- The estimate phase accesses any truth file or official TEST.
+- Probability semantics cannot be justified from the v1 LogitCompensatedCE objective.
+
+## Explicitly prohibited next steps
+
+- No 200-epoch v2 training.
+- No 200-epoch noisy Teacher + 200-epoch frozen-gamma two-stage training.
+- No static frozen gamma plan.
+- No automatic switch to the earlier remote branch.
+- No changes to BCL_AUDIT/, v1 training defaults or the original BCL loss.
+- No tuning hyperparameters against clean truth. Truth is evaluation-only.
+
+Expected deliverables:
+- Focused pytest receipts and exact source hashes.
+- Data preparation audit JSON and per-regime manifests.
+- Logit extraction receipt.
+- Per-regime estimator_only.json, seal.json, offline_evaluation.json, per_class_metrics.csv and STAGE1_AUDIT_REPORT.md.
+- One concise Codex completion summary with exact commands, exit codes, artifact hashes, truth-access audit and a go/no-go recommendation.
