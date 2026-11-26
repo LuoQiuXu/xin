@@ -1,0 +1,139 @@
+{
+  "state": "verified",
+  "created_utc": "2026-11-26T06:00:19.061148+00:00",
+  "branch": "research/bcl-ltn-root-correction-20261124",
+  "code_commit": "723e681b58f9ed654fd4628085c194546df4ac22",
+  "original_training_epochs": {
+    "B": 200,
+    "C": 200
+  },
+  "original_formal_exit_code": 0,
+  "original_test_file_opens": 1,
+  "original_formal_log_sha256": "08017923e2b0435222b691a75beed3a87150210d4f6390072573064616194266",
+  "q_epoch_statistics_recorded": false,
+  "supplemental_confusion_replay": {
+    "official_test_file_opens": 1,
+    "denied_attempts": 0,
+    "test_file_sha256": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "seconds": 3.950433999998495,
+    "environment": {
+      "device": "cuda:0",
+      "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+      "torch": "2.14.1+cu132",
+      "torchvision": "0.29.1+cu132",
+      "cuda": "13.2",
+      "cudnn": 92400
+    },
+    "optimizer_updates": 0,
+    "raw_predictions_published": false
+  },
+  "confusion_sources": {
+    "A": {
+      "method": "archived final TEST predictions",
+      "archived_prediction_sha256": "61e479c6627dde1fa92eea88624b90d7d7447a2a4bb470f5d4a525b8b4a2b056",
+      "checkpoint_sha256": "e58e465a9cde73de3c5b499553cc5239225fcd876b3783a205f4dd8117d9cac5",
+      "evaluation_passes_in_publication": 0,
+      "original_per_class_correct_counts_match": 100
+    },
+    "B": {
+      "method": "read-only epoch-200 TEST checkpoint replay",
+      "checkpoint_sha256": "a78c148683a150e272cf4a6c3f8835623544501f651b75654b4afc8a96d28548",
+      "model_state_sha256": "bbd51e283efc100e240d374a3111197a4d3f40cb55bfc981f56ae28ac3c62171",
+      "original_per_class_correct_counts_match": 100,
+      "model_state_unchanged": true,
+      "evaluation_passes": 1
+    },
+    "C": {
+      "method": "read-only epoch-200 TEST checkpoint replay",
+      "checkpoint_sha256": "e58bf4981b2d56770dc054cac0040613ebf616c0b22ccaae953b765c816e8d5e",
+      "model_state_sha256": "5b56040e41b3a8600af436bb7fc3730f5c824da0db9eef61f755e278318ec6e5",
+      "original_per_class_correct_counts_match": 100,
+      "model_state_unchanged": true,
+      "evaluation_passes": 1
+    }
+  },
+  "few_class_changes": {
+    "B_vs_A": {
+      "improved": 17,
+      "tied": 4,
+      "worse": 9
+    },
+    "C_vs_A": {
+      "improved": 14,
+      "tied": 7,
+      "worse": 9
+    },
+    "C_vs_B": {
+      "improved": 10,
+      "tied": 11,
+      "worse": 9
+    }
+  },
+  "new_training_epochs": 0,
+  "published_files_except_receipt": {
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/NTC_BCL_ROOT_FIX_REPORT.md": {
+      "sha256": "ce716f4a627beb4ce5aa859fbbb4343e1f798685ffc6eaa7f1ea664f6f1c62be",
+      "bytes": 4486
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/comparison_summary.json": {
+      "sha256": "74e4daa91149f2bff89ae0eab5dd6ba8b053bbecee563613da0c92aa2b0fbfe3",
+      "bytes": 61207
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/environment.json": {
+      "sha256": "9da045c0d79ac6e0dbd7913946cb1a0b1f20ae24315085664902ca1b629b9779",
+      "bytes": 3143
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/corrected_prior.json": {
+      "sha256": "88c9c1a06d80c9d5fc487390c594364ac0f13157de5b928d5ed9964f34aba8b3",
+      "bytes": 11676
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/BCL_sym04/history.csv": {
+      "sha256": "c1b08a40c2dbc10bf5b513a0b660149a2d01aacaa70845bde941b44f48a23a93",
+      "bytes": 122667
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/classification/confusion_matrix_A.csv": {
+      "sha256": "2832e15b5f970eb3dd451a66e8796a2118db5ce346dd6c898e10f1c9b054b8f4",
+      "bytes": 22644
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/classification/confusion_matrix_B.csv": {
+      "sha256": "67cf3ef029bd68211ba86907ad32162b577f24e06c59974933b76f8ab19f7a86",
+      "bytes": 22666
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/classification/confusion_matrix_C.csv": {
+      "sha256": "475561ecc45b83f358347f75d8227ae792320896cc3ba850022b27d9d7da0986",
+      "bytes": 22656
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/classification/many_medium_few_summary.csv": {
+      "sha256": "949e57430922e0cbc1ff41876835b6a54df030b3077564f9fe49db54882b58d2",
+      "bytes": 935
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/classification/per_class_accuracy.csv": {
+      "sha256": "dcc61c492ba07eb3c7e2915bb3e5111b1a13ab9e385f4c032b249e79ca07afeb",
+      "bytes": 4550
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/formal.log": {
+      "sha256": "08017923e2b0435222b691a75beed3a87150210d4f6390072573064616194266",
+      "bytes": 60142
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/NTC_FULL_SOFT_BCL/history.csv": {
+      "sha256": "1c789581e196238bac6ae58c4e96a06e23cc8d96a9f56e2aa10eee6917ab4396",
+      "bytes": 140419
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/NTC_FULL_SOFT_BCL/training.log": {
+      "sha256": "a9d163ef9a9fc4fb9aee112343ea17cda23cf44b244c1e28258f13b8312c615c",
+      "bytes": 29674
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/NTC_LC_HARD_BCL/history.csv": {
+      "sha256": "035cb8175f0903c948ec3c5d8d7d0a2859874988f27eb07117b219fc93dd1400",
+      "bytes": 140135
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/NTC_LC_HARD_BCL/training.log": {
+      "sha256": "d9d34b5ff74ec6dd4584ecc435eb254e9250ec3bb66bc7e99ac764905373b41b",
+      "bytes": 29259
+    },
+    "BCL_LTN/outputs/NTC_BCL_sym04_seed42_20261124/publication_20261126/README.md": {
+      "sha256": "ed1f34321a0f139a209008e4d6f51c9079d2abc5cc323367c368cabf20ec5f35",
+      "bytes": 2566
+    }
+  }
+}
