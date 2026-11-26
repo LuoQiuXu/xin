@@ -31,7 +31,9 @@ DEFAULT_LEGACY_SPLIT = (
 )
 EXPECTED_TRAIN_SHA256 = "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
 EXPECTED_HUMAN_LABELS_NPZ_SHA256 = "e50697c3d0e956ea837ba689b298d6fc2ccd97841b075ae613fc2d2e90d94e87"
+EXPECTED_SPLIT_NPZ_SHA256 = "2f2b478a349cf94f632f92b766aba5197cc18edc983b4ffea82582f7a000bc88"
 EXPECTED_INDICES_SHA256 = "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7"
+EXPECTED_CIFAR100N_LT_NOISE_RATE = 0.35973080114317324
 N, K = 10_847, 100
 
 
@@ -66,6 +68,7 @@ def write_regime(
     indices: np.ndarray,
     *,
     source: str,
+    indices_sha256: str,
     requested_noise_rate: float | None = None,
     source_sha256: dict | None = None,
 ) -> dict:
@@ -100,7 +103,7 @@ def write_regime(
         "label_source": source,
         "num_samples": N,
         "num_classes": K,
-        "indices_sha256": hashlib.sha256(np.ascontiguousarray(indices).tobytes()).hexdigest(),
+        "indices_sha256": indices_sha256,
         "observed_labels_file": observed_path.name,
         "observed_labels_sha256": sha256(observed_path),
         "observed_class_counts": observed_counts.tolist(),
@@ -150,12 +153,15 @@ def main() -> None:
     train_sha = sha256(train_file)
     indices_sha = sha256(args.indices_file)
     human_sha = sha256(args.human_labels)
+    split_sha = sha256(args.legacy_split)
     if train_sha != EXPECTED_TRAIN_SHA256:
         raise RuntimeError("CIFAR-100 Python TRAIN source SHA256 mismatch")
     if indices_sha != EXPECTED_INDICES_SHA256:
         raise RuntimeError("Fixed CIFAR-100-LT IF=100 indices SHA256 mismatch")
     if human_sha != EXPECTED_HUMAN_LABELS_NPZ_SHA256:
         raise RuntimeError("Cached official CIFAR-100N human_labels.npz SHA256 mismatch")
+    if split_sha != EXPECTED_SPLIT_NPZ_SHA256:
+        raise RuntimeError("Previously audited CIFAR-100N LT split.npz SHA256 mismatch")
 
     with train_file.open("rb") as stream:
         raw = pickle.load(stream, encoding="latin1")
@@ -192,6 +198,7 @@ def main() -> None:
         results[name] = write_regime(
             args.output_root, name, clean_lt, observed, indices,
             source="synthetic instance-independent symmetric noise; other 99 classes equally likely",
+            indices_sha256=indices_sha,
             requested_noise_rate=rate,
             source_sha256={"train": train_sha, "indices_file": indices_sha},
         )
@@ -205,9 +212,13 @@ def main() -> None:
         raise RuntimeError("CIFAR-100N official fine labels do not align with Python TRAIN order")
     real_clean = human_clean[indices]
     real_observed = human_noisy[indices]
+    real_noise_rate = float(np.mean(real_clean != real_observed))
+    if abs(real_noise_rate - EXPECTED_CIFAR100N_LT_NOISE_RATE) > 1e-12:
+        raise RuntimeError("CIFAR-100N LT noise rate differs from the previously audited 35.9730801%")
     results["cifar100n_real"] = write_regime(
         args.output_root, "cifar100n_real", real_clean, real_observed, indices,
         source="official CIFAR-100N human fine noisy_label",
+        indices_sha256=indices_sha,
         requested_noise_rate=None,
         source_sha256={"human_labels_npz": human_sha, "train": train_sha, "indices_file": indices_sha},
     )
