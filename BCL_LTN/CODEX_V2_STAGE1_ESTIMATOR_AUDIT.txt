@@ -12,6 +12,10 @@ Base/v1 branch: research/bcl-ltn-root-correction-20261124
 - Do not modify the locked v1 generator BCL_LTN/make_noisy_lt.py, the v1 trainer, BCL losses, backbone, classifier, or projection architecture.
 - Do not run a new 200-epoch training job. This task is CPU/unit-test + data preparation + one frozen-checkpoint TRAIN-only audit.
 - Do not commit data arrays, logits, checkpoints, probability arrays, NPZ bundles, or generated outputs. Commit source, tests and compact reports only.
+- Before any local operation, run git status --short --branch and record the exact current branch and dirty paths.
+- Preserve all pre-existing staged, unstaged and untracked work. Never run git reset --hard, git clean, git checkout --, or stash/pop as a cleanup shortcut.
+- If the local branch is not the target branch, stop and report; do not switch branches automatically.
+- Do not stage, modify or commit any pre-existing BCL_AUDIT/ changes. Stage only the explicitly listed BCL_LTN source/test/task files.
 - The epoch-200 v1 BCL checkpoint is a frozen teacher, NOT an EMA teacher. Do not relabel it as EMA.
 - The fixed teacher was trained on Sym-0.4. Applying it to Sym-0.2, Sym-0.6, Asym and CIFAR-100N is a fixed-teacher estimator sensitivity audit, not per-regime end-to-end training.
 
