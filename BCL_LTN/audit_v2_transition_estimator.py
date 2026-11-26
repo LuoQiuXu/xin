@@ -82,14 +82,19 @@ def estimator_summary(result, posterior_kind: str) -> dict:
     }
 
 
-def load_checkpoint_prototype_geometry(checkpoint_path: Path, expected_state_sha: str | None) -> dict:
+def load_checkpoint_prototype_geometry(
+    checkpoint_path: Path,
+    expected_state_sha: str | None,
+    state_key: str,
+) -> dict:
     checkpoint = safe_torch_load(checkpoint_path, torch.device("cpu"))
     if not isinstance(checkpoint, dict):
         raise RuntimeError("Checkpoint payload must be a dictionary")
-    state_key = "ema_model_state" if isinstance(checkpoint.get("ema_model_state"), dict) else "model_state"
+    if state_key not in ("model_state", "ema_model_state"):
+        raise RuntimeError("Unsupported checkpoint state key for prototype diagnostics")
     state = checkpoint.get(state_key)
     if not isinstance(state, dict):
-        raise RuntimeError("Checkpoint must contain model_state or ema_model_state")
+        raise RuntimeError(f"Checkpoint does not contain the requested {state_key}")
     actual_state_sha = state_dict_sha256(state)
     if expected_state_sha and actual_state_sha != expected_state_sha:
         raise RuntimeError("Prototype checkpoint state differs from the logits checkpoint state")
@@ -206,7 +211,9 @@ def estimate_phase(args) -> None:
         if sha256(checkpoint_path) != logits_receipt.get("checkpoint_sha256"):
             raise RuntimeError("Prototype checkpoint must be the same file used for logit extraction")
         prototype = load_checkpoint_prototype_geometry(
-            checkpoint_path, logits_receipt.get("checkpoint_state_sha256")
+            checkpoint_path,
+            logits_receipt.get("checkpoint_state_sha256"),
+            logits_receipt.get("checkpoint_state_key", "model_state"),
         )
 
     output_dir.mkdir(parents=True, exist_ok=False)
