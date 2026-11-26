@@ -18,7 +18,6 @@ import torch
 
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
 from BCL_LTN.ntc_bcl_v2_core import (
-    EMATeacher,
     estimate_transition_em,
     evaluate_transition_estimate,
     probability_metrics,
@@ -26,6 +25,7 @@ from BCL_LTN.ntc_bcl_v2_core import (
     q_from_logits,
     soft_bcl_batch_diagnostics,
     softmax_numpy,
+    transition_truth_from_labels,
 )
 
 
@@ -91,9 +91,12 @@ def aggregate_soft_bcl_diagnostics(
         )
         anchors = 2 * len(batch)
         for key in sums:
-            sums[key] += np.asarray(diag[key], dtype=np.float64) * (
-                anchors if "inverse_denominator" in key or "denominator_by_class" in key else 1.0
-            )
+            if "inverse_denominator" in key or "denominator_by_class" in key:
+                sums[key] += np.asarray(diag[key], dtype=np.float64) * anchors
+            elif "positive_mass" in key:
+                sums[key] += np.asarray(diag[key], dtype=np.float64)
+            else:
+                sums[key] += np.asarray(diag[key], dtype=np.float64)
         total_anchors += anchors
         batch_count += 1
         positive_mass_sum += float(np.asarray(diag["positive_mass_per_anchor"]).sum())
@@ -103,7 +106,7 @@ def aggregate_soft_bcl_diagnostics(
         floors.append(float(diag["class_mass_floor"]))
 
     for key in sums:
-        if "inverse_denominator" in key or "denominator_by_class" in key:
+        if "inverse_denominator" in key or "denominator_by_class" in key or "positive_mass" in key:
             sums[key] /= max(total_anchors, 1)
         else:
             sums[key] /= max(batch_count, 1)
@@ -210,6 +213,7 @@ def main():
     if clean.dtype != np.int64 or clean.shape != observed.shape:
         raise RuntimeError("Offline clean labels must be int64 and align with observed labels")
     clean_counts = np.bincount(clean, minlength=100)
+    truth = transition_truth_from_labels(clean, observed)
     transition_metrics = evaluate_transition_estimate(estimate, clean, observed)
 
     q_raw = q_from_logits(logits)
@@ -246,9 +250,7 @@ def main():
             "group": class_group(int(clean_counts[c])),
             "pi_true": float(clean_counts[c] / clean_counts.sum()),
             "pi_estimated": float(estimate["clean_prior"][c]),
-            "T_diag_true": float(transition_metrics["group_noise_rates"] is not None and
-                                 np.asarray(__import__("BCL_LTN.ntc_bcl_v2_core", fromlist=["transition_truth_from_labels"])
-                                            .transition_truth_from_labels(clean, observed)["transition"])[c, c] or 0.0),
+            "T_diag_true": float(truth["transition"][c, c]),
             "T_diag_estimated": float(np.asarray(estimate["transition"])[c, c]),
             "effective_support": float(np.asarray(estimate["effective_support"])[c]),
             "raw_q_accuracy_pct": raw_class[c]["accuracy_percent"],
