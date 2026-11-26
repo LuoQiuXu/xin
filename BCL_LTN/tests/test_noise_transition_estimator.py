@@ -142,6 +142,9 @@ def test_prototype_health_diagnostics_detect_small_classifier_weights_and_cosine
     prototypes = torch.tensor([[1.0, 0.0], [1.0, 0.001], [1.0, -0.001]])
     result = prototype_health_diagnostics(weight, prototypes, small_weight_threshold=0.15)
     assert result["small_weight_mask"].tolist() == [False, True, True]
+    assert torch.allclose(
+        result["prototype_output_norm"], torch.ones(3), atol=1e-3, rtol=1e-3
+    )
     assert result["prototype_max_offdiag_cosine"].min() > 0.99
     assert result["mean_offdiag_cosine"] > 0.99
 
