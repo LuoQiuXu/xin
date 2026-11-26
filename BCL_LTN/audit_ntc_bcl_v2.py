@@ -125,15 +125,17 @@ def aggregate_soft_bcl_diagnostics(
 
 def load_prototype_geometry(checkpoint_path: Path) -> dict:
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-    state = checkpoint.get("ema_model_state")
+    state_key = "ema_model_state" if isinstance(checkpoint.get("ema_model_state"), dict) else "model_state"
+    state = checkpoint.get(state_key)
     if not isinstance(state, dict):
-        raise RuntimeError("Checkpoint does not contain ema_model_state")
+        raise RuntimeError("Checkpoint must contain ema_model_state or model_state")
     model = BCLCIFARModel()
     model.load_state_dict(state, strict=True)
     model.eval()
     result = prototype_geometry(model.classifier.weight, model.prototype_mlp)
     result["checkpoint_sha256"] = sha256(checkpoint_path)
-    result["ema_state_sha256"] = checkpoint.get("ema_state_sha256")
+    result["checkpoint_state_key"] = state_key
+    result["model_state_sha256"] = checkpoint.get("ema_state_sha256" if state_key == "ema_model_state" else "model_state_sha256")
     return result
 
 
