@@ -28,6 +28,8 @@ from BCL_LTN.train_noisy_bcl import safe_torch_load
 
 K = 100
 N = 10_847
+EXPECTED_INDICES_SHA256 = "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7"
+EXPECTED_TRAIN_SHA256 = "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
 DEFAULT_SUPPORT_FLOOR_RATIOS = (0.0, 0.5)
 
 
@@ -137,6 +139,8 @@ def estimate_phase(args) -> None:
         raise RuntimeError("Unexpected observed-label filename in public manifest")
     if manifest.get("num_samples") != N or manifest.get("num_classes") != K:
         raise RuntimeError("Protocol manifest does not describe CIFAR-100-LT IF=100")
+    if manifest.get("indices_sha256") != EXPECTED_INDICES_SHA256:
+        raise RuntimeError("Protocol manifest does not use the locked IF=100 TRAIN indices")
     observed_sha = sha256(observed_path)
     if manifest.get("observed_labels_sha256") != observed_sha:
         raise RuntimeError("Observed-label SHA256 does not match the public protocol manifest")
@@ -148,10 +152,12 @@ def estimate_phase(args) -> None:
     logits_sha = sha256(logits_path)
     if (logits_receipt.get("state") != "complete"
             or logits_receipt.get("logits_sha256") != logits_sha
+            or logits_receipt.get("indices_sha256") != manifest.get("indices_sha256")
+            or logits_receipt.get("train_source_sha256") != EXPECTED_TRAIN_SHA256
             or logits_receipt.get("clean_labels_loaded") is not False
             or logits_receipt.get("observed_labels_loaded") is not False
             or logits_receipt.get("official_test_opened") is not False):
-        raise RuntimeError("Logit extraction receipt is invalid or reports forbidden data access")
+        raise RuntimeError("Logit receipt is invalid, misaligned to the protocol IDs, or reports forbidden data access")
 
     logits = np.load(logits_path, allow_pickle=False)
     observed = np.load(observed_path, allow_pickle=False)
@@ -160,8 +166,9 @@ def estimate_phase(args) -> None:
             or np.any((observed < 0) | (observed >= K))):
         raise RuntimeError("Logits/observed labels must align as finite [10847,100] and int64 [10847]")
     observed_counts = np.bincount(observed, minlength=K)
-    if np.any(observed_counts <= 0):
-        raise RuntimeError("Every observed class must have positive support")
+    if (np.any(observed_counts <= 0)
+            or manifest.get("observed_class_counts") != observed_counts.tolist()):
+        raise RuntimeError("Observed class counts are empty or disagree with the public protocol manifest")
 
     # The v1 checkpoint was trained with LogitCompensatedCE(logits + log n_obs).
     # Thus softmax(raw logits) is the balanced-evidence interpretation. The
@@ -527,13 +534,19 @@ def evaluate_phase(args) -> None:
     observed = np.load(observed_path, allow_pickle=False)
     empirical_transition = np.load(empirical_transition_path, allow_pickle=False)
     if (clean.shape != (N,) or clean.dtype != np.int64 or observed.shape != (N,)
-            or empirical_transition.shape != (K, K)):
-        raise RuntimeError("Offline truth arrays have invalid shapes or dtypes")
+            or observed.dtype != np.int64 or empirical_transition.shape != (K, K)
+            or np.any((clean < 0) | (clean >= K)) or np.any((observed < 0) | (observed >= K))):
+        raise RuntimeError("Offline truth arrays have invalid shapes, dtypes or class IDs")
     clean_counts = np.bincount(clean, minlength=K)
     if truth_manifest.get("clean_class_counts") != clean_counts.tolist():
         raise RuntimeError("Offline clean class counts do not match the truth manifest")
     if not np.allclose(empirical_transition.sum(axis=1), 1.0, atol=1e-8):
         raise RuntimeError("Empirical truth transition is not row stochastic")
+    recomputed_counts = np.zeros((K, K), dtype=np.float64)
+    np.add.at(recomputed_counts, (clean, observed), 1.0)
+    recomputed_empirical = recomputed_counts / recomputed_counts.sum(axis=1, keepdims=True)
+    if not np.allclose(empirical_transition, recomputed_empirical, atol=1e-10):
+        raise RuntimeError("Stored empirical transition does not match the offline clean/observed labels")
 
     theoretical_path = truth_dir / "theoretical_transition.npy"
     theoretical_transition = None
@@ -541,9 +554,10 @@ def evaluate_phase(args) -> None:
         if not theoretical_path.is_file() or sha256(theoretical_path) != truth_manifest["theoretical_transition_sha256"]:
             raise RuntimeError("Theoretical transition SHA256 mismatch")
         theoretical_transition = np.load(theoretical_path, allow_pickle=False)
-        if theoretical_transition.shape != (K, K) or not np.allclose(
-            theoretical_transition.sum(axis=1), 1.0, atol=1e-8
-        ):
+        if (theoretical_transition.shape != (K, K)
+                or not np.isfinite(theoretical_transition).all()
+                or np.any(theoretical_transition < 0)
+                or not np.allclose(theoretical_transition.sum(axis=1), 1.0, atol=1e-8)):
             raise RuntimeError("Theoretical transition is invalid")
     transition_reference = theoretical_transition if theoretical_transition is not None else empirical_transition
     reference_kind = "theoretical_protocol_matrix" if theoretical_transition is not None else "empirical_finite_sample_matrix"
