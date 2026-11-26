@@ -281,7 +281,17 @@ def prototype_health_diagnostics(
     if not bool(torch.isfinite(classifier_weight).all() & torch.isfinite(prototype_embedding).all()):
         raise ValueError("classifier weights and prototype embeddings must be finite")
     w_norm = classifier_weight.detach().norm(dim=1)
-    p = F.normalize(prototype_embedding.detach(), dim=1)
+    # ProjectionMLP.forward() already returns unit-normalized prototypes.
+    # Reuse that output directly; do not add another normalization stage.
+    p = prototype_embedding.detach()
+    prototype_norm = p.norm(dim=1)
+    if not torch.allclose(
+        prototype_norm,
+        torch.ones_like(prototype_norm),
+        atol=1e-3,
+        rtol=1e-3,
+    ):
+        raise ValueError("prototype_embedding must already be unit-normalized by ProjectionMLP")
     cosine = p @ p.T
     k = cosine.shape[0]
     offdiag = ~torch.eye(k, dtype=torch.bool, device=cosine.device)
@@ -289,6 +299,7 @@ def prototype_health_diagnostics(
     return {
         "classifier_weight_norm": w_norm,
         "small_weight_mask": w_norm < float(small_weight_threshold),
+        "prototype_output_norm": prototype_norm,
         "prototype_pairwise_cosine": cosine,
         "prototype_max_offdiag_cosine": per_class_max,
         "mean_offdiag_cosine": cosine[offdiag].mean(),
