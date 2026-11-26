@@ -1,0 +1,122 @@
+{
+  "passed": true,
+  "regime": "sym04",
+  "provenance": {
+    "git_branch": "research/ntc-bcl-v2-unknown-transition-audit-20261126",
+    "git_head": "975efa355722b1265ea21829e2cec702496c7eb6",
+    "regime": "sym04",
+    "regime_manifest_observed_sha256": "691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f",
+    "init": {
+      "source": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42\\init_seed42.pth",
+      "file_sha256": "6a86b7fe21062c079970856f08489c844543942ae260291c87e518572a3e2421",
+      "model_state_sha256": "11c52fe9e2b082b0c36ef025f19ae2d963dbc19c456e0d5aa17aac14fffdf440"
+    },
+    "hyperparams": {
+      "epochs": 200,
+      "warmup_epochs": 20,
+      "semantic_ramp_epochs": 20,
+      "estimate_interval": 5,
+      "ema_decay": 0.99,
+      "confidence_power": 2.0,
+      "shrinkage_mass": 10.0,
+      "prior_pseudocount": 1.0,
+      "transition_blend": 0.35,
+      "support_floor_ratio": 0.5,
+      "denominator_epsilon": 1e-06,
+      "q_temperature": 1.0,
+      "prototype_input_mode": "direction"
+    }
+  },
+  "official_test_opens": 0,
+  "truth_opens": 0,
+  "phases": {
+    "warmup_instance": {
+      "passed": true,
+      "epoch_index": 0,
+      "epoch_seed": 4200000,
+      "lr": 0.03,
+      "semantic_ramp": 0.0,
+      "identity": {
+        "augmented_views_sha256": "68ca753a0506e00aa62b6d86ea44d906cd32c847ad3314667e35355c9c4f9133",
+        "source_indices_sha256": "8fe5d09256557fc70e84f23286ee00fc914a5d0b622fd8daa022571025f9416f",
+        "observed_labels_sha256": "64e7b2049a55254e57d9016bee3a83c33c67d0d46243d08a6c0e11744e109720"
+      },
+      "actual_calls": {
+        "backbone": 1,
+        "sample_mlp": 1,
+        "prototype_mlp": 0,
+        "optimizer": 1
+      },
+      "prototype_state_unchanged": true,
+      "seconds": 0.7829889999993611,
+      "em_check": null,
+      "loss_lc": 7.493282794952393,
+      "loss_bcl": 6.790839195251465,
+      "loss_total": 19.06106948852539,
+      "observed_correct": 3,
+      "ema_alpha": 0.1,
+      "anchor_positive_mass_mean": 1.0,
+      "anchor_positive_mass_min": 1.0,
+      "denominator_weight_min": 1.0,
+      "denominator_weight_median": 1.0,
+      "q_entropy_mean": 4.605170185988092,
+      "q_reliability_mean": 0.0,
+      "active_gradient_tensors": 101,
+      "expected_grad_none": [
+        "prototype_mlp.net.0.bias",
+        "prototype_mlp.net.0.weight",
+        "prototype_mlp.net.1.bias",
+        "prototype_mlp.net.1.weight",
+        "prototype_mlp.net.3.bias",
+        "prototype_mlp.net.3.weight"
+      ],
+      "changed_parameter_tensors": 101,
+      "max_abs_parameter_change": 0.10298258066177368,
+      "raw_three_view_logits_sha256": "f8074fecb6e217f62f8c9f1718180d416633726d70216c4e1cfb1a113a5ddbaa"
+    },
+    "semantic_active": {
+      "passed": true,
+      "epoch_index": 20,
+      "epoch_seed": 4200020,
+      "lr": 0.15,
+      "semantic_ramp": 0.5,
+      "identity": {
+        "augmented_views_sha256": "4fe15cbc1ea40149b852bae4709677c471c95f79a70012aa74d97154e3feee0a",
+        "source_indices_sha256": "ba2b551992e8e7844f5b88d52f8ad0ef620f721d0d0d33fa7a7cc96a7a6ee648",
+        "observed_labels_sha256": "211d2b8b7bb80bf27cda2a32a0f4c2268eb9667d4505ae97feb3817e7b208d31"
+      },
+      "actual_calls": {
+        "backbone": 1,
+        "sample_mlp": 1,
+        "prototype_mlp": 1,
+        "optimizer": 1
+      },
+      "prototype_state_unchanged": false,
+      "seconds": 0.3879962000064552,
+      "em_check": {
+        "estimated_noise_rate": 0.9700377984360176,
+        "em_iterations": 2,
+        "em_converged": true,
+        "blended_prior_min": 0.002129326336961053,
+        "classifier_norm_min": 1.1418395042419434,
+        "dir_mean_offdiag_cosine": 0.7034000158309937
+      },
+      "loss_lc": 7.568508625030518,
+      "loss_bcl": 1.560570240020752,
+      "loss_total": 16.0733585357666,
+      "observed_correct": 4,
+      "ema_alpha": 0.1,
+      "anchor_positive_mass_mean": 256.49932861328125,
+      "anchor_positive_mass_min": 256.45361328125,
+      "denominator_weight_min": 3.0599546432495117,
+      "denominator_weight_median": 512.4996337890625,
+      "q_entropy_mean": 7.197249487944646e-06,
+      "q_reliability_mean": 0.9999992847442627,
+      "active_gradient_tensors": 107,
+      "expected_grad_none": [],
+      "changed_parameter_tensors": 107,
+      "max_abs_parameter_change": 0.5042301416397095,
+      "raw_three_view_logits_sha256": "585ad97538050614d7372ff0398830936e8b14e9c609922ba57f54067bc6fa50"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "epoch": 180,
+  "samples": 10847,
+  "model_state_unchanged": true,
+  "model_state_sha256": "c3a448fc7780d783032fe74c02ad5459a4047e2d56e7df1480d0ff79f1995e3e",
+  "ema_state_sha256": "cc2bd55d909ade7c1167d9d2133ab9654d4c36a24471f47b995f51e1139f269b",
+  "prediction_sha256": "af26b409d2e58f49f56745e408c5249bb6dda9920fcc932f22ca204eaeb5d218",
+  "clean_subset_accuracy": {
+    "Overall": {
+      "correct": 4980,
+      "total": 6468,
+      "accuracy_percent": 76.99443413729128
+    },
+    "Many": {
+      "correct": 4124,
+      "total": 5237,
+      "accuracy_percent": 78.74737445102157
+    },
+    "Medium": {
+      "correct": 775,
+      "total": 1037,
+      "accuracy_percent": 74.73481195756992
+    },
+    "Few": {
+      "correct": 81,
+      "total": 194,
+      "accuracy_percent": 41.75257731958763
+    }
+  },
+  "noisy_subset_wrong_label_memorization_rate": {
+    "Overall": {
+      "predicted_as_corrupted_observed_label": 285,
+      "total_noisy_examples": 4379,
+      "memorization_rate_percent": 6.508335236355332
+    },
+    "Many": {
+      "predicted_as_corrupted_observed_label": 227,
+      "total_noisy_examples": 3587,
+      "memorization_rate_percent": 6.3284081405073875
+    },
+    "Medium": {
+      "predicted_as_corrupted_observed_label": 51,
+      "total_noisy_examples": 681,
+      "memorization_rate_percent": 7.488986784140969
+    },
+    "Few": {
+      "predicted_as_corrupted_observed_label": 7,
+      "total_noisy_examples": 111,
+      "memorization_rate_percent": 6.306306306306307
+    }
+  },
+  "ema_clean_subset_accuracy": {
+    "Overall": {
+      "correct": 5077,
+      "total": 6468,
+      "accuracy_percent": 78.49412492269636
+    },
+    "Many": {
+      "correct": 4195,
+      "total": 5237,
+      "accuracy_percent": 80.10311246897078
+    },
+    "Medium": {
+      "correct": 795,
+      "total": 1037,
+      "accuracy_percent": 76.66345226615236
+    },
+    "Few": {
+      "correct": 87,
+      "total": 194,
+      "accuracy_percent": 44.845360824742265
+    }
+  },
+  "ema_noisy_subset_wrong_label_memorization_rate": {
+    "Overall": {
+      "predicted_as_corrupted_observed_label": 254,
+      "total_noisy_examples": 4379,
+      "memorization_rate_percent": 5.80041105275177
+    },
+    "Many": {
+      "predicted_as_corrupted_observed_label": 198,
+      "total_noisy_examples": 3587,
+      "memorization_rate_percent": 5.5199330917201
+    },
+    "Medium": {
+      "predicted_as_corrupted_observed_label": 49,
+      "total_noisy_examples": 681,
+      "memorization_rate_percent": 7.195301027900147
+    },
+    "Few": {
+      "predicted_as_corrupted_observed_label": 7,
+      "total_noisy_examples": 111,
+      "memorization_rate_percent": 6.306306306306307
+    }
+  }
+}

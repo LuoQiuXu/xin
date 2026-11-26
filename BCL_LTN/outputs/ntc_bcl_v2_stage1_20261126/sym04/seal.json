@@ -1,0 +1,10 @@
+{
+  "state": "immutable_estimator_outputs",
+  "estimate_bundle_sha256": "f198d5a6a75c8ca3fd09c2729c22a71dd632cbe37de561f45f575e6b56be20ba",
+  "estimator_only_sha256": "9990db9c11df694ecad8fc97a4d86d391a5b62156275fe5aed30464bddba2501",
+  "logits_sha256": "6f82d1af1902722284da45214ea8412e1231da7938f2962737b14f6cae3699e8",
+  "observed_labels_sha256": "691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f",
+  "protocol_manifest_sha256": "806a0b62a7d4c33c8e714433c9b2b28befb0d0a97b2a9cd7b364c85445b53fbd",
+  "truth_loaded_before_seal": false,
+  "official_test_opened": false
+}

@@ -1,0 +1,30 @@
+{
+  "state": "complete",
+  "checkpoint": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42\\BCL_sym04_seed42\\checkpoints\\epoch_200.pth",
+  "checkpoint_sha256": "e58e465a9cde73de3c5b499553cc5239225fcd876b3783a205f4dd8117d9cac5",
+  "checkpoint_state_key": "model_state",
+  "checkpoint_state_sha256": "425cdbfe6b296ccbc7de11fca696e523bb6055c5760f2c86877de7057a502a2b",
+  "checkpoint_epoch": 200,
+  "checkpoint_seed": 42,
+  "checkpoint_group": null,
+  "expected_checkpoint_sha256": "e58e465a9cde73de3c5b499553cc5239225fcd876b3783a205f4dd8117d9cac5",
+  "indices_sha256": "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7",
+  "train_source_sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+  "logits_path": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\ntc_bcl_v2_stage1_20261126\\train_logits.npy",
+  "logits_sha256": "6f82d1af1902722284da45214ea8412e1231da7938f2962737b14f6cae3699e8",
+  "logits_shape": [
+    10847,
+    100
+  ],
+  "logits_dtype": "float32",
+  "split": "fixed 10,847-image CIFAR-100-LT TRAIN subset; deterministic eval transform; indices-file order",
+  "teacher_type": "frozen v1 checkpoint; not EMA unless state-key=ema_model_state",
+  "clean_labels_loaded": false,
+  "observed_labels_loaded": false,
+  "corruption_mask_loaded": false,
+  "official_test_opened": false,
+  "precision": "fp32",
+  "device": "cuda:0",
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "batch_size": 256
+}

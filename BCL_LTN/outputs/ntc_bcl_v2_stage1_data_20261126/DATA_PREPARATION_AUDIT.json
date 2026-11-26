@@ -1,0 +1,42 @@
+{
+  "seed": 42,
+  "num_samples": 10847,
+  "num_classes": 100,
+  "indices_file_sha256": "be73a9441289dbadec4190c8c30a1bfc551434f17b33f6dc0ceea7fb77340ac7",
+  "legacy_train_id_set_matches": true,
+  "legacy_validation_count": 1980,
+  "official_human_clean_labels_match_all_50000": true,
+  "regimes": {
+    "sym02": {
+      "observed_label_sha256": "cced3c5618d3a6893703582c49112e126f9b550d39f7000c3d1ac896da627dbb",
+      "observed_class_min": 19,
+      "observed_class_max": 409,
+      "realized_noise_rate_offline": 0.20282105651332166
+    },
+    "sym04": {
+      "observed_label_sha256": "691b8c8bf5758811d54c33c213e3bf2db12f586aa3d857f37da309a55d03554f",
+      "observed_class_min": 35,
+      "observed_class_max": 325,
+      "realized_noise_rate_offline": 0.40370609385083434
+    },
+    "sym06": {
+      "observed_label_sha256": "29d03fff66830a51c9d05d3f284432355d8ed6ac319334358ad2c34f353372e7",
+      "observed_class_min": 54,
+      "observed_class_max": 263,
+      "realized_noise_rate_offline": 0.6095694662118558
+    },
+    "asym04_coarse_cycle": {
+      "observed_label_sha256": "4a3e13944be1889f59c4d7f2d730055143677b02e4aa815428e78587174bdacd",
+      "observed_class_min": 7,
+      "observed_class_max": 368,
+      "realized_noise_rate_offline": 0.40370609385083434
+    },
+    "cifar100n_real": {
+      "observed_label_sha256": "a19cd32002d581a832ca314e2b7d0561a9e7e71cc8c6cad68141c81e45cb7d5c",
+      "observed_class_min": 14,
+      "observed_class_max": 445,
+      "realized_noise_rate_offline": 0.35973080114317324
+    }
+  },
+  "leakage_policy": "Only each regime's observed_labels.npy may be read by the trainer. truth/ is opened after predictions are sealed."
+}
