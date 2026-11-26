@@ -19,6 +19,7 @@ from PIL import Image
 from BCL_AUDIT.cifar100lt.data import build_cifar_transforms
 from BCL_AUDIT.cifar100lt.models import BCLCIFARModel
 from BCL_LTN.audit_epoch160_margin_reliability import load_cifar100_train_pixels_only
+from BCL_LTN.train_noisy_bcl import safe_torch_load
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,7 +64,8 @@ def main():
     if args.output.exists() or args.output.with_suffix(args.output.suffix + ".json").exists():
         raise FileExistsError("Refusing to overwrite logits or provenance output")
 
-    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
+    # Locally generated project checkpoints may include historical RNG metadata.
+    checkpoint = safe_torch_load(args.checkpoint, torch.device("cpu"))
     state = checkpoint.get(args.state_key)
     if not isinstance(state, dict):
         raise RuntimeError(f"Checkpoint does not contain {args.state_key}")
