@@ -83,27 +83,24 @@ Under the fixed newly estimated T_hat, first compute the original regularized
 EM prior pi_EM with prior_pseudocount=1.0.
 
 Then solve in float64:
-min_pi KL(mu_obs || T_hat.T @ pi) + lambda_h * sum_c (pi_c - pi_EM_c)^2
+min_pi KL(mu_obs || T_hat.T @ pi) + lambda_h * sum_c (sqrt(pi_c) - sqrt(pi_EM_c))^2
 subject to:
 sum_c pi_c = 1, pi_c >= pi_min.
 
 Defaults:
-- lambda_h = 1.0
+- lambda_h = 1.0 (squared Hellinger tether, no 1/2 prefactor)
 - prior_min = 3/N (prior_min_count=3)
-- float64 L-BFGS
-- max iterations 100 (150 allowed only if convergence tests require it)
-- tolerance 1e-8
+- float64 two-stage optimization: Stage-1 strong-Wolfe L-BFGS (tolerance_grad <= 1e-12,
+  tolerance_change <= 1e-14) followed by Stage-2 exact primal Projected Newton when
+  active floor constraints or primal KKT conditions require refinement
+- max iterations 200 per stage
+- primal KKT and Frank-Wolfe gap tolerance 1e-8
 - blend calibrated pi and T with the unchanged transition_blend=0.35.
 
-Check solver convergence, finite objective, simplex error, and lower-bound
-constraints at every EM update. A failed calibration must stop the run; do not
-silently fall back to an uncalibrated prior.
-
-Terminology caution: the objective above contains a squared L2 tether
-sum((pi-pi_EM)^2), not a Hellinger distance. Implement the exact written
-objective and report it as constrained KL + L2 prior calibration. Do not
-silently replace it with a different Hellinger formula or describe the L2 term
-as a Hellinger distance.
+Check primal KKT stationarity residual, Frank-Wolfe duality gap, finite objective,
+simplex error, and lower-bound constraints at every EM update. A failed calibration
+must stop the run; do not silently fall back to an uncalibrated prior or relax
+convergence tolerances.
 
 ### 2.4 Zero-intervention diagnostics
 

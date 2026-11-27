@@ -975,7 +975,7 @@ def write_v2_report(
         f"- Epochs completed: `{args.epochs}` (warmup `{args.warmup_epochs}`, semantic ramp `{args.semantic_ramp_epochs}`, EM interval `{args.estimate_interval}`)",
         f"- Unknown transition & clean prior: no true noise rate or symmetry used during training",
         f"- Prototype input mode: `{args.prototype_input_mode}` | support floor ratio: `{args.support_floor_ratio}` | EMA decay: `{args.ema_decay}`",
-        f"- Module B: PiW(raw soft support) + constrained prior calibration (lambda_h={args.prior_calibration_lambda}, pi_min={args.prior_min_count}/N) + transition blend={args.transition_blend}",
+        f"- Module B: PiW(raw soft support) + constrained KL + Hellinger prior calibration (lambda_h={args.prior_calibration_lambda}, pi_min={args.prior_min_count}/N) + transition blend={args.transition_blend}",
         "- No DEATG, no temporal probability smoothing, and no epoch-based transition freeze; fit statistics are diagnostics only.",
         "",
     ]
@@ -1100,7 +1100,7 @@ def train_v2(args: argparse.Namespace) -> None:
             "shrinkage_mass": args.shrinkage_mass,
             "prior_pseudocount": args.prior_pseudocount,
             "transition_blend": args.transition_blend,
-            "module_b": "PiW(raw_S)+KL-L2_prior_calibration+safe_floor",
+            "module_b": "PiW(raw_S)+KL-Hellinger_prior_calibration+safe_floor",
             "prior_calibration_lambda_h": args.prior_calibration_lambda,
             "prior_min_count": args.prior_min_count,
             "prior_min_probability": float(args.prior_min_count) / float(N),
@@ -1524,10 +1524,10 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--lambda-h", "--prior-calibration-lambda",
         dest="prior_calibration_lambda", type=float, default=1.0,
-        help="Quadratic tether weight in KL(mu_obs || T.T pi) + lambda_h ||pi-pi_EM||_2^2.",
+        help="Squared Hellinger tether weight in KL(mu_obs || T.T pi) + lambda_h sum((sqrt(pi)-sqrt(pi_EM))^2).",
     )
     parser.add_argument("--prior-min-count", type=float, default=3.0)
-    parser.add_argument("--prior-calibration-max-iter", type=int, default=100)
+    parser.add_argument("--prior-calibration-max-iter", type=int, default=200)
     parser.add_argument("--prior-calibration-tolerance", type=float, default=1e-8)
     parser.add_argument("--support-floor-ratio", type=float, default=0.5)
     parser.add_argument("--denominator-epsilon", type=float, default=1e-6)
