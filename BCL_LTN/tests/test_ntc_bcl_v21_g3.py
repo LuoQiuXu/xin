@@ -120,3 +120,27 @@ def test_piw_anchor_defaults_to_uniform_prior_for_backward_compatibility():
     )
     torch.testing.assert_close(old_style.transition, uniform.transition)
     torch.testing.assert_close(old_style.anchor_support, uniform.anchor_support)
+
+
+def test_prior_calibration_scales_to_100_classes_in_float64():
+    k = 100
+    counts = torch.logspace(math.log10(500), math.log10(5), k, dtype=torch.float64).round()
+    transition = torch.full((k, k), 0.4 / (k - 1), dtype=torch.float64)
+    transition.fill_diagonal_(0.6)
+    generator = torch.Generator().manual_seed(20261127)
+    em_prior = torch.softmax(torch.randn(k, generator=generator, dtype=torch.float64) * 2.0, dim=0)
+    prior, diag = calibrate_clean_prior(
+        counts,
+        transition,
+        em_prior,
+        prior_min=3.0 / 10847.0,
+        lambda_h=1.0,
+        max_iter=150,
+        tolerance=1e-8,
+    )
+    assert prior.shape == (k,)
+    assert prior.dtype == torch.float64
+    assert torch.isfinite(prior).all()
+    assert float(prior.min()) >= 3.0 / 10847.0 - 1e-12
+    assert float(prior.sum()) == pytest.approx(1.0, abs=1e-10)
+    assert diag["converged"] is True
