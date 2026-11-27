@@ -81,6 +81,10 @@ from BCL_LTN.ntc_bcl_v2_losses import (
     estimate_anchored_transition_and_prior,
     measure_prototype_and_classifier_health,
 )
+from BCL_LTN.ntc_bcl_v21_calibration import (
+    calibrate_clean_prior,
+    observed_fit_statistics,
+)
 from BCL_LTN.train_noisy_bcl import (
     FIXED_INDICES_SHA256,
     FIXED_TRAIN_SOURCE_SHA256,
@@ -604,25 +608,42 @@ def run_gpu_smoke(
                 ema_teacher.model, dataset, device
             )
             obs_t = torch.from_numpy(dataset.observed).long()
+            fit_stats = observed_fit_statistics(probs, obs_t)
             est = estimate_anchored_transition_and_prior(
                 probs,
                 obs_t,
                 confidence_power=args.confidence_power,
                 shrinkage_mass=args.shrinkage_mass,
                 prior_pseudocount=args.prior_pseudocount,
+                reference_prior=cur_pi,
+            )
+            calibrated_prior, calibration_diag = calibrate_clean_prior(
+                torch.as_tensor(observed_counts, dtype=torch.float64),
+                est.transition,
+                est.clean_prior,
+                prior_min=float(args.prior_min_count) / float(N),
+                lambda_h=args.prior_calibration_lambda,
+                max_iter=args.prior_calibration_max_iter,
+                tolerance=args.prior_calibration_tolerance,
             )
             new_pi, new_t = blend_transition_and_prior(
-                cur_pi, cur_t, est.clean_prior, est.transition, blend_alpha=args.transition_blend
+                cur_pi, cur_t, calibrated_prior, est.transition,
+                blend_alpha=args.transition_blend
             )
             correction.update_transition_and_prior(new_pi, new_t)
             health = measure_prototype_and_classifier_health(
                 model.classifier.weight, model.prototype_mlp
             )
             em_test = {
-                "estimated_noise_rate": est.estimated_noise_rate,
+                "raw_em_noise_rate": est.estimated_noise_rate,
+                "calibrated_noise_rate": float(
+                    1.0 - (calibrated_prior * est.transition.diag()).sum().item()
+                ),
                 "em_iterations": est.iterations,
                 "em_converged": est.converged,
                 "blended_prior_min": float(new_pi.min().item()),
+                "prior_calibration": calibration_diag,
+                **fit_stats,
                 "classifier_norm_min": health["classifier_weight_norm_min"],
                 "dir_mean_offdiag_cosine": health["dir_mean_offdiag_cosine"],
             }
@@ -830,8 +851,12 @@ def offline_truth_and_estimator_audit(
             t_hat = arr["blended_transition"].astype(np.float64)
             raw_pi = arr["raw_em_prior"].astype(np.float64)
             raw_t = arr["raw_em_transition"].astype(np.float64)
+            calibrated_pi = arr["calibrated_prior"].astype(np.float64)
         pi_kl = float(np.sum(pi_true * np.log((pi_true + pi_eps) / (pi_hat + pi_eps))))
         raw_kl = float(np.sum(pi_true * np.log((pi_true + pi_eps) / (raw_pi + pi_eps))))
+        calibrated_kl = float(
+            np.sum(pi_true * np.log((pi_true + pi_eps) / (calibrated_pi + pi_eps)))
+        )
         em_audit_rows.append(
             {
                 "epoch": snap["epoch"],
@@ -843,6 +868,9 @@ def offline_truth_and_estimator_audit(
                 "blended_prior_mae": float(np.mean(np.abs(pi_hat - pi_true))),
                 "blended_prior_kl": pi_kl,
                 "raw_prior_kl": raw_kl,
+                "calibrated_prior_mae": float(np.mean(np.abs(calibrated_pi - pi_true))),
+                "calibrated_prior_kl": calibrated_kl,
+                "calibrated_prior_min": float(calibrated_pi.min()),
                 "blended_prior_min": float(pi_hat.min()),
             }
         )
@@ -937,13 +965,33 @@ def write_v2_report(
 ) -> None:
     groups = ("Overall", "Many", "Medium", "Few")
     lines = [
-        f"# NTC-BCL v2 Report — {args.regime}",
+        f"# NTC-BCL v2.1 G3 Report — {args.regime}",
         "",
         f"- Epochs completed: `{args.epochs}` (warmup `{args.warmup_epochs}`, semantic ramp `{args.semantic_ramp_epochs}`, EM interval `{args.estimate_interval}`)",
         f"- Unknown transition & clean prior: no true noise rate or symmetry used during training",
         f"- Prototype input mode: `{args.prototype_input_mode}` | support floor ratio: `{args.support_floor_ratio}` | EMA decay: `{args.ema_decay}`",
+        f"- Module B: PiW(raw soft support) + constrained prior calibration (lambda_h={args.prior_calibration_lambda}, pi_min={args.prior_min_count}/N) + transition blend={args.transition_blend}",
+        "- No DEATG, no temporal probability smoothing, and no epoch-based transition freeze; fit statistics are diagnostics only.",
         "",
     ]
+    fit_rows = [
+        (row["epoch"], row["em_update"])
+        for row in history_rows
+        if row.get("em_update") is not None
+    ]
+    if fit_rows:
+        lines.extend([
+            "## Zero-Intervention Observed-Label Fit Diagnostics",
+            "",
+            "| Epoch | F_top20 | F_top50 | F_all_macro |",
+            "| ---: | ---: | ---: | ---: |",
+        ])
+        for epoch, stats in fit_rows:
+            lines.append(
+                f"| {epoch} | {stats['f_top20']:.6f} | {stats['f_top50']:.6f} | {stats['f_all_macro']:.6f} |"
+            )
+        lines.append("")
+
     if test_summary is not None:
         lines.extend(["## Official TEST Metrics", "", "| Evaluator | Overall | Many | Medium | Few |", "| --- | ---: | ---: | ---: | ---: |"])
         for tag in ("student", "ema_teacher"):
@@ -967,7 +1015,7 @@ def write_v2_report(
             "",
             f"- Realized dataset noise: `{diag_summary['realized_noise_rate']:.4f}`",
             f"- Final blended estimated noise (Epoch {last_em['epoch']}): `{last_em['blended_estimated_noise_rate']:.4f}` (raw `{last_em['raw_estimated_noise_rate']:.4f}`)",
-            f"- Final blended `T` MAE: `{last_em['blended_T_mae']:.6f}` | `T` diag MAE: `{last_em['blended_T_diag_mae']:.4f}` | Prior KL: `{last_em['blended_prior_kl']:.5f}` | Min prior: `{last_em['blended_prior_min']:.2e}`",
+            f"- Final blended `T` MAE: `{last_em['blended_T_mae']:.6f}` | `T` diag MAE: `{last_em['blended_T_diag_mae']:.4f}` | Prior KL: `{last_em['blended_prior_kl']:.5f}` | Calibrated prior KL: `{last_em['calibrated_prior_kl']:.5f}` | Min prior: `{last_em['blended_prior_min']:.2e}`",
             "",
         ])
 
@@ -990,6 +1038,7 @@ def collect_source_provenance() -> Dict[str, object]:
         "BCL_LTN/ntc_bcl_v2_losses.py",
         "BCL_LTN/train_ntc_bcl_v2.py",
         "BCL_LTN/noise_transition_estimator.py",
+        "BCL_LTN/ntc_bcl_v21_calibration.py",
     )
     git_branch = subprocess.check_output(
         ["git", "branch", "--show-current"], cwd=ROOT, text=True
@@ -1044,6 +1093,12 @@ def train_v2(args: argparse.Namespace) -> None:
             "shrinkage_mass": args.shrinkage_mass,
             "prior_pseudocount": args.prior_pseudocount,
             "transition_blend": args.transition_blend,
+            "module_b": "PiW(raw_S)+KL-L2_prior_calibration+safe_floor",
+            "prior_calibration_lambda_h": args.prior_calibration_lambda,
+            "prior_min_count": args.prior_min_count,
+            "prior_min_probability": float(args.prior_min_count) / float(N),
+            "prior_calibration_max_iter": args.prior_calibration_max_iter,
+            "prior_calibration_tolerance": args.prior_calibration_tolerance,
             "support_floor_ratio": args.support_floor_ratio,
             "denominator_epsilon": args.denominator_epsilon,
             "q_temperature": args.q_temperature,
@@ -1172,17 +1227,31 @@ def train_v2(args: argparse.Namespace) -> None:
                 teacher_probs, _ = evaluate_deterministic_train_probabilities(
                     ema_teacher.model, dataset, device
                 )
+                # Zero-intervention observation diagnostics: record only; never
+                # feed these values into the estimator, optimizer, or update gate.
+                fit_stats = observed_fit_statistics(teacher_probs, obs_tensor)
+                reference_prior = cur_prior.detach().clone()
                 est = estimate_anchored_transition_and_prior(
                     teacher_probs,
                     obs_tensor,
                     confidence_power=args.confidence_power,
                     shrinkage_mass=args.shrinkage_mass,
                     prior_pseudocount=args.prior_pseudocount,
+                    reference_prior=reference_prior,
+                )
+                calibrated_prior, calibration_diag = calibrate_clean_prior(
+                    torch.as_tensor(observed_counts, dtype=torch.float64),
+                    est.transition,
+                    est.clean_prior,
+                    prior_min=float(args.prior_min_count) / float(N),
+                    lambda_h=args.prior_calibration_lambda,
+                    max_iter=args.prior_calibration_max_iter,
+                    tolerance=args.prior_calibration_tolerance,
                 )
                 new_prior, new_transition = blend_transition_and_prior(
                     cur_prior,
                     cur_transition,
-                    est.clean_prior,
+                    calibrated_prior,
                     est.transition,
                     blend_alpha=args.transition_blend,
                 )
@@ -1195,14 +1264,23 @@ def train_v2(args: argparse.Namespace) -> None:
                 with snap_path.open("xb") as sf:
                     np.savez_compressed(
                         sf,
+                        reference_prior=reference_prior.cpu().numpy(),
                         raw_em_prior=est.clean_prior.cpu().numpy(),
                         raw_em_transition=est.transition.cpu().numpy(),
+                        calibrated_prior=calibrated_prior.cpu().numpy(),
                         blended_prior=cur_prior.cpu().numpy(),
                         blended_transition=cur_transition.cpu().numpy(),
+                        anchor_support=est.anchor_support.cpu().numpy(),
+                        f_top20=np.asarray(fit_stats["f_top20"], dtype=np.float64),
+                        f_top50=np.asarray(fit_stats["f_top50"], dtype=np.float64),
+                        f_all_macro=np.asarray(fit_stats["f_all_macro"], dtype=np.float64),
                     )
                 em_meta = {
                     "epoch": epoch,
                     "raw_estimated_noise_rate": est.estimated_noise_rate,
+                    "calibrated_estimated_noise_rate": float(
+                        1.0 - (calibrated_prior * est.transition.diag()).sum().item()
+                    ),
                     "blended_estimated_noise_rate": float(
                         1.0 - (cur_prior * cur_transition.diag()).sum().item()
                     ),
@@ -1210,6 +1288,11 @@ def train_v2(args: argparse.Namespace) -> None:
                     "em_iterations": est.iterations,
                     "em_converged": est.converged,
                     "em_final_delta": est.final_delta,
+                    "anchor_support_min": float(est.anchor_support.min().item()),
+                    "anchor_support_median": float(est.anchor_support.median().item()),
+                    "anchor_support_max": float(est.anchor_support.max().item()),
+                    "prior_calibration": calibration_diag,
+                    **fit_stats,
                     "blended_prior_min": float(cur_prior.min().item()),
                     "blended_prior_max": float(cur_prior.max().item()),
                     "prior_update_delta": prior_delta,
@@ -1431,6 +1514,14 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument("--shrinkage-mass", type=float, default=10.0)
     parser.add_argument("--prior-pseudocount", type=float, default=1.0)
     parser.add_argument("--transition-blend", type=float, default=0.35)
+    parser.add_argument(
+        "--lambda-h", "--prior-calibration-lambda",
+        dest="prior_calibration_lambda", type=float, default=1.0,
+        help="Quadratic tether weight in KL(mu_obs || T.T pi) + lambda_h ||pi-pi_EM||_2^2.",
+    )
+    parser.add_argument("--prior-min-count", type=float, default=3.0)
+    parser.add_argument("--prior-calibration-max-iter", type=int, default=100)
+    parser.add_argument("--prior-calibration-tolerance", type=float, default=1e-8)
     parser.add_argument("--support-floor-ratio", type=float, default=0.5)
     parser.add_argument("--denominator-epsilon", type=float, default=1e-6)
     parser.add_argument("--q-temperature", type=float, default=1.0)
