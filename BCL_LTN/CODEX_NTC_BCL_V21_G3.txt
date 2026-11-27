@@ -1,0 +1,248 @@
+# Codex task — NTC-BCL v2.1 G3 online closed-loop validation
+
+## 0. Branch and preservation contract
+
+- Target branch: research/ntc-bcl-v21-g3-prior-calibration-20261127
+- Exact base commit: 71684bdf64652f03c319877ff656a065583743ba (71684bd).
+- The branch was created from that exact commit. Keep the existing branch
+  research/ntc-bcl-v2-unknown-transition-audit-20261126 completely untouched.
+- Before any local operation, run:
+  - git status --short --branch
+  - git branch --show-current
+  - git rev-parse HEAD
+- Confirm the current branch is the target branch. If the worktree contains
+  pre-existing changes, preserve them. Do not reset, clean, stash/pop, or switch
+  away from a dirty branch as a shortcut.
+- Do not modify BCL_AUDIT/, the BCL backbone/model, original BCL losses,
+  data-generation scripts, fixed train indices, or the original v2 baseline
+  output directories.
+- Do not cherry-pick commits from another experiment branch.
+- Commit source, tests, and this task file only. Never commit .pth, .npz,
+  logits, probability arrays, generated datasets, or run outputs.
+
+## 1. Experimental question
+
+Run G3 only:
+
+Module B = PiW(raw soft support) + constrained prior calibration + Safe Floor.
+
+Module A remains the original fixed update (transition_blend=0.35).
+No DEATG, no temporal probability smoothing, no JS drift weighting, no
+epoch-based freeze, and no adaptive update gate.
+
+Run the two matched 200-epoch regimes:
+1. sym04
+2. cifar100n_real
+
+The purpose is to test whether the revised Module B improves the online
+T/pi -> forward-corrected LC -> student/EMA -> next T/pi feedback loop.
+The previous cached-probability offline improvements are not proof of online
+closed-loop improvement.
+
+## 2. Exact mathematical contract
+
+### 2.1 Probability semantics
+
+The deterministic EMA TRAIN pass returns:
+p_bal(c|x) = softmax(ema_logits).
+
+Do not add log_prior before this softmax. The existing
+EstimatedTransitionForwardCorrection training objective uses
+logits + log_prior; therefore the raw EMA softmax is the balanced-posterior
+quantity used by the PiW step.
+
+### 2.2 PiW-EstT with raw support (no Kish ESS)
+
+For the first EM update (Epoch 20), use:
+pi_ref = observed_counts / N.
+
+For every later update, use the previous already-blended prior:
+pi_ref = pi_blended_(t-1).
+
+For each sample:
+q_ic = p_bal_ic * pi_ref_c / sum_k(p_bal_ik * pi_ref_k).
+
+Keep the existing visual confidence weight:
+w_i = (((max_c p_bal_ic - 1/K) / (1 - 1/K)).clamp_min(0)) ** confidence_power
+with confidence_power=2.0.
+
+Then:
+S_c = sum_i w_i * q_ic (raw soft support; do NOT compute Kish ESS).
+C_cj = sum_i w_i * q_ic * 1[observed_i=j] / S_c.
+lambda_c = S_c / (S_c + shrinkage_mass) with shrinkage_mass=10.0.
+Use the existing high-support global transition template and row normalization.
+Every T row must remain finite, non-negative, and sum to one.
+
+Important: reference_prior is only used for this PiW anchor. Preserve the
+original regularized EM prior step, including prior_pseudocount=1.0; do not
+silently replace the EM initialization or multiply the clean prior twice.
+
+### 2.3 Prior calibration and Safe Floor
+
+Under the fixed newly estimated T_hat, first compute the original regularized
+EM prior pi_EM with prior_pseudocount=1.0.
+
+Then solve in float64:
+min_pi KL(mu_obs || T_hat.T @ pi) + lambda_h * sum_c (pi_c - pi_EM_c)^2
+subject to:
+sum_c pi_c = 1, pi_c >= pi_min.
+
+Defaults:
+- lambda_h = 1.0
+- prior_min = 3/N (prior_min_count=3)
+- float64 L-BFGS
+- max iterations 100 (150 allowed only if convergence tests require it)
+- tolerance 1e-8
+- blend calibrated pi and T with the unchanged transition_blend=0.35.
+
+Check solver convergence, finite objective, simplex error, and lower-bound
+constraints at every EM update. A failed calibration must stop the run; do not
+silently fall back to an uncalibrated prior.
+
+Terminology caution: the objective above contains a squared L2 tether
+sum((pi-pi_EM)^2), not a Hellinger distance. Implement the exact written
+objective and report it as constrained KL + L2 prior calibration. Do not
+silently replace it with a different Hellinger formula or describe the L2 term
+as a Hellinger distance.
+
+### 2.4 Zero-intervention diagnostics
+
+At each EM update, calculate from the same p_bal and observed labels only:
+- f_top20: within each observed class, rank samples by max_c p_bal; take
+  ceil(20% * n_class) highest-confidence samples (at least one); calculate
+  the fraction whose argmax equals the observed class; macro-average over
+  observed classes.
+- f_top50: same procedure using ceil(50% * n_class).
+- f_all_macro: all-sample observed-label fit rate, macro-averaged over
+  observed classes.
+
+These are diagnostics only. They must not affect T, pi, loss, optimizer,
+EMA, or the update coefficient.
+
+Save all three values in:
+1. each history.jsonl row containing an em_update;
+2. each corresponding em_snapshots/epoch_*.npz.
+
+Each EM snapshot must also contain:
+- reference_prior
+- raw_em_prior (pi_EM)
+- raw_em_transition (T_hat)
+- calibrated_prior
+- blended_prior
+- blended_transition
+- anchor_support (S_c)
+
+For 200 epochs, with warmup 20 and interval 5, expect exactly 36 EM updates:
+Epochs 20, 25, ..., 195.
+
+## 3. Preserve all matched settings
+
+Do not change:
+- seed 42
+- CIFAR-100-LT IF=100 fixed 10,847 TRAIN subset and fixed indices
+- ResNet-32 BCL model and three-view pipeline
+- FP32; AMP remains disabled
+- batch size 256
+- 200 epochs
+- warmup 20 epochs
+- semantic ramp 20 epochs
+- EMA decay 0.99
+- confidence power 2.0
+- shrinkage mass 10.0
+- prior pseudocount 1.0
+- transition blend 0.35
+- original Soft-BCL parameters
+- optimizer, LR schedule, data transforms and checkpoint protocol
+- official TEST evaluation exactly once after training/diagnostics.
+
+No clean labels, corruption masks, true noise rates, or true transition matrices
+may be used during training or calibration. They remain available only to the
+existing post-training offline audit after frozen TRAIN predictions are sealed.
+
+## 4. Validation before training
+
+Run from the repository root.
+
+### 4.1 Focused unit tests
+
+    python -m pytest BCL_LTN/tests/test_ntc_bcl_v21_g3.py BCL_LTN/tests/test_ntc_bcl_v2_training.py BCL_LTN/tests/test_noise_transition_estimator.py BCL_LTN/tests/test_noise_robust_losses.py -q
+
+Also run the existing relevant v2 protocol / data-isolation tests that are
+available and were previously green. Do not weaken tests to get a green result.
+
+### 4.2 CLI and smoke checks
+
+    python -B -m BCL_LTN.train_ntc_bcl_v2 --help
+
+Then run one GPU smoke for each regime, using separate empty output folders:
+
+    python -B -m BCL_LTN.train_ntc_bcl_v2 --regime sym04 --output BCL_LTN/outputs/NTC_BCL_V21_G3_sym04_seed42_20261127_smoke --device cuda:0 --smoke-only --lambda-h 1.0 --prior-min-count 3
+
+    python -B -m BCL_LTN.train_ntc_bcl_v2 --regime cifar100n_real --output BCL_LTN/outputs/NTC_BCL_V21_G3_cifar100n_real_seed42_20261127_smoke --device cuda:0 --smoke-only --lambda-h 1.0 --prior-min-count 3
+
+Each smoke must pass both warmup and semantic-active steps, anchored T
+estimation, prior calibration, and isolation gates. Do not begin 200-epoch
+training if either smoke or any required test fails.
+
+## 5. Full G3 runs (sequentially, same GPU)
+
+After all validation succeeds, run:
+
+    python -B -m BCL_LTN.train_ntc_bcl_v2 --regime sym04 --output BCL_LTN/outputs/NTC_BCL_V21_G3_sym04_seed42_20261127 --device cuda:0 --epochs 200 --warmup-epochs 20 --semantic-ramp-epochs 20 --estimate-interval 5 --ema-decay 0.99 --confidence-power 2.0 --shrinkage-mass 10.0 --prior-pseudocount 1.0 --transition-blend 0.35 --lambda-h 1.0 --prior-min-count 3 --support-floor-ratio 0.5 --denominator-epsilon 1e-6 --q-temperature 1.0 --prototype-input-mode direction
+
+    python -B -m BCL_LTN.train_ntc_bcl_v2 --regime cifar100n_real --output BCL_LTN/outputs/NTC_BCL_V21_G3_cifar100n_real_seed42_20261127 --device cuda:0 --epochs 200 --warmup-epochs 20 --semantic-ramp-epochs 20 --estimate-interval 5 --ema-decay 0.99 --confidence-power 2.0 --shrinkage-mass 10.0 --prior-pseudocount 1.0 --transition-blend 0.35 --lambda-h 1.0 --prior-min-count 3 --support-floor-ratio 0.5 --denominator-epsilon 1e-6 --q-temperature 1.0 --prototype-input-mode direction
+
+Do not use --skip-test for the formal runs.
+
+## 6. Required post-run checks and report
+
+For each regime verify:
+- exactly 200 history.jsonl records;
+- exactly 36 EM snapshots for epochs 20..195;
+- all 36 prior-calibration records report convergence;
+- every blended_prior is finite, sums to one and has minimum >= 3/N;
+- every T row is finite, non-negative and sums to one;
+- reference_prior at Epoch 20 equals observed_counts/N;
+- each later reference_prior equals the previous update's blended_prior;
+- f_top20, f_top50, f_all_macro exist in both history and snapshots;
+- raw_em_prior, calibrated_prior, and blended_prior are distinct saved stages;
+- exactly one official TEST opening per run;
+- no truth access before frozen TRAIN predictions are written;
+- no .pth, .npz, logits, or data arrays are staged for commit.
+
+Produce and compare:
+- NTC_BCL_V21_G3_REPORT.md
+- history.jsonl
+- online_em_truth_audit.json
+- train_diagnostics.csv
+- final_test_metrics.json
+- run_summary.json
+- all 36 EM snapshots (keep local; do not commit).
+
+Compare G3 directly against the already committed v2 baselines:
+- NTC_BCL_V2_sym04_seed42_20261126
+- NTC_BCL_V2_cifar100n_real_seed42_20261127
+
+Report Overall / Many / Medium / Few TEST accuracy; TRAIN clean accuracy and
+wrong-label memorization; raw / calibrated / blended prior KL and MAE; T MAE
+and diagonal MAE; estimated noise-rate trajectory; F_top20 / F_top50 /
+F_all_macro trajectory; calibration convergence and floor statistics.
+
+Do not claim that Module A is necessary or that DEATG is validated. G3 is the
+only intervention in this experiment. Recommend the next step from the actual
+two-regime online results.
+
+## 7. Completion message
+
+Return:
+- exact branch and HEAD SHA;
+- exact test commands, exit codes and counts;
+- smoke results;
+- exact 200-epoch commands and completion status;
+- output paths and SHA256 hashes of compact reports / JSON / CSV;
+- 36-snapshot count and calibration convergence checks;
+- official TEST and truth-access audit;
+- a concise G3-vs-v2 baseline table;
+- a go / no-go recommendation for adding any Module A mechanism.
+
+Do not claim training or tests passed unless their actual receipts show it.
