@@ -43,6 +43,8 @@ NOISE_ARRAYS = {
     "is_noisy": "cifar100lt_if100_is_noisy_seed42.npy",
 }
 DEFAULT_FORMAL_SMOKE_REPORT = Path("BCL_LTN/outputs/BCL_sym04_seed42_smoke/smoke_report.json")
+REGIMES = ("sym02", "sym04", "sym06", "asym04_coarse_cycle", "cifar100n_real")
+DEFAULT_STAGE1_DATA_ROOT = Path("BCL_LTN/outputs/ntc_bcl_v2_stage1_data_20261126")
 
 
 class OfficialTestAudit:
@@ -120,6 +122,93 @@ def load_verified_noise(data_root, indices_path, noise_dir):
             or manifest.get("noise_rate_realized") != flips / len(mask)
             or abs(flips / len(mask) - 0.4) >= 0.02):
         raise RuntimeError("Noise manifest class counts, flip totals or realized noise rate are inconsistent")
+    return base, manifest, noisy, clean, mask
+
+
+def load_verified_regime_noise(data_root: Path, indices_path: Path, regime_dir: Path, regime: str):
+    """Load and verify a Stage-1 regime's observed noisy labels and offline TRAIN truth."""
+    actual_index_hash = file_sha256(indices_path)
+    if actual_index_hash != FIXED_INDICES_SHA256:
+        raise RuntimeError(f"Fixed IF=100 index SHA256 mismatch: {indices_path}")
+    train_source = data_root / "cifar-100-python"
+    if any(file_sha256(train_source / name) != expected for name, expected in FIXED_TRAIN_SOURCE_SHA256.items()):
+        raise RuntimeError("CIFAR-100 TRAIN or meta SHA256 does not match the locked source")
+
+    manifest_path = regime_dir / "manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"Missing regime manifest: {manifest_path}")
+    obs_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if (obs_manifest.get("regime") != regime
+            or obs_manifest.get("num_samples") != 10_847
+            or obs_manifest.get("num_classes") != 100
+            or obs_manifest.get("indices_sha256") != actual_index_hash):
+        raise RuntimeError(f"Regime manifest mismatch in {manifest_path}")
+
+    obs_path = regime_dir / str(obs_manifest.get("observed_labels_file", "observed_labels.npy"))
+    if file_sha256(obs_path) != obs_manifest.get("observed_labels_sha256"):
+        raise RuntimeError(f"Observed noisy labels SHA256 mismatch: {obs_path}")
+    noisy = np.load(obs_path, allow_pickle=False)
+    if (noisy.shape != (10_847,) or noisy.dtype != np.int64
+            or np.any((noisy < 0) | (noisy >= 100))):
+        raise RuntimeError(f"Invalid observed noisy labels array: {obs_path}")
+    observed_counts = np.bincount(noisy, minlength=100)
+    if (np.any(observed_counts <= 0)
+            or obs_manifest.get("observed_class_counts") != observed_counts.tolist()):
+        raise RuntimeError(f"Observed noisy class counts mismatch in {manifest_path}")
+
+    truth_dir = regime_dir / "truth"
+    t_manifest = json.loads((truth_dir / "truth_manifest.json").read_text(encoding="utf-8"))
+    clean_path = truth_dir / "clean_labels.npy"
+    mask_path = truth_dir / "is_noisy.npy"
+    if (file_sha256(clean_path) != t_manifest.get("clean_labels_sha256")
+            or file_sha256(mask_path) != t_manifest.get("is_noisy_sha256")):
+        raise RuntimeError(f"Regime truth SHA256 mismatch under {truth_dir}")
+    clean = np.load(clean_path, allow_pickle=False)
+    mask = np.load(mask_path, allow_pickle=False)
+    if (clean.shape != noisy.shape or mask.shape != noisy.shape
+            or clean.dtype != np.int64 or mask.dtype != np.bool_
+            or np.any((clean < 0) | (clean >= 100))
+            or not np.array_equal(noisy != clean, mask)):
+        raise RuntimeError("Invalid regime clean labels or flip mask")
+
+    base = CIFAR100LT(root=data_root, mode="bcl", indices_file=indices_path, split_seed=0, download=False)
+    if not np.array_equal(base.targets[base.indices], clean):
+        raise RuntimeError("Saved regime clean labels do not align with the fixed TRAIN indices")
+    clean_counts = cifar100lt_class_counts()
+    if (not np.array_equal(np.bincount(clean, minlength=100), clean_counts)
+            or t_manifest.get("clean_class_counts") != clean_counts.tolist()):
+        raise RuntimeError("Regime clean class counts mismatch")
+
+    flips = int(mask.sum())
+    groups = group_class_ids(clean_counts)
+    mmf = {}
+    for gname, cids in groups.items():
+        clean_mask = np.isin(clean, cids)
+        obs_mask = np.isin(noisy, cids)
+        mmf[gname] = {
+            "num_classes": int(len(cids)),
+            "clean_samples": int(clean_mask.sum()),
+            "clean_source_samples_flipped": int((clean_mask & mask).sum()),
+            "observed_noisy_label_samples": int(obs_mask.sum()),
+        }
+
+    manifest = {
+        "regime": regime,
+        "label_source": obs_manifest.get("label_source", regime),
+        "indices_sha256": actual_index_hash,
+        "train_source_sha256": dict(FIXED_TRAIN_SOURCE_SHA256),
+        "noisy_labels_sha256": obs_manifest["observed_labels_sha256"],
+        "clean_labels_sha256": t_manifest["clean_labels_sha256"],
+        "is_noisy_sha256": t_manifest["is_noisy_sha256"],
+        "clean_class_counts": clean_counts.tolist(),
+        "observed_noisy_class_counts": observed_counts.tolist(),
+        "num_train_samples": int(len(mask)),
+        "num_flipped": flips,
+        "num_unflipped": int(len(mask) - flips),
+        "noise_rate_requested": t_manifest.get("requested_noise_rate"),
+        "noise_rate_realized": float(flips / len(mask)),
+        "many_medium_few": mmf,
+    }
     return base, manifest, noisy, clean, mask
 
 
@@ -328,15 +417,24 @@ def train(args):
         reserved = {output_root, output_root / "environment.json", output_root / "class_counts_comparison.csv"}
         if smoke_report_path.exists() or smoke_report_path in reserved:
             raise FileExistsError(f"Smoke report requires a fresh output file: {smoke_report_path}")
-    report_path = output_root.parent / "BCL_sym04_baseline_report.md"
+    report_name = f"BCL_{args.regime}_baseline_report.md" if args.regime else "BCL_sym04_baseline_report.md"
+    report_path = output_root.parent / report_name
     if report_path.exists():
         report_path = output_root / report_path.name
-    manifest_path = noise_dir / "noise_manifest.json"
     test_audit = OfficialTestAudit(data_root)
 
-    # Validate the serialized artifacts before replacing the selected in-memory targets.
-    base, manifest, noisy_labels, clean_labels, is_noisy = load_verified_noise(data_root, indices_path, noise_dir)
-    manifest_sha256 = file_sha256(manifest_path)
+    if args.regime:
+        regime_dir = args.stage1_data_root.expanduser().resolve() / args.regime
+        manifest_path = regime_dir / "manifest.json"
+        base, manifest, noisy_labels, clean_labels, is_noisy = load_verified_regime_noise(
+            data_root, indices_path, regime_dir, args.regime
+        )
+        manifest_sha256 = file_sha256(manifest_path)
+    else:
+        manifest_path = noise_dir / "noise_manifest.json"
+        # Validate the serialized artifacts before replacing the selected in-memory targets.
+        base, manifest, noisy_labels, clean_labels, is_noisy = load_verified_noise(data_root, indices_path, noise_dir)
+        manifest_sha256 = file_sha256(manifest_path)
     indices = base.indices.astype(np.int64, copy=True)
     noisy_full_targets = base.targets.copy()
     noisy_full_targets[indices] = noisy_labels
@@ -375,6 +473,7 @@ def train(args):
         "noise_manifest_sha256": manifest_sha256,
         "train_source_sha256": FIXED_TRAIN_SOURCE_SHA256,
         "source_sha256": source_hashes(),
+        **({"regime": args.regime} if args.regime else {}),
     }
     smoke = None if args.smoke_only else verify_smoke_receipt(smoke_report_path, environment)
     if smoke is not None:
@@ -462,7 +561,8 @@ def train(args):
         print(json.dumps(receipt, indent=2))
         return receipt
 
-    run_dir = output_root / "BCL_sym04_seed42"
+    run_name = f"BCL_{args.regime}_seed42" if args.regime else "BCL_sym04_seed42"
+    run_dir = output_root / run_name
     if run_dir.exists():
         raise FileExistsError(f"Refusing to overwrite run directory: {run_dir}")
     checkpoint_dir = run_dir / "checkpoints"
@@ -577,7 +677,7 @@ def train(args):
 
         with history_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
-        print(f"[BCL_sym04] epoch {epoch:03d}/{EPOCHS} lr={lr:.5g} "
+        print(f"[{run_name}] epoch {epoch:03d}/{EPOCHS} lr={lr:.5g} "
               f"LC={row['loss_lc']:.4f} BCL={row['loss_bcl']:.4f} "
               f"total={row['loss_total']:.4f} time={elapsed:.1f}s "
               f"peak_allocated={peak_memory / (1024**3):.2f}GiB reserved={peak_reserved / (1024**3):.2f}GiB")
@@ -591,7 +691,7 @@ def train(args):
         raise RuntimeError("Formal optimizer, TRAIN diagnostic or TEST isolation gate did not pass")
     write_train_diagnostics_csv(run_dir / "train_diagnostics.csv", diagnostics)
     training_summary = {
-        "run": "BCL_sym04_seed42", "epochs_completed": EPOCHS,
+        "run": run_name, "epochs_completed": EPOCHS,
         "total_training_seconds": total_seconds,
         "max_peak_cuda_memory_bytes": max_peak_memory,
         "max_peak_cuda_reserved_bytes": max_reserved_memory,
@@ -650,17 +750,29 @@ def train(args):
     np.savez_compressed(run_dir / "final_test_predictions.npz",
                         labels=y, predictions=pred, class_accuracy=class_acc)
 
+    req_rate = manifest.get("noise_rate_requested")
+    req_rate_str = f"{req_rate:.4f}" if isinstance(req_rate, (int, float)) else "N/A (real-world human annotation noise)"
+    noise_desc = (
+        f"- Regime: `{args.regime}` ({manifest.get('label_source', args.regime)})."
+        if args.regime
+        else "- Independent Bernoulli(0.4) symmetric label noise, seed 42; replacement uniformly among other 99 classes."
+    )
+    tail_note = (
+        f"- This runs the original BCL algorithm unchanged on regime `{args.regime}` as the paired non-robust baseline."
+        if args.regime
+        else "- This is synthetic instance-independent symmetric noise; it does not establish robustness to real-world annotation noise."
+    )
     report_lines = [
-        "# BCL_sym04_seed42 — symmetric-noise baseline report", "",
+        f"# {run_name} — noisy-label baseline report", "",
         "## Protocol",
         "- CIFAR-100-LT IF=100; fixed 10,847-image TRAIN subset; no resampling.",
-        "- Independent Bernoulli(0.4) symmetric label noise, seed 42; replacement uniformly among other 99 classes.",
+        noise_desc,
         "- Original BCL ResNet-32, three views, FP32, batch 256, 200 epochs.",
         "- Objective: 2.0 × LC + 0.6 × BCL; LC prior and BCL class-count argument use observed noisy-label counts.",
         "- SGD 0.15, momentum 0.9, weight decay 0.0005, 5-epoch warmup, decay ×0.1 after epochs 160 and 180.",
         "- One balanced TEST evaluation after all 200 epochs and the five TRAIN diagnostics.", "",
         "## Noise realization",
-        f"- Requested rate: {manifest['noise_rate_requested']:.4f}",
+        f"- Requested rate: {req_rate_str}",
         f"- Realized rate: {manifest['noise_rate_realized']:.6f}",
         f"- Flipped: {manifest['num_flipped']} / {manifest['num_train_samples']}",
         f"- Index SHA256: {manifest['indices_sha256']}",
@@ -700,7 +812,11 @@ def train(args):
         "| Metric | Noisy BCL | Clean BCL reference | Delta (pp) |",
         "|---|---:|---:|---:|",
     ]
-    refs = {"Overall": 50.76, "Many": 66.54, "Medium": 49.40, "Few": 31.20}
+    refs = (
+        {"Overall": 50.76, "Many": 66.54, "Medium": 51.74, "Few": 31.20}
+        if args.regime
+        else {"Overall": 50.76, "Many": 66.54, "Medium": 49.40, "Few": 31.20}
+    )
     keys = {"Overall": "overall", "Many": "Many", "Medium": "Medium", "Few": "Few"}
     for label, key in keys.items():
         value = test_metrics[key]
@@ -722,7 +838,7 @@ def train(args):
         f"- TEST pickle opens before the final gate: {training_summary['official_test_opens_before_gate']}. "
         f"Final TEST evaluator passes: 1. TEST pickle opens during evaluation (integrity check and load): {test_audit.opens}.",
         "- Training completed with the fixed FP32 batch and no OOM, retries, or protocol deviations.",
-        "- This is synthetic instance-independent symmetric noise; it does not establish robustness to real-world annotation noise.",
+        tail_note,
     ]
     with report_path.open("x", encoding="utf-8") as stream:
         stream.write("\n".join(report_lines) + "\n")
@@ -732,10 +848,12 @@ def train(args):
 
 
 def parse_args(argv=None):
-    p = argparse.ArgumentParser(description="Train original BCL on CIFAR-100-LT with symmetric label noise")
+    p = argparse.ArgumentParser(description="Train original BCL on CIFAR-100-LT with label noise")
     p.add_argument("--data-root", type=Path, required=True)
     p.add_argument("--indices-file", type=Path, required=True)
     p.add_argument("--noise-dir", type=Path, default=Path("BCL_LTN/data"))
+    p.add_argument("--regime", choices=REGIMES, default=None)
+    p.add_argument("--stage1-data-root", type=Path, default=DEFAULT_STAGE1_DATA_ROOT)
     p.add_argument("--output-root", type=Path, default=Path("BCL_LTN/outputs/BCL_sym04_seed42"))
     p.add_argument("--num-workers", type=int, default=0)
     p.add_argument("--device", type=str, default=None)
@@ -744,7 +862,12 @@ def parse_args(argv=None):
                    help="Smoke JSON output in smoke-only mode, or a passed Smoke JSON input for formal training.")
     args = p.parse_args(argv)
     if args.smoke_report is None:
-        args.smoke_report = args.output_root / "smoke_report.json" if args.smoke_only else DEFAULT_FORMAL_SMOKE_REPORT
+        if args.smoke_only:
+            args.smoke_report = args.output_root / "smoke_report.json"
+        elif args.regime is None:
+            args.smoke_report = DEFAULT_FORMAL_SMOKE_REPORT
+        else:
+            args.smoke_report = args.output_root.with_name(f"{args.output_root.name}_smoke") / "smoke_report.json"
     return args
 
 

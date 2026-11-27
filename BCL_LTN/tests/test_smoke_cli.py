@@ -43,3 +43,30 @@ def test_formal_smoke_gate_rejects_mismatch(tmp_path, field):
     path.write_text(json.dumps(smoke), encoding="utf-8")
     with pytest.raises(RuntimeError, match="passed, TEST-free" if field == "passed" else field):
         verify_smoke_receipt(path, environment)
+
+
+def test_regime_cli_defaults_and_smoke_report():
+    args_formal = parse_args([*CLI_ARGS, "--regime", "cifar100n_real"])
+    assert args_formal.regime == "cifar100n_real"
+    assert args_formal.smoke_report == Path("fresh_smoke/smoke_report.json")
+    args_smoke = parse_args([*CLI_ARGS, "--regime", "cifar100n_real", "--smoke-only"])
+    assert args_smoke.smoke_report == Path("fresh/smoke_report.json")
+
+
+def test_load_verified_regime_noise_real_data_contract():
+    from BCL_LTN.train_noisy_bcl import load_verified_regime_noise
+
+    data_root = Path("H2T/data/cifar100")
+    indices_file = Path("BCL_AUDIT/outputs/data_audit_recheck_20261122_01/cifar100lt_if100_train_indices_seed0.npy")
+    regime_dir = Path("BCL_LTN/outputs/ntc_bcl_v2_stage1_data_20261126/cifar100n_real")
+    if not (data_root / "cifar-100-python" / "train").is_file() or not regime_dir.is_dir():
+        pytest.skip("Local CIFAR-100 / Stage-1 regime artifacts not present")
+    base, manifest, noisy, clean, mask = load_verified_regime_noise(
+        data_root, indices_file, regime_dir, "cifar100n_real"
+    )
+    assert len(base) == 10_847
+    assert manifest["regime"] == "cifar100n_real"
+    assert manifest["noise_rate_requested"] is None
+    assert abs(manifest["noise_rate_realized"] - (3902 / 10_847)) < 1e-12
+    assert noisy.shape == clean.shape == mask.shape == (10_847,)
+    assert int(mask.sum()) == 3902
