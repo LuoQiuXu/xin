@@ -205,9 +205,10 @@ def calibrate_clean_prior(
     # The gradient is measured in unconstrained logits, not directly in pi.
     # A 1e-5 norm is a conservative practical stationarity check for K=100;
     # an already-optimal initialization (zero LBFGS iterations) is also converged.
+    stationarity_tolerance = max(100.0 * float(tolerance), 1e-5)
     converged = bool(
         math.isfinite(grad_norm)
-        and grad_norm <= max(100.0 * float(tolerance), 1e-5)
+        and grad_norm <= stationarity_tolerance
     )
 
     simplex_error = abs(float(calibrated.sum().item()) - 1.0)
@@ -247,7 +248,9 @@ def calibrate_clean_prior(
         "max_iter": int(max_iter),
         "iterations": iterations,
         "closure_calls": closure_calls,
-        "tolerance": float(tolerance),
+        "lbfgs_tolerance_grad": float(tolerance),
+        "gradient_stationarity_tolerance": stationarity_tolerance,
+        "gradient_norm_space": "unconstrained_softmax_logits",
         "gradient_norm": grad_norm,
         "objective_initial": initial_objective,
         "objective_final": final_objective,
