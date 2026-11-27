@@ -21,7 +21,7 @@ import torch
 def observed_fit_statistics(
     balanced_probabilities: torch.Tensor,
     observed_labels: torch.Tensor,
-) -> Dict[str, float]:
+) -> Dict[str, object]:
     """Macro observed-label fit rates, with confidence-ranked within-class subsets.
 
     For each observed class j, rank its examples by max_c p_bal(c|x), then
