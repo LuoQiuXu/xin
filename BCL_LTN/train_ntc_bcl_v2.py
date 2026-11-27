@@ -862,12 +862,17 @@ def offline_truth_and_estimator_audit(
                 "epoch": snap["epoch"],
                 "realized_noise_rate": float(t_manifest["realized_noise_rate"]),
                 "raw_estimated_noise_rate": float(1.0 - np.dot(raw_pi, np.diag(raw_t))),
+                "calibrated_estimated_noise_rate": float(
+                    1.0 - np.dot(calibrated_pi, np.diag(raw_t))
+                ),
                 "blended_estimated_noise_rate": float(1.0 - np.dot(pi_hat, np.diag(t_hat))),
                 "blended_T_mae": float(np.mean(np.abs(t_hat - true_t))),
                 "blended_T_diag_mae": float(np.mean(np.abs(np.diag(t_hat) - np.diag(true_t)))),
                 "blended_prior_mae": float(np.mean(np.abs(pi_hat - pi_true))),
                 "blended_prior_kl": pi_kl,
                 "raw_prior_kl": raw_kl,
+                "raw_prior_mae": float(np.mean(np.abs(raw_pi - pi_true))),
+                "raw_prior_min": float(raw_pi.min()),
                 "calibrated_prior_mae": float(np.mean(np.abs(calibrated_pi - pi_true))),
                 "calibrated_prior_kl": calibrated_kl,
                 "calibrated_prior_min": float(calibrated_pi.min()),
@@ -1015,7 +1020,9 @@ def write_v2_report(
             "",
             f"- Realized dataset noise: `{diag_summary['realized_noise_rate']:.4f}`",
             f"- Final blended estimated noise (Epoch {last_em['epoch']}): `{last_em['blended_estimated_noise_rate']:.4f}` (raw `{last_em['raw_estimated_noise_rate']:.4f}`)",
-            f"- Final blended `T` MAE: `{last_em['blended_T_mae']:.6f}` | `T` diag MAE: `{last_em['blended_T_diag_mae']:.4f}` | Prior KL: `{last_em['blended_prior_kl']:.5f}` | Calibrated prior KL: `{last_em['calibrated_prior_kl']:.5f}` | Min prior: `{last_em['blended_prior_min']:.2e}`",
+            f"- Final blended `T` MAE: `{last_em['blended_T_mae']:.6f}` | `T` diag MAE: `{last_em['blended_T_diag_mae']:.4f}`",
+            f"- Prior MAE (raw / calibrated / blended): `{last_em['raw_prior_mae']:.5f}` / `{last_em['calibrated_prior_mae']:.5f}` / `{last_em['blended_prior_mae']:.5f}`",
+            f"- Prior KL (raw / calibrated / blended): `{last_em['raw_prior_kl']:.5f}` / `{last_em['calibrated_prior_kl']:.5f}` / `{last_em['blended_prior_kl']:.5f}` | Min blended prior: `{last_em['blended_prior_min']:.2e}`",
             "",
         ])
 
