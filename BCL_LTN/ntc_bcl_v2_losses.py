@@ -63,6 +63,7 @@ def estimate_anchored_transition_and_prior(
     max_iter: int = 200,
     tolerance: float = 1e-6,
     initial_prior: Optional[torch.Tensor] = None,
+    reference_prior: Optional[torch.Tensor] = None,
     eps: float = 1e-8,
 ) -> AnchoredTransitionEstimate:
     """Estimate T and clean prior pi from balanced EMA teacher probabilities.
@@ -79,6 +80,9 @@ def estimate_anchored_transition_and_prior(
             toward the high-support global transition template.
         prior_pseudocount: Per-class Dirichlet Laplace pseudocount added during
             the pi M-step so weak tail priors cannot collapse multiplicatively.
+        reference_prior: Previous blended clean prior used only to form the
+            PiW visual-side posterior q_i ∝ p_bal(c|x_i) * pi_ref,c. If omitted,
+            a uniform prior is used for backward-compatible unweighted anchoring.
     """
     probs, observed = _validate_inputs(
         teacher_probabilities.detach().to(torch.float64), observed_labels
@@ -107,6 +111,27 @@ def estimate_anchored_transition_and_prior(
     n, k = probs.shape
     dtype, device = probs.dtype, probs.device
 
+    # PiW-EstT: calibrate balanced visual evidence by the previous blended prior.
+    # The first online update receives observed_counts / N from the trainer;
+    # subsequent updates receive the previous blended clean prior.
+    if reference_prior is None:
+        ref_pi = torch.full((k,), 1.0 / k, dtype=dtype, device=device)
+    else:
+        ref_pi = torch.as_tensor(reference_prior, dtype=dtype, device=device).detach().clone()
+        if (
+            ref_pi.shape != (k,)
+            or not bool(torch.isfinite(ref_pi).all())
+            or bool((ref_pi <= 0).any())
+            or bool(ref_pi.sum() <= 0)
+        ):
+            raise ValueError("reference_prior must be a finite positive [K] vector")
+        ref_pi = ref_pi / ref_pi.sum()
+    q_joint = probs * ref_pi.unsqueeze(0)
+    q_mass = q_joint.sum(dim=1, keepdim=True)
+    if bool((q_mass <= eps).any()):
+        raise RuntimeError("PiW reference-prior posterior has zero row mass")
+    q_anchor = q_joint / q_mass
+
     # Step 1: Visual-confidence anchored M-step for row-stochastic transition T.
     max_prob = probs.max(dim=1).values
     visual_reliability = ((max_prob - 1.0 / k) / (1.0 - 1.0 / k)).clamp_min(0.0)
@@ -117,7 +142,9 @@ def estimate_anchored_transition_and_prior(
     else:
         sample_weights = torch.ones(n, dtype=dtype, device=device)
 
-    anchor_weights = probs * sample_weights.unsqueeze(1)
+    # Raw soft support S_c = sum_i w_i q_ic. Do not replace this with Kish ESS:
+    # diffuse low-probability leakage would spuriously inflate tail support.
+    anchor_weights = q_anchor * sample_weights.unsqueeze(1)
     observed_one_hot = F.one_hot(observed, k).to(dtype=dtype)
     anchor_counts = anchor_weights.T @ observed_one_hot
     anchor_support = anchor_weights.sum(0)
