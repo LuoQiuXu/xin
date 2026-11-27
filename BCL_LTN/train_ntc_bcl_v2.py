@@ -1019,7 +1019,7 @@ def write_v2_report(
             "## Online Anchored EM Evolution (Offline Truth Audit)",
             "",
             f"- Realized dataset noise: `{diag_summary['realized_noise_rate']:.4f}`",
-            f"- Final blended estimated noise (Epoch {last_em['epoch']}): `{last_em['blended_estimated_noise_rate']:.4f}` (raw `{last_em['raw_estimated_noise_rate']:.4f}`)",
+            f"- Estimated noise raw / calibrated / blended (Epoch {last_em['epoch']}): `{last_em['raw_estimated_noise_rate']:.4f}` / `{last_em['calibrated_estimated_noise_rate']:.4f}` / `{last_em['blended_estimated_noise_rate']:.4f}`",
             f"- Final blended `T` MAE: `{last_em['blended_T_mae']:.6f}` | `T` diag MAE: `{last_em['blended_T_diag_mae']:.4f}`",
             f"- Prior MAE (raw / calibrated / blended): `{last_em['raw_prior_mae']:.5f}` / `{last_em['calibrated_prior_mae']:.5f}` / `{last_em['blended_prior_mae']:.5f}`",
             f"- Prior KL (raw / calibrated / blended): `{last_em['raw_prior_kl']:.5f}` / `{last_em['calibrated_prior_kl']:.5f}` / `{last_em['blended_prior_kl']:.5f}` | Min blended prior: `{last_em['blended_prior_min']:.2e}`",
