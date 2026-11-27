@@ -1029,7 +1029,7 @@ def write_v2_report(
         f"- Prototype off-diag cosine (raw input) mean / max: `{proto['raw_mean_offdiag_cosine']:.4f}` / `{proto['raw_max_offdiag_cosine']:.4f}`",
         f"- Soft-BCL q entropy mean: `{last['q_entropy_mean']:.4f}` | min denominator weight: `{last['denominator_weight_min']:.4f}` | anchor positive mass mean: `{last['anchor_positive_mass_mean']:.4f}`",
     ])
-    (output_dir / "NTC_BCL_V2_REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (output_dir / "NTC_BCL_V21_G3_REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def collect_source_provenance() -> Dict[str, object]:
