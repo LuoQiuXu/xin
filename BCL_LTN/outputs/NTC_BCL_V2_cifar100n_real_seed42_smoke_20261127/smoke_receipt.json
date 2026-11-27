@@ -1,0 +1,129 @@
+{
+  "passed": true,
+  "regime": "cifar100n_real",
+  "provenance": {
+    "git_branch": "research/ntc-bcl-v2-unknown-transition-audit-20261126",
+    "git_head": "bc222c341463b6aaf98fe039adb98527c76cbcb8",
+    "v2_source_dirty": false,
+    "v2_source_status": [],
+    "v2_source_sha256": {
+      "BCL_LTN/ntc_bcl_v2_losses.py": "f2666e301085d36b44d3a9f325fe094474e022570eca8c95959704d570a50212",
+      "BCL_LTN/train_ntc_bcl_v2.py": "671145f4c570de15d523467ee8df76d1758b73ae04193d1522fa1d4022e8cd6f",
+      "BCL_LTN/noise_transition_estimator.py": "a3a6a878109a883ceaa943e35391b0c0b5df272bf077af0e5b2c3b808d92de71"
+    },
+    "regime": "cifar100n_real",
+    "regime_manifest_observed_sha256": "a19cd32002d581a832ca314e2b7d0561a9e7e71cc8c6cad68141c81e45cb7d5c",
+    "init": {
+      "source": "D:\\xiangmuxunlian\\xin\\BCL_LTN\\outputs\\BCL_sym04_seed42\\init_seed42.pth",
+      "file_sha256": "6a86b7fe21062c079970856f08489c844543942ae260291c87e518572a3e2421",
+      "model_state_sha256": "11c52fe9e2b082b0c36ef025f19ae2d963dbc19c456e0d5aa17aac14fffdf440"
+    },
+    "hyperparams": {
+      "epochs": 200,
+      "warmup_epochs": 20,
+      "semantic_ramp_epochs": 20,
+      "estimate_interval": 5,
+      "ema_decay": 0.99,
+      "confidence_power": 2.0,
+      "shrinkage_mass": 10.0,
+      "prior_pseudocount": 1.0,
+      "transition_blend": 0.35,
+      "support_floor_ratio": 0.5,
+      "denominator_epsilon": 1e-06,
+      "q_temperature": 1.0,
+      "prototype_input_mode": "direction"
+    }
+  },
+  "official_test_opens": 0,
+  "truth_opens": 0,
+  "phases": {
+    "warmup_instance": {
+      "passed": true,
+      "epoch_index": 0,
+      "epoch_seed": 4200000,
+      "lr": 0.03,
+      "semantic_ramp": 0.0,
+      "identity": {
+        "augmented_views_sha256": "68ca753a0506e00aa62b6d86ea44d906cd32c847ad3314667e35355c9c4f9133",
+        "source_indices_sha256": "8fe5d09256557fc70e84f23286ee00fc914a5d0b622fd8daa022571025f9416f",
+        "observed_labels_sha256": "f4627ba7f7d9a8693f1afbc03b2f4a5c3ffb58879360a86726073d46dad5b343"
+      },
+      "actual_calls": {
+        "backbone": 1,
+        "sample_mlp": 1,
+        "prototype_mlp": 0,
+        "optimizer": 1
+      },
+      "prototype_state_unchanged": true,
+      "seconds": 1.0330908999894746,
+      "em_check": null,
+      "loss_lc": 7.248906135559082,
+      "loss_bcl": 6.790839195251465,
+      "loss_total": 18.572315216064453,
+      "observed_correct": 4,
+      "ema_alpha": 0.1,
+      "anchor_positive_mass_mean": 1.0,
+      "anchor_positive_mass_min": 1.0,
+      "denominator_weight_min": 1.0,
+      "denominator_weight_median": 1.0,
+      "q_entropy_mean": 4.605170185988092,
+      "q_reliability_mean": 0.0,
+      "active_gradient_tensors": 101,
+      "expected_grad_none": [
+        "prototype_mlp.net.0.bias",
+        "prototype_mlp.net.0.weight",
+        "prototype_mlp.net.1.bias",
+        "prototype_mlp.net.1.weight",
+        "prototype_mlp.net.3.bias",
+        "prototype_mlp.net.3.weight"
+      ],
+      "changed_parameter_tensors": 101,
+      "max_abs_parameter_change": 0.09303325414657593,
+      "raw_three_view_logits_sha256": "f8074fecb6e217f62f8c9f1718180d416633726d70216c4e1cfb1a113a5ddbaa"
+    },
+    "semantic_active": {
+      "passed": true,
+      "epoch_index": 20,
+      "epoch_seed": 4200020,
+      "lr": 0.15,
+      "semantic_ramp": 0.5,
+      "identity": {
+        "augmented_views_sha256": "4fe15cbc1ea40149b852bae4709677c471c95f79a70012aa74d97154e3feee0a",
+        "source_indices_sha256": "ba2b551992e8e7844f5b88d52f8ad0ef620f721d0d0d33fa7a7cc96a7a6ee648",
+        "observed_labels_sha256": "f9e1c370cfe801fd04f9b091a735499b1ba554544993a9df613a8a6edd648c2f"
+      },
+      "actual_calls": {
+        "backbone": 1,
+        "sample_mlp": 1,
+        "prototype_mlp": 1,
+        "optimizer": 1
+      },
+      "prototype_state_unchanged": false,
+      "seconds": 0.4152620999957435,
+      "em_check": {
+        "estimated_noise_rate": 0.9589748316272833,
+        "em_iterations": 2,
+        "em_converged": true,
+        "blended_prior_min": 0.0008709138726852159,
+        "classifier_norm_min": 1.142586350440979,
+        "dir_mean_offdiag_cosine": 0.7036857008934021
+      },
+      "loss_lc": 7.333291530609131,
+      "loss_bcl": 1.560570240020752,
+      "loss_total": 15.602925300598145,
+      "observed_correct": 3,
+      "ema_alpha": 0.1,
+      "anchor_positive_mass_mean": 256.49932861328125,
+      "anchor_positive_mass_min": 256.45361328125,
+      "denominator_weight_min": 3.0599546432495117,
+      "denominator_weight_median": 512.4996337890625,
+      "q_entropy_mean": 7.197249487944646e-06,
+      "q_reliability_mean": 0.9999992847442627,
+      "active_gradient_tensors": 107,
+      "expected_grad_none": [],
+      "changed_parameter_tensors": 107,
+      "max_abs_parameter_change": 0.4723184108734131,
+      "raw_three_view_logits_sha256": "585ad97538050614d7372ff0398830936e8b14e9c609922ba57f54067bc6fa50"
+    }
+  }
+}
