@@ -1,0 +1,49 @@
+{
+  "predictions": [
+    {
+      "epoch": 40,
+      "path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\checkpoints\\epoch_040.pth",
+      "sha256": "73f8398162747d3e83317492f071b87f247e56321085cc5a0eb09dd3616c8346",
+      "model_state_sha256": "2677681c89dcb894e5327238f2ccdd16cd7b46c50b7c8feb6b053695d1175ebd",
+      "ema_state_sha256": "9c4befb6aa6021e436474505e0c16f9e0c6e84082422a051672b84cd6e523b0e",
+      "prediction_path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\train_predictions\\epoch_040.npz",
+      "prediction_sha256": "ff22966e68fa953091698640818722186109d034aa304f8d6369d7282f724768"
+    },
+    {
+      "epoch": 100,
+      "path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\checkpoints\\epoch_100.pth",
+      "sha256": "726e74d2727cce3fac29f7af3dd3109bca98887b69ed03c17059d498931df318",
+      "model_state_sha256": "fc9c909fb7e7a13b7859f9d3fb46f643e22fc8e09be048da0d4f150563b35cfb",
+      "ema_state_sha256": "d62513adf90ece863f1c849000881605f42e9a6173ca10d0cf7642a5d238331c",
+      "prediction_path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\train_predictions\\epoch_100.npz",
+      "prediction_sha256": "0bbab322ec0f78ac35eb2bc7d2352d3c12e72808a4fb4a081478eb9d5365971a"
+    },
+    {
+      "epoch": 160,
+      "path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\checkpoints\\epoch_160.pth",
+      "sha256": "f0e62d6ffaf163c21f8c2224576687f7c279a0c35cad681f099f415e4784cab7",
+      "model_state_sha256": "502719cfa59426669deea46ed059cf0a9a39ebc8e662a7ec2f7937a1ebcb1265",
+      "ema_state_sha256": "639ccaac3e7af53c7850ac02ad4c0a739b5a2da083c211894044125af856bd00",
+      "prediction_path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\train_predictions\\epoch_160.npz",
+      "prediction_sha256": "c349a5b58529fb9df8ce10afb13365205b51892eb1c9de51bf3982ad2b769917"
+    },
+    {
+      "epoch": 180,
+      "path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\checkpoints\\epoch_180.pth",
+      "sha256": "7a776f87e43dfee1034fb4a7ca809f6f2c325690ace799817d16632f6b504587",
+      "model_state_sha256": "088fd5c245f6348abecae9ed4d266f96b491dfecac4115f3af5529a6ee57dfc4",
+      "ema_state_sha256": "667bf9485cd0ec0cb47896a70cdd5cbfa042cf04b71edc95a2b8dc68b579e534",
+      "prediction_path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\train_predictions\\epoch_180.npz",
+      "prediction_sha256": "021b6e065985a500743d1486e94258b635d49163f3b924aa278edeb5834a4eed"
+    },
+    {
+      "epoch": 200,
+      "path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\checkpoints\\epoch_200.pth",
+      "sha256": "5f2f0bce85058cac8b575743f71ed9f62e31efccd1540b2ca32f2aa081643e19",
+      "model_state_sha256": "4bdd61e0a0652e74d16dca10ba08ef593b4afcd7f569c8f4cf8a5bff6ac3c5f4",
+      "ema_state_sha256": "436945bf9dcc375ede303d8fb95a9a2dc627091845dd7ba64b7f6b144d7b5405",
+      "prediction_path": "BCL_LTN\\outputs\\NTC_BCL_V21_G3_cifar100n_real_seed42_20261127\\train_predictions\\epoch_200.npz",
+      "prediction_sha256": "839934fcaa555c5b1c99cd7b5c21068c876890407b7b1a81b23bc103c912ed57"
+    }
+  ]
+}
